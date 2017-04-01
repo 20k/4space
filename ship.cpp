@@ -101,6 +101,27 @@ float component_attribute::consume_from(component_attribute& other, float max_pr
     return amount_drained;
 }
 
+float component_attribute::consume_from_amount(component_attribute& other, float amount, float step_s)
+{
+    if(drained_per_s <= FLOAT_BOUND)
+        return 0.f;
+
+    float max_drain_amount = amount;
+
+    float needed_drain = drained_per_s * step_s - currently_drained;
+
+    needed_drain = std::max(needed_drain, 0.f);
+
+    float to_drain = std::min(max_drain_amount, needed_drain);
+
+    float amount_drained = other.consume_max(to_drain);
+
+    currently_drained += amount_drained;
+    cur_efficiency = currently_drained / (drained_per_s * step_s);
+
+    return amount_drained;
+}
+
 /*float component_attribute::drain(float amount)
 {
     if(drained_per_s <= 0.001f)
@@ -435,6 +456,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
     std::map<ship_component_element, float> stored_and_produced = get_stored_and_produced_resources(step_s);
     std::map<ship_component_element, float> needed = get_needed_resources(step_s);
     std::map<ship_component_element, float> produced = get_produced_resources(step_s);
+    std::map<ship_component_element, float> stored = get_stored_resources();
 
     std::map<ship_component_element, float> to_apply_prop;
 
@@ -443,13 +465,20 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
         if(produced[i.first] <= FLOAT_BOUND || i.second <= FLOAT_BOUND)
             continue;
 
+        float available_to_take_now = produced[i.first];
+        float total_resource = stored_and_produced[i.first];
+
+        float valid_to_take_frac = available_to_take_now / total_resource;
+
         ///so this is the overall proportion of whats to be drained vs what needs to be drained
-        float frac = produced[i.first] / i.second;
+        //float frac = produced[i.first] / i.second;
+
+        float frac = i.second / produced[i.first];
 
         to_apply_prop[i.first] = frac;
     }
 
-    printf("%f stap\n", produced[ship_component_elements::ENERGY]);
+    //printf("%f stap\n", produced[ship_component_elements::ENERGY]);
     //printf("%f %f stap\n", stored_and_produced[ship_component_elements::OXYGEN], to_apply_prop[ship_component_elements::OXYGEN]);
 
     ///change to take first from production, then from storage instead of weird proportional
@@ -479,15 +508,80 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     component_attribute& other = c2.second;
 
+                    float take_amount = frac * other.produced_per_s * other.cur_efficiency * step_s;
+
                     ///ie the amount we actually took from other
-                    float drained = me.consume_from(other, frac, step_s);
+                    float drained = me.consume_from_amount(other, take_amount, step_s);
 
                     produced[c.first] -= drained;
+                    needed[c.first] -= drained;
                 }
 
             }
         }
     }
+
+    to_apply_prop.clear();
+
+    for(auto& i : needed)
+    {
+        if(stored[i.first] <= FLOAT_BOUND)
+            continue;
+
+        if(i.second <= FLOAT_BOUND)
+            continue;
+
+        ///no produced left if we're dipping into stored
+        //float frac = stored[i.first] / i.second;
+
+        ///take frac from all
+        float frac = i.second / stored[i.first];
+
+        to_apply_prop[i.first] = frac;
+    }
+
+    for(auto& i : entity_list)
+    {
+        for(auto& c : i.components)
+        {
+            float my_proportion_of_total = to_apply_prop[c.first];
+
+            component_attribute& me = c.second;
+
+            float frac = my_proportion_of_total;
+
+            ///dis broken
+            //if(c.first == ship_component_element::ENERGY)
+            //    printf("Dfrac %f\n", frac);
+
+            if(frac > 1)
+                frac = 1;
+
+            for(auto& k : entity_list)
+            {
+                for(auto& c2 : k.components)
+                {
+                    if(c2.first != c.first)
+                        continue;
+
+                    component_attribute& other = c2.second;
+
+                    float take_amount = frac * other.cur_amount * step_s;
+
+                    ///ie the amount we actually took from other
+                    float drained = me.consume_from_amount(other, take_amount, step_s);
+
+                    produced[c.first] -= drained;
+                    needed[c.first] -= drained;
+                }
+            }
+        }
+    }
+
+    /*for(auto& i : needed)
+    {
+        if()
+    }*/
 
     for(auto& i : produced)
     {
@@ -522,10 +616,10 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
             tmap[i.first] = applying_to_this;
 
-            if(i.first == ship_component_elements::ENERGY)
+            /*if(i.first == ship_component_elements::ENERGY)
             {
                 printf("test %f\n", applying_to_this);
-            }
+            }*/
 
             auto r = c.apply_diff(tmap);
 
