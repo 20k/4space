@@ -82,6 +82,8 @@ struct component
 
     ///how much *more* we can take
     std::map<ship_component_element, float> get_available_capacities();
+
+    void add(ship_component_element element, const component_attribute& attr);
 };
 
 struct ship
@@ -92,6 +94,8 @@ struct ship
     std::map<ship_component_element, float> tick_all_components(float step_s);
 
     std::map<ship_component_element, float> get_available_capacities();
+
+    void add(const component& c);
 
     ///?
     //void fire();

@@ -45,7 +45,6 @@ bool component::has_element(const ship_component_element& type)
     return components.find(type) != components.end();
 }
 
-
 std::map<ship_component_element, float> merge_diffs(const std::map<ship_component_element, float>& one, const std::map<ship_component_element, float>& two)
 {
     std::map<ship_component_element, float> ret = one;
@@ -148,6 +147,18 @@ std::map<ship_component_element, float> component::get_available_capacities()
     return ret;
 }
 
+void component::add(ship_component_element element, const component_attribute& attr)
+{
+    if(has_element(element))
+    {
+        printf("DUPLICATE ELEMENT ADDED RUH ROH");
+        throw;
+    }
+
+    components[element] = attr;
+}
+
+
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
     std::map<ship_component_element, float> total_to_apply;
@@ -158,6 +169,8 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
         total_to_apply = merge_diffs(total_to_apply, diff);
     }
+
+    //printf("%f POWER\n", total_to_apply[ship_component_element::ENERGY]);
 
     std::map<ship_component_element, float> available_capacities = get_available_capacities();
 
@@ -211,4 +224,9 @@ std::map<ship_component_element, float> ship::get_available_capacities()
     }
 
     return ret;
+}
+
+void ship::add(const component& c)
+{
+    entity_list.push_back(c);
 }
