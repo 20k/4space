@@ -32,6 +32,8 @@ namespace ship_component_elements
         FUEL,
         CARGO,
         SHIELD_POWER, ///ie a system can produce shield power, or scanning power
+        ARMOUR, ///second layer
+        HP, ///last layer, raw health for components
         ENGINE_POWER,
         WARP_POWER,
         SCANNING_POWER,
@@ -54,6 +56,8 @@ namespace ship_component_elements
         "FUEL",
         "CARGO",
         "SHIELD_POWER",
+        "ARMOUR",
+        "HP",
         "ENGINE_POWER",
         "WARP_POWER",
         "SCANNING_POWER",
@@ -92,6 +96,8 @@ struct component_attribute
     float add_amount(float amount);
     bool can_use();
     float get_available_capacity();
+
+    float get_produced_amount(float step_s);
 
     //float get_net();
 
@@ -157,6 +163,8 @@ struct component
     void propagate_total_efficiency();
 };
 
+struct projectile;
+
 struct ship : positional
 {
     int team = 0;
@@ -185,6 +193,9 @@ struct ship : positional
     std::vector<component> fire();
 
     void add(const component& c);
+
+
+    void hit(projectile* p);
 
 
     ///?

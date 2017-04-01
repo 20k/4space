@@ -35,6 +35,11 @@ float component_attribute::get_available_capacity()
     return max_amount - cur_amount;
 }
 
+float component_attribute::get_produced_amount(float step_s)
+{
+    return produced_per_s * cur_efficiency * step_s;
+}
+
 /*float component_attribute::get_net()
 {
     return produced_per_s - drained_per_s;
@@ -508,7 +513,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     component_attribute& other = c2.second;
 
-                    float take_amount = frac * other.produced_per_s * other.cur_efficiency * step_s;
+                    float take_amount = frac * other.get_produced_amount(step_s);
 
                     ///ie the amount we actually took from other
                     float drained = me.consume_from_amount(other, take_amount, step_s);
@@ -566,7 +571,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     component_attribute& other = c2.second;
 
-                    float take_amount = frac * other.cur_amount * step_s;
+                    float take_amount = frac * other.cur_amount;
 
                     ///ie the amount we actually took from other
                     float drained = me.consume_from_amount(other, take_amount, step_s);
@@ -890,4 +895,9 @@ void ship::add_negative_resources(std::map<ship_component_element, float> res)
 void ship::add(const component& c)
 {
     entity_list.push_back(c);
+}
+
+void ship::hit(projectile* p)
+{
+
 }

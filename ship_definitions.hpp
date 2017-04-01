@@ -1,6 +1,8 @@
 #ifndef SHIP_DEFINITIONS_HPP_INCLUDED
 #define SHIP_DEFINITIONS_HPP_INCLUDED
 
+#define default_room_hp 1.f
+
 component make_default_crew()
 {
     component_attribute command;
@@ -13,10 +15,20 @@ component make_default_crew()
     component_attribute repair;
     repair.produced_per_s = 0.2f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+    hp.produced_per_s = 0.1f;
+
+    component_attribute armour;
+    armour.produced_per_s = 0.05f;
+
     component crew;
     crew.add(ship_component_element::COMMAND, command);
     crew.add(ship_component_element::OXYGEN, oxygen);
     crew.add(ship_component_element::REPAIR, repair);
+    crew.add(ship_component_element::HP, hp);
+    crew.add(ship_component_element::ARMOUR, armour);
 
     crew.name = "Crew";
 
@@ -32,9 +44,14 @@ component make_default_life_support()
     power.drained_per_s = 5.f;
     power.max_amount = 10.f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
     component life_support;
     life_support.add(ship_component_element::OXYGEN, oxygen);
     life_support.add(ship_component_element::ENERGY, power);
+    life_support.add(ship_component_element::HP, hp);
 
     life_support.name = "Life Support";
 
@@ -46,8 +63,13 @@ component make_default_ammo_store()
     component_attribute ammo;
     ammo.max_amount = 1000.f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
     component ammo_store;
     ammo_store.add(ship_component_element::AMMO, ammo);
+    ammo_store.add(ship_component_element::HP, hp);
 
     ammo_store.name = "Ammo Store";
 
@@ -63,9 +85,14 @@ component make_default_shields()
     component_attribute power;
     power.drained_per_s = 20.f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
     component shields;
     shields.add(ship_component_element::SHIELD_POWER, shield);
     shields.add(ship_component_element::ENERGY, power);
+    shields.add(ship_component_element::HP, hp);
 
     shields.name = "Shield Generator";
 
@@ -78,8 +105,13 @@ component make_default_power_core()
     power.produced_per_s = 80.f;
     power.max_amount = 80.f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
     component core;
     core.add(ship_component_element::ENERGY, power);
+    core.add(ship_component_element::HP, hp);
 
     core.name = "Power Core";
 
@@ -101,11 +133,16 @@ component make_default_engines()
     component_attribute engine;
     engine.produced_per_s = 1.f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
     component thruster;
     thruster.add(ship_component_element::FUEL, fuel);
     thruster.add(ship_component_element::ENERGY, power);
     thruster.add(ship_component_element::COMMAND, command);
     thruster.add(ship_component_element::ENGINE_POWER, engine);
+    thruster.add(ship_component_element::HP, hp);
 
     thruster.name = "Thruster";
 
@@ -118,8 +155,13 @@ component make_default_heatsink()
     cooling.max_amount = 80;
     cooling.produced_per_s = 1.1f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
     component heatsink;
     heatsink.add(ship_component_element::COOLING_POTENTIAL, cooling);
+    heatsink.add(ship_component_element::HP, hp);
 
     heatsink.name = "Heatsink";
 
@@ -146,11 +188,16 @@ component make_default_railgun()
     component_attribute command;
     command.drained_per_s = 1.f;
 
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
     component gun;
     gun.add(ship_component_element::RAILGUN, railgun);
     gun.add(ship_component_element::COOLING_POTENTIAL, cooling);
     gun.add(ship_component_element::ENERGY, power);
     gun.add(ship_component_element::COMMAND, command);
+    gun.add(ship_component_element::HP, hp);
 
     gun.name = "Railgun";
 
