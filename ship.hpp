@@ -19,7 +19,7 @@ namespace ship_component_elements
         ENGINE_POWER,
         WARP_POWER,
         SCANNING_POWER,
-        DAMAGE, ///outputting damage. Have a receive damage as well component? Integrity AND hp?
+        PROJECTILE, ///outputting damage. Have a receive damage as well component? Integrity AND hp?
         COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
         STEALTH,
         REPAIR,
@@ -37,7 +37,7 @@ namespace ship_component_elements
         "ENGINE_POWER",
         "WARP_POWER",
         "SCANNING_POWER",
-        "DAMAGE",
+        "PROJECTILE",
         "COMMAND",
         "STEALTH",
         "REPAIR",

@@ -171,8 +171,10 @@ std::vector<std::string> get_components_display_string(ship& s)
             std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
             std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
 
-            std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
-            std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
+            //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
+            //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
+
+            std::string storage_str = "Storage: " + to_string_with_precision(cur_amount) + "/" + to_string_with_precision(max_amount, 3);
 
             std::string efficiency_str = "Curr Efficiency %: " + to_string_with_precision(attr.cur_efficiency, 3);
 
@@ -190,12 +192,15 @@ std::vector<std::string> get_components_display_string(ship& s)
             if(time_until_next_use > 0)
                 component_str += "\n" + left_str;
 
-            if(max_amount > 0)
-                component_str += "\n" + mamount_str;
+            /*if(max_amount > 0)
+                component_str += "\n" + mamount_str;*/
 
             ///not a typo
+            /*if(max_amount > 0)
+                component_str += "\n" + camount_str;*/
+
             if(max_amount > 0)
-                component_str += "\n" + camount_str;
+                component_str += "\n" + storage_str;
 
             component_str += "\n" + efficiency_str;
 
