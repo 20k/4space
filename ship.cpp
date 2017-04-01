@@ -1,6 +1,4 @@
 #include "ship.hpp"
-#include <math.h>
-#include <vec/vec.hpp>
 
 float component_attribute::add_amount(float amount)
 {

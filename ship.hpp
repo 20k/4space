@@ -3,6 +3,18 @@
 
 #include <map>
 #include <vector>
+#include <vec/vec.hpp>
+
+struct positional
+{
+    ///game map etc, temporary atm
+    vec2f world_pos;
+    float world_rot = 0;
+
+    ///battles
+    vec2f local_pos;
+    float local_rot = 0;
+};
 
 ///we need components to require other components to function
 namespace ship_component_elements
@@ -140,7 +152,7 @@ struct component
     void propagate_total_efficiency();
 };
 
-struct ship
+struct ship : positional
 {
     int team = 0;
 
