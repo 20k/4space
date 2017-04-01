@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+///we need components to require other components to function
 namespace ship_component_elements
 {
     enum types
@@ -22,6 +23,24 @@ namespace ship_component_elements
         COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
         STEALTH,
         REPAIR,
+    };
+
+    static std::vector<std::string> display_strings
+    {
+        "HEAT",
+        "ENERGY",
+        "OXYGEN",
+        "AMMO",
+        "FUEL",
+        "CARGO",
+        "SHIELD_POWER",
+        "ENGINE_POWER",
+        "WARP_POWER",
+        "SCANNING_POWER",
+        "DAMAGE",
+        "COMMAND",
+        "STEALTH",
+        "REPAIR",
     };
 }
 
@@ -44,19 +63,34 @@ struct component_attribute
     float max_amount = 0;
     float cur_amount = 0;
 
+    float cur_efficiency = 1.f;
+
     float add_amount(float amount);
     bool can_use();
     float get_available_capacity();
 
-    void update_time(float step_s);
+    float get_net();
+
+    void update_time(float step_s); ///resets drained
+    //float drain(float amount); ///returns leftover, sets efficiency
+
+    ///returns amount consumed
+    float consume_from(component_attribute& other, float max_proportion, float step_s);
+
+    ///temporary storage so that other components can nab from me
+    float available_for_consumption = 0;
+
+    float consume_max(float amount);
+
+private:
+    float currently_drained = 0.f;
 };
 
 std::map<ship_component_element, float> merge_diffs(const std::map<ship_component_element, float>& one, const std::map<ship_component_element, float>& two);
 
-
-
 ///ie what can things do
 ///this is a ship entity for the moment.. but could likely describe a character as well
+///float get_current_functionality
 struct component
 {
     /*component_attribute heat;
@@ -73,15 +107,21 @@ struct component
 
     ///ie calculate all offsets
     std::map<ship_component_element, float> get_timestep_diff(float step_s);
+    std::map<ship_component_element, float> get_timestep_production_diff(float step_s);
+    std::map<ship_component_element, float> get_timestep_consumption_diff(float step_s);
     std::map<ship_component_element, float> get_use_diff();
 
     ///returns a pair of new component, extra resources left over
-    std::pair<component, std::map<ship_component_element, float>> apply_diff(const std::map<ship_component_element, float>& diff);
+    //std::pair<component, std::map<ship_component_element, float>> apply_diff(const std::map<ship_component_element, float>& diff);
+
+    std::map<ship_component_element, float> apply_diff(const std::map<ship_component_element, float>& available);
 
     void update_time(float step_s);
 
     ///how much *more* we can take
     std::map<ship_component_element, float> get_available_capacities();
+    //std::map<ship_component_element, float> get_needed_resources(float time_s);
+    std::map<ship_component_element, float> get_stored_and_produced_resources(float time_s);
 
     void add(ship_component_element element, const component_attribute& attr);
 };
@@ -94,6 +134,13 @@ struct ship
     std::map<ship_component_element, float> tick_all_components(float step_s);
 
     std::map<ship_component_element, float> get_available_capacities();
+    /*std::map<ship_component_element, float> get_needed_resources();*/
+    std::map<ship_component_element, float> get_produced_resources(float time_s);
+
+    std::map<ship_component_element, float> get_stored_and_produced_resources(float time_s);
+    std::map<ship_component_element, float> get_needed_resources(float time_s);
+
+    void update_efficiency();
 
     void add(const component& c);
 

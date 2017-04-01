@@ -31,8 +31,34 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add option="-std=gnu++14" />
 		</Compiler>
+		<Linker>
+			<Add option="-lmingw32" />
+			<Add option="-limgui" />
+			<Add option="-lsfml-graphics" />
+			<Add option="-lsfml-audio" />
+			<Add option="-lsfml-network" />
+			<Add option="-lsfml-window" />
+			<Add option="-lsfml-system" />
+			<Add option="-lfreetype" />
+			<Add option="-ljpeg" />
+			<Add option="-lopengl32" />
+			<Add option="-lopencl" />
+			<Add option="-lglew64.dll" />
+			<Add option="-lws2_32" />
+			<Add option="-lwinmm" />
+			<Add option="-lgdi32" />
+			<Add option="-lflac" />
+			<Add option="-lopenal32" />
+			<Add option="-logg" />
+			<Add option="-lmyo64" />
+			<Add option="-limm32" />
+			<Add option="-lSDL2" />
+		</Linker>
 		<Unit filename="main.cpp" />
+		<Unit filename="ship.cpp" />
+		<Unit filename="ship.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
