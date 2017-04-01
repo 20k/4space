@@ -10,15 +10,24 @@ struct projectile : positional
     vec2f velocity;
 };
 
+struct battle_manager;
+
+namespace sf
+{
+    struct RenderWindow;
+}
+
 struct projectile_manager
 {
     std::vector<projectile*> projectiles;
 
     projectile* make_new();
 
-    void tick();
+    void tick(battle_manager& manager);
 
     void destroy(projectile* proj);
+
+    void draw(sf::RenderWindow& win);
 };
 
 struct battle_manager
@@ -29,6 +38,8 @@ struct battle_manager
     void tick(float time_s);
 
     void draw(sf::RenderWindow& win);
+
+    void add_ship(ship* s);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

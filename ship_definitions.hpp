@@ -4,7 +4,7 @@
 component make_default_crew()
 {
     component_attribute command;
-    command.produced_per_s = 1.f;
+    command.produced_per_s = 2.f;
 
     component_attribute oxygen;
     oxygen.drained_per_s = 0.5f;
@@ -144,7 +144,7 @@ component make_default_railgun()
     power.drained_per_use = 50.f;
 
     component_attribute command;
-    command.drained_per_s = 5.f;
+    command.drained_per_s = 1.f;
 
     component gun;
     gun.add(ship_component_element::RAILGUN, railgun);
