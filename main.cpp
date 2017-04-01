@@ -4,6 +4,7 @@
 #include "../../render_projects/imgui/imgui.h"
 #include "../../render_projects/imgui/imgui-SFML.h"
 #include <iomanip>
+#include "battle_manager.hpp"
 
 template <typename T>
 std::string to_string_with_precision(const T a_value, const int n = 6)
@@ -56,7 +57,7 @@ std::vector<std::string> get_components_display_string(ship& s)
             //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
             //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
 
-            std::string storage_str = "Storage: " + to_string_with_precision(cur_amount) + "/" + to_string_with_precision(max_amount, 3);
+            std::string storage_str = "Storage: " + to_string_with_precision(cur_amount, 5) + "/" + to_string_with_precision(max_amount, 5);
 
             std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
 
@@ -150,9 +151,25 @@ void debug_menu(const std::vector<ship*>& ships)
     ImGui::End();
 }
 
+void debug_battle(battle_manager& battle)
+{
+    ImGui::Begin("Battle DBG");
+
+    if(ImGui::Button("Step Battle 1s"))
+    {
+        battle.tick(1.f);
+    }
+
+    ImGui::End();
+}
+
 int main()
 {
     ship test_ship = make_default();
+    ship test_ship2 = make_default();
+
+    test_ship.team = 0;
+    test_ship2.team = 1;
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
@@ -162,7 +179,7 @@ int main()
 
     sf::RenderWindow window;
 
-    window.create(sf::VideoMode(800, 600),"Wowee");
+    window.create(sf::VideoMode(1024, 768),"Wowee");
 
     ImGui::SFML::Init(window);
 
@@ -172,6 +189,11 @@ int main()
 
     float last_time_s = 0.f;
     float diff_s = 0.f;
+
+    battle_manager battle;
+
+    battle.add_ship(&test_ship);
+    battle.add_ship(&test_ship2);
 
     sf::Keyboard key;
 
@@ -194,6 +216,8 @@ int main()
         display_ship_info(test_ship);
 
         debug_menu({&test_ship});
+        debug_battle(battle);
+        battle.draw(window);
 
         ImGui::Render();
         window.display();

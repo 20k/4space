@@ -32,6 +32,8 @@ struct projectile_manager
 
 struct battle_manager
 {
+    projectile_manager projectile_manage;
+
     ///team -> ship
     std::map<int, ship*> ships;
 
@@ -40,6 +42,8 @@ struct battle_manager
     void draw(sf::RenderWindow& win);
 
     void add_ship(ship* s);
+
+    ship* get_nearest_hostile(ship* s);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

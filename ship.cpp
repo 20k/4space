@@ -703,6 +703,29 @@ void ship::use(component& c)
     add_negative_resources(negative);
 }
 
+std::vector<component> ship::fire()
+{
+    std::vector<component> ret;
+
+    for(component& c : entity_list)
+    {
+        if(c.has_element(ship_component_element::RAILGUN) ||
+           c.has_element(ship_component_element::COILGUN) ||
+           c.has_element(ship_component_element::PLASMAGUN) ||
+           c.has_element(ship_component_element::TORPEDO))
+        {
+            if(can_use(c))
+            {
+                use(c);
+
+                ret.push_back(c);
+            }
+        }
+    }
+
+    return ret;
+}
+
 void ship::distribute_resources(std::map<ship_component_element, float> res)
 {
     std::map<ship_component_element, float> available_capacities = get_available_capacities();

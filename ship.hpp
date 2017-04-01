@@ -177,7 +177,10 @@ struct ship : positional
     bool can_use(component& c);
     void use(component& c);
 
+    std::vector<component> fire();
+
     void add(const component& c);
+
 
     ///?
     //void fire();
