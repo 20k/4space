@@ -47,8 +47,8 @@ std::vector<std::string> get_components_display_string(ship& s)
             float max_amount = attr.max_amount;
             float cur_amount = attr.cur_amount;
 
-            std::string use_string = "Net Available (s): " + to_string_with_precision(net_usage, 3);
-            std::string per_use_string = "Net Available (per use): " + to_string_with_precision(net_per_use, 3);
+            std::string use_string = "" + to_string_with_precision(net_usage, 3) + "/s";
+            std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "/use";
 
             std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
             std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
@@ -108,7 +108,6 @@ void display_ship_info(ship& s)
 
     ImGui::Begin("Test");
 
-
     int num = 0;
 
     for(auto& i : display_strs)
@@ -120,6 +119,17 @@ void display_ship_info(ship& s)
 
         //ImGui::SameLine();
         num++;
+    }
+
+    for(component& i : s.entity_list)
+    {
+        if(i.has_element(ship_component_elements::RAILGUN))
+        {
+            if(s.can_use(i) && ImGui::Button("Fire Railgun"))
+            {
+                s.use(i);
+            }
+        }
     }
 
     ImGui::End();

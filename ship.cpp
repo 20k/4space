@@ -192,6 +192,23 @@ std::map<ship_component_element, float> component::get_timestep_consumption_diff
     return ret;
 }
 
+std::map<ship_component_element, float> component::get_stored()
+{
+    std::map<ship_component_element, float> ret;
+
+    for(auto& i : components)
+    {
+        auto type = i.first;
+        auto attr = i.second;
+
+        float val = attr.cur_amount;
+
+        ret[type] = val;
+    }
+
+    return ret;
+}
+
 ///how to account for max storage? Apply_diff?
 ///need to keep track of time
 std::map<ship_component_element, float> component::get_use_diff()
@@ -206,7 +223,7 @@ std::map<ship_component_element, float> component::get_use_diff()
         float net = 0.f;
 
         if(attr.can_use())
-            net = (attr.produced_per_use - attr.drained_per_use) * attr.cur_efficiency;
+            net = (attr.produced_per_use - attr.drained_per_use);
 
         ret[type] = net;
     }
@@ -543,6 +560,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
     ///so now we've put production into storage,
 
+    ///this is capacites shit, ignore me
     return left_over;
 }
 
@@ -618,11 +636,93 @@ std::map<ship_component_element, float> ship::get_produced_resources(float time_
     return ret;
 }
 
+std::map<ship_component_element, float> ship::get_stored_resources()
+{
+    std::map<ship_component_element, float> ret;
+
+    for(auto& i : entity_list)
+    {
+        ret = merge_diffs(ret, i.get_stored());
+    }
+
+    return ret;
+}
+
 /*void ship::update_efficiency()
 {
     auto needed = get_needed_resources();
     auto produced = get_produced_resources();
 }*/
+
+bool ship::can_use(component& c)
+{
+    std::map<ship_component_element, float> requirements;
+
+    ///+ve means we need input from the ship to power it
+    for(auto& celem : c.components)
+    {
+        component_attribute& attr = celem.second;
+
+        requirements[celem.first] = attr.drained_per_use - attr.produced_per_use;
+    }
+
+    auto stored = get_stored_resources();
+
+    for(auto& i : requirements)
+    {
+        if(stored[i.first] < requirements[i.first])
+            return false;
+    }
+
+    return true;
+}
+
+void ship::use(component& c)
+{
+    if(!can_use(c))
+        return;
+
+    auto diff = c.get_use_diff();
+
+    distribute_resources(diff);
+}
+
+void ship::distribute_resources(std::map<ship_component_element, float> res)
+{
+    std::map<ship_component_element, float> available_capacities = get_available_capacities();
+
+    ///how to apply the output to systems fairly? Try and distribute evenly? Proportionally?
+    ///proportional seems reasonable atm
+    ///ok so this step distributes to all the individual storage
+    for(component& c : entity_list)
+    {
+        std::map<ship_component_element, float> this_entity_available = c.get_available_capacities();
+
+        for(auto& i : this_entity_available)
+        {
+            if(available_capacities[i.first] <= 0.001f)
+                continue;
+
+            float proportion = i.second / available_capacities[i.first];
+
+            float applying_to_this = proportion * res[i.first];
+
+            std::map<ship_component_element, float> tmap;
+
+            tmap[i.first] = applying_to_this;
+
+            /*if(i.first == ship_component_elements::ENERGY)
+            {
+                printf("test %f\n", applying_to_this);
+            }*/
+
+            auto r = c.apply_diff(tmap);
+
+            ///can be none left over as we're using available capacities
+            auto left_over = r;
+        }
+    }
+}
 
 void ship::add(const component& c)
 {

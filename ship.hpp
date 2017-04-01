@@ -9,7 +9,7 @@ namespace ship_component_elements
 {
     enum types
     {
-        HEAT, ///active heat management, but we'll also lose heat into space proportionally to the temperature difference
+        COOLING_POTENTIAL, ///active heat management, but we'll also lose heat into space proportionally to the temperature difference
         ENERGY,
         OXYGEN,
         AMMO,
@@ -31,7 +31,7 @@ namespace ship_component_elements
 
     static std::vector<std::string> display_strings
     {
-        "HEAT",
+        "COOLING_POTENTIAL",
         "ENERGY",
         "OXYGEN",
         "AMMO",
@@ -119,6 +119,7 @@ struct component
     std::map<ship_component_element, float> get_timestep_diff(float step_s);
     std::map<ship_component_element, float> get_timestep_production_diff(float step_s);
     std::map<ship_component_element, float> get_timestep_consumption_diff(float step_s);
+    std::map<ship_component_element, float> get_stored();
     std::map<ship_component_element, float> get_use_diff();
 
     ///returns a pair of new component, extra resources left over
@@ -146,14 +147,20 @@ struct ship
     ///returns extra resources for us to handle
     std::map<ship_component_element, float> tick_all_components(float step_s);
 
+    //std::map<ship_component_element, float> last_left_over;
+
     std::map<ship_component_element, float> get_available_capacities();
     /*std::map<ship_component_element, float> get_needed_resources();*/
     std::map<ship_component_element, float> get_produced_resources(float time_s);
 
     std::map<ship_component_element, float> get_stored_and_produced_resources(float time_s);
     std::map<ship_component_element, float> get_needed_resources(float time_s);
+    std::map<ship_component_element, float> get_stored_resources();
 
-    void update_efficiency();
+    void distribute_resources(std::map<ship_component_element, float> res);
+
+    bool can_use(component& c);
+    void use(component& c);
 
     void add(const component& c);
 

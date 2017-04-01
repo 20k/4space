@@ -76,7 +76,7 @@ component make_default_power_core()
 {
     component_attribute power;
     power.produced_per_s = 100.f;
-    power.max_amount = 20.f;
+    power.max_amount = 80.f;
 
     component core;
     core.add(ship_component_element::ENERGY, power);
@@ -118,8 +118,12 @@ component make_default_railgun()
     component_attribute railgun;
     railgun.produced_per_use = 1;
 
-    component_attribute heat;
-    heat.produced_per_use = 10.f;
+    ///ok so... positive heat is good,negative is bad
+    ///rename cooling?
+    component_attribute cooling;
+    cooling.drained_per_use = 10.f;
+    cooling.produced_per_s = 5.1f;
+    cooling.max_amount = 10.f;
 
     component_attribute power;
     power.drained_per_s = 5;
@@ -130,7 +134,7 @@ component make_default_railgun()
 
     component gun;
     gun.add(ship_component_element::RAILGUN, railgun);
-    gun.add(ship_component_element::HEAT, heat);
+    gun.add(ship_component_element::COOLING_POTENTIAL, cooling);
     gun.add(ship_component_element::ENERGY, power);
     gun.add(ship_component_element::COMMAND, command);
 
