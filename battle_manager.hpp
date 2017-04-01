@@ -37,7 +37,7 @@ struct battle_manager
     ///team -> ship
     std::map<int, ship*> ships;
 
-    void tick(float time_s);
+    void tick(float step_s);
 
     void draw(sf::RenderWindow& win);
 

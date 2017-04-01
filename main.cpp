@@ -209,6 +209,12 @@ int main()
                 window.close();
         }
 
+        if(key.isKeyPressed(sf::Keyboard::Num1))
+        {
+            battle.tick(diff_s);
+
+            printf("Timestep %f\n", diff_s);
+        }
 
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);

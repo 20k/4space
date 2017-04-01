@@ -35,10 +35,10 @@ float component_attribute::get_available_capacity()
     return max_amount - cur_amount;
 }
 
-float component_attribute::get_net()
+/*float component_attribute::get_net()
 {
     return produced_per_s - drained_per_s;
-}
+}*/
 
 void component_attribute::update_time(float step_s)
 {
@@ -82,7 +82,7 @@ float component_attribute::consume_max(float amount_to_try)
 
 float component_attribute::consume_from(component_attribute& other, float max_proportion, float step_s)
 {
-    if(drained_per_s <= 0.001f)
+    if(drained_per_s <= FLOAT_BOUND)
         return 0.f;
 
     float max_drain_amount = drained_per_s * max_proportion * step_s;
@@ -96,7 +96,7 @@ float component_attribute::consume_from(component_attribute& other, float max_pr
     float amount_drained = other.consume_max(to_drain);
 
     currently_drained += amount_drained;
-    cur_efficiency = currently_drained / drained_per_s;
+    cur_efficiency = currently_drained / (drained_per_s * step_s);
 
     return amount_drained;
 }
@@ -361,12 +361,15 @@ void component::propagate_total_efficiency()
 
     for(auto& i : components)
     {
-        i.second.cur_efficiency = min_eff;
+        //i.second.cur_efficiency = min_eff;
     }
 }
 
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
+    //if(step_s < 0.1)
+    //    step_s = 0.1;
+
     /*std::map<ship_component_element, float> total_production;
 
     for(component& c : entity_list)
@@ -437,17 +440,19 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
     for(auto& i : needed)
     {
-        if(stored_and_produced[i.first] <= 0.001f || i.second <= 0.001f)
+        if(produced[i.first] <= FLOAT_BOUND || i.second <= FLOAT_BOUND)
             continue;
 
         ///so this is the overall proportion of whats to be drained vs what needs to be drained
-        float frac = stored_and_produced[i.first] / i.second;
+        float frac = produced[i.first] / i.second;
 
         to_apply_prop[i.first] = frac;
     }
 
+    printf("%f stap\n", produced[ship_component_elements::ENERGY]);
     //printf("%f %f stap\n", stored_and_produced[ship_component_elements::OXYGEN], to_apply_prop[ship_component_elements::OXYGEN]);
 
+    ///change to take first from production, then from storage instead of weird proportional
     for(auto& i : entity_list)
     {
         for(auto& c : i.components)
@@ -456,26 +461,14 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
             component_attribute& me = c.second;
 
-            /*float amount_to_drain = me.drained_per_s;
-
-            float available_amount_to_try = stored_and_produced[c.first] * my_proportion_of_total;
-
-            float to_drain = std::min(amount_to_drain, available_amount_to_try);
-
-            float frac = 0.f;
-
-            if(amount_to_drain > 0.001f)
-                frac = to_drain / amount_to_drain;*/
-
             float frac = my_proportion_of_total;
+
+            ///dis broken
+            //if(c.first == ship_component_element::ENERGY)
+            //    printf("Dfrac %f\n", frac);
 
             if(frac > 1)
                 frac = 1;
-
-            /*if(c.first == ship_component_elements::OXYGEN)
-            {
-                printf("%f frac\n", frac);
-            }*/
 
             for(auto& k : entity_list)
             {
@@ -518,7 +511,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
         for(auto& i : this_entity_available)
         {
-            if(available_capacities[i.first] <= 0.001f)
+            if(available_capacities[i.first] <= FLOAT_BOUND)
                 continue;
 
             float proportion = i.second / available_capacities[i.first];
@@ -529,10 +522,10 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
             tmap[i.first] = applying_to_this;
 
-            /*if(i.first == ship_component_elements::ENERGY)
+            if(i.first == ship_component_elements::ENERGY)
             {
                 printf("test %f\n", applying_to_this);
-            }*/
+            }
 
             auto r = c.apply_diff(tmap);
 
@@ -739,7 +732,7 @@ void ship::distribute_resources(std::map<ship_component_element, float> res)
 
         for(auto& i : this_entity_available)
         {
-            if(available_capacities[i.first] <= 0.001f)
+            if(available_capacities[i.first] <= FLOAT_BOUND)
                 continue;
 
             float proportion = i.second / available_capacities[i.first];
@@ -776,7 +769,7 @@ void ship::add_negative_resources(std::map<ship_component_element, float> res)
 
         for(auto& i : this_entity_available)
         {
-            if(available_capacities[i.first] <= 0.001f)
+            if(available_capacities[i.first] <= FLOAT_BOUND)
                 continue;
 
             float proportion = i.second / available_capacities[i.first];

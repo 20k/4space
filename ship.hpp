@@ -5,6 +5,8 @@
 #include <vector>
 #include <vec/vec.hpp>
 
+#define FLOAT_BOUND 0.00000001f
+
 struct positional
 {
     ///game map etc, temporary atm
@@ -89,7 +91,7 @@ struct component_attribute
     bool can_use();
     float get_available_capacity();
 
-    float get_net();
+    //float get_net();
 
     void update_time(float step_s); ///resets drained
     //float drain(float amount); ///returns leftover, sets efficiency
