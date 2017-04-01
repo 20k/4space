@@ -8,6 +8,8 @@ struct projectile : positional
     int type = 0;
 
     vec2f velocity;
+
+    int pteam = 0;
 };
 
 struct battle_manager;

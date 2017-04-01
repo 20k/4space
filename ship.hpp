@@ -16,6 +16,8 @@ struct positional
     ///battles
     vec2f local_pos;
     float local_rot = 0;
+
+    vec2f dim;
 };
 
 ///we need components to require other components to function
