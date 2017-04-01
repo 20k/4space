@@ -19,10 +19,14 @@ namespace ship_component_elements
         ENGINE_POWER,
         WARP_POWER,
         SCANNING_POWER,
-        PROJECTILE, ///outputting damage. Have a receive damage as well component? Integrity AND hp?
+        //PROJECTILE, ///outputting damage. Have a receive damage as well component? Integrity AND hp?
         COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
         STEALTH,
-        REPAIR,
+        REPAIR, ///this is dumb, just make crew produce hp
+        RAILGUN,
+        TORPEDO,
+        PLASMAGUN,
+        COILGUN,
     };
 
     static std::vector<std::string> display_strings
@@ -37,10 +41,14 @@ namespace ship_component_elements
         "ENGINE_POWER",
         "WARP_POWER",
         "SCANNING_POWER",
-        "PROJECTILE",
+        //"PROJECTILE",
         "COMMAND",
         "STEALTH",
         "REPAIR",
+        "RAILGUN",
+        "TORPEDO",
+        "PLASMAGUN",
+        "COILGUN",
     };
 }
 

@@ -1,5 +1,6 @@
 #include "ship.hpp"
 #include <math.h>
+#include <vec/vec.hpp>
 
 float component_attribute::add_amount(float amount)
 {
@@ -75,6 +76,8 @@ float component_attribute::consume_max(float amount_to_try)
             amount_valid -= extra;
         }
     }
+
+    cur_amount = clamp(cur_amount, 0.f, max_amount);
 
     return amount_valid;
 }
@@ -480,7 +483,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
     for(auto& i : produced)
     {
-        if(i.second < 0)
+        if(i.second < -0.0001f)
         {
             printf("Logic error somewhere\n");
         }
