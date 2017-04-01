@@ -51,7 +51,7 @@ void component_attribute::update_time(float step_s)
 
     currently_drained = 0;
 
-    available_for_consumption = produced_per_s * step_s;
+    available_for_consumption = get_produced_amount(step_s);
 }
 
 float component_attribute::consume_max(float amount_to_try)
@@ -85,6 +85,42 @@ float component_attribute::consume_max(float amount_to_try)
     return amount_valid;
 }
 
+float component_attribute::consume_max_available(float amount_to_try)
+{
+    float available = available_for_consumption;
+
+    available -= amount_to_try;
+
+    if(available < 0)
+    {
+        available_for_consumption = 0;
+
+        return amount_to_try - fabs(available);
+    }
+
+    available_for_consumption = available;
+
+    return amount_to_try;
+}
+
+float component_attribute::consume_max_stored(float amount_to_try)
+{
+    float available = cur_amount;
+
+    available -= amount_to_try;
+
+    if(available < 0)
+    {
+        cur_amount = 0;
+
+        return amount_to_try - fabs(available);
+    }
+
+    cur_amount = available;
+
+    return amount_to_try;
+}
+
 float component_attribute::consume_from(component_attribute& other, float max_proportion, float step_s)
 {
     if(drained_per_s <= FLOAT_BOUND)
@@ -106,7 +142,7 @@ float component_attribute::consume_from(component_attribute& other, float max_pr
     return amount_drained;
 }
 
-float component_attribute::consume_from_amount(component_attribute& other, float amount, float step_s)
+float component_attribute::consume_from_amount_available(component_attribute& other, float amount, float step_s)
 {
     if(drained_per_s <= FLOAT_BOUND)
         return 0.f;
@@ -119,7 +155,28 @@ float component_attribute::consume_from_amount(component_attribute& other, float
 
     float to_drain = std::min(max_drain_amount, needed_drain);
 
-    float amount_drained = other.consume_max(to_drain);
+    float amount_drained = other.consume_max_available(to_drain);
+
+    currently_drained += amount_drained;
+    cur_efficiency = currently_drained / (drained_per_s * step_s);
+
+    return amount_drained;
+
+}
+float component_attribute::consume_from_amount_stored(component_attribute& other, float amount, float step_s)
+{
+    if(drained_per_s <= FLOAT_BOUND)
+        return 0.f;
+
+    float max_drain_amount = amount;
+
+    float needed_drain = drained_per_s * step_s - currently_drained;
+
+    needed_drain = std::max(needed_drain, 0.f);
+
+    float to_drain = std::min(max_drain_amount, needed_drain);
+
+    float amount_drained = other.consume_max_stored(to_drain);
 
     currently_drained += amount_drained;
     cur_efficiency = currently_drained / (drained_per_s * step_s);
@@ -191,7 +248,7 @@ std::map<ship_component_element, float> component::get_timestep_production_diff(
         auto type = i.first;
         auto attr = i.second;
 
-        float net = (attr.produced_per_s) * step_s * attr.cur_efficiency;
+        float net = attr.get_produced_amount(step_s);
 
         ret[type] = net;
     }
@@ -378,7 +435,17 @@ float component::calculate_total_efficiency()
         }
     }
 
-    return min_eff;
+    float max_hp = components[ship_component_element::HP].max_amount;
+    float cur_hp = components[ship_component_element::HP].cur_amount;
+
+    float frac = 1.f;
+
+    if(max_hp > 0)
+    {
+        frac = cur_hp / max_hp;
+    }
+
+    return min_eff * frac;
 }
 
 void component::propagate_total_efficiency()
@@ -387,7 +454,7 @@ void component::propagate_total_efficiency()
 
     for(auto& i : components)
     {
-        //i.second.cur_efficiency = min_eff;
+        i.second.cur_efficiency = min_eff;
     }
 }
 
@@ -483,6 +550,8 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
         to_apply_prop[i.first] = frac;
     }
 
+    //printf("%f need\n", needed[ship_component_element::OXYGEN]);
+
     //printf("%f stap\n", produced[ship_component_elements::ENERGY]);
     //printf("%f %f stap\n", stored_and_produced[ship_component_elements::OXYGEN], to_apply_prop[ship_component_elements::OXYGEN]);
 
@@ -504,6 +573,8 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
             if(frac > 1)
                 frac = 1;
 
+            float extra = 0;
+
             for(auto& k : entity_list)
             {
                 for(auto& c2 : k.components)
@@ -513,13 +584,25 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     component_attribute& other = c2.second;
 
-                    float take_amount = frac * other.get_produced_amount(step_s);
+                    float take_amount = frac * other.get_produced_amount(step_s) + extra;
+
+                    /*if(c.first == ship_component_element::OXYGEN)
+                    {
+                        printf("%f take\n", take_amount);
+                    }*/
 
                     ///ie the amount we actually took from other
-                    float drained = me.consume_from_amount(other, take_amount, step_s);
+                    float drained = me.consume_from_amount_available(other, take_amount, step_s);
+
+                    /*if(c.first == ship_component_element::OXYGEN)
+                    {
+                        printf("%f taken\n", drained);
+                    }*/
 
                     produced[c.first] -= drained;
                     needed[c.first] -= drained;
+
+                    extra += (take_amount - drained);
                 }
 
             }
@@ -540,6 +623,8 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
         //float frac = stored[i.first] / i.second;
 
         ///take frac from all
+        ///ok we can't just use stored because there might still be some left in the produced section
+        ///because we're taking proportionally
         float frac = i.second / stored[i.first];
 
         to_apply_prop[i.first] = frac;
@@ -562,6 +647,8 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
             if(frac > 1)
                 frac = 1;
 
+            float extra = 0;
+
             for(auto& k : entity_list)
             {
                 for(auto& c2 : k.components)
@@ -571,13 +658,20 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     component_attribute& other = c2.second;
 
-                    float take_amount = frac * other.cur_amount;
+                    float take_amount = frac * other.cur_amount + extra;
+
+                    if(c2.first == ship_component_element::OXYGEN)
+                    {
+                        printf("%f taking\n", take_amount);
+                    }
 
                     ///ie the amount we actually took from other
-                    float drained = me.consume_from_amount(other, take_amount, step_s);
+                    float drained = me.consume_from_amount_stored(other, take_amount, step_s);
 
                     produced[c.first] -= drained;
                     needed[c.first] -= drained;
+
+                    extra += (take_amount - drained);
                 }
             }
         }
@@ -899,5 +993,36 @@ void ship::add(const component& c)
 
 void ship::hit(projectile* p)
 {
+    float shields = get_stored_resources()[ship_component_element::SHIELD_POWER];
+    float armour = get_stored_resources()[ship_component_element::ARMOUR];
 
+    float damage = 60.f;
+
+    float sdamage = std::min(damage, shields);
+
+    float raw_armour_damage = damage - sdamage;
+
+    float armour_damage = std::min(raw_armour_damage, armour);
+
+    float hp_damage = raw_armour_damage - armour_damage;
+
+    std::map<ship_component_element, float> diff;
+    diff[ship_component_element::SHIELD_POWER] = -sdamage;
+    diff[ship_component_element::ARMOUR] = -armour_damage;
+
+    add_negative_resources(diff);
+
+    if(entity_list.size() == 0)
+    {
+        printf("filthy degenerate in ship::hit\n");
+    }
+
+    int random_component = (int)randf_s(0.f, entity_list.size());
+
+    component& h = entity_list[random_component];
+
+    std::map<ship_component_element, float> hp_diff;
+    hp_diff[ship_component_element::HP] = -hp_damage;
+
+    h.apply_diff(hp_diff);
 }

@@ -106,12 +106,15 @@ struct component_attribute
 
     ///returns amount consumed
     float consume_from(component_attribute& other, float max_proportion, float step_s);
-    float consume_from_amount(component_attribute& other, float amount, float step_s);
+    float consume_from_amount_available(component_attribute& other, float amount, float step_s);
+    float consume_from_amount_stored(component_attribute& other, float amount, float step_s);
 
     ///temporary storage so that other components can nab from me
     float available_for_consumption = 0;
 
     float consume_max(float amount);
+    float consume_max_available(float amount);
+    float consume_max_stored(float amount);
 
 private:
     float currently_drained = 0.f;

@@ -1,7 +1,7 @@
 #ifndef SHIP_DEFINITIONS_HPP_INCLUDED
 #define SHIP_DEFINITIONS_HPP_INCLUDED
 
-#define default_room_hp 1.f
+#define default_room_hp 10.f
 
 component make_default_crew()
 {
