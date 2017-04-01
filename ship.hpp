@@ -142,6 +142,8 @@ struct component
 
 struct ship
 {
+    int team = 0;
+
     std::vector<component> entity_list;
 
     ///returns extra resources for us to handle

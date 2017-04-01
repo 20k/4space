@@ -75,7 +75,7 @@ component make_default_shields()
 component make_default_power_core()
 {
     component_attribute power;
-    power.produced_per_s = 100.f;
+    power.produced_per_s = 80.f;
     power.max_amount = 80.f;
 
     component core;
@@ -112,6 +112,20 @@ component make_default_engines()
     return thruster;
 }
 
+component make_default_heatsink()
+{
+    component_attribute cooling;
+    cooling.max_amount = 80;
+    cooling.produced_per_s = 2.1f;
+
+    component heatsink;
+    heatsink.add(ship_component_element::COOLING_POTENTIAL, cooling);
+
+    heatsink.name = "Heatsink";
+
+    return heatsink;
+}
+
 component make_default_railgun()
 {
     ///...the railgun literally produces railgun
@@ -122,7 +136,7 @@ component make_default_railgun()
     ///rename cooling?
     component_attribute cooling;
     cooling.drained_per_use = 10.f;
-    cooling.produced_per_s = 5.1f;
+    cooling.produced_per_s = 1.1f;
     cooling.max_amount = 10.f;
 
     component_attribute power;
@@ -186,6 +200,7 @@ ship make_default()
     test_ship.add(make_default_power_core());
     test_ship.add(make_default_engines());
     test_ship.add(make_default_railgun());
+    test_ship.add(make_default_heatsink());
 
     return test_ship;
 }
