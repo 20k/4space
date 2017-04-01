@@ -101,6 +101,8 @@ struct component
     component_attribute damage;
     component_attribute */
 
+    std::string name = "";
+
     std::map<ship_component_element, component_attribute> components;
 
     bool has_element(const ship_component_element& type);
@@ -124,6 +126,9 @@ struct component
     std::map<ship_component_element, float> get_stored_and_produced_resources(float time_s);
 
     void add(ship_component_element element, const component_attribute& attr);
+
+    float calculate_total_efficiency();
+    void propagate_total_efficiency();
 };
 
 struct ship

@@ -13,125 +13,7 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
     return out.str();
 }
 
-component make_default_crew()
-{
-    component_attribute command;
-    command.produced_per_s = 1.f;
-
-    component_attribute oxygen;
-    oxygen.drained_per_s = 0.5f;
-    oxygen.max_amount = 5.f;
-
-    component_attribute repair;
-    repair.produced_per_s = 0.2f;
-
-    component crew;
-    crew.add(ship_component_element::COMMAND, command);
-    crew.add(ship_component_element::OXYGEN, oxygen);
-    crew.add(ship_component_element::REPAIR, repair);
-
-    return crew;
-}
-
-component make_default_life_support()
-{
-    component_attribute oxygen;
-    oxygen.produced_per_s = 10.f;
-
-    component_attribute power;
-    power.drained_per_s = 5.f;
-    power.max_amount = 10.f;
-
-    component life_support;
-    life_support.add(ship_component_element::OXYGEN, oxygen);
-    life_support.add(ship_component_element::ENERGY, power);
-
-    return life_support;
-}
-
-component make_default_ammo_store()
-{
-    component_attribute ammo;
-    ammo.max_amount = 1000.f;
-
-    component ammo_store;
-    ammo_store.add(ship_component_element::AMMO, ammo);
-
-    return ammo_store;
-}
-
-component make_default_shields()
-{
-    component_attribute shield;
-    shield.produced_per_s = 1.f;
-    shield.max_amount = 50.f;
-
-    component_attribute power;
-    power.drained_per_s = 20.f;
-
-    component shields;
-    shields.add(ship_component_element::SHIELD_POWER, shield);
-    shields.add(ship_component_element::ENERGY, power);
-
-    return shields;
-}
-
-component make_default_power_core()
-{
-    component_attribute power;
-    power.produced_per_s = 100.f;
-    power.max_amount = 20.f;
-
-    component core;
-    core.add(ship_component_element::ENERGY, power);
-
-    return core;
-}
-
-ship make_default()
-{
-    /*ship test_ship;
-
-    component_attribute powerplanet_core;
-    powerplanet_core.produced_per_s = 1;
-
-    component_attribute energy_sink;
-    energy_sink.drained_per_s = 0.1f;
-    energy_sink.max_amount = 50.f;
-
-    component_attribute energy_sink2;
-    energy_sink2.drained_per_s = 0.2f;
-    energy_sink2.max_amount = 50.f;
-
-    component_attribute powerplant_core2;
-    powerplant_core2.produced_per_s = 2;
-
-    component powerplant;
-    powerplant.add(ship_component_element::ENERGY, powerplanet_core);
-
-    component powerplant2;
-    powerplant2.add(ship_component_element::ENERGY, powerplant_core2);
-
-    component battery;
-    battery.add(ship_component_element::ENERGY, energy_sink);
-
-    component battery2;
-    battery2.add(ship_component_element::ENERGY, energy_sink2);
-
-    test_ship.add(powerplant);
-    test_ship.add(battery);
-    test_ship.add(battery2);
-    test_ship.add(powerplant2);*/
-
-    ship test_ship;
-    test_ship.add(make_default_crew());
-    test_ship.add(make_default_life_support());
-    test_ship.add(make_default_ammo_store());
-    test_ship.add(make_default_shields());
-    test_ship.add(make_default_power_core());
-
-    return test_ship;
-}
+#include "ship_definitions.hpp"
 
 ///vertical list of attributes, going horizontally with separators between components
 ///we'll also want a systems level version of this, ie overall not specific
@@ -143,7 +25,7 @@ std::vector<std::string> get_components_display_string(ship& s)
 
     for(component& c : components)
     {
-        std::string component_str;
+        std::string component_str = c.name + ":\n";
 
         int num = 0;
 
@@ -176,7 +58,7 @@ std::vector<std::string> get_components_display_string(ship& s)
 
             std::string storage_str = "Storage: " + to_string_with_precision(cur_amount) + "/" + to_string_with_precision(max_amount, 3);
 
-            std::string efficiency_str = "Curr Efficiency %: " + to_string_with_precision(attr.cur_efficiency, 3);
+            std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
 
             component_str += header;
 
@@ -202,7 +84,8 @@ std::vector<std::string> get_components_display_string(ship& s)
             if(max_amount > 0)
                 component_str += "\n" + storage_str;
 
-            component_str += "\n" + efficiency_str;
+            if(attr.cur_efficiency < 1)
+                component_str += "\n" + efficiency_str;
 
 
             if(num != c.components.size() - 1)

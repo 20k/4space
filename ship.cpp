@@ -322,6 +322,30 @@ void component::add(ship_component_element element, const component_attribute& a
     components[element] = attr;
 }
 
+float component::calculate_total_efficiency()
+{
+    float min_eff = 1.f;
+
+    for(auto& i : components)
+    {
+        if(i.second.cur_efficiency < min_eff)
+        {
+            min_eff = i.second.cur_efficiency;
+        }
+    }
+
+    return min_eff;
+}
+
+void component::propagate_total_efficiency()
+{
+    float min_eff = calculate_total_efficiency();
+
+    for(auto& i : components)
+    {
+        i.second.cur_efficiency = min_eff;
+    }
+}
 
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
@@ -497,6 +521,11 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
             ///can be none left over as we're using available capacities
             auto left_over = r;
         }
+    }
+
+    for(auto& c : entity_list)
+    {
+        c.propagate_total_efficiency();
     }
 
     ///so amount left over is total_to_apply - available_capacities
