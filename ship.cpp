@@ -684,7 +684,25 @@ void ship::use(component& c)
 
     auto diff = c.get_use_diff();
 
-    distribute_resources(diff);
+    //add_negative_resources(diff);
+
+    std::map<ship_component_element, float> positive;
+    std::map<ship_component_element, float> negative;
+
+    for(auto& i : diff)
+    {
+        if(i.second < 0)
+        {
+            negative[i.first] = i.second;
+        }
+        else
+        {
+            positive[i.first] = i.second;
+        }
+    }
+
+    distribute_resources(positive);
+    add_negative_resources(negative);
 }
 
 void ship::distribute_resources(std::map<ship_component_element, float> res)
@@ -697,6 +715,43 @@ void ship::distribute_resources(std::map<ship_component_element, float> res)
     for(component& c : entity_list)
     {
         std::map<ship_component_element, float> this_entity_available = c.get_available_capacities();
+
+        for(auto& i : this_entity_available)
+        {
+            if(available_capacities[i.first] <= 0.001f)
+                continue;
+
+            float proportion = i.second / available_capacities[i.first];
+
+            float applying_to_this = proportion * res[i.first];
+
+            std::map<ship_component_element, float> tmap;
+
+            tmap[i.first] = applying_to_this;
+
+            /*if(i.first == ship_component_elements::ENERGY)
+            {
+                printf("test %f\n", applying_to_this);
+            }*/
+
+            auto r = c.apply_diff(tmap);
+
+            ///can be none left over as we're using available capacities
+            auto left_over = r;
+        }
+    }
+}
+
+void ship::add_negative_resources(std::map<ship_component_element, float> res)
+{
+    std::map<ship_component_element, float> available_capacities = get_stored_resources();
+
+    ///how to apply the output to systems fairly? Try and distribute evenly? Proportionally?
+    ///proportional seems reasonable atm
+    ///ok so this step distributes to all the individual storage
+    for(component& c : entity_list)
+    {
+        std::map<ship_component_element, float> this_entity_available = c.get_stored();
 
         for(auto& i : this_entity_available)
         {

@@ -158,6 +158,7 @@ struct ship
     std::map<ship_component_element, float> get_stored_resources();
 
     void distribute_resources(std::map<ship_component_element, float> res);
+    void add_negative_resources(std::map<ship_component_element, float> res);
 
     bool can_use(component& c);
     void use(component& c);
