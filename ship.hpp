@@ -116,6 +116,8 @@ struct component_attribute
     float consume_max_available(float amount);
     float consume_max_stored(float amount);
 
+    void calculate_efficiency(float step_s);
+
 private:
     float currently_drained = 0.f;
 };
@@ -162,8 +164,8 @@ struct component
 
     void add(ship_component_element element, const component_attribute& attr);
 
-    float calculate_total_efficiency();
-    void propagate_total_efficiency();
+    float calculate_total_efficiency(float step_s);
+    void propagate_total_efficiency(float step_s);
 };
 
 struct projectile;

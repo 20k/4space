@@ -121,6 +121,11 @@ float component_attribute::consume_max_stored(float amount_to_try)
     return amount_to_try;
 }
 
+void component_attribute::calculate_efficiency(float step_s)
+{
+    cur_efficiency = currently_drained / (drained_per_s * step_s);
+}
+
 float component_attribute::consume_from(component_attribute& other, float max_proportion, float step_s)
 {
     if(drained_per_s <= FLOAT_BOUND)
@@ -137,7 +142,7 @@ float component_attribute::consume_from(component_attribute& other, float max_pr
     float amount_drained = other.consume_max(to_drain);
 
     currently_drained += amount_drained;
-    cur_efficiency = currently_drained / (drained_per_s * step_s);
+    //cur_efficiency = currently_drained / (drained_per_s * step_s);
 
     return amount_drained;
 }
@@ -158,7 +163,7 @@ float component_attribute::consume_from_amount_available(component_attribute& ot
     float amount_drained = other.consume_max_available(to_drain);
 
     currently_drained += amount_drained;
-    cur_efficiency = currently_drained / (drained_per_s * step_s);
+    //cur_efficiency = currently_drained / (drained_per_s * step_s);
 
     return amount_drained;
 
@@ -179,7 +184,7 @@ float component_attribute::consume_from_amount_stored(component_attribute& other
     float amount_drained = other.consume_max_stored(to_drain);
 
     currently_drained += amount_drained;
-    cur_efficiency = currently_drained / (drained_per_s * step_s);
+    //cur_efficiency = currently_drained / (drained_per_s * step_s);
 
     return amount_drained;
 }
@@ -423,12 +428,14 @@ void component::add(ship_component_element element, const component_attribute& a
     components[element] = attr;
 }
 
-float component::calculate_total_efficiency()
+float component::calculate_total_efficiency(float step_s)
 {
     float min_eff = 1.f;
 
     for(auto& i : components)
     {
+        i.second.calculate_efficiency(step_s);
+
         if(i.second.cur_efficiency < min_eff)
         {
             min_eff = i.second.cur_efficiency;
@@ -448,9 +455,9 @@ float component::calculate_total_efficiency()
     return min_eff * frac;
 }
 
-void component::propagate_total_efficiency()
+void component::propagate_total_efficiency(float step_s)
 {
-    float min_eff = calculate_total_efficiency();
+    float min_eff = calculate_total_efficiency(step_s);
 
     for(auto& i : components)
     {
@@ -552,7 +559,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
     //printf("%f need\n", needed[ship_component_element::OXYGEN]);
 
-    //printf("%f stap\n", produced[ship_component_elements::ENERGY]);
+    printf("%f stap\n", produced[ship_component_elements::OXYGEN]);
     //printf("%f %f stap\n", stored_and_produced[ship_component_elements::OXYGEN], to_apply_prop[ship_component_elements::OXYGEN]);
 
     ///change to take first from production, then from storage instead of weird proportional
@@ -729,7 +736,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
     for(auto& c : entity_list)
     {
-        c.propagate_total_efficiency();
+        c.propagate_total_efficiency(step_s);
     }
 
     ///so amount left over is total_to_apply - available_capacities
