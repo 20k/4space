@@ -35,6 +35,11 @@ float component_attribute::get_available_capacity()
     return max_amount - cur_amount;
 }
 
+float component_attribute::get_total_capacity(float step_s)
+{
+    return get_available_capacity() + (drained_per_s * step_s - currently_drained);
+}
+
 float component_attribute::get_produced_amount(float step_s)
 {
     return produced_per_s * cur_efficiency * step_s;
@@ -559,7 +564,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
     //printf("%f need\n", needed[ship_component_element::OXYGEN]);
 
-    printf("%f stap\n", produced[ship_component_elements::OXYGEN]);
+    //printf("%f stap\n", produced[ship_component_elements::OXYGEN]);
     //printf("%f %f stap\n", stored_and_produced[ship_component_elements::OXYGEN], to_apply_prop[ship_component_elements::OXYGEN]);
 
     ///change to take first from production, then from storage instead of weird proportional
@@ -593,9 +598,12 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     float take_amount = frac * other.get_produced_amount(step_s) + extra;
 
+                    if(take_amount > me.get_total_capacity(step_s))
+                        take_amount = me.get_total_capacity(step_s);
+
                     /*if(c.first == ship_component_element::OXYGEN)
                     {
-                        printf("%f take\n", take_amount);
+                        printf("%f atake\n", take_amount);
                     }*/
 
                     ///ie the amount we actually took from other
@@ -603,7 +611,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     /*if(c.first == ship_component_element::OXYGEN)
                     {
-                        printf("%f taken\n", drained);
+                        printf("%f ataken\n", drained);
                     }*/
 
                     produced[c.first] -= drained;
@@ -667,15 +675,24 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
                     float take_amount = frac * other.cur_amount + extra;
 
-                    if(c2.first == ship_component_element::OXYGEN)
+                    if(take_amount > me.get_total_capacity(step_s))
+                        take_amount = me.get_total_capacity(step_s);
+
+                    /*if(c2.first == ship_component_element::OXYGEN)
                     {
-                        printf("%f taking\n", take_amount);
-                    }
+                        printf("%f taking from %s\n", take_amount, k.name.c_str());
+                    }*/
 
                     ///ie the amount we actually took from other
                     float drained = me.consume_from_amount_stored(other, take_amount, step_s);
 
-                    produced[c.first] -= drained;
+                    /*if(c2.first == ship_component_element::OXYGEN)
+                    {
+                        printf("%f taken\n", drained);
+                    }*/
+
+                    ///incorrect, this is taken from STORAGE not PRODUCED
+                    //produced[c.first] -= drained;
                     needed[c.first] -= drained;
 
                     extra += (take_amount - drained);
@@ -694,6 +711,8 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
         if(i.second < -0.0001f)
         {
             printf("Logic error somewhere\n");
+
+            i.second = 0;
         }
     }
 
@@ -722,7 +741,7 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 
             tmap[i.first] = applying_to_this;
 
-            /*if(i.first == ship_component_elements::ENERGY)
+            /*if(i.first == ship_component_elements::OXYGEN)
             {
                 printf("test %f\n", applying_to_this);
             }*/
