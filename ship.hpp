@@ -21,6 +21,7 @@ struct positional
 };
 
 ///we need components to require other components to function
+///we need a tag system, for eg RECOIL or DAMAGE or ARC_OF_FIRE, ie isolated attributes
 namespace ship_component_elements
 {
     enum types
