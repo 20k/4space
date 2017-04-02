@@ -27,7 +27,7 @@ struct projectile_manager
 
     projectile* make_new();
 
-    void tick(battle_manager& manager);
+    void tick(battle_manager& manager, float step_s);
 
     void destroy(projectile* proj);
 

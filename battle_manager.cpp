@@ -37,14 +37,14 @@ bool projectile_within_ship(projectile* p, ship* s)
     return false;
 }
 
-void projectile_manager::tick(battle_manager& manage)
+void projectile_manager::tick(battle_manager& manage, float step_s)
 {
     //for(auto& i : projectiles)
     for(int kk=0; kk < projectiles.size(); kk++)
     {
         projectile* p = projectiles[kk];
 
-        p->local_pos = p->local_pos + p->velocity;
+        p->local_pos = p->local_pos + p->velocity * step_s;
 
         for(auto& i : manage.ships)
         {
@@ -167,11 +167,11 @@ void battle_manager::tick(float step_s)
 
             float speed = 20.f;
 
-            p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)} * step_s;
+            p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
         }
     }
 
-    projectile_manage.tick(*this);
+    projectile_manage.tick(*this, step_s);
 }
 
 void battle_manager::draw(sf::RenderWindow& win)
