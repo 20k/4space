@@ -1,4 +1,5 @@
 #include "ship.hpp"
+#include "battle_manager.hpp"
 
 float component_attribute::add_amount(float amount)
 {
@@ -27,7 +28,10 @@ float component_attribute::add_amount(float amount)
 
 bool component_attribute::can_use()
 {
-    return current_time_s >= time_last_used_s + time_between_uses_s;
+    bool time_valid = current_time_s >= time_last_used_s + time_between_uses_s;
+    bool efficiency_valid = cur_efficiency > 0.75f;
+
+    return time_valid && efficiency_valid;
 }
 
 float component_attribute::get_available_capacity()
@@ -874,6 +878,9 @@ bool ship::can_use(component& c)
         component_attribute& attr = celem.second;
 
         requirements[celem.first] = attr.drained_per_use - attr.produced_per_use;
+
+        if(!attr.can_use())
+            return false;
     }
 
     auto stored = get_stored_resources();
@@ -1022,7 +1029,7 @@ void ship::hit(projectile* p)
     float shields = get_stored_resources()[ship_component_element::SHIELD_POWER];
     float armour = get_stored_resources()[ship_component_element::ARMOUR];
 
-    float damage = 60.f;
+    float damage = p->damage;
 
     float sdamage = std::min(damage, shields);
 

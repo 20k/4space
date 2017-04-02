@@ -85,7 +85,7 @@ std::vector<std::string> get_components_display_string(ship& s)
             if(max_amount > 0)
                 component_str += "\n" + storage_str;
 
-            if(attr.cur_efficiency < 1)
+            if(attr.cur_efficiency < 0.99999f)
                 component_str += "\n" + efficiency_str;
 
 

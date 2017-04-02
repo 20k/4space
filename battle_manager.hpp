@@ -10,6 +10,8 @@ struct projectile : positional
     vec2f velocity;
 
     int pteam = 0;
+
+    float damage = 0;
 };
 
 struct battle_manager;
