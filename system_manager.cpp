@@ -10,6 +10,48 @@ void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
     }
 }
 
+void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos)
+{
+    for(int i=0; i<vert_dist.size(); i++)
+    {
+        int cur = i;
+        int next = (i + 1) % vert_dist.size();
+
+        float d1 = vert_dist[cur];
+        float d2 = vert_dist[next];
+
+        float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
+        float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
+
+        a1 += rotation;
+        a2 += rotation;
+
+        vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)};
+        vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)};
+
+        l1 += absolute_pos;
+        l2 += absolute_pos;
+
+        sf::RectangleShape shape;
+
+        float width = (l1 - l2).length();
+        float height = 1;
+
+        shape.setPosition(l1.x(), l1.y());
+
+        shape.setSize({width, height});
+
+        shape.setRotation(r2d((l2 - l1).angle()));
+
+        #ifdef HOLLOWISH
+        if((i % 2) == 0)
+            continue;
+        #endif
+
+        win.draw(shape);
+    }
+}
+
 void orbital::set_orbit(float ang, float len, float ang_vel_s)
 {
     orbital_angle = ang;
@@ -57,44 +99,7 @@ void orbital::draw(sf::RenderWindow& win)
 
     win.draw(&lines[0], lines.size(), sf::Lines);*/
 
-    for(int i=0; i<vert_dist.size(); i++)
-    {
-        int cur = i;
-        int next = (i + 1) % vert_dist.size();
-
-        float d1 = vert_dist[cur];
-        float d2 = vert_dist[next];
-
-        float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
-        float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
-
-        a1 += rotation;
-        a2 += rotation;
-
-        vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)};
-        vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)};
-
-        l1 += absolute_pos;
-        l2 += absolute_pos;
-
-        sf::RectangleShape shape;
-
-        float width = (l1 - l2).length();
-        float height = 1;
-
-        shape.setPosition(l1.x(), l1.y());
-
-        shape.setSize({width, height});
-
-        shape.setRotation(r2d((l2 - l1).angle()));
-
-        #ifdef HOLLOWISH
-        if((i % 2) == 0)
-            continue;
-        #endif
-
-        win.draw(shape);
-    }
+    simple_renderable.draw(win, rotation, absolute_pos);
 }
 
 void orbital::center_camera(sf::RenderWindow& win)
@@ -112,7 +117,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad)
 
     n->type = type;
     n->rad = rad;
-    n->init(10, n->rad * 0.85f, n->rad * 1.2f);
+    n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
 
     orbitals.push_back(n);
 

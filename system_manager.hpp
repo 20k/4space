@@ -27,10 +27,14 @@ struct orbital_simple_renderable
     std::vector<float> vert_dist;
 
     void init(int n, float min_rad, float max_rad);
+
+    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos);
 };
 
-struct orbital : orbital_simple_renderable
+struct orbital
 {
+    orbital_simple_renderable simple_renderable;
+
     void* data = nullptr;
 
     vec2f absolute_pos;
