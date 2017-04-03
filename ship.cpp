@@ -1,6 +1,8 @@
 #include "ship.hpp"
 #include "battle_manager.hpp"
 
+int ship::gid;
+
 float component_attribute::add_amount(float amount)
 {
     cur_amount += amount;
@@ -305,6 +307,23 @@ std::map<ship_component_element, float> component::get_stored()
         auto attr = i.second;
 
         float val = attr.cur_amount;
+
+        ret[type] = val;
+    }
+
+    return ret;
+}
+
+std::map<ship_component_element, float> component::get_stored_max()
+{
+    std::map<ship_component_element, float> ret;
+
+    for(auto& i : components)
+    {
+        auto type = i.first;
+        auto attr = i.second;
+
+        float val = attr.max_amount;
 
         ret[type] = val;
     }
@@ -907,6 +926,18 @@ std::map<ship_component_element, float> ship::get_stored_resources()
     for(auto& i : entity_list)
     {
         ret = merge_diffs(ret, i.get_stored());
+    }
+
+    return ret;
+}
+
+std::map<ship_component_element, float> ship::get_max_resources()
+{
+    std::map<ship_component_element, float> ret;
+
+    for(auto& i : entity_list)
+    {
+        ret = merge_diffs(ret, i.get_stored_max());
     }
 
     return ret;

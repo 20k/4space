@@ -73,6 +73,29 @@ namespace ship_component_elements
         "PLASMAGUN",
         "COILGUN",
     };
+
+    static std::vector<std::string> short_name
+    {
+        "CL",
+        "EN",
+        "OX",
+        "AM",
+        "FU",
+        "CA",
+        "SH",
+        "AR",
+        "HP",
+        "EG",
+        "WP",
+        "SN",
+        "CM",
+        "ST",
+        "RP",
+        "WR",
+        "WT",
+        "WP",
+        "WC",
+    };
 }
 
 ///misc tags
@@ -165,6 +188,7 @@ struct component
     std::map<ship_component_element, float> get_timestep_production_diff(float step_s);
     std::map<ship_component_element, float> get_timestep_consumption_diff(float step_s);
     std::map<ship_component_element, float> get_stored();
+    std::map<ship_component_element, float> get_stored_max();
     std::map<ship_component_element, float> get_use_diff();
 
     ///returns a pair of new component, extra resources left over
@@ -191,12 +215,18 @@ struct component
     float get_tag(component_tag::tag tag);
 
     void set_tag(component_tag::tag tag, float val);
+
+    ///for ui stuff. Its better to keep this internally in case we add new components
+    bool clicked = false;
 };
 
 struct projectile;
 
 struct ship : positional
 {
+    int id = gid++;
+    static int gid;
+
     int team = 0;
 
     std::vector<component> entity_list;
@@ -213,6 +243,7 @@ struct ship : positional
     std::map<ship_component_element, float> get_stored_and_produced_resources(float time_s);
     std::map<ship_component_element, float> get_needed_resources(float time_s);
     std::map<ship_component_element, float> get_stored_resources();
+    std::map<ship_component_element, float> get_max_resources();
 
     void distribute_resources(std::map<ship_component_element, float> res);
     void add_negative_resources(std::map<ship_component_element, float> res);
