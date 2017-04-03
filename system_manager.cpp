@@ -69,12 +69,12 @@ void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolu
     win.draw(spr);
 }
 
-void orbital::set_orbit(float ang, float len, float ang_vel_s)
+void orbital::set_orbit(float ang, float len)
 {
     orbital_angle = ang;
     orbital_length = len;
 
-    angular_velocity_ps = ang_vel_s;
+    //angular_velocity_ps = ang_vel_s;
 }
 
 void orbital::tick(float step_s)
@@ -84,7 +84,23 @@ void orbital::tick(float step_s)
     if(parent == nullptr)
         return;
 
-    orbital_angle += angular_velocity_ps * step_s;
+    double mass_of_sun = 2 * pow(10., 30.);
+    double distance_from_earth_to_sun = 149000000000;
+    double g_const = 6.674 * pow(10., -11.);
+
+    float mu = mass_of_sun * g_const;
+
+    //double years_per_second =
+
+    double default_scale = 1000000.;
+
+    double scaled_real_dist = (orbital_length / default_scale) * distance_from_earth_to_sun;
+
+    double vspeed = sqrt(mu / scaled_real_dist);
+
+    float calculated_angular_velocity_ps = sqrt(vspeed * vspeed / (scaled_real_dist * scaled_real_dist));
+
+    orbital_angle += calculated_angular_velocity_ps * step_s;
 
     absolute_pos = orbital_length * (vec2f){cosf(orbital_angle), sinf(orbital_angle)} + parent->absolute_pos;
 }

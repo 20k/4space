@@ -71,7 +71,7 @@ struct orbital
 
     vec2f absolute_pos;
 
-    float angular_velocity_ps = 0.f;
+    //float angular_velocity_ps = 0.f;
     float rotation_velocity_ps = 0;
 
     float rotation = 0;
@@ -83,7 +83,7 @@ struct orbital
 
     orbital_info::type type = orbital_info::NONE;
 
-    void set_orbit(float ang, float len, float ang_vel_s);
+    void set_orbit(float ang, float len);
 
     void tick(float step_s);
 
