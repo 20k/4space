@@ -348,3 +348,24 @@ ship* battle_manager::get_ship_under(vec2f pos)
 
     return nullptr;
 }
+
+void battle_manager::set_view(sf::RenderWindow& win)
+{
+    vec2f avg = {0,0};
+    int num = 0;
+
+    for(auto& i : ships)
+    {
+        avg += i.second->local_pos;
+
+        num++;
+    }
+
+    if(num > 0)
+        avg = avg / num;
+
+    sf::View v1 = win.getDefaultView();
+    v1.setCenter(avg.x(), avg.y());
+
+    win.setView(v1);
+}

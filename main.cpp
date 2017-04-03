@@ -368,7 +368,9 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win)
     int x = mouse.getPosition(win).x;
     int y = mouse.getPosition(win).y;
 
-    ship* s = battle.get_ship_under({x, y});
+    auto transformed = win.mapPixelToCoords({x, y});
+
+    ship* s = battle.get_ship_under({transformed.x, transformed.y});
 
     if(s)
     {
@@ -477,11 +479,13 @@ int main()
 
         if(state == 1)
         {
+            battle.set_view(window);
             debug_battle(battle, window);
             battle.draw(window);
         }
         if(state == 0)
         {
+            sun->center_camera(window);
             debug_system(system_manage, window);
             base->draw(window);
         }

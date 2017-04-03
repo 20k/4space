@@ -57,6 +57,8 @@ struct battle_manager
 
     ///in world coordinates... which atm is screenspace I WILL FORGET THIS
     ship* get_ship_under(vec2f pos);
+
+    void set_view(sf::RenderWindow& win);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

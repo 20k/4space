@@ -52,6 +52,8 @@ struct orbital : orbital_simple_renderable
     void tick(float step_s);
 
     void draw(sf::RenderWindow& win);
+
+    void center_camera(sf::RenderWindow& win);
 };
 
 struct orbital_system

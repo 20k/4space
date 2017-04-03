@@ -97,6 +97,15 @@ void orbital::draw(sf::RenderWindow& win)
     }
 }
 
+void orbital::center_camera(sf::RenderWindow& win)
+{
+    sf::View view1 = win.getDefaultView();
+
+    view1.setCenter(absolute_pos.x(), absolute_pos.y());
+
+    win.setView(view1);
+}
+
 orbital* orbital_system::make_new(orbital_info::type type, float rad)
 {
     orbital* n = new orbital;
@@ -140,7 +149,6 @@ void orbital_system::draw(sf::RenderWindow& win)
         i->draw(win);
     }
 }
-
 
 orbital_system* system_manager::make_new()
 {
