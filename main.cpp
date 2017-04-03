@@ -431,7 +431,7 @@ int main()
 
     orbital_system* base = system_manage.make_new();
 
-    orbital* sun = base->make_new(orbital_info::STAR, 20.f);
+    orbital* sun = base->make_new(orbital_info::STAR, 10.f);
     orbital* planet = base->make_new(orbital_info::PLANET, 5.f);
     planet->parent = sun;
 

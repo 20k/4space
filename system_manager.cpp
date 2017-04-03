@@ -92,7 +92,7 @@ void orbital::tick(float step_s)
 
     //double years_per_second =
 
-    double default_scale = 1000000.;
+    double default_scale = (365*24*60*60.) / 50.;
 
     double scaled_real_dist = (orbital_length / default_scale) * distance_from_earth_to_sun;
 
