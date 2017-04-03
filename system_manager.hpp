@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <vec/vec.hpp>
+#include <SFML/Graphics.hpp>
 
 namespace orbital_info
 {
@@ -31,9 +32,22 @@ struct orbital_simple_renderable
     void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos);
 };
 
+struct sprite_renderable
+{
+    sf::Image img;
+    sf::Texture tex;
+
+    void load(const std::string& str);
+
+    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos);
+};
+
 struct orbital
 {
     orbital_simple_renderable simple_renderable;
+    sprite_renderable sprite;
+
+    int render_type = 0;
 
     void* data = nullptr;
 

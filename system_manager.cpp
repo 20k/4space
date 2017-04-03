@@ -52,6 +52,23 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
     }
 }
 
+void sprite_renderable::load(const std::string& str)
+{
+    img.loadFromFile(str);
+    tex.loadFromImage(img);
+}
+
+void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos)
+{
+    sf::Sprite spr(tex);
+
+    spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+    spr.setPosition(absolute_pos.x(), absolute_pos.y());
+    spr.setRotation(r2d(rotation));
+
+    win.draw(spr);
+}
+
 void orbital::set_orbit(float ang, float len, float ang_vel_s)
 {
     orbital_angle = ang;
@@ -99,7 +116,10 @@ void orbital::draw(sf::RenderWindow& win)
 
     win.draw(&lines[0], lines.size(), sf::Lines);*/
 
-    simple_renderable.draw(win, rotation, absolute_pos);
+    if(render_type == 0)
+        simple_renderable.draw(win, rotation, absolute_pos);
+    else
+        sprite.draw(win, rotation, absolute_pos);
 }
 
 void orbital::center_camera(sf::RenderWindow& win)
