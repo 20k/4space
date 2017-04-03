@@ -403,7 +403,7 @@ int main()
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
-    test_ship.tick_all_components(1.f);f
+    test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);*/
 
     sf::ContextSettings settings;

@@ -54,8 +54,6 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
 void sprite_renderable::load(const std::string& str)
 {
-    std::cout << str << std::endl;
-
     img.loadFromFile(str);
     tex.loadFromImage(img);
 }
