@@ -20,6 +20,8 @@ void orbital::set_orbit(float ang, float len, float ang_vel_s)
 
 void orbital::tick(float step_s)
 {
+    rotation += rotation_velocity_ps * step_s;
+
     if(parent == nullptr)
         return;
 
@@ -65,6 +67,9 @@ void orbital::draw(sf::RenderWindow& win)
 
         float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
         float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
+
+        a1 += rotation;
+        a2 += rotation;
 
         vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)};
         vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)};

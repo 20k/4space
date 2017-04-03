@@ -36,7 +36,9 @@ struct orbital : orbital_simple_renderable
     vec2f absolute_pos;
 
     float angular_velocity_ps = 0.f;
+    float rotation_velocity_ps = 0;
 
+    float rotation = 0;
     float orbital_angle = 0.f;
     float orbital_length = 0;
     float rad = 0.f;

@@ -429,14 +429,16 @@ int main()
 
     orbital_system* base = system_manage.make_new();
 
-    orbital* sun = base->make_new(orbital_info::STAR, 10.f);
+    orbital* sun = base->make_new(orbital_info::STAR, 20.f);
     orbital* planet = base->make_new(orbital_info::PLANET, 5.f);
     planet->parent = sun;
 
     sun->absolute_pos = {500, 500};
+    sun->rotation_velocity_ps = 2*M_PI/60.f;
 
-    planet->orbital_length = 100.f;
+    planet->orbital_length = 150.f;
     planet->angular_velocity_ps = 2*M_PI / 100.f;
+    planet->rotation_velocity_ps = 2*M_PI / 200.f;
 
     sf::Keyboard key;
 
