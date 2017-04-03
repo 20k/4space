@@ -1071,7 +1071,7 @@ void ship::hit(projectile* p)
     float shields = get_stored_resources()[ship_component_element::SHIELD_POWER];
     float armour = get_stored_resources()[ship_component_element::ARMOUR];
 
-    float damage = p->damage;
+    float damage = p->base.get_tag(component_tag::DAMAGE);
 
     float sdamage = std::min(damage, shields);
 

@@ -199,6 +199,9 @@ component make_default_railgun()
     gun.add(ship_component_element::COMMAND, command);
     gun.add(ship_component_element::HP, hp);
 
+    gun.set_tag(component_tag::DAMAGE, 30.f);
+    gun.set_tag(component_tag::SPEED, 20.f);
+
     gun.name = "Railgun";
 
     return gun;

@@ -206,9 +206,9 @@ void battle_manager::tick(float step_s)
 
             p->pteam = s.team;
 
-            p->damage = 30;
+            p->base = i;
 
-            float speed = 20.f;
+            float speed = i.get_tag(component_tag::SPEED);
 
             p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
 

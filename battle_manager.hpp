@@ -12,7 +12,7 @@ struct projectile : positional
 
     int pteam = 0;
 
-    float damage = 0;
+    component base;
 
     sf::Image img;
     sf::Texture tex;
