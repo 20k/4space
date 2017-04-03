@@ -81,6 +81,7 @@ namespace component_tag
     {
         DAMAGE = 1,
         SPEED = 2,
+        SCALE = 4, ///render scale
     };
 }
 

@@ -63,8 +63,10 @@ std::vector<std::string> get_components_display_string(ship& s)
             std::string use_string = "" + to_string_with_precision(net_usage, 3) + "/s";
             std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "/use";
 
-            std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
-            std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
+            //std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
+            //std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
+
+            std::string fire_time_remaining = "Charge time remaining (s): " + to_string_with_precision(time_until_next_use, 3) + "/" + to_string_with_precision(time_between_uses, 3);
 
             //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
             //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
@@ -82,10 +84,7 @@ std::vector<std::string> get_components_display_string(ship& s)
                 component_str += "\n" + per_use_string;
 
             if(time_between_uses > 0)
-                component_str += "\n" + time_str;
-
-            if(time_until_next_use > 0)
-                component_str += "\n" + left_str;
+                component_str += "\n" + fire_time_remaining;
 
             /*if(max_amount > 0)
                 component_str += "\n" + mamount_str;*/

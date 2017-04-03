@@ -6,7 +6,7 @@
 component make_default_crew()
 {
     component_attribute command;
-    command.produced_per_s = 2.f;
+    command.produced_per_s = 3.f;
 
     component_attribute oxygen;
     oxygen.drained_per_s = 0.5f;
@@ -201,7 +201,8 @@ component make_default_railgun()
     gun.add(ship_component_element::HP, hp);
 
     gun.set_tag(component_tag::DAMAGE, 30.f);
-    gun.set_tag(component_tag::SPEED, 20.f);
+    gun.set_tag(component_tag::SPEED, 80.f);
+    gun.set_tag(component_tag::SCALE, 0.5f);
 
     gun.name = "Railgun";
 
@@ -224,7 +225,7 @@ component make_default_torpedo()
     power.drained_per_use = 5;
 
     component_attribute command;
-    command.drained_per_s = 0;
+    command.drained_per_s = 1;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;
@@ -238,7 +239,8 @@ component make_default_torpedo()
     torp.add(ship_component_element::HP, hp);
 
     torp.set_tag(component_tag::DAMAGE, 35);
-    torp.set_tag(component_tag::SPEED, 5);
+    torp.set_tag(component_tag::SPEED, 40);
+    torp.set_tag(component_tag::SCALE, 0.5f);
 
     torp.name = "Torpedo";
 

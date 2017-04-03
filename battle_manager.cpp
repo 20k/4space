@@ -139,6 +139,13 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
         spr.setRotation(r2d(p->local_rot + M_PI/2));
 
+        float scale = 1.f;
+
+        if(p->base.has_tag(component_tag::SCALE))
+            scale = p->base.get_tag(component_tag::SCALE);
+
+        spr.setScale(scale, scale);
+
         win.draw(spr);
     }
 }
@@ -258,7 +265,7 @@ void battle_manager::add_ship(ship* s)
 
     s->local_pos = team_positions[s->team];
 
-    s->dim = {50, 20};
+    s->dim = {100, 40};
 }
 
 ship* battle_manager::get_nearest_hostile(ship* s)
