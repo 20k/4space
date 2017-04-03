@@ -1138,6 +1138,8 @@ void ship::generate_image(vec2i dim)
     intermediate_texture->create(dim.x(), dim.y());
     intermediate_texture->setSmooth(true);
 
+    sf::BlendMode blend(sf::BlendMode::Factor::One, sf::BlendMode::Factor::Zero);
+
     sf::RectangleShape r1;
 
     r1.setFillColor(sf::Color(255, 255, 255));
@@ -1150,7 +1152,7 @@ void ship::generate_image(vec2i dim)
 
     sf::RectangleShape corner;
     corner.setSize({granularity, granularity});
-    corner.setFillColor(sf::Color(0,0,0));
+    corner.setFillColor(sf::Color(0,0,0,0));
     corner.setOrigin(corner.getLocalBounds().width/2, corner.getLocalBounds().height/2);
 
     vec2f corners[] = {{0,0}, {0, dim.y()}, {dim.x(), 0}, {dim.x(), dim.y()}};
@@ -1176,7 +1178,7 @@ void ship::generate_image(vec2i dim)
         corner.setPosition(c.x(), c.y());
         corner.setRotation(r2d(rot));
 
-        intermediate_texture->draw(corner);
+        intermediate_texture->draw(corner, blend);
     }
 
     sf::RectangleShape chunk = corner;
@@ -1230,7 +1232,7 @@ void ship::generate_image(vec2i dim)
             chunk.setRotation(0.f);
         }
 
-        intermediate_texture->draw(chunk);
+        intermediate_texture->draw(chunk, blend);
 
         exclusion.push_back(pos);
     }

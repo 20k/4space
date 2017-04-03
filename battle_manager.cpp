@@ -42,13 +42,8 @@ projectile* projectile_manager::make_new()
     return p;
 }
 
-bool projectile_within_ship(projectile* p, ship* s)
+bool point_within_ship(vec2f pos, ship* s)
 {
-    //vec2f tl = i->local_pos -
-
-    if(p->pteam == s->team)
-        return false;
-
     vec2f tl = s->local_pos - s->dim/2.f;
     vec2f br = s->local_pos + s->dim/2.f;
 
@@ -57,7 +52,7 @@ bool projectile_within_ship(projectile* p, ship* s)
     //tl = (tl - s->local_pos).rot(back_angle) + s->local_pos;
     //br = (br - s->local_pos).rot(back_angle) + s->local_pos;
 
-    vec2f ppos = (p->local_pos - s->local_pos).rot(back_angle) + s->local_pos;
+    vec2f ppos = (pos - s->local_pos).rot(back_angle) + s->local_pos;
 
     //printf("%f %f %f %f %f %f\n", ppos.x(),ppos.y(), tl.x(), tl.y(), br.x(), br.y());
 
@@ -67,6 +62,16 @@ bool projectile_within_ship(projectile* p, ship* s)
     }
 
     return false;
+}
+
+bool projectile_within_ship(projectile* p, ship* s)
+{
+    //vec2f tl = i->local_pos -
+
+    if(p->pteam == s->team)
+        return false;
+
+    return point_within_ship(p->local_pos, s);
 }
 
 void projectile_manager::tick(battle_manager& manage, float step_s)
@@ -268,7 +273,32 @@ void battle_manager::draw(sf::RenderWindow& win)
         spr.setPosition({s->local_pos.x(), s->local_pos.y()});
         spr.setRotation(r2d(s->local_rot));
 
+        if(s->highlight)
+        {
+            float xlen = s->dim.x();
+            float ylen = s->dim.y();
+
+            //float xextra = xlen - ylen;
+
+            //float xfrac = (xlen - xextra) / ylen;
+
+            int highlight_width = 5;
+
+            float xpixel = (xlen + highlight_width) / xlen;
+            float ypixel = (ylen + highlight_width) / ylen;
+
+            spr.setColor(sf::Color(0, 128, 255));
+            spr.setScale(1.f * xpixel, 1.f * ypixel);
+
+            win.draw(spr);
+
+            spr.setColor(sf::Color(255, 255, 255));
+            spr.setScale(1, 1);
+        }
+
         win.draw(spr);
+
+        s->highlight = false;
     }
 }
 
@@ -310,4 +340,15 @@ ship* battle_manager::get_nearest_hostile(ship* s)
     }
 
     return found_ship;
+}
+
+ship* battle_manager::get_ship_under(vec2f pos)
+{
+    for(auto& i : ships)
+    {
+        if(point_within_ship(pos, i.second))
+            return i.second;
+    }
+
+    return nullptr;
 }

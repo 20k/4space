@@ -54,6 +54,9 @@ struct battle_manager
     void add_ship(ship* s);
 
     ship* get_nearest_hostile(ship* s);
+
+    ///in world coordinates... which atm is screenspace I WILL FORGET THIS
+    ship* get_ship_under(vec2f pos);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

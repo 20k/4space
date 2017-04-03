@@ -237,6 +237,8 @@ struct ship : positional
 
     bool is_loaded = false;
 
+    bool highlight = false;
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
