@@ -54,6 +54,8 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
 void sprite_renderable::load(const std::string& str)
 {
+    std::cout << str << std::endl;
+
     img.loadFromFile(str);
     tex.loadFromImage(img);
 }
@@ -147,7 +149,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad)
     }
     else if(n->render_type == 1)
     {
-        n->sprite.load(orbital_info::load_strs[n->render_type]);
+        n->sprite.load(orbital_info::load_strs[type]);
     }
 
     orbitals.push_back(n);

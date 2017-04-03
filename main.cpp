@@ -403,7 +403,7 @@ int main()
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
-    test_ship.tick_all_components(1.f);
+    test_ship.tick_all_components(1.f);f
     test_ship.tick_all_components(1.f);*/
 
     sf::ContextSettings settings;
@@ -441,6 +441,14 @@ int main()
     planet->orbital_length = 150.f;
     planet->angular_velocity_ps = 2*M_PI / 100.f;
     planet->rotation_velocity_ps = 2*M_PI / 200.f;
+
+    orbital* fleet = base->make_new(orbital_info::FLEET, 5.f);
+
+    fleet->orbital_angle = 200.f;
+    fleet->angular_velocity_ps = 2 * M_PI/100.f;
+    fleet->orbital_length = 200.f;
+    fleet->parent = sun;
+
 
     sf::Keyboard key;
 
