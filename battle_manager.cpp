@@ -1,6 +1,36 @@
 #include "battle_manager.hpp"
 #include <SFML/Graphics.hpp>
 
+void projectile::load(int type)
+{
+    using namespace ship_component_elements;
+
+    std::string str = "./pics/";
+
+    if(type == RAILGUN)
+    {
+        str += "railgun.png";
+    }
+
+    if(type == TORPEDO)
+    {
+        str += "torpedo.png";
+    }
+
+    if(type == PLASMAGUN)
+    {
+        str += "plasmabolt.png";
+    }
+
+    if(type == COILGUN)
+    {
+        str += "coilgun.png";
+    }
+
+    img.loadFromFile(str);
+    tex.loadFromImage(img);
+}
+
 projectile* projectile_manager::make_new()
 {
     projectile* p = new projectile;
@@ -80,7 +110,7 @@ void projectile_manager::destroy(projectile* proj)
 
 void projectile_manager::draw(sf::RenderWindow& win)
 {
-    sf::RectangleShape rect;
+    /*sf::RectangleShape rect;
 
     rect.setFillColor(sf::Color(255, 128, 100));
 
@@ -95,6 +125,19 @@ void projectile_manager::draw(sf::RenderWindow& win)
         rect.setRotation(r2d(p->local_rot));
 
         win.draw(rect);
+    }*/
+
+    for(projectile* p : projectiles)
+    {
+        sf::Sprite spr(p->tex);
+
+        spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+
+        spr.setPosition(p->local_pos.x(), p->local_pos.y());
+
+        spr.setRotation(r2d(p->local_rot + M_PI/2));
+
+        win.draw(spr);
     }
 }
 
@@ -168,6 +211,8 @@ void battle_manager::tick(float step_s)
             float speed = 20.f;
 
             p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
+
+            p->load(i.get_weapon_type());
         }
     }
 

@@ -46,6 +46,7 @@ namespace ship_component_elements
         TORPEDO,
         PLASMAGUN,
         COILGUN,
+        NONE,
     };
 
     static std::vector<std::string> display_strings
@@ -70,6 +71,16 @@ namespace ship_component_elements
         "TORPEDO",
         "PLASMAGUN",
         "COILGUN",
+    };
+}
+
+///misc tags
+namespace component_tag
+{
+    enum tag
+    {
+        DAMAGE = 1,
+        SPEED = 2,
     };
 }
 
@@ -142,6 +153,7 @@ struct component
     std::string name = "";
 
     std::map<ship_component_element, component_attribute> components;
+    std::map<component_tag::tag, float> tag_list;
 
     bool has_element(const ship_component_element& type);
 
@@ -168,6 +180,14 @@ struct component
 
     float calculate_total_efficiency(float step_s);
     void propagate_total_efficiency(float step_s);
+
+    ship_component_element get_weapon_type();
+
+    bool has_tag(component_tag::tag tag);
+
+    float get_tag(component_tag::tag tag);
+
+    void set_tag(component_tag::tag tag, float val);
 };
 
 struct projectile;

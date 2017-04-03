@@ -2,6 +2,7 @@
 #define BATTLE_MANAGER_HPP_INCLUDED
 
 #include "ship.hpp"
+#include <SFML/Graphics.hpp>
 
 struct projectile : positional
 {
@@ -12,6 +13,11 @@ struct projectile : positional
     int pteam = 0;
 
     float damage = 0;
+
+    sf::Image img;
+    sf::Texture tex;
+
+    void load(int type);
 };
 
 struct battle_manager;

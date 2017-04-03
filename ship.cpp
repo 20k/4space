@@ -474,6 +474,48 @@ void component::propagate_total_efficiency(float step_s)
     }
 }
 
+ship_component_element component::get_weapon_type()
+{
+    using namespace ship_component_elements;
+
+    if(has_element(RAILGUN))
+        return RAILGUN;
+
+    if(has_element(TORPEDO))
+        return TORPEDO;
+
+    if(has_element(PLASMAGUN))
+        return PLASMAGUN;
+
+    if(has_element(COILGUN))
+        return COILGUN;
+
+    return NONE;
+}
+
+bool component::has_tag(component_tag::tag tag)
+{
+    return tag_list.find(tag) != tag_list.end();
+}
+
+float component::get_tag(component_tag::tag tag)
+{
+    ///preserve integrity of map?
+    if(!has_tag(tag))
+    {
+        printf("warning: Tag fuckup in get_tag %i %s\n", tag, name.c_str());
+
+        return 0.f;
+    }
+
+    return tag_list[tag];
+}
+
+void component::set_tag(component_tag::tag tag, float val)
+{
+    tag_list[tag] = val;
+}
+
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
     //if(step_s < 0.1)
