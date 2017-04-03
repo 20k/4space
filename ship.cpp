@@ -1278,3 +1278,39 @@ ship::~ship()
     if(intermediate_texture)
         delete intermediate_texture;
 }
+
+ship* ship_manager::make_new(int team)
+{
+    ship* s = new ship;
+
+    ships.push_back(s);
+
+    s->team = team;
+
+    return s;
+}
+
+ship* ship_manager::make_new_from(int team, ship& ns)
+{
+    ship* s = new ship(ns);
+
+    ships.push_back(s);
+
+    s->team = team;
+
+    return s;
+}
+
+void ship_manager::destroy(ship* s)
+{
+    for(int i=0; i<ships.size(); i++)
+    {
+        if(ships[i] == s)
+        {
+            ships.erase(ships.begin() + i);
+            delete s;
+
+            return;
+        }
+    }
+}

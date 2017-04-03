@@ -277,4 +277,15 @@ private:
     //void fire();
 };
 
+///can be used as a fleet
+struct ship_manager
+{
+    std::vector<ship*> ships;
+
+    ship* make_new(int team);
+    ship* make_new_from(int team, ship& s);
+
+    void destroy(ship* s);
+};
+
 #endif // SHIP_HPP_INCLUDED
