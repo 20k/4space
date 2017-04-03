@@ -6,6 +6,29 @@
 #include <iomanip>
 #include "battle_manager.hpp"
 #include <set>
+#include "system_manager.hpp"
+
+template<sf::Keyboard::Key k>
+bool once()
+{
+    static bool last;
+
+    sf::Keyboard key;
+
+    if(key.isKeyPressed(k) && !last)
+    {
+        last = true;
+
+        return true;
+    }
+
+    if(!key.isKeyPressed(k))
+    {
+        last = false;
+    }
+
+    return false;
+}
 
 template <typename T>
 std::string to_string_with_precision(const T a_value, const int n = 6)
@@ -362,6 +385,11 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win)
     ImGui::End();
 }
 
+void debug_system(system_manager& system_manage, sf::RenderWindow& win)
+{
+
+}
+
 int main()
 {
     ship test_ship = make_default();
@@ -397,7 +425,22 @@ int main()
     battle.add_ship(&test_ship);
     battle.add_ship(&test_ship2);
 
+    system_manager system_manage;
+
+    orbital_system* base = system_manage.make_new();
+
+    orbital* sun = base->make_new(orbital_info::STAR, 10.f);
+    orbital* planet = base->make_new(orbital_info::PLANET, 5.f);
+    planet->parent = sun;
+
+    sun->absolute_pos = {500, 500};
+
+    planet->orbital_length = 100.f;
+    planet->angular_velocity_ps = 2*M_PI / 100.f;
+
     sf::Keyboard key;
+
+    int state = 0;
 
     while(window.isOpen())
     {
@@ -418,14 +461,30 @@ int main()
             //printf("Timestep %f\n", diff_s);
         }
 
+        if(once<sf::Keyboard::F1>())
+        {
+            state = (state + 1) % 2;
+        }
+
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);
 
         display_ship_info(test_ship, diff_s);
 
         debug_menu({&test_ship});
-        debug_battle(battle, window);
-        battle.draw(window);
+
+        if(state == 1)
+        {
+            debug_battle(battle, window);
+            battle.draw(window);
+        }
+        if(state == 0)
+        {
+            debug_system(system_manage, window);
+            base->draw(window);
+        }
+
+        system_manage.tick(diff_s);
 
         ImGui::Render();
         window.display();

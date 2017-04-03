@@ -159,8 +159,8 @@ void tick_ship_ai(battle_manager& battle_manage, ship& s, float step_s)
 {
     ship* nearest = battle_manage.get_nearest_hostile(&s);
 
-    vec2f their_pos = nearest->local_pos;
-    vec2f my_pos = s.local_pos;
+    //vec2f their_pos = nearest->local_pos;
+    //vec2f my_pos = s.local_pos;
 
     float max_turn_rate_per_s = step_s * M_PI/16;
 
