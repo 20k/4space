@@ -275,7 +275,7 @@ void battle_manager::draw(sf::RenderWindow& win)
 
         if(s->highlight)
         {
-            float xlen = s->dim.x();
+            /*float xlen = s->dim.x();
             float ylen = s->dim.y();
 
             int highlight_width = 5;
@@ -289,7 +289,25 @@ void battle_manager::draw(sf::RenderWindow& win)
             win.draw(spr);
 
             spr.setColor(sf::Color(255, 255, 255));
-            spr.setScale(1, 1);
+            spr.setScale(1, 1);*/
+
+            spr.setColor(sf::Color(0, 128, 255));
+
+            int hw = 2;
+
+            for(int y=-hw; y<=hw; y++)
+            {
+                for(int x=-hw; x<=hw; x++)
+                {
+                    spr.setPosition(s->local_pos.x() + x, s->local_pos.y() + y);
+
+                    win.draw(spr);
+                }
+            }
+
+            spr.setColor(sf::Color(255, 255, 255));
+
+            spr.setPosition(s->local_pos.x(), s->local_pos.y());
         }
 
         win.draw(spr);
