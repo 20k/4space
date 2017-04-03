@@ -19,6 +19,9 @@ std::string to_string_with_variable_prec(const T a_value)
 {
     int n = ceil(log10(a_value)) + 1;
 
+    if(a_value <= 0.0001f)
+        n = 2;
+
     if(n < 2)
         n = 2;
 
