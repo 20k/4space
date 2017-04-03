@@ -1114,3 +1114,137 @@ void ship::hit(projectile* p)
 
     h.apply_diff(hp_diff);
 }
+
+void set_center_sfml(sf::RectangleShape& shape)
+{
+    shape.setOrigin(shape.getLocalBounds().width/2.f, shape.getLocalBounds().height/2.f);
+}
+
+void ship::check_load(vec2i dim)
+{
+    if(is_loaded)
+        return;
+
+    generate_image(dim);
+}
+
+void ship::generate_image(vec2i dim)
+{
+    float min_bound = std::min(dim.x(), dim.y());
+
+    tex.setSmooth(true);
+
+    intermediate_texture = new sf::RenderTexture;
+    intermediate_texture->create(dim.x(), dim.y());
+    intermediate_texture->setSmooth(true);
+
+    sf::RectangleShape r1;
+
+    r1.setFillColor(sf::Color(255, 255, 255));
+    r1.setSize({dim.x(), dim.y()});
+    r1.setPosition(0, 0);
+
+    intermediate_texture->draw(r1);
+
+    int granularity = min_bound/4;
+
+    sf::RectangleShape corner;
+    corner.setSize({granularity, granularity});
+    corner.setFillColor(sf::Color(0,0,0));
+    corner.setOrigin(corner.getLocalBounds().width/2, corner.getLocalBounds().height/2);
+
+    vec2f corners[] = {{0,0}, {0, dim.y()}, {dim.x(), 0}, {dim.x(), dim.y()}};
+    float rotations[] = {0, -M_PI/2, M_PI/2, M_PI};
+    bool done[] = {false, false, false, false};
+
+    int num_corners = randf_s(1, 5);
+
+    std::vector<vec2f> exclusion;
+
+    for(int i=0; i<num_corners; i++)
+    {
+        int element = randf_s(0, 4);
+
+        while(done[element])
+            element = randf_s(0, 4);
+
+        vec2f c = corners[element];
+        float rot = rotations[element] + M_PI/4;
+
+        exclusion.push_back(c);
+
+        corner.setPosition(c.x(), c.y());
+        corner.setRotation(r2d(rot));
+
+        intermediate_texture->draw(corner);
+    }
+
+    sf::RectangleShape chunk = corner;
+
+
+    //chunk.setRotation(0.f);
+
+    int chunks = randf_s(1, 20);
+
+    for(int i=0; i<chunks; i++)
+    {
+        float len_frac = randf_s(0.f, 1.f);
+
+        int side = randf_s(0.f, 4.f);
+
+        vec2f pos;
+
+        if(side == 0)
+            pos = {randf_s(0.f, dim.x()), 0.f};
+
+        if(side == 1)
+            pos = {randf_s(0.f, dim.x()), dim.y()};
+
+        if(side == 2)
+            pos = {0.f, randf_s(0.f, dim.y())};
+
+        if(side == 3)
+            pos = {dim.x(), randf_s(0.f, dim.y())};
+
+        pos = round_to_multiple(pos, granularity);
+
+        bool skip = false;
+
+        for(auto& kk : exclusion)
+        {
+            if((pos - kk).length() < granularity*1.5f)
+            {
+                skip = true;
+                break;
+            }
+        }
+
+        if(skip)
+            continue;
+
+        chunk.setPosition(pos.x(), pos.y());
+
+        if(randf_s(0.f, 1.f) < 0.5f)
+        {
+            chunk.setRotation(45);
+        }
+        else
+        {
+            chunk.setRotation(0.f);
+        }
+
+        intermediate_texture->draw(chunk);
+
+        exclusion.push_back(pos);
+    }
+
+    intermediate_texture->display();
+
+    tex = intermediate_texture->getTexture();
+}
+
+ship::~ship()
+{
+    if(intermediate_texture)
+        delete intermediate_texture;
+}

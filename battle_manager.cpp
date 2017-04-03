@@ -232,7 +232,7 @@ void battle_manager::draw(sf::RenderWindow& win)
 {
     projectile_manage.draw(win);
 
-    sf::RectangleShape rect;
+    //sf::RectangleShape rect;
 
     /*float w = 50;
     float h = 20;
@@ -241,7 +241,7 @@ void battle_manager::draw(sf::RenderWindow& win)
 
     rect.setSize({w, h});*/
 
-    rect.setFillColor(sf::Color(255, 255, 255));
+    /*rect.setFillColor(sf::Color(255, 255, 255));
 
     for(auto& p : ships)
     {
@@ -254,6 +254,21 @@ void battle_manager::draw(sf::RenderWindow& win)
         rect.setRotation(r2d(s->local_rot));
 
         win.draw(rect);
+    }*/
+
+    for(auto& p : ships)
+    {
+        ship* s = p.second;
+
+        sf::Texture& tex = s->tex;
+
+        sf::Sprite spr(tex);
+
+        spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+        spr.setPosition({s->local_pos.x(), s->local_pos.y()});
+        spr.setRotation(r2d(s->local_rot));
+
+        win.draw(spr);
     }
 }
 
@@ -266,6 +281,8 @@ void battle_manager::add_ship(ship* s)
     s->local_pos = team_positions[s->team];
 
     s->dim = {100, 40};
+
+    s->check_load({s->dim.x(), s->dim.y()});
 }
 
 ship* battle_manager::get_nearest_hostile(ship* s)

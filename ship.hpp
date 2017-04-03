@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <vec/vec.hpp>
+#include <SFML/Graphics.hpp>
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -226,6 +227,18 @@ struct ship : positional
 
     void hit(projectile* p);
 
+    void check_load(vec2i dim);
+    void generate_image(vec2i dim);
+
+    ~ship();
+
+    sf::Image img;
+    sf::Texture tex;
+
+    bool is_loaded = false;
+
+private:
+    sf::RenderTexture* intermediate_texture = nullptr;
 
     ///?
     //void fire();
