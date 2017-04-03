@@ -32,6 +32,94 @@ std::string to_string_with_variable_prec(const T a_value)
 
 #include "ship_definitions.hpp"
 
+///so display this (ish) on mouseover for a component
+std::string get_component_display_string(component& c)
+{
+    std::string component_str = c.name + ":\n";
+
+    int num = 0;
+
+    std::string eff = "";
+
+    float efficiency = 1.f;
+
+    if(c.components.begin() != c.components.end())
+        efficiency = c.components.begin()->second.cur_efficiency * 100.f;
+
+    if(efficiency < 99.9f)
+        eff = "Efficiency %%: " + to_string_with_precision(efficiency, 3) + "\n";
+
+    component_str += eff;
+
+    for(auto& i : c.components)
+    {
+        auto type = i.first;
+        component_attribute attr = i.second;
+
+        std::string header = ship_component_elements::display_strings[type];
+
+        ///ok, we can take the nets
+
+        float net_usage = attr.produced_per_s - attr.drained_per_s;
+        float net_per_use = attr.produced_per_use - attr.drained_per_use;
+
+        float time_between_uses = attr.time_between_uses_s;
+        float time_until_next_use = std::max(0.f, attr.time_between_uses_s - (attr.current_time_s - attr.time_last_used_s));
+
+        float max_amount = attr.max_amount;
+        float cur_amount = attr.cur_amount;
+
+        std::string use_string = "" + to_string_with_precision(net_usage, 3) + "/s";
+        std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "/use";
+
+        //std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
+        //std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
+
+        std::string fire_time_remaining = "Time Left (s): " + to_string_with_precision(time_until_next_use, 3) + "/" + to_string_with_precision(time_between_uses, 3);
+
+        //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
+        //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
+
+        std::string storage_str = "(" + to_string_with_variable_prec(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
+
+        //std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
+
+        component_str += header;
+
+        if(net_usage != 0)
+            component_str += " " + use_string;
+
+        if(net_per_use != 0)
+            component_str += " " + per_use_string;
+
+        if(time_between_uses > 0)
+            component_str += " " + fire_time_remaining;
+
+        /*if(max_amount > 0)
+            component_str += "\n" + mamount_str;*/
+
+        ///not a typo
+        /*if(max_amount > 0)
+            component_str += "\n" + camount_str;*/
+
+        if(max_amount > 0)
+            component_str += " " + storage_str;
+
+        //if(attr.cur_efficiency < 0.99999f)
+        //    component_str += "\n" + efficiency_str;
+
+
+        if(num != c.components.size() - 1)
+        {
+            component_str += "\n";
+        }
+
+        num++;
+    }
+
+    return component_str;
+}
+
 ///vertical list of attributes, going horizontally with separators between components
 ///we'll also want a systems level version of this, ie overall not specific
 std::vector<std::string> get_components_display_string(ship& s)
@@ -42,87 +130,7 @@ std::vector<std::string> get_components_display_string(ship& s)
 
     for(component& c : components)
     {
-        std::string component_str = c.name + ":\n";
-
-        int num = 0;
-
-        std::string eff = "";
-
-        float efficiency = 1.f;
-
-        if(c.components.begin() != c.components.end())
-            efficiency = c.components.begin()->second.cur_efficiency * 100.f;
-
-        if(efficiency < 99.9f)
-            eff = "Efficiency %%: " + to_string_with_precision(efficiency, 3) + "\n";
-
-        component_str += eff;
-
-        for(auto& i : c.components)
-        {
-            auto type = i.first;
-            component_attribute attr = i.second;
-
-            std::string header = ship_component_elements::display_strings[type];
-
-            ///ok, we can take the nets
-
-            float net_usage = attr.produced_per_s - attr.drained_per_s;
-            float net_per_use = attr.produced_per_use - attr.drained_per_use;
-
-            float time_between_uses = attr.time_between_uses_s;
-            float time_until_next_use = std::max(0.f, attr.time_between_uses_s - (attr.current_time_s - attr.time_last_used_s));
-
-            float max_amount = attr.max_amount;
-            float cur_amount = attr.cur_amount;
-
-            std::string use_string = "" + to_string_with_precision(net_usage, 3) + "/s";
-            std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "/use";
-
-            //std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
-            //std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
-
-            std::string fire_time_remaining = "Time Left (s): " + to_string_with_precision(time_until_next_use, 3) + "/" + to_string_with_precision(time_between_uses, 3);
-
-            //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
-            //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
-
-            std::string storage_str = "(" + to_string_with_variable_prec(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
-
-            //std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
-
-            component_str += header;
-
-            if(net_usage != 0)
-                component_str += " " + use_string;
-
-            if(net_per_use != 0)
-                component_str += " " + per_use_string;
-
-            if(time_between_uses > 0)
-                component_str += " " + fire_time_remaining;
-
-            /*if(max_amount > 0)
-                component_str += "\n" + mamount_str;*/
-
-            ///not a typo
-            /*if(max_amount > 0)
-                component_str += "\n" + camount_str;*/
-
-            if(max_amount > 0)
-                component_str += " " + storage_str;
-
-            //if(attr.cur_efficiency < 0.99999f)
-            //    component_str += "\n" + efficiency_str;
-
-
-            if(num != c.components.size() - 1)
-            {
-                component_str += "\n";
-            }
-
-            num++;
-        }
+        std::string component_str = get_component_display_string(c);
 
         display_str.push_back(component_str);
     }
@@ -178,8 +186,20 @@ void debug_menu(const std::vector<ship*>& ships)
     ImGui::End();
 }
 
-void debug_battle(battle_manager& battle)
+void debug_battle(battle_manager& battle, sf::RenderWindow& win)
 {
+    sf::Mouse mouse;
+
+    int x = mouse.getPosition(win).x;
+    int y = mouse.getPosition(win).y;
+
+    ship* s = battle.get_ship_under({x, y});
+
+    if(s)
+    {
+        s->highlight = true;
+    }
+
     ImGui::Begin("Battle DBG");
 
     if(ImGui::Button("Step Battle 1s"))
@@ -243,7 +263,7 @@ int main()
         {
             battle.tick(diff_s);
 
-            printf("Timestep %f\n", diff_s);
+            //printf("Timestep %f\n", diff_s);
         }
 
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
@@ -252,7 +272,7 @@ int main()
         display_ship_info(test_ship);
 
         debug_menu({&test_ship});
-        debug_battle(battle);
+        debug_battle(battle, window);
         battle.draw(window);
 
         ImGui::Render();

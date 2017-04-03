@@ -278,10 +278,6 @@ void battle_manager::draw(sf::RenderWindow& win)
             float xlen = s->dim.x();
             float ylen = s->dim.y();
 
-            //float xextra = xlen - ylen;
-
-            //float xfrac = (xlen - xextra) / ylen;
-
             int highlight_width = 5;
 
             float xpixel = (xlen + highlight_width) / xlen;
