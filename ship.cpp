@@ -1181,9 +1181,6 @@ void ship::generate_image(vec2i dim)
 
     sf::RectangleShape chunk = corner;
 
-
-    //chunk.setRotation(0.f);
-
     int chunks = randf_s(1, 20);
 
     for(int i=0; i<chunks; i++)

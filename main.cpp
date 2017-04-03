@@ -14,6 +14,19 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
     return out.str();
 }
 
+template<typename T>
+std::string to_string_with_variable_prec(const T a_value)
+{
+    int n = ceil(log10(a_value)) + 1;
+
+    if(n < 2)
+        n = 2;
+
+    std::ostringstream out;
+    out << std::setprecision(n) << a_value;
+    return out.str();
+}
+
 #include "ship_definitions.hpp"
 
 ///vertical list of attributes, going horizontally with separators between components
@@ -38,7 +51,7 @@ std::vector<std::string> get_components_display_string(ship& s)
             efficiency = c.components.begin()->second.cur_efficiency * 100.f;
 
         if(efficiency < 99.9f)
-            eff = "Overall Efficiency %%: " + to_string_with_precision(efficiency, 3) + "\n";
+            eff = "Efficiency %%: " + to_string_with_precision(efficiency, 3) + "\n";
 
         component_str += eff;
 
@@ -66,25 +79,25 @@ std::vector<std::string> get_components_display_string(ship& s)
             //std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
             //std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
 
-            std::string fire_time_remaining = "Charge time remaining (s): " + to_string_with_precision(time_until_next_use, 3) + "/" + to_string_with_precision(time_between_uses, 3);
+            std::string fire_time_remaining = "Time Left (s): " + to_string_with_precision(time_until_next_use, 3) + "/" + to_string_with_precision(time_between_uses, 3);
 
             //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
             //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
 
-            std::string storage_str = "Storage: " + to_string_with_precision(cur_amount, 5) + "/" + to_string_with_precision(max_amount, 5);
+            std::string storage_str = "(" + to_string_with_variable_prec(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
 
             //std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
 
             component_str += header;
 
             if(net_usage != 0)
-                component_str += "\n" + use_string;
+                component_str += " " + use_string;
 
             if(net_per_use != 0)
-                component_str += "\n" + per_use_string;
+                component_str += " " + per_use_string;
 
             if(time_between_uses > 0)
-                component_str += "\n" + fire_time_remaining;
+                component_str += " " + fire_time_remaining;
 
             /*if(max_amount > 0)
                 component_str += "\n" + mamount_str;*/
@@ -94,7 +107,7 @@ std::vector<std::string> get_components_display_string(ship& s)
                 component_str += "\n" + camount_str;*/
 
             if(max_amount > 0)
-                component_str += "\n" + storage_str;
+                component_str += " " + storage_str;
 
             //if(attr.cur_efficiency < 0.99999f)
             //    component_str += "\n" + efficiency_str;
