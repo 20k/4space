@@ -107,6 +107,7 @@ struct component_attribute
 
     float add_amount(float amount);
     bool can_use();
+    void use();
     float get_available_capacity();
     float get_total_capacity(float step_s); ///including drain
 

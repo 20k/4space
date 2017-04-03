@@ -29,6 +29,8 @@ void projectile::load(int type)
 
     img.loadFromFile(str);
     tex.loadFromImage(img);
+
+    tex.setSmooth(true);
 }
 
 projectile* projectile_manager::make_new()

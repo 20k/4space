@@ -30,6 +30,18 @@ std::vector<std::string> get_components_display_string(ship& s)
 
         int num = 0;
 
+        std::string eff = "";
+
+        float efficiency = 1.f;
+
+        if(c.components.begin() != c.components.end())
+            efficiency = c.components.begin()->second.cur_efficiency * 100.f;
+
+        if(efficiency < 99.9f)
+            eff = "Overall Efficiency %%: " + to_string_with_precision(efficiency, 3) + "\n";
+
+        component_str += eff;
+
         for(auto& i : c.components)
         {
             auto type = i.first;
@@ -59,7 +71,7 @@ std::vector<std::string> get_components_display_string(ship& s)
 
             std::string storage_str = "Storage: " + to_string_with_precision(cur_amount, 5) + "/" + to_string_with_precision(max_amount, 5);
 
-            std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
+            //std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
 
             component_str += header;
 
@@ -85,8 +97,8 @@ std::vector<std::string> get_components_display_string(ship& s)
             if(max_amount > 0)
                 component_str += "\n" + storage_str;
 
-            if(attr.cur_efficiency < 0.99999f)
-                component_str += "\n" + efficiency_str;
+            //if(attr.cur_efficiency < 0.99999f)
+            //    component_str += "\n" + efficiency_str;
 
 
             if(num != c.components.size() - 1)
@@ -177,9 +189,12 @@ int main()
     test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);*/
 
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+
     sf::RenderWindow window;
 
-    window.create(sf::VideoMode(1024, 768),"Wowee");
+    window.create(sf::VideoMode(1024, 768),"Wowee", sf::Style::Default, settings);
 
     ImGui::SFML::Init(window);
 

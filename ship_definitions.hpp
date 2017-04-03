@@ -173,6 +173,7 @@ component make_default_railgun()
     ///...the railgun literally produces railgun
     component_attribute railgun;
     railgun.produced_per_use = 1;
+    railgun.time_between_uses_s = 24;
 
     ///ok so... positive heat is good,negative is bad
     ///rename cooling?
@@ -205,6 +206,43 @@ component make_default_railgun()
     gun.name = "Railgun";
 
     return gun;
+}
+
+component make_default_torpedo()
+{
+    component_attribute torpedo;
+    torpedo.produced_per_use = 1;
+    torpedo.time_between_uses_s = 16;
+
+    component_attribute cooling;
+    cooling.drained_per_use = 2.f;
+    cooling.produced_per_s = 0.01f;
+    cooling.max_amount = 1;
+
+    component_attribute power;
+    power.drained_per_s = 1;
+    power.drained_per_use = 5;
+
+    component_attribute command;
+    command.drained_per_s = 0;
+
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
+    component torp;
+    torp.add(ship_component_element::TORPEDO, torpedo);
+    torp.add(ship_component_element::COOLING_POTENTIAL, cooling);
+    torp.add(ship_component_element::ENERGY, power);
+    torp.add(ship_component_element::COMMAND, command);
+    torp.add(ship_component_element::HP, hp);
+
+    torp.set_tag(component_tag::DAMAGE, 35);
+    torp.set_tag(component_tag::SPEED, 5);
+
+    torp.name = "Torpedo";
+
+    return torp;
 }
 
 ship make_default()
@@ -251,6 +289,7 @@ ship make_default()
     test_ship.add(make_default_engines());
     test_ship.add(make_default_railgun());
     test_ship.add(make_default_heatsink());
+    test_ship.add(make_default_torpedo());
 
     return test_ship;
 }

@@ -34,6 +34,14 @@ bool component_attribute::can_use()
     return time_valid && efficiency_valid;
 }
 
+void component_attribute::use()
+{
+    if(!can_use())
+        return;
+
+    time_last_used_s = current_time_s;
+}
+
 float component_attribute::get_available_capacity()
 {
     return max_amount - cur_amount;
@@ -942,6 +950,11 @@ void ship::use(component& c)
         return;
 
     auto diff = c.get_use_diff();
+
+    for(auto& elems : c.components)
+    {
+        elems.second.use();
+    }
 
     //add_negative_resources(diff);
 
