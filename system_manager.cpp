@@ -137,7 +137,18 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad)
 
     n->type = type;
     n->rad = rad;
-    n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
+    //n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
+
+    n->render_type = orbital_info::render_type[type];
+
+    if(n->render_type == 0)
+    {
+        n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
+    }
+    else if(n->render_type == 1)
+    {
+        n->sprite.load(orbital_info::load_strs[n->render_type]);
+    }
 
     orbitals.push_back(n);
 

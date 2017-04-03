@@ -16,6 +16,24 @@ namespace orbital_info
         MISC,
         NONE,
     };
+
+    static std::vector<int> render_type =
+    {
+        0,
+        0,
+        0,
+        1,
+        1,
+    };
+
+    static std::vector<std::string> load_strs =
+    {
+        "",
+        "",
+        "",
+        "pics/fleet.png",
+        ""
+    };
 }
 
 namespace sf
