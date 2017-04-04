@@ -1,4 +1,7 @@
 #include "resource_manager.hpp"
+#include "../../render_projects/imgui/imgui.h"
+
+#include "util.hpp"
 
 bool resource::is_processed(resource::types type)
 {
@@ -8,6 +11,11 @@ bool resource::is_processed(resource::types type)
 resource_manager::resource_manager()
 {
     resources.resize(resource::types::COUNT);
+
+    for(int i=0; i<resources.size(); i++)
+    {
+        resources[i].type = (resource::types)i;
+    }
 }
 
 resource_element& resource_manager::get_resource(resource::types type)
@@ -19,4 +27,93 @@ resource_element& resource_manager::get_resource(resource::types type)
     }
 
     throw;
+}
+
+void resource_manager::draw_ui(sf::RenderWindow& win)
+{
+    ImGui::Begin("Resources");
+
+    std::vector<std::string> names_up;
+    std::vector<std::string> vals_up;
+
+    std::vector<std::string> names_p;
+    std::vector<std::string> vals_p;
+
+    for(resource_element& elem : resources)
+    {
+        std::string name = resource::short_names[elem.type];
+
+        std::string val = "(" + to_string_with_variable_prec(elem.amount) + ")";
+
+        if(resource::is_processed(elem.type))
+        {
+            names_up.push_back("");
+            vals_up.push_back("");
+
+            names_p.push_back(name);
+            vals_p.push_back(val);
+        }
+        else
+        {
+            names_p.push_back("");
+            vals_p.push_back("");
+
+            names_up.push_back(name);
+            vals_up.push_back(val);
+        }
+
+        //ImGui::Text((name + " (" + val + ")").c_str());
+
+        /*ImGui::Text(name.c_str());
+        ImGui::SameLine();
+        ImGui::Text(val.c_str());
+
+        //ImGui::SameLine();
+
+        if(!resource::is_processed(elem.type) && resource::is_processed((resource::types)((int)elem.type + 1)))
+        {
+            ImGui::NewLine();
+        }*/
+    }
+
+    ImGui::BeginGroup();
+
+    for(int i=0; i<resources.size(); i++)
+    {
+        resource_element& elem = resources[i];
+
+        std::string name;
+        std::string val;
+
+        if(resource::is_processed(elem.type))
+        {
+            name = "|  " + format(names_p[i], names_p);
+            val = format(vals_p[i], vals_p);
+        }
+        else
+        {
+            name = format(names_up[i], names_up);
+            val = format(vals_up[i], vals_up);
+        }
+
+        ImGui::Text(name.c_str());
+        ImGui::SameLine();
+        ImGui::Text(val.c_str());
+
+        if(!resource::is_processed(elem.type) && resource::is_processed((resource::types)((int)elem.type + 1)))
+        {
+            ImGui::EndGroup();
+
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+            //ImGui::NewLine();
+
+            ImGui::BeginGroup();
+        }
+    }
+
+    ImGui::EndGroup();
+
+    ImGui::End();
 }

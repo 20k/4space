@@ -42,6 +42,24 @@ namespace resource
         "Error",
     };
 
+    static std::vector<std::string> short_names =
+    {
+        "Ice",
+        "CuS",
+        "NO2",
+        "FE,NI",
+        "TiO2",
+        "UO2",
+
+        "O2",
+        "Cu",
+        "H2",
+        "Fe",
+        "Ti",
+        "U",
+        "WTF",
+    };
+
     static types unprocessed_end = OXYGEN;
 
     bool is_processed(types type);
@@ -53,6 +71,11 @@ struct resource_element
     float amount = 0.f;
 };
 
+namespace sf
+{
+    struct RenderWindow;
+}
+
 struct resource_manager
 {
     resource_manager();
@@ -60,6 +83,8 @@ struct resource_manager
     std::vector<resource_element> resources;
 
     resource_element& get_resource(resource::types type);
+
+    void draw_ui(sf::RenderWindow& win);
 };
 
 #endif // RESOURCE_MANAGER_HPP_INCLUDED

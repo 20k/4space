@@ -9,6 +9,10 @@
 #include <deque>
 #include "system_manager.hpp"
 
+#include "util.hpp"
+
+#include "resource_manager.hpp"
+
 template<sf::Keyboard::Key k>
 bool once()
 {
@@ -53,29 +57,6 @@ bool once()
     return false;
 }
 
-template <typename T>
-std::string to_string_with_precision(const T a_value, const int n = 6)
-{
-    std::ostringstream out;
-    out << std::setprecision(n) << a_value;
-    return out.str();
-}
-
-template<typename T>
-std::string to_string_with_variable_prec(const T a_value)
-{
-    int n = ceil(log10(a_value)) + 1;
-
-    if(a_value <= 0.0001f)
-        n = 2;
-
-    if(n < 2)
-        n = 2;
-
-    std::ostringstream out;
-    out << std::setprecision(n) << a_value;
-    return out.str();
-}
 
 #include "ship_definitions.hpp"
 
@@ -185,23 +166,6 @@ std::vector<std::string> get_components_display_string(ship& s)
     return display_str;
 }
 
-std::string format(std::string to_format, const std::vector<std::string>& all_strings)
-{
-    int len = 0;
-
-    for(auto& i : all_strings)
-    {
-        if(i.length() > len)
-            len = i.length();
-    }
-
-    for(int i=to_format.length(); i<len; i++)
-    {
-        to_format = to_format + " ";
-    }
-
-    return to_format;
-}
 
 void display_ship_info(ship& s)
 {
@@ -693,6 +657,8 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
 int main()
 {
+    resource_manager resource_manage;
+
     fleet_manager fleet_manage;
 
     ship_manager* fleet1 = fleet_manage.make_new();
@@ -845,6 +811,8 @@ int main()
 
         system_manage.cull_empty_orbital_fleets();
         fleet_manage.cull_dead();
+
+        resource_manage.draw_ui(window);
 
         ImGui::Render();
         window.display();
