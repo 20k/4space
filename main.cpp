@@ -368,12 +368,28 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }
 
-struct popup_info
+struct popup_element
 {
     std::string header;
     std::string data;
 
     void* element = nullptr;
+};
+
+struct popup_info
+{
+    std::vector<popup_element> elements;
+
+    popup_element* fetch(void* element)
+    {
+        for(auto& i : elements)
+        {
+            if(i.element == element)
+                return &i;
+        }
+
+        return nullptr;
+    }
 
     bool going = false;
 };
@@ -428,51 +444,77 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     auto transformed = win.mapPixelToCoords({x, y});
 
-    if(lclick)
+    sf::Keyboard key;
+
+    bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
+
+    if(lclick && !lshift)
     {
         popup.going = false;
+
+        popup.elements.clear();
     }
 
-    orbital* selected = nullptr;
+    std::vector<orbital*> selected;
 
     for(orbital_system* sys : system_manage.systems)
     {
+        bool term = false;
+
         for(orbital* orb : sys->orbitals)
         {
             if(orb->point_within({transformed.x, transformed.y}))
             {
+                //if(selected.size() == 0 || lshift)
                 orb->highlight = true;
 
                 if(lclick)
                 {
                     popup.going = true;
 
-                    popup.element = orb;
+                    popup_element elem;
+                    elem.element = orb;
+
+                    popup.elements.push_back(elem);
+
+                    term = true;
                 }
             }
 
-            if(popup.element == orb)
+            if(popup.fetch(orb) != nullptr)
             {
-                selected = orb;
+                selected.push_back(orb);
             }
+
+            if(term)
+                break;
         }
     }
 
-    if(selected != nullptr)
+    if(selected.size() > 0 && popup.going)
     {
-        popup.header = orbital_info::names[selected->type];
-
-        popup.data = selected->get_info_str();
-
-        if(popup.going)
+        for(auto& kk : selected)
         {
-            selected->highlight = true;
+            popup_element* elem = popup.fetch(kk);
 
-            if(rclick && (selected->type == orbital_info::FLEET))
+            if(elem == nullptr)
+                continue;
+
+            elem->header = orbital_info::names[kk->type];
+
+            elem->data = kk->get_info_str();
+
+            if(popup.going)
             {
-                selected->transfer({transformed.x, transformed.y});
+                kk->highlight = true;
+
+                if(rclick && (kk->type == orbital_info::FLEET))
+                {
+                    kk->transfer({transformed.x, transformed.y});
+                }
             }
         }
+
     }
 }
 
@@ -481,9 +523,13 @@ void do_popup(popup_info& popup)
     if(!popup.going)
         return;
 
-    ImGui::Begin((popup.header + "###INFO_PANEL").c_str(), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin(("Selected:###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::Text(popup.data.c_str());
+    for(auto& i : popup.elements)
+    {
+        ImGui::Text(i.header.c_str());
+        ImGui::Text(i.data.c_str());
+    }
 
     ImGui::End();
 }
@@ -492,15 +538,22 @@ int main()
 {
     ship_manager fleet1;
     ship_manager fleet2;
+    ship_manager fleet3;
 
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
 
     ship* test_ship = fleet1.make_new_from(0, make_default());
+    ship* test_ship3 = fleet1.make_new_from(0, make_default());
+
     ship* test_ship2 = fleet2.make_new_from(1, make_default());
+
+    ship* test_ship4 = fleet3.make_new_from(0, make_default());
 
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
+    test_ship3->name = "SS Duplicate";
+    test_ship4->name = "SS Secondary";
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
@@ -551,6 +604,13 @@ int main()
     fleet->orbital_length = 200.f;
     fleet->parent = sun;
     fleet->data = &fleet1;
+
+    orbital* ofleet2 = base->make_new(orbital_info::FLEET, 5.f);
+
+    ofleet2->orbital_angle = randf_s(0.f, 2*M_PI);
+    ofleet2->orbital_length = randf_s(50.f, 300.f);
+    ofleet2->parent = sun;
+    ofleet2->data = &fleet3;
 
     orbital* tplanet = base->make_new(orbital_info::PLANET, 3.f);
     tplanet->orbital_length = 50.f;

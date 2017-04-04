@@ -144,6 +144,8 @@ struct system_manager
     void tick(float step_s);
 
     void destroy(orbital_system* s);
+
+    void repulse_fleets();
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

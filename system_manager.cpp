@@ -344,9 +344,14 @@ void orbital_system::destroy(orbital* o)
 ///need to figure out higher positioning, but whatever
 void orbital_system::draw(sf::RenderWindow& win)
 {
-    for(auto& i : orbitals)
+    /*for(auto& i : orbitals)
     {
         i->draw(win);
+    }*/
+
+    for(int kk=orbitals.size()-1; kk >= 0; kk--)
+    {
+        orbitals[kk]->draw(win);
     }
 }
 
@@ -365,6 +370,8 @@ void system_manager::tick(float step_s)
     {
         i->tick(step_s);
     }
+
+    repulse_fleets();
 }
 
 void system_manager::destroy(orbital_system* s)
@@ -377,6 +384,50 @@ void system_manager::destroy(orbital_system* s)
             delete s;
             i--;
             return;
+        }
+    }
+}
+
+void repulse(orbital* o1, orbital* o2)
+{
+    if(o1->absolute_pos == o2->absolute_pos)
+    {
+        o1->orbital_length -= 1;
+
+        return;
+    }
+
+    if(o1->transferring || o2->transferring)
+        return;
+
+    vec2f o1_to_o2 = (o2->absolute_pos - o1->absolute_pos).norm();
+
+    vec2f new_o1_pos = -o1_to_o2 + o1->absolute_pos;
+    vec2f new_o2_pos = o1_to_o2 + o2->absolute_pos;
+
+    o1->transfer(new_o1_pos);
+    o2->transfer(new_o2_pos);
+}
+
+void system_manager::repulse_fleets()
+{
+    for(orbital_system* sys : systems)
+    {
+        for(orbital* o : sys->orbitals)
+        {
+            for(orbital* k : sys->orbitals)
+            {
+                if(k == o)
+                    continue;
+
+                vec2f a1 = o->absolute_pos;
+                vec2f a2 = k->absolute_pos;
+
+                float dist = (a2 - a1).length();
+
+                if(dist < 5.f)
+                    repulse(o, k);
+            }
         }
     }
 }
