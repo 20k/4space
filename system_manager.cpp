@@ -425,7 +425,7 @@ void system_manager::repulse_fleets()
 
                 float dist = (a2 - a1).length();
 
-                if(dist < 5.f)
+                if(dist < 10.f)
                     repulse(o, k);
             }
         }

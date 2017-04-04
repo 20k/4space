@@ -391,6 +391,18 @@ struct popup_info
         return nullptr;
     }
 
+    void rem(void* element)
+    {
+        for(int i=0; i<elements.size(); i++)
+        {
+            if(elements[i].element == element)
+            {
+                elements.erase(elements.begin() + i);
+                return;
+            }
+        }
+    }
+
     bool going = false;
 };
 
@@ -457,6 +469,8 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     std::vector<orbital*> selected;
 
+    bool first = true;
+
     for(orbital_system* sys : system_manage.systems)
     {
         bool term = false;
@@ -466,9 +480,20 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             if(orb->point_within({transformed.x, transformed.y}))
             {
                 //if(selected.size() == 0 || lshift)
-                orb->highlight = true;
 
-                if(lclick)
+                if(first)
+                {
+                    orb->highlight = true;
+                    first = false;
+                }
+
+                if(lclick && popup.fetch(orb))
+                {
+                    popup.rem(orb);
+                    break;
+                }
+
+                if(lclick && popup.fetch(orb) == nullptr)
                 {
                     popup.going = true;
 
@@ -520,8 +545,12 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
 void do_popup(popup_info& popup)
 {
+    if(popup.elements.size() == 0)
+        popup.going = false;
+
     if(!popup.going)
         return;
+
 
     ImGui::Begin(("Selected:###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
 
