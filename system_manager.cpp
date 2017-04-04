@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include "ship.hpp"
+#include "util.hpp"
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
@@ -272,8 +273,13 @@ std::vector<std::string> orbital::get_info_str()
 {
     if(type != orbital_info::FLEET || data == nullptr)
     {
-        std::string str = "Radius: " + std::to_string(rad);
-        std::string pstr = "Position: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y());
+        std::string str = "Radius: " + to_string_with_variable_prec(rad);
+
+        //vec2f rpos = round(absolute_pos * 10.f) / 10.f;
+
+        vec2f rpos = absolute_pos;
+
+        std::string pstr = "Position: " + std::to_string(rpos.x()) + " " + std::to_string(rpos.y());
 
         return {str + "\n" + pstr};
     }
