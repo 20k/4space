@@ -203,7 +203,7 @@ std::string format(std::string to_format, const std::vector<std::string>& all_st
     return to_format;
 }
 
-void display_ship_info(ship& s, float step_s)
+void display_ship_info(ship& s)
 {
     auto produced = s.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = s.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -232,7 +232,7 @@ void display_ship_info(ship& s, float step_s)
         elements.insert(i.first);
     }
 
-    ImGui::Begin("Test");
+    ImGui::Begin(s.name.c_str());
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -340,7 +340,7 @@ void display_ship_info_old(ship& s, float step_s)
 {
     auto display_strs = get_components_display_string(s);
 
-    ImGui::Begin("Test");
+    ImGui::Begin(s.name.c_str());
 
     int num = 0;
 
@@ -792,7 +792,7 @@ int main()
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);
 
-        display_ship_info(*test_ship, diff_s);
+        display_ship_info(*test_ship);
 
         debug_menu({test_ship});
 
