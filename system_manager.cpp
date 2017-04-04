@@ -224,7 +224,7 @@ std::string orbital::get_info_str()
     {
         ship_manager* mgr = (ship_manager*)data;
 
-        return mgr->get_info_str();
+        return mgr->get_info_str() + "\nPosition: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y());
     }
 }
 

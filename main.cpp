@@ -373,6 +373,8 @@ struct popup_info
     std::string header;
     std::string data;
 
+    void* element = nullptr;
+
     bool going = false;
 };
 
@@ -441,11 +443,17 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool cli
 
                 if(clicked)
                 {
-                    popup.header = orbital_info::names[orb->type];
-                    popup.data = orb->get_info_str();
-
                     popup.going = true;
+
+                    popup.element = orb;
                 }
+            }
+
+            if(popup.element == orb)
+            {
+                popup.header = orbital_info::names[orb->type];
+
+                popup.data = orb->get_info_str();
             }
         }
     }

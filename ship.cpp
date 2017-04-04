@@ -1324,5 +1324,8 @@ std::string ship_manager::get_info_str()
         ret = ret + i->name + "\n";
     }
 
+    if(ships.size() > 0)
+        ret.pop_back();
+
     return ret;
 }
