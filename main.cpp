@@ -232,7 +232,7 @@ void display_ship_info(ship& s)
         elements.insert(i.first);
     }
 
-    ImGui::Begin(s.name.c_str());
+    ImGui::Begin(s.name.c_str(), &s.display_ui);
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -568,6 +568,8 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
     std::set<ship*> potential_new_fleet;
 
+    sf::Keyboard key;
+
     ///remember we'll need to make an orbital associated with the new fleet
     ///going to need the ability to drag and drop these
     ///nah use checkboxes
@@ -588,7 +590,10 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
             ImGui::Text(str.c_str());
 
-            bool clicked = ImGui::IsItemClicked();
+            bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
+
+            bool shift_clicked = ImGui::IsItemClicked() && lshift;
+            bool non_shift_clicked = ImGui::IsItemClicked() && !lshift;
             bool hovered = ImGui::IsItemHovered();
 
             if(i.mergeable)
@@ -598,19 +603,28 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
                 std::string label_str = "";
 
-                if(!i.checked[kk])
+                if(i.checked[kk])
                     label_str += "+";
 
                 ImGui::Text((label_str).c_str());
 
-                if(ImGui::IsItemClicked() || clicked)
+                if((ImGui::IsItemClicked() && lshift) || shift_clicked)
                 {
                     i.checked[kk] = !i.checked[kk];
                 }
 
+                if(non_shift_clicked)
+                {
+                    orbital* o = (orbital*)i.element;
+
+                    ship_manager* smanage = (ship_manager*)o->data;
+
+                    smanage->ships[num]->display_ui = !smanage->ships[num]->display_ui;
+                }
+
                 if(ImGui::IsItemHovered() || hovered)
                 {
-                    ImGui::SetTooltip("Click to add to fleet");
+                    ImGui::SetTooltip("Shift-Click to add to fleet");
                 }
 
                 if(i.checked[kk])
@@ -792,7 +806,7 @@ int main()
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);
 
-        display_ship_info(*test_ship);
+        //display_ship_info(*test_ship);
 
         debug_menu({test_ship});
 
@@ -807,6 +821,17 @@ int main()
             sun->center_camera(window);
             debug_system(system_manage, window, lclick, rclick, popup);
             base->draw(window);
+        }
+
+        for(ship_manager* smanage : fleet_manage.fleets)
+        {
+            for(ship* s : smanage->ships)
+            {
+                if(s->display_ui)
+                {
+                    display_ship_info(*s);
+                }
+            }
         }
 
         system_manage.tick(diff_s);

@@ -275,6 +275,8 @@ struct ship : positional
 
     ship_manager* owned_by = nullptr;
 
+    bool display_ui = false;
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 

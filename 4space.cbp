@@ -62,6 +62,8 @@
 		<Unit filename="ship.cpp" />
 		<Unit filename="ship.hpp" />
 		<Unit filename="ship_definitions.hpp" />
+		<Unit filename="system_manager.cpp" />
+		<Unit filename="system_manager.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
