@@ -74,7 +74,7 @@ void empire::generate_resource_from_owned(float step_s)
 
     for(orbital* o : owned)
     {
-        if(!o->is_resource_asteroid)
+        if(!o->is_resource_object)
             continue;
 
         resource_manager manager = o->produced_resources_ps;

@@ -126,10 +126,11 @@ struct orbital
     vec3f col = {1,1,1};
 
     ///change to produces resources so we can apply to planets
-    bool is_resource_asteroid = false;
+    bool is_resource_object = false;
     resource_manager produced_resources_ps;
 
     void make_random_resource_asteroid(float max_ps);
+    void make_random_resource_planet(float max_ps);
 };
 
 struct orbital_system

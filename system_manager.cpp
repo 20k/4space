@@ -283,7 +283,7 @@ std::vector<std::string> orbital::get_info_str()
 
         std::string rstr = "";
 
-        if(is_resource_asteroid)
+        if(is_resource_object)
         {
             rstr = "\n\n" + produced_resources_ps.get_unprocessed_str();
         }
@@ -340,7 +340,16 @@ void orbital::make_random_resource_asteroid(float total_ps)
 
     col = {1, 0.8, 0};
 
-    is_resource_asteroid = true;
+    is_resource_object = true;
+}
+
+void orbital::make_random_resource_planet(float total_ps)
+{
+    int num_resources = 4;
+
+
+
+    is_resource_object = true;
 }
 
 orbital* orbital_system::get_base()
@@ -527,7 +536,7 @@ void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_a
     {
         int n = randf_s(0.f, cur_orbitals.size());
 
-        if(cur_orbitals[n]->is_resource_asteroid)
+        if(cur_orbitals[n]->is_resource_object)
         {
             i--;
             continue;
