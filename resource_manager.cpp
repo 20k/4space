@@ -61,19 +61,6 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
             names_up.push_back(name);
             vals_up.push_back(val);
         }
-
-        //ImGui::Text((name + " (" + val + ")").c_str());
-
-        /*ImGui::Text(name.c_str());
-        ImGui::SameLine();
-        ImGui::Text(val.c_str());
-
-        //ImGui::SameLine();
-
-        if(!resource::is_processed(elem.type) && resource::is_processed((resource::types)((int)elem.type + 1)))
-        {
-            ImGui::NewLine();
-        }*/
     }
 
     ImGui::BeginGroup();
@@ -107,7 +94,6 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
             ImGui::SameLine();
             ImGui::Spacing();
             ImGui::SameLine();
-            //ImGui::NewLine();
 
             ImGui::BeginGroup();
         }

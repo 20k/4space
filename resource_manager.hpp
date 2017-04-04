@@ -44,7 +44,7 @@ namespace resource
 
     static std::vector<std::string> short_names =
     {
-        "Ice",
+        "H20(s)",
         "CuS",
         "NO2",
         "FE,NI",
