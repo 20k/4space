@@ -152,6 +152,7 @@ struct orbital_system
     orbital* get_by_element(void* element);
 
     void generate_asteroids(int n, int num_belts, int num_resource_asteroids);
+    void generate_planet_resources(float max_ps);
 };
 
 struct system_manager

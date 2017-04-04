@@ -285,7 +285,7 @@ std::vector<std::string> orbital::get_info_str()
 
         if(is_resource_object)
         {
-            rstr = "\n\n" + produced_resources_ps.get_unprocessed_str();
+            rstr = "\n\n" + produced_resources_ps.get_formatted_str();
         }
 
         return {str + "\n" + pstr + rstr};
@@ -347,7 +347,29 @@ void orbital::make_random_resource_planet(float total_ps)
 {
     int num_resources = 4;
 
+    ///ok. Planets should be lacking an asteroid resource (in great quantity)
+    ///Planets also generate a small amount of processed resources?
 
+    std::map<resource::types, float> ore_mults;
+
+    ore_mults[resource::ICE] = 1.f;
+    ore_mults[resource::COPPER_ORE] = 0.2;
+    ore_mults[resource::NITRATES] = 1.f;
+    ore_mults[resource::IRON_ORE] = 0.3;
+    ore_mults[resource::TITANIUM_ORE] = 0.1;
+    ore_mults[resource::URANIUM_ORE] = 0.1;
+
+    ore_mults[resource::OXYGEN] = 2.f;
+    ore_mults[resource::COPPER] = 0.05f;
+    ore_mults[resource::HYDROGEN] = 0.7f;
+    ore_mults[resource::IRON] = 0.1f;
+    ore_mults[resource::TITANIUM] = 0.025;
+    ore_mults[resource::URANIUM] = 0.01f;
+
+    for(auto& i : ore_mults)
+    {
+        produced_resources_ps.resources[i.first].amount += randf_s(0.55f, total_ps) * i.second;
+    }
 
     is_resource_object = true;
 }
@@ -543,6 +565,17 @@ void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_a
         }
 
         cur_orbitals[n]->make_random_resource_asteroid(1.f);
+    }
+}
+
+void orbital_system::generate_planet_resources(float max_ps)
+{
+    for(orbital* o : orbitals)
+    {
+        if(o->type == orbital_info::PLANET)
+        {
+            o->make_random_resource_planet(max_ps);
+        }
     }
 }
 

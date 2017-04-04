@@ -89,6 +89,11 @@ struct resource_manager
     void draw_ui(sf::RenderWindow& win);
 
     std::string get_unprocessed_str();
+    std::string get_processed_str();
+
+    std::string get_formatted_str();
+
+    bool has_any_processed();
 };
 
 #endif // RESOURCE_MANAGER_HPP_INCLUDED
