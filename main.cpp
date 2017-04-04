@@ -429,7 +429,7 @@ void debug_menu(const std::vector<ship*>& ships)
     ImGui::End();
 }
 
-void debug_battle(battle_manager& battle, sf::RenderWindow& win)
+void debug_battle(battle_manager& battle, sf::RenderWindow& win, bool lclick)
 {
     sf::Mouse mouse;
 
@@ -443,6 +443,11 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win)
     if(s)
     {
         s->highlight = true;
+
+        if(lclick)
+        {
+            s->display_ui = !s->display_ui;
+        }
     }
 
     ImGui::Begin("Battle DBG");
@@ -813,7 +818,7 @@ int main()
         if(state == 1)
         {
             battle.set_view(window);
-            debug_battle(battle, window);
+            debug_battle(battle, window, lclick);
             battle.draw(window);
         }
         if(state == 0)
