@@ -59,6 +59,8 @@
 		<Unit filename="battle_manager.cpp" />
 		<Unit filename="battle_manager.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="resource_manager.cpp" />
+		<Unit filename="resource_manager.hpp" />
 		<Unit filename="ship.cpp" />
 		<Unit filename="ship.hpp" />
 		<Unit filename="ship_definitions.hpp" />
