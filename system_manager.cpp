@@ -122,10 +122,6 @@ void do_transfer(orbital* o)
 
     float frac = (o->internal_time_s - o->start_time_s) / traverse_time;
 
-    /*vec2f cpos = end_pos * frac + start_pos * (1.f - frac);
-
-    cpos = cpos.norm();*/
-
     float a1 = start_pos.angle();
     float a2 = end_pos.angle();
 
@@ -139,32 +135,16 @@ void do_transfer(orbital* o)
         a2 -= 2*M_PI;
     }
 
-
-    //float real_angle = (end_pos - start_pos).angle();
-
-    //float end_angle = asin(sin(o->new_angle));
-    //float start_angle = asin(sin(o->old_angle));
-
     float iangle = o->old_angle + frac * (a2 - a1);
-
-    //float iangle = end_angle * frac + start_angle * (1.f - frac);
     float irad = o->new_rad * frac + o->old_rad * (1.f - frac);
 
     o->orbital_angle = iangle;
     o->orbital_length = irad;
 
-    //o->orbital_angle = cpos.angle();
-    //o->orbital_length = cpos.length();
-
     if(distance < 2 || frac > 1)
     {
         o->transferring = false;
     }
-
-    //printf("%f %f\n", cpos.x(), cpos.y());
-    //printf("%f f\n", frac);
-
-    //printf("%f %f %f %f\n", o->new_rad, o->new_angle, o->old_rad, o->old_angle);
 }
 
 void orbital::tick(float step_s)
