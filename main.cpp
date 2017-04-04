@@ -108,7 +108,7 @@ std::string get_component_display_string(component& c)
         //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
         //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
 
-        std::string storage_str = "(" + to_string_with_variable_prec(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
+        std::string storage_str = "(" + to_string_with_enforced_variable_dp(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
 
         //std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
 
@@ -214,13 +214,13 @@ void display_ship_info(ship& s)
 
         //display_str += "+" + to_string_with_precision(prod, 3) + " | -" + to_string_with_precision(cons, 3) + " | ";
 
-        std::string prod_str = "+" + to_string_with_precision(prod, 3);
-        std::string cons_str = "-" + to_string_with_precision(cons, 3);
+        std::string prod_str = "+" + to_string_with_enforced_variable_dp(prod, 1);
+        std::string cons_str = "-" + to_string_with_enforced_variable_dp(cons, 1);
 
         std::string store_max_str;
 
         if(maximum > 0)
-            store_max_str += "(" + to_string_with_variable_prec(store) + "/" + to_string_with_variable_prec(maximum) + ")";
+            store_max_str += "(" + to_string_with_enforced_variable_dp(store) + "/" + to_string_with_variable_prec(maximum) + ")";
 
         std::string header_str = ship_component_elements::display_strings[id];
 

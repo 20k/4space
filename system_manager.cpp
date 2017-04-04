@@ -273,13 +273,13 @@ std::vector<std::string> orbital::get_info_str()
 {
     if(type != orbital_info::FLEET || data == nullptr)
     {
-        std::string str = "Radius: " + to_string_with_enforced_1dp(rad);
+        std::string str = "Radius: " + to_string_with_enforced_variable_dp(rad);
 
         //vec2f rpos = round(absolute_pos * 10.f) / 10.f;
 
         vec2f rpos = absolute_pos;
 
-        std::string pstr = "Position: " + to_string_with_enforced_1dp(rpos.x()) + " " + to_string_with_enforced_1dp(rpos.y());
+        std::string pstr = "Position: " + to_string_with_enforced_variable_dp(rpos.x()) + " " + to_string_with_enforced_variable_dp(rpos.y());
 
         std::string rstr = "";
 

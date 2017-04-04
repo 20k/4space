@@ -49,7 +49,7 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
     {
         std::string name = resource::short_names[elem.type];
 
-        std::string val = "(" + to_string_with_enforced_1dp(elem.amount) + ")";
+        std::string val = "(" + to_string_with_enforced_variable_dp(elem.amount) + ")";
 
         if(resource::is_processed(elem.type))
         {

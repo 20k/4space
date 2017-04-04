@@ -32,7 +32,7 @@ std::string to_string_with_variable_prec(const T a_value)
 
 template<typename T>
 inline
-std::string to_string_with_enforced_1dp(const T a_value)
+std::string to_string_with_enforced_variable_dp(const T a_value, int forced_dp = 1)
 {
     /*std::ostringstream out;
     out << std::setprecision(n) << a_value;
@@ -47,7 +47,10 @@ std::string to_string_with_enforced_1dp(const T a_value)
         return fstr + ".0";
     }
 
-    found+=2;
+    if(fabs(a_value) <= 0.0999999 && fabs(a_value) >= 0.0001)
+        forced_dp++;
+
+    found += forced_dp + 1;
 
     if(found >= fstr.size())
         return fstr;
