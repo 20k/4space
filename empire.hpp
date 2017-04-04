@@ -26,6 +26,8 @@ struct empire
     void take_ownership_of_all(orbital_system* o);
 
     bool owns(orbital* o);
+
+    void generate_resource_from_owned(float step_s);
 };
 
 #endif // EMPIRE_HPP_INCLUDED

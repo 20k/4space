@@ -30,6 +30,33 @@ std::string to_string_with_variable_prec(const T a_value)
     return out.str();
 }
 
+template<typename T>
+inline
+std::string to_string_with_enforced_1dp(const T a_value)
+{
+    /*std::ostringstream out;
+    out << std::setprecision(n) << a_value;
+    std::string fstr = out.str();*/
+
+    std::string fstr = std::to_string(a_value);
+
+    auto found = fstr.find('.');
+
+    if(found == std::string::npos)
+    {
+        return fstr + ".0";
+    }
+
+    found+=2;
+
+    if(found >= fstr.size())
+        return fstr;
+
+    fstr.resize(found);
+
+    return fstr;
+}
+
 inline
 std::string format(std::string to_format, const std::vector<std::string>& all_strings)
 {

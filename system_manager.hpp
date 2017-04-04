@@ -125,6 +125,7 @@ struct orbital
 
     vec3f col = {1,1,1};
 
+    ///change to produces resources so we can apply to planets
     bool is_resource_asteroid = false;
     resource_manager produced_resources_ps;
 

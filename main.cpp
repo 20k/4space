@@ -819,6 +819,7 @@ int main()
         fleet_manage.cull_dead();
 
         player_empire.resources.draw_ui(window);
+        player_empire.generate_resource_from_owned(diff_s);
 
         ImGui::Render();
         window.display();

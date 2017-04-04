@@ -66,3 +66,27 @@ bool empire::owns(orbital* o)
 
     return false;
 }
+
+void empire::generate_resource_from_owned(float step_s)
+{
+    std::vector<float> res;
+    res.resize(resource::COUNT);
+
+    for(orbital* o : owned)
+    {
+        if(!o->is_resource_asteroid)
+            continue;
+
+        resource_manager manager = o->produced_resources_ps;
+
+        for(int i=0; i<manager.resources.size(); i++)
+        {
+            res[i] += manager.resources[i].amount * step_s;
+        }
+    }
+
+    for(int i=0; i<res.size(); i++)
+    {
+        resources.resources[i].amount += res[i];
+    }
+}
