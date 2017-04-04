@@ -121,6 +121,8 @@ struct orbital
 
     void transfer(float new_rad, float new_angle);
     void transfer(vec2f pos);
+
+    vec3f col = {1,1,1};
 };
 
 struct orbital_system
