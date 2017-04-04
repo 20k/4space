@@ -4,6 +4,7 @@
 #include <vector>
 #include <vec/vec.hpp>
 #include <SFML/Graphics.hpp>
+#include "resource_manager.hpp"
 
 namespace orbital_info
 {
@@ -123,6 +124,11 @@ struct orbital
     void transfer(vec2f pos);
 
     vec3f col = {1,1,1};
+
+    bool is_resource_asteroid = false;
+    resource_manager produced_resources_ps;
+
+    void make_random_resource_asteroid(float max_ps);
 };
 
 struct orbital_system
@@ -143,7 +149,7 @@ struct orbital_system
 
     orbital* get_by_element(void* element);
 
-    void generate_asteroids(int n, int num_belts);
+    void generate_asteroids(int n, int num_belts, int num_resource_asteroids);
 };
 
 struct system_manager

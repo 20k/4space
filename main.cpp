@@ -11,7 +11,7 @@
 
 #include "util.hpp"
 
-#include "resource_manager.hpp"
+#include "empire.hpp"
 
 template<sf::Keyboard::Key k>
 bool once()
@@ -657,7 +657,8 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
 int main()
 {
-    resource_manager resource_manage;
+    empire player_empire;
+    player_empire.name = "Glorious Azerbaijanian Conglomerate";
 
     fleet_manager fleet_manage;
 
@@ -721,12 +722,12 @@ int main()
     planet->orbital_length = 150.f;
     planet->rotation_velocity_ps = 2*M_PI / 200.f;
 
-    orbital* fleet = base->make_new(orbital_info::FLEET, 5.f);
+    orbital* ofleet = base->make_new(orbital_info::FLEET, 5.f);
 
-    fleet->orbital_angle = M_PI/13.f;
-    fleet->orbital_length = 200.f;
-    fleet->parent = sun;
-    fleet->data = fleet1;
+    ofleet->orbital_angle = M_PI/13.f;
+    ofleet->orbital_length = 200.f;
+    ofleet->parent = sun;
+    ofleet->data = fleet1;
 
     orbital* ofleet2 = base->make_new(orbital_info::FLEET, 5.f);
 
@@ -739,7 +740,12 @@ int main()
     tplanet->orbital_length = 50.f;
     tplanet->parent = sun;
 
-    base->generate_asteroids(100, 3);
+    base->generate_asteroids(100, 3, 5);
+
+    player_empire.take_ownership_of_all(base);
+    player_empire.take_ownership(fleet1);
+    player_empire.take_ownership(fleet3);
+
 
     popup_info popup;
 
@@ -812,7 +818,7 @@ int main()
         system_manage.cull_empty_orbital_fleets();
         fleet_manage.cull_dead();
 
-        resource_manage.draw_ui(window);
+        player_empire.resources.draw_ui(window);
 
         ImGui::Render();
         window.display();

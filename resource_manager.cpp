@@ -2,6 +2,12 @@
 #include "../../render_projects/imgui/imgui.h"
 
 #include "util.hpp"
+#include <vec/vec.hpp>
+
+resource::types resource::get_random_unprocessed()
+{
+    return (resource::types)randf_s(0.f, resource::unprocessed_end);
+}
 
 bool resource::is_processed(resource::types type)
 {
@@ -102,4 +108,35 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
     ImGui::EndGroup();
 
     ImGui::End();
+}
+
+std::string resource_manager::get_unprocessed_str()
+{
+    std::vector<std::string> names;
+    std::vector<std::string> vals;
+
+    for(resource_element& elem : resources)
+    {
+        std::string name = resource::short_names[elem.type];
+
+        std::string val = "(" + to_string_with_variable_prec(elem.amount) + ")";
+
+        if(fabs(elem.amount) <= 0.001f)
+            continue;
+
+        names.push_back(name);
+        vals.push_back(val);
+    }
+
+    names.resize(resource::unprocessed_end);
+    vals.resize(resource::unprocessed_end);
+
+    std::string ret;
+
+    for(int i=0; i<names.size(); i++)
+    {
+        ret = ret + names[i] + " " + vals[i] + "\n";
+    }
+
+    return ret;
 }

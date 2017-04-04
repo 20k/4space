@@ -60,6 +60,8 @@ namespace resource
         "WTF",
     };
 
+    types get_random_unprocessed();
+
     static types unprocessed_end = OXYGEN;
 
     bool is_processed(types type);
@@ -85,6 +87,8 @@ struct resource_manager
     resource_element& get_resource(resource::types type);
 
     void draw_ui(sf::RenderWindow& win);
+
+    std::string get_unprocessed_str();
 };
 
 #endif // RESOURCE_MANAGER_HPP_INCLUDED

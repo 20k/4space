@@ -240,7 +240,7 @@ void orbital::draw(sf::RenderWindow& win)
 
 
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, absolute_pos);
+        simple_renderable.draw(win, rotation, absolute_pos, col);
     else if(render_type == 1)
         sprite.draw(win, rotation, absolute_pos, {1, 1, 1}, highlight);
 
@@ -281,7 +281,14 @@ std::vector<std::string> orbital::get_info_str()
 
         std::string pstr = "Position: " + std::to_string(rpos.x()) + " " + std::to_string(rpos.y());
 
-        return {str + "\n" + pstr};
+        std::string rstr = "";
+
+        if(is_resource_asteroid)
+        {
+            rstr = "\n\n" + produced_resources_ps.get_unprocessed_str();
+        }
+
+        return {str + "\n" + pstr + rstr};
     }
     else
     {
@@ -319,6 +326,23 @@ void orbital::transfer(vec2f pos)
     transfer(rel.length(), rel.angle());
 }
 
+void orbital::make_random_resource_asteroid(float total_ps)
+{
+    ///[1, 4]
+    int num_resources = randf_s(1.f, 5.f);
+
+    for(int i=0; i<num_resources; i++)
+    {
+        int rand_res = (int)resource::get_random_unprocessed();
+
+        produced_resources_ps.resources[rand_res].amount += randf_s(0.25f, total_ps);
+    }
+
+    col = {1, 0.8, 0};
+
+    is_resource_asteroid = true;
+}
+
 orbital* orbital_system::get_base()
 {
     for(auto& i : orbitals)
@@ -337,6 +361,11 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     n->type = type;
     n->rad = rad;
     //n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
+
+    if(type == orbital_info::ASTEROID)
+    {
+        n->col = {1, 1, 1};
+    }
 
     n->render_type = orbital_info::render_type[type];
 
@@ -424,7 +453,7 @@ orbital* orbital_system::get_by_element(void* element)
     return nullptr;
 }
 
-void orbital_system::generate_asteroids(int n, int num_belts)
+void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_asteroids)
 {
     std::vector<float> exclusion_radiuses;
 
@@ -441,6 +470,8 @@ void orbital_system::generate_asteroids(int n, int num_belts)
     float max_belt = 500.f;
 
     int asteroids_per_belt = n / num_belts;
+
+    std::vector<orbital*> cur_orbitals;
 
     for(int i=0; i<num_belts; i++)
     {
@@ -484,7 +515,25 @@ void orbital_system::generate_asteroids(int n, int num_belts)
 
             o->parent = get_base();
             o->rotation_velocity_ps = 2 * M_PI / randf_s(10.f, 1000.f);
+
+            cur_orbitals.push_back(o);
         }
+    }
+
+    int c = 0;
+    int max_c = 100;
+
+    for(int i=0; i<num_resource_asteroids && c < max_c; i++, c++)
+    {
+        int n = randf_s(0.f, cur_orbitals.size());
+
+        if(cur_orbitals[n]->is_resource_asteroid)
+        {
+            i--;
+            continue;
+        }
+
+        cur_orbitals[n]->make_random_resource_asteroid(1.f);
     }
 }
 
