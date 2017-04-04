@@ -588,10 +588,30 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
             ImGui::Text(str.c_str());
 
+            bool clicked = ImGui::IsItemClicked();
+            bool hovered = ImGui::IsItemHovered();
+
             if(i.mergeable)
             {
                 ImGui::SameLine();
-                ImGui::Checkbox(("###" + std::to_string(id) + std::to_string(num)).c_str(), &i.checked[kk]);
+                //ImGui::Checkbox(("###" + std::to_string(id) + std::to_string(num)).c_str(), &i.checked[kk]);
+
+                std::string label_str = "";
+
+                if(!i.checked[kk])
+                    label_str += "+";
+
+                ImGui::Text((label_str).c_str());
+
+                if(ImGui::IsItemClicked() || clicked)
+                {
+                    i.checked[kk] = !i.checked[kk];
+                }
+
+                if(ImGui::IsItemHovered() || hovered)
+                {
+                    ImGui::SetTooltip("Click to add to fleet");
+                }
 
                 if(i.checked[kk])
                 {
@@ -637,7 +657,6 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             }
 
             orbital* associated = current_system->make_new(orbital_info::FLEET, 5.f);
-            //associated->set_orbit(fleet_angle, fleet_length);
             associated->parent = current_system->get_base();
             associated->set_orbit(fleet_pos);
             associated->data = ns;
