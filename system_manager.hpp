@@ -74,6 +74,8 @@ struct sprite_renderable
 
 struct orbital
 {
+    float internal_time_s = 0.f;
+
     bool highlight = false;
 
     orbital_simple_renderable simple_renderable;
@@ -93,6 +95,13 @@ struct orbital
     float orbital_length = 0;
     float rad = 0.f;
 
+    float old_rad = 0;
+    float old_angle = 0;
+    float new_rad = 0;
+    float new_angle = 0;
+    bool transferring = false;
+    float start_time_s = 0;
+
     orbital* parent = nullptr;
 
     orbital_info::type type = orbital_info::NONE;
@@ -108,6 +117,9 @@ struct orbital
     bool point_within(vec2f pos);
 
     std::string get_info_str();
+
+    void transfer(float new_rad, float new_angle);
+    void transfer(vec2f pos);
 };
 
 struct orbital_system

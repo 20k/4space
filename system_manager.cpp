@@ -109,9 +109,72 @@ void orbital::set_orbit(float ang, float len)
     //angular_velocity_ps = ang_vel_s;
 }
 
+void do_transfer(orbital* o)
+{
+    float speed_s = 10;
+
+    vec2f end_pos = o->new_rad * (vec2f){cos(o->new_angle), sin(o->new_angle)};
+    vec2f start_pos = o->old_rad * (vec2f){cos(o->old_angle), sin(o->old_angle)};
+
+    float distance = (end_pos - start_pos).length();
+
+    float traverse_time = distance / speed_s;
+
+    float frac = (o->internal_time_s - o->start_time_s) / traverse_time;
+
+    /*vec2f cpos = end_pos * frac + start_pos * (1.f - frac);
+
+    cpos = cpos.norm();*/
+
+    float a1 = start_pos.angle();
+    float a2 = end_pos.angle();
+
+    if(fabs(a2 + 2 * M_PI - a1) < fabs(a2 - a1))
+    {
+        a2 += 2*M_PI;
+    }
+
+    if(fabs(a2 - 2 * M_PI - a1) < fabs(a2 - a1))
+    {
+        a2 -= 2*M_PI;
+    }
+
+
+    //float real_angle = (end_pos - start_pos).angle();
+
+    //float end_angle = asin(sin(o->new_angle));
+    //float start_angle = asin(sin(o->old_angle));
+
+    float iangle = o->old_angle + frac * (a2 - a1);
+
+    //float iangle = end_angle * frac + start_angle * (1.f - frac);
+    float irad = o->new_rad * frac + o->old_rad * (1.f - frac);
+
+    o->orbital_angle = iangle;
+    o->orbital_length = irad;
+
+    //o->orbital_angle = cpos.angle();
+    //o->orbital_length = cpos.length();
+
+    if(distance < 2 || frac > 1)
+    {
+        o->transferring = false;
+    }
+
+    //printf("%f %f\n", cpos.x(), cpos.y());
+    //printf("%f f\n", frac);
+
+    //printf("%f %f %f %f\n", o->new_rad, o->new_angle, o->old_rad, o->old_angle);
+}
+
 void orbital::tick(float step_s)
 {
+    internal_time_s += step_s;
+
     rotation += rotation_velocity_ps * step_s;
+
+    if(transferring)
+        do_transfer(this);
 
     if(parent == nullptr)
         return;
@@ -226,6 +289,30 @@ std::string orbital::get_info_str()
 
         return mgr->get_info_str() + "\nPosition: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y());
     }
+}
+
+void orbital::transfer(float pnew_rad, float pnew_angle)
+{
+    old_rad = orbital_length;
+    old_angle = orbital_angle;
+    new_rad = pnew_rad;
+    new_angle = pnew_angle;
+
+    transferring = true;
+
+    start_time_s = internal_time_s;
+}
+
+void orbital::transfer(vec2f pos)
+{
+    vec2f base;
+
+    if(parent)
+        base = parent->absolute_pos;
+
+    vec2f rel = pos - base;
+
+    transfer(rel.length(), rel.angle());
 }
 
 orbital* orbital_system::make_new(orbital_info::type type, float rad)

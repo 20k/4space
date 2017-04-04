@@ -419,7 +419,7 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win)
     ImGui::End();
 }
 
-void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool clicked, popup_info& popup)
+void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup)
 {
     sf::Mouse mouse;
 
@@ -428,10 +428,12 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool cli
 
     auto transformed = win.mapPixelToCoords({x, y});
 
-    if(clicked)
+    if(lclick)
     {
         popup.going = false;
     }
+
+    orbital* selected = nullptr;
 
     for(orbital_system* sys : system_manage.systems)
     {
@@ -441,7 +443,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool cli
             {
                 orb->highlight = true;
 
-                if(clicked)
+                if(lclick)
                 {
                     popup.going = true;
 
@@ -451,9 +453,24 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool cli
 
             if(popup.element == orb)
             {
-                popup.header = orbital_info::names[orb->type];
+                selected = orb;
+            }
+        }
+    }
 
-                popup.data = orb->get_info_str();
+    if(selected != nullptr)
+    {
+        popup.header = orbital_info::names[selected->type];
+
+        popup.data = selected->get_info_str();
+
+        if(popup.going)
+        {
+            selected->highlight = true;
+
+            if(rclick && (selected->type == orbital_info::FLEET))
+            {
+                selected->transfer({transformed.x, transformed.y});
             }
         }
     }
@@ -529,7 +546,7 @@ int main()
 
     orbital* fleet = base->make_new(orbital_info::FLEET, 5.f);
 
-    fleet->orbital_angle = 200.f;
+    fleet->orbital_angle = M_PI/13.f;
     //fleet->angular_velocity_ps = 2 * M_PI/100.f;
     fleet->orbital_length = 200.f;
     fleet->parent = sun;
@@ -569,7 +586,8 @@ int main()
             state = (state + 1) % 2;
         }
 
-        bool clicked = once<sf::Mouse::Left>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();//once<sf::Mouse::Left>();
+        bool lclick = once<sf::Mouse::Left>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
+        bool rclick = once<sf::Mouse::Right>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
 
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);
@@ -587,7 +605,7 @@ int main()
         if(state == 0)
         {
             sun->center_camera(window);
-            debug_system(system_manage, window, clicked, popup);
+            debug_system(system_manage, window, lclick, rclick, popup);
             base->draw(window);
         }
 
