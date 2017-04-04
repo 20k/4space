@@ -389,16 +389,35 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win)
 
 void debug_system(system_manager& system_manage, sf::RenderWindow& win)
 {
+    sf::Mouse mouse;
 
+    int x = mouse.getPosition(win).x;
+    int y = mouse.getPosition(win).y;
+
+    auto transformed = win.mapPixelToCoords({x, y});
+
+    for(orbital_system* sys : system_manage.systems)
+    {
+        for(orbital* orb : sys->orbitals)
+        {
+            if(orb->point_within({transformed.x, transformed.y}))
+            {
+                orb->highlight = true;
+            }
+        }
+    }
 }
 
 int main()
 {
-    ship test_ship = make_default();
-    ship test_ship2 = make_default();
+    ship_manager fleet1;
+    ship_manager fleet2;
 
-    test_ship.team = 0;
-    test_ship2.team = 1;
+    //ship test_ship = make_default();
+    //ship test_ship2 = make_default();
+
+    ship* test_ship = fleet1.make_new_from(0, make_default());
+    ship* test_ship2 = fleet2.make_new_from(1, make_default());
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
@@ -424,8 +443,8 @@ int main()
 
     battle_manager battle;
 
-    battle.add_ship(&test_ship);
-    battle.add_ship(&test_ship2);
+    battle.add_ship(test_ship);
+    battle.add_ship(test_ship2);
 
     system_manager system_manage;
 
@@ -485,9 +504,9 @@ int main()
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);
 
-        display_ship_info(test_ship, diff_s);
+        display_ship_info(*test_ship, diff_s);
 
-        debug_menu({&test_ship});
+        debug_menu({test_ship});
 
         if(state == 1)
         {

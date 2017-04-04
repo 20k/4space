@@ -1290,7 +1290,7 @@ ship* ship_manager::make_new(int team)
     return s;
 }
 
-ship* ship_manager::make_new_from(int team, ship& ns)
+ship* ship_manager::make_new_from(int team, const ship& ns)
 {
     ship* s = new ship(ns);
 

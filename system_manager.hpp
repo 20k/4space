@@ -24,6 +24,7 @@ namespace orbital_info
         0,
         1,
         1,
+        0,
     };
 
     static std::vector<std::string> load_strs =
@@ -32,6 +33,7 @@ namespace orbital_info
         "",
         "",
         "pics/fleet.png",
+        "",
         ""
     };
 }
@@ -47,7 +49,7 @@ struct orbital_simple_renderable
 
     void init(int n, float min_rad, float max_rad);
 
-    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos);
+    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col = {1,1,1});
 };
 
 struct sprite_renderable
@@ -57,11 +59,13 @@ struct sprite_renderable
 
     void load(const std::string& str);
 
-    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos);
+    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col = {1,1,1}, bool highlight = false);
 };
 
 struct orbital
 {
+    bool highlight = false;
+
     orbital_simple_renderable simple_renderable;
     sprite_renderable sprite;
 
@@ -90,6 +94,8 @@ struct orbital
     void draw(sf::RenderWindow& win);
 
     void center_camera(sf::RenderWindow& win);
+
+    bool point_within(vec2f pos);
 };
 
 struct orbital_system

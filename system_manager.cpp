@@ -10,8 +10,10 @@ void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
     }
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos)
+void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col)
 {
+    col = col * 255.f;
+
     for(int i=0; i<vert_dist.size(); i++)
     {
         int cur = i;
@@ -43,6 +45,8 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
         shape.setRotation(r2d((l2 - l1).angle()));
 
+        shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+
         #ifdef HOLLOWISH
         if((i % 2) == 0)
             continue;
@@ -58,13 +62,40 @@ void sprite_renderable::load(const std::string& str)
     tex.loadFromImage(img);
 }
 
-void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos)
+void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
 {
-    sf::Sprite spr(tex);
+    col = col * 255.f;
+
+    col = clamp(col, 0.f, 255.f);
+
+    sf::Sprite spr;
+    spr.setTexture(tex);
 
     spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
-    spr.setPosition(absolute_pos.x(), absolute_pos.y());
     spr.setRotation(r2d(rotation));
+
+    /*if(highlight)
+    {
+        float ux = spr.getLocalBounds().width;
+        float uy = spr.getLocalBounds().height;
+
+        spr.setScale(2.f, 2.f);
+        //spr.setScale((ux + 15) / ux, (uy + 15) / uy);
+        spr.setColor(sf::Color(0, 128, 255));
+
+        win.draw(spr);
+
+        spr.setScale(2.f, 2.f);
+    }*/
+
+    spr.setColor(sf::Color(col.x(), col.y(), col.z()));
+
+    if(highlight)
+    {
+        spr.setColor(sf::Color(0, 128, 255));
+    }
+
+    spr.setPosition(absolute_pos.x(), absolute_pos.y());
 
     win.draw(spr);
 }
@@ -132,10 +163,29 @@ void orbital::draw(sf::RenderWindow& win)
 
     win.draw(&lines[0], lines.size(), sf::Lines);*/
 
+    /*int wh = 2;
+
+    if(highlight)
+    {
+        for(int y=-wh; y<=wh; y++)
+        {
+            for(int x=-wh; x<=wh; x++)
+            {
+                if(render_type == 0)
+                    simple_renderable.draw(win, rotation, absolute_pos + (vec2f){x, y}, {0, 0.5f, 1});
+                else
+                    sprite.draw(win, rotation, absolute_pos + (vec2f){x, y}, {1, 0.5f, 1});
+            }
+        }
+    }*/
+
+
     if(render_type == 0)
         simple_renderable.draw(win, rotation, absolute_pos);
-    else
-        sprite.draw(win, rotation, absolute_pos);
+    else if(render_type == 1)
+        sprite.draw(win, rotation, absolute_pos, {1, 1, 1}, highlight);
+
+    highlight = false;
 }
 
 void orbital::center_camera(sf::RenderWindow& win)
@@ -145,6 +195,19 @@ void orbital::center_camera(sf::RenderWindow& win)
     view1.setCenter(absolute_pos.x(), absolute_pos.y());
 
     win.setView(view1);
+}
+
+bool orbital::point_within(vec2f pos)
+{
+    vec2f dim = rad * 1.5f;
+    vec2f apos = absolute_pos;
+
+    if(pos.x() < apos.x() + dim.x() && pos.x() >= apos.x() - dim.x() && pos.y() < apos.y() + dim.y() && pos.y() >= apos.y() - dim.y())
+    {
+        return true;
+    }
+
+    return false;
 }
 
 orbital* orbital_system::make_new(orbital_info::type type, float rad)
