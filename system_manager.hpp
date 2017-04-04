@@ -107,6 +107,7 @@ struct orbital
     orbital_info::type type = orbital_info::NONE;
 
     void set_orbit(float ang, float len);
+    void set_orbit(vec2f pos);
 
     void tick(float step_s);
 
@@ -116,7 +117,7 @@ struct orbital
 
     bool point_within(vec2f pos);
 
-    std::string get_info_str();
+    std::vector<std::string> get_info_str();
 
     void transfer(float new_rad, float new_angle);
     void transfer(vec2f pos);
@@ -124,6 +125,8 @@ struct orbital
 
 struct orbital_system
 {
+    orbital* get_base();
+
     std::vector<orbital*> orbitals;
 
     orbital* make_new(orbital_info::type type, float rad);
@@ -133,6 +136,10 @@ struct orbital_system
     void destroy(orbital*);
 
     void draw(sf::RenderWindow& win);
+
+    void cull_empty_orbital_fleets();
+
+    orbital* get_by_element(void* element);
 };
 
 struct system_manager
@@ -146,6 +153,8 @@ struct system_manager
     void destroy(orbital_system* s);
 
     void repulse_fleets();
+
+    void cull_empty_orbital_fleets();
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

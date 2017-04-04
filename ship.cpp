@@ -1287,6 +1287,8 @@ ship* ship_manager::make_new(int team)
 
     s->team = team;
 
+    s->owned_by = this;
+
     return s;
 }
 
@@ -1297,6 +1299,8 @@ ship* ship_manager::make_new_from(int team, const ship& ns)
     ships.push_back(s);
 
     s->team = team;
+
+    s->owned_by = this;
 
     return s;
 }
@@ -1315,17 +1319,91 @@ void ship_manager::destroy(ship* s)
     }
 }
 
-std::string ship_manager::get_info_str()
+std::vector<std::string> ship_manager::get_info_strs()
 {
-    std::string ret;
+    std::vector<std::string> ret;
 
     for(auto& i : ships)
     {
-        ret = ret + i->name + "\n";
+        ret.push_back(i->name);
     }
 
-    if(ships.size() > 0)
-        ret.pop_back();
-
     return ret;
+}
+
+void ship_manager::merge_into_me(ship_manager& other)
+{
+    if(this == &other)
+        return;
+
+    for(auto& i : other.ships)
+    {
+        i->owned_by = this;
+
+        ships.push_back(i);
+    }
+}
+
+void ship_manager::steal(ship* const s)
+{
+    if(s->owned_by == this)
+        return;
+
+    ship_manager* other = s->owned_by;
+
+    for(int i=0; i<other->ships.size(); i++)
+    {
+        if(other->ships[i] == s)
+        {
+            other->ships.erase(other->ships.begin() + i);
+            break;
+        }
+    }
+
+    s->owned_by = this;
+
+    ships.push_back(s);
+}
+
+ship_manager* fleet_manager::make_new()
+{
+    ship_manager* ns = new ship_manager;
+
+    fleets.push_back(ns);
+
+    return ns;
+}
+
+void fleet_manager::destroy(ship_manager* ns)
+{
+    for(int i=0; i < fleets.size(); i++)
+    {
+        if(fleets[i] == ns)
+        {
+            fleets.erase(fleets.begin() + i);
+
+            delete ns;
+
+            return;
+        }
+    }
+}
+
+void fleet_manager::cull_dead()
+{
+    for(int i=0; i < fleets.size(); i++)
+    {
+        if(fleets[i]->ships.size() == 0)
+        {
+            auto m = fleets[i];
+
+            fleets.erase(fleets.begin() + i);
+
+            delete m;
+
+            i--;
+
+            continue;
+        }
+    }
 }

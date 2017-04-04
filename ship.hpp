@@ -221,6 +221,7 @@ struct component
 };
 
 struct projectile;
+struct ship_manager;
 
 struct ship : positional
 {
@@ -272,6 +273,8 @@ struct ship : positional
 
     bool highlight = false;
 
+    ship_manager* owned_by = nullptr;
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
@@ -289,7 +292,24 @@ struct ship_manager
 
     void destroy(ship* s);
 
-    std::string get_info_str();
+    std::vector<std::string> get_info_strs();
+
+    void merge_into_me(ship_manager& other);
+
+    ///from other ship manager
+    void steal(ship* const s);
+};
+
+///manages fleets
+struct fleet_manager
+{
+    std::vector<ship_manager*> fleets;
+
+    ship_manager* make_new();
+
+    void destroy(ship_manager*);
+
+    void cull_dead();
 };
 
 #endif // SHIP_HPP_INCLUDED

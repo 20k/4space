@@ -6,6 +6,7 @@
 #include <iomanip>
 #include "battle_manager.hpp"
 #include <set>
+#include <deque>
 #include "system_manager.hpp"
 
 template<sf::Keyboard::Key k>
@@ -370,11 +371,18 @@ void display_ship_info_old(ship& s, float step_s)
 
 struct popup_element
 {
+    static int gid;
+    int id = gid++;
+
     std::string header;
-    std::string data;
+    std::vector<std::string> data;
+    std::deque<bool> checked; ///screw you idiotic language
+    bool mergeable = false;
 
     void* element = nullptr;
 };
+
+int popup_element::gid;
 
 struct popup_info
 {
@@ -479,8 +487,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         {
             if(orb->point_within({transformed.x, transformed.y}))
             {
-                //if(selected.size() == 0 || lshift)
-
                 if(first)
                 {
                     orb->highlight = true;
@@ -499,6 +505,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                     popup_element elem;
                     elem.element = orb;
+
+                    if(orb->type == orbital_info::FLEET)
+                    {
+                        elem.mergeable = true;
+                    }
 
                     popup.elements.push_back(elem);
 
@@ -543,7 +554,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     }
 }
 
-void do_popup(popup_info& popup)
+void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system)
 {
     if(popup.elements.size() == 0)
         popup.going = false;
@@ -551,33 +562,114 @@ void do_popup(popup_info& popup)
     if(!popup.going)
         return;
 
-
     ImGui::Begin(("Selected:###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
 
+    bool any_checkbox = false;
+
+    std::set<ship*> potential_new_fleet;
+
+    ///remember we'll need to make an orbital associated with the new fleet
+    ///going to need the ability to drag and drop these
+    ///nah use checkboxes
     for(auto& i : popup.elements)
     {
+        int id = i.id;
+
         ImGui::Text(i.header.c_str());
-        ImGui::Text(i.data.c_str());
+
+        int num = 0;
+
+        i.checked.resize(i.data.size());
+
+        //for(std::string& str : i.data)
+        for(int kk=0; kk < i.data.size(); kk++)
+        {
+            const std::string& str = i.data[kk];
+
+            ImGui::Text(str.c_str());
+
+            if(i.mergeable)
+            {
+                ImGui::SameLine();
+                ImGui::Checkbox(("###" + std::to_string(id) + std::to_string(num)).c_str(), &i.checked[kk]);
+
+                if(i.checked[kk])
+                {
+                    any_checkbox = true;
+
+                    orbital* o = (orbital*)i.element;
+
+                    ship_manager* smanage = (ship_manager*)o->data;
+
+                    potential_new_fleet.insert(smanage->ships[num]);
+                }
+
+                num++;
+            }
+
+        }
     }
+
+    if(potential_new_fleet.size() > 0)
+    {
+        if(ImGui::Button("Make New Fleet"))
+        {
+            ship_manager* ns = fleet_manage.make_new();
+
+            vec2f fleet_pos;
+
+            float fleet_angle = 0;
+            float fleet_length = 200;
+
+            for(ship* i : potential_new_fleet)
+            {
+                orbital* real = current_system->get_by_element((void*)i->owned_by);
+
+                if(real != nullptr)
+                {
+                    fleet_pos = real->absolute_pos;
+
+                    fleet_angle = real->orbital_angle;
+                    fleet_length = real->orbital_length;
+                }
+
+                ns->steal(i);
+            }
+
+            orbital* associated = current_system->make_new(orbital_info::FLEET, 5.f);
+            //associated->set_orbit(fleet_angle, fleet_length);
+            associated->parent = current_system->get_base();
+            associated->set_orbit(fleet_pos);
+            associated->data = ns;
+
+            popup.elements.clear();
+            popup.going = false;
+        }
+    }
+
+    all_systems.cull_empty_orbital_fleets();
+    fleet_manage.cull_dead();
 
     ImGui::End();
 }
 
 int main()
 {
-    ship_manager fleet1;
-    ship_manager fleet2;
-    ship_manager fleet3;
+    fleet_manager fleet_manage;
+
+    ship_manager* fleet1 = fleet_manage.make_new();
+    ship_manager* fleet2 = fleet_manage.make_new();
+    ship_manager* fleet3 = fleet_manage.make_new();
 
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
 
-    ship* test_ship = fleet1.make_new_from(0, make_default());
-    ship* test_ship3 = fleet1.make_new_from(0, make_default());
+    ship* test_ship = fleet1->make_new_from(0, make_default());
+    ship* test_ship3 = fleet1->make_new_from(0, make_default());
 
-    ship* test_ship2 = fleet2.make_new_from(1, make_default());
+    ship* test_ship2 = fleet2->make_new_from(1, make_default());
 
-    ship* test_ship4 = fleet3.make_new_from(0, make_default());
+    ship* test_ship4 = fleet3->make_new_from(0, make_default());
 
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
@@ -632,14 +724,14 @@ int main()
     //fleet->angular_velocity_ps = 2 * M_PI/100.f;
     fleet->orbital_length = 200.f;
     fleet->parent = sun;
-    fleet->data = &fleet1;
+    fleet->data = fleet1;
 
     orbital* ofleet2 = base->make_new(orbital_info::FLEET, 5.f);
 
     ofleet2->orbital_angle = randf_s(0.f, 2*M_PI);
     ofleet2->orbital_length = randf_s(50.f, 300.f);
     ofleet2->parent = sun;
-    ofleet2->data = &fleet3;
+    ofleet2->data = fleet3;
 
     orbital* tplanet = base->make_new(orbital_info::PLANET, 3.f);
     tplanet->orbital_length = 50.f;
@@ -700,7 +792,10 @@ int main()
 
         system_manage.tick(diff_s);
 
-        do_popup(popup);
+        do_popup(popup, fleet_manage, system_manage, base);
+
+        system_manage.cull_empty_orbital_fleets();
+        fleet_manage.cull_dead();
 
         ImGui::Render();
         window.display();

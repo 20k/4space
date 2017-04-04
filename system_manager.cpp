@@ -106,7 +106,21 @@ void orbital::set_orbit(float ang, float len)
     orbital_angle = ang;
     orbital_length = len;
 
+    //printf("SETTING %f %f\n", orbital_angle, orbital_length);
+
     //angular_velocity_ps = ang_vel_s;
+}
+
+void orbital::set_orbit(vec2f pos)
+{
+    vec2f base;
+
+    if(parent)
+        base = parent->absolute_pos;
+
+    vec2f rel = pos - base;
+
+    set_orbit(rel.angle(), rel.length());
 }
 
 void do_transfer(orbital* o)
@@ -254,20 +268,24 @@ bool orbital::point_within(vec2f pos)
     return false;
 }
 
-std::string orbital::get_info_str()
+std::vector<std::string> orbital::get_info_str()
 {
     if(type != orbital_info::FLEET || data == nullptr)
     {
         std::string str = "Radius: " + std::to_string(rad);
         std::string pstr = "Position: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y());
 
-        return str + "\n" + pstr;
+        return {str + "\n" + pstr};
     }
     else
     {
         ship_manager* mgr = (ship_manager*)data;
 
-        return mgr->get_info_str() + "\nPosition: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y());
+        std::vector<std::string> ret = mgr->get_info_strs();
+
+        //ret.push_back("Position: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y()));
+
+        return ret;
     }
 }
 
@@ -293,6 +311,17 @@ void orbital::transfer(vec2f pos)
     vec2f rel = pos - base;
 
     transfer(rel.length(), rel.angle());
+}
+
+orbital* orbital_system::get_base()
+{
+    for(auto& i : orbitals)
+    {
+        if(i->type == orbital_info::STAR)
+            return i;
+    }
+
+    return nullptr;
 }
 
 orbital* orbital_system::make_new(orbital_info::type type, float rad)
@@ -353,6 +382,40 @@ void orbital_system::draw(sf::RenderWindow& win)
     {
         orbitals[kk]->draw(win);
     }
+}
+
+void orbital_system::cull_empty_orbital_fleets()
+{
+    //for(orbital* o : orbitals)
+    for(int i=0; i<orbitals.size(); i++)
+    {
+        orbital* o = orbitals[i];
+
+        if(o->type == orbital_info::FLEET)
+        {
+            ship_manager* smanage = (ship_manager*)o->data;
+
+            if(smanage->ships.size() == 0)
+            {
+                //printf("culled");
+
+                destroy(o);
+                i--;
+                continue;
+            }
+        }
+    }
+}
+
+orbital* orbital_system::get_by_element(void* element)
+{
+    for(auto& i : orbitals)
+    {
+        if(i->data == element)
+            return i;
+    }
+
+    return nullptr;
 }
 
 orbital_system* system_manager::make_new()
@@ -429,5 +492,13 @@ void system_manager::repulse_fleets()
                     repulse(o, k);
             }
         }
+    }
+}
+
+void system_manager::cull_empty_orbital_fleets()
+{
+    for(auto& i : systems)
+    {
+        i->cull_empty_orbital_fleets();
     }
 }
