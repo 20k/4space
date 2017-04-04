@@ -324,7 +324,7 @@ orbital* orbital_system::get_base()
     return nullptr;
 }
 
-orbital* orbital_system::make_new(orbital_info::type type, float rad)
+orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_verts)
 {
     orbital* n = new orbital;
 
@@ -336,7 +336,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad)
 
     if(n->render_type == 0)
     {
-        n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
+        n->simple_renderable.init(num_verts, n->rad * 0.85f, n->rad * 1.2f);
     }
     else if(n->render_type == 1)
     {
@@ -416,6 +416,70 @@ orbital* orbital_system::get_by_element(void* element)
     }
 
     return nullptr;
+}
+
+void orbital_system::generate_asteroids(int n, int num_belts)
+{
+    std::vector<float> exclusion_radiuses;
+
+    for(auto& i : orbitals)
+    {
+        if(i->type == orbital_info::PLANET)
+        {
+            exclusion_radiuses.push_back(i->orbital_length);
+        }
+    }
+
+    float min_belt = 50.f;
+
+    float max_belt = 500.f;
+
+    int asteroids_per_belt = n / num_belts;
+
+    for(int i=0; i<num_belts; i++)
+    {
+        float rad = 0.f;
+
+        bool bad = false;
+
+        int max_tries = 10;
+        int cur_tries = 0;
+
+        do
+        {
+            bad = false;
+
+            rad = randf_s(min_belt, max_belt);
+
+            for(auto& i : exclusion_radiuses)
+            {
+                if(fabs(rad - i) < 20)
+                {
+                    bad = true;
+                    break;
+                }
+            }
+
+            cur_tries++;
+        }
+        while(bad && cur_tries < max_tries);
+
+        exclusion_radiuses.push_back(rad);
+
+        for(int kk=0; kk<asteroids_per_belt; kk++)
+        {
+            float angle = ((float)kk / (asteroids_per_belt + 1)) * 2 * M_PI;
+
+            float len = rad * randf_s(0.9, 1.1);
+
+            orbital* o = make_new(orbital_info::ASTEROID, 2.f * randf_s(0.5f, 1.5f), 5);
+            o->orbital_angle = angle + randf_s(0.f, M_PI*2/16.f);
+            o->orbital_length = len;
+
+            o->parent = get_base();
+            o->rotation_velocity_ps = 2 * M_PI / randf_s(10.f, 1000.f);
+        }
+    }
 }
 
 orbital_system* system_manager::make_new()

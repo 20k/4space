@@ -129,7 +129,7 @@ struct orbital_system
 
     std::vector<orbital*> orbitals;
 
-    orbital* make_new(orbital_info::type type, float rad);
+    orbital* make_new(orbital_info::type type, float rad, int num_verts = 5);
 
     void tick(float step_s);
 
@@ -140,6 +140,8 @@ struct orbital_system
     void cull_empty_orbital_fleets();
 
     orbital* get_by_element(void* element);
+
+    void generate_asteroids(int n, int num_belts);
 };
 
 struct system_manager

@@ -745,8 +745,8 @@ int main()
 
     orbital_system* base = system_manage.make_new();
 
-    orbital* sun = base->make_new(orbital_info::STAR, 10.f);
-    orbital* planet = base->make_new(orbital_info::PLANET, 5.f);
+    orbital* sun = base->make_new(orbital_info::STAR, 10.f, 10);
+    orbital* planet = base->make_new(orbital_info::PLANET, 5.f, 10);
     planet->parent = sun;
 
     sun->absolute_pos = {500, 500};
@@ -774,6 +774,8 @@ int main()
     orbital* tplanet = base->make_new(orbital_info::PLANET, 3.f);
     tplanet->orbital_length = 50.f;
     tplanet->parent = sun;
+
+    base->generate_asteroids(100, 3);
 
     popup_info popup;
 
