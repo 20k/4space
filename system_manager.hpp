@@ -17,6 +17,16 @@ namespace orbital_info
         NONE,
     };
 
+    static std::vector<std::string> names =
+    {
+        "STAR",
+        "PLANET",
+        "ASTEROID",
+        "FLEET",
+        "FLEET",
+        "NONE",
+    };
+
     static std::vector<int> render_type =
     {
         0,
@@ -96,6 +106,8 @@ struct orbital
     void center_camera(sf::RenderWindow& win);
 
     bool point_within(vec2f pos);
+
+    std::string get_info_str();
 };
 
 struct orbital_system

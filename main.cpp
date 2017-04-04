@@ -30,6 +30,28 @@ bool once()
     return false;
 }
 
+template<sf::Mouse::Button b>
+bool once()
+{
+    static bool last;
+
+    sf::Mouse mouse;
+
+    if(mouse.isButtonPressed(b) && !last)
+    {
+        last = true;
+
+        return true;
+    }
+
+    if(!mouse.isButtonPressed(b))
+    {
+        last = false;
+    }
+
+    return false;
+}
+
 template <typename T>
 std::string to_string_with_precision(const T a_value, const int n = 6)
 {
@@ -346,6 +368,14 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }
 
+struct popup_info
+{
+    std::string header;
+    std::string data;
+
+    bool going = false;
+};
+
 void debug_menu(const std::vector<ship*>& ships)
 {
     ImGui::Begin("Debug");
@@ -387,7 +417,7 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win)
     ImGui::End();
 }
 
-void debug_system(system_manager& system_manage, sf::RenderWindow& win)
+void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool clicked, popup_info& popup)
 {
     sf::Mouse mouse;
 
@@ -396,6 +426,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win)
 
     auto transformed = win.mapPixelToCoords({x, y});
 
+    if(clicked)
+    {
+        popup.going = false;
+    }
+
     for(orbital_system* sys : system_manage.systems)
     {
         for(orbital* orb : sys->orbitals)
@@ -403,9 +438,29 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win)
             if(orb->point_within({transformed.x, transformed.y}))
             {
                 orb->highlight = true;
+
+                if(clicked)
+                {
+                    popup.header = orbital_info::names[orb->type];
+                    popup.data = orb->get_info_str();
+
+                    popup.going = true;
+                }
             }
         }
     }
+}
+
+void do_popup(popup_info& popup)
+{
+    if(!popup.going)
+        return;
+
+    ImGui::Begin((popup.header + "###INFO_PANEL").c_str(), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::Text(popup.data.c_str());
+
+    ImGui::End();
 }
 
 int main()
@@ -418,6 +473,9 @@ int main()
 
     ship* test_ship = fleet1.make_new_from(0, make_default());
     ship* test_ship2 = fleet2.make_new_from(1, make_default());
+
+    test_ship->name = "SS Icarus";
+    test_ship2->name = "SS Buttz";
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
@@ -467,11 +525,13 @@ int main()
     //fleet->angular_velocity_ps = 2 * M_PI/100.f;
     fleet->orbital_length = 200.f;
     fleet->parent = sun;
+    fleet->data = &fleet1;
 
     orbital* tplanet = base->make_new(orbital_info::PLANET, 3.f);
     tplanet->orbital_length = 50.f;
     tplanet->parent = sun;
 
+    popup_info popup;
 
     sf::Keyboard key;
 
@@ -501,6 +561,8 @@ int main()
             state = (state + 1) % 2;
         }
 
+        bool clicked = once<sf::Mouse::Left>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();//once<sf::Mouse::Left>();
+
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);
 
@@ -517,11 +579,13 @@ int main()
         if(state == 0)
         {
             sun->center_camera(window);
-            debug_system(system_manage, window);
+            debug_system(system_manage, window, clicked, popup);
             base->draw(window);
         }
 
         system_manage.tick(diff_s);
+
+        do_popup(popup);
 
         ImGui::Render();
         window.display();

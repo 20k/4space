@@ -1314,3 +1314,15 @@ void ship_manager::destroy(ship* s)
         }
     }
 }
+
+std::string ship_manager::get_info_str()
+{
+    std::string ret;
+
+    for(auto& i : ships)
+    {
+        ret = ret + i->name + "\n";
+    }
+
+    return ret;
+}

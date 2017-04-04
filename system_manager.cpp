@@ -1,6 +1,7 @@
 #include "system_manager.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Vertex.hpp>
+#include "ship.hpp"
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
@@ -208,6 +209,23 @@ bool orbital::point_within(vec2f pos)
     }
 
     return false;
+}
+
+std::string orbital::get_info_str()
+{
+    if(type != orbital_info::FLEET || data == nullptr)
+    {
+        std::string str = "Radius: " + std::to_string(rad);
+        std::string pstr = "Position: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y());
+
+        return str + "\n" + pstr;
+    }
+    else
+    {
+        ship_manager* mgr = (ship_manager*)data;
+
+        return mgr->get_info_str();
+    }
 }
 
 orbital* orbital_system::make_new(orbital_info::type type, float rad)

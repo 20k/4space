@@ -224,6 +224,8 @@ struct projectile;
 
 struct ship : positional
 {
+    std::string name;
+
     int id = gid++;
     static int gid;
 
@@ -286,6 +288,8 @@ struct ship_manager
     ship* make_new_from(int team, const ship& s);
 
     void destroy(ship* s);
+
+    std::string get_info_str();
 };
 
 #endif // SHIP_HPP_INCLUDED
