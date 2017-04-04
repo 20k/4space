@@ -753,13 +753,11 @@ int main()
     sun->rotation_velocity_ps = 2*M_PI/60.f;
 
     planet->orbital_length = 150.f;
-    //planet->angular_velocity_ps = 2*M_PI / 100.f;
     planet->rotation_velocity_ps = 2*M_PI / 200.f;
 
     orbital* fleet = base->make_new(orbital_info::FLEET, 5.f);
 
     fleet->orbital_angle = M_PI/13.f;
-    //fleet->angular_velocity_ps = 2 * M_PI/100.f;
     fleet->orbital_length = 200.f;
     fleet->parent = sun;
     fleet->data = fleet1;
