@@ -206,7 +206,7 @@ struct system_manager
 
     void draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire);
 
-    void set_viewed_system(orbital_system* s);
+    void set_viewed_system(orbital_system* s, bool reset_zoom = true);
 
     void draw_universe_map(sf::RenderWindow& win, empire* viewer_empire);
     void process_universe_map(sf::RenderWindow& win, bool lclick);
@@ -214,11 +214,12 @@ struct system_manager
     ///camera. Set here because zoom will be useful
     ///Camera panning should also probably go here
     void change_zoom(float zoom);
-    void set_zoom(float zoom);
+    void set_zoom(float zoom, bool auto_enter_system = false);
     void pan_camera(vec2f dir);
 
     bool in_system_view();
     void enter_universe_view();
+    orbital_system* get_nearest_to_camera();
 
     float zoom_level = 1.f;
     vec2f camera;

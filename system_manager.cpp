@@ -855,13 +855,14 @@ void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_em
     currently_viewed->draw(win, viewer_empire);
 }
 
-void system_manager::set_viewed_system(orbital_system* s)
+void system_manager::set_viewed_system(orbital_system* s, bool reset_zoom)
 {
     currently_viewed = s;
 
     if(s != nullptr && s->get_base())
     {
-        set_zoom(1.f);
+        if(reset_zoom)
+            set_zoom(1.f);
 
         s->get_base()->center_camera(*this);
     }
@@ -952,10 +953,10 @@ void system_manager::change_zoom(float zoom)
     else
         zoom = scale/2 * zoom;
 
-    set_zoom(zoom_level - zoom);
+    set_zoom(zoom_level - zoom, true);
 }
 
-void system_manager::set_zoom(float zoom)
+void system_manager::set_zoom(float zoom, bool auto_enter_system)
 {
     bool was_in_system_view = in_system_view();
 
@@ -974,9 +975,13 @@ void system_manager::set_zoom(float zoom)
 
     if(is_in_system_view && !was_in_system_view)
     {
+        if(auto_enter_system)
+            set_viewed_system(get_nearest_to_camera(), false);
+
         camera = camera - currently_viewed->universe_pos * universe_scale;
 
-        //currently_viewed->get_base()->center_camera(*this);
+        if(auto_enter_system)
+            currently_viewed->get_base()->center_camera(*this);
     }
     if(was_in_system_view && !is_in_system_view)
     {
@@ -997,4 +1002,23 @@ bool system_manager::in_system_view()
 void system_manager::enter_universe_view()
 {
     zoom_level = 10;
+}
+
+orbital_system* system_manager::get_nearest_to_camera()
+{
+    float dist = FLT_MAX;
+    orbital_system* f = nullptr;
+
+    for(orbital_system* s : systems)
+    {
+        float found_dist = (camera - s->universe_pos * universe_scale).length();
+
+        if(found_dist < dist)
+        {
+            f = s;
+            dist = found_dist;
+        }
+    }
+
+    return f;
 }
