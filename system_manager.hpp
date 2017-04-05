@@ -75,6 +75,7 @@ struct sprite_renderable
 
 struct empire;
 struct empire_manager;
+struct system_manager;
 
 struct orbital
 {
@@ -117,7 +118,7 @@ struct orbital
 
     void draw(sf::RenderWindow& win, empire* viewer_empire);
 
-    void center_camera(sf::RenderWindow& win);
+    void center_camera(system_manager& system_manage);
 
     bool point_within(vec2f pos);
 
@@ -148,6 +149,8 @@ struct orbital
 
 struct orbital_system
 {
+    vec2f universe_pos = {0,0};
+
     orbital* get_base();
 
     std::vector<orbital*> orbitals;
@@ -189,6 +192,14 @@ struct system_manager
     void cull_empty_orbital_fleets(empire_manager& empire_manage);
 
     void draw_alerts(sf::RenderWindow& win);
+
+    ///camera. Set here because zoom will be useful
+    ///Camera panning should also probably go here
+    void change_zoom(float zoom);
+    void pan_camera(vec2f dir);
+
+    float zoom_level = 1.f;
+    vec2f camera;
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

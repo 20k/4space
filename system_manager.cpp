@@ -261,13 +261,9 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     highlight = false;
 }
 
-void orbital::center_camera(sf::RenderWindow& win)
+void orbital::center_camera(system_manager& system_manage)
 {
-    sf::View view1 = win.getDefaultView();
-
-    view1.setCenter(absolute_pos.x(), absolute_pos.y());
-
-    win.setView(view1);
+    system_manage.camera = absolute_pos;
 }
 
 bool orbital::point_within(vec2f pos)
@@ -809,4 +805,29 @@ void system_manager::draw_alerts(sf::RenderWindow& win)
     {
         i->draw_alerts(win);
     }
+}
+
+void system_manager::change_zoom(float zoom)
+{
+    float min_zoom = 1.f / 1000.f;
+    float max_zoom = 5.f;
+
+    float scale = zoom_level;
+
+    zoom *= 0.4f;
+
+    if(zoom < 0)
+        zoom = scale * zoom;
+    else
+        zoom = scale/2 * zoom;
+
+    zoom_level = zoom_level - zoom;
+
+    if(zoom_level < min_zoom)
+        zoom_level = min_zoom;
+}
+
+void system_manager::pan_camera(vec2f dir)
+{
+    camera = camera - dir * zoom_level;
 }

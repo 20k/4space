@@ -21,6 +21,7 @@ struct projectile : positional
 };
 
 struct battle_manager;
+struct system_manager;
 
 namespace sf
 {
@@ -58,7 +59,7 @@ struct battle_manager
     ///in world coordinates... which atm is screenspace I WILL FORGET THIS
     ship* get_ship_under(vec2f pos);
 
-    void set_view(sf::RenderWindow& win);
+    void set_view(system_manager& system_manage);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

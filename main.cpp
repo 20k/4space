@@ -700,6 +700,16 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
     ImGui::End();
 }
 
+void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
+{
+    sf::View view = window.getDefaultView();
+
+    view.zoom(system_manage.zoom_level);
+    view.setCenter({system_manage.camera.x(), system_manage.camera.y()});
+
+    window.setView(view);
+}
+
 int main()
 {
     empire_manager empire_manage;
@@ -816,6 +826,7 @@ int main()
 
     orbital_system* sys_2 = system_manage.make_new();
     sys_2->generate_full_random_system();
+    sys_2->universe_pos = {10, 10};
 
 
     popup_info popup;
@@ -824,9 +835,13 @@ int main()
 
     int state = 0;
 
+    bool focused = true;
+
     while(window.isOpen())
     {
         sf::Event event;
+
+        float scrollwheel_delta = 0;
 
         while(window.pollEvent(event))
         {
@@ -834,7 +849,33 @@ int main()
 
             if(event.type == sf::Event::Closed)
                 window.close();
+
+            if(event.type == sf::Event::GainedFocus)
+                focused = true;
+
+            if(event.type == sf::Event::LostFocus)
+                focused = false;
+
+            if(event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+                scrollwheel_delta += event.mouseWheelScroll.delta;
         }
+
+        vec2f cdir = {0,0};
+
+        if(key.isKeyPressed(sf::Keyboard::W))
+            cdir.y() += 1;
+
+        if(key.isKeyPressed(sf::Keyboard::S))
+            cdir.y() -= 1;
+
+        if(key.isKeyPressed(sf::Keyboard::A))
+            cdir.x() += 1;
+
+        if(key.isKeyPressed(sf::Keyboard::D))
+            cdir.x() -= 1;
+
+        system_manage.pan_camera(cdir);
+        system_manage.change_zoom(scrollwheel_delta);
 
         ///BATTLE MANAGER IS NO LONGER TICKING SHIP COMPONENTS, IT IS ASSUMED TO BE DONE GLOBALLY WHICH WE WONT WANT
         ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME
@@ -845,13 +886,25 @@ int main()
             //printf("Timestep %f\n", diff_s);
         }
 
+        handle_camera(window, system_manage);
+
         if(once<sf::Keyboard::F1>())
         {
             state = (state + 1) % 2;
+
+            if(state == 0)
+            {
+                sun->center_camera(system_manage);
+            }
+            if(state == 1)
+            {
+                battle.set_view(system_manage);
+            }
         }
 
         if(once<sf::Keyboard::F3>())
         {
+            sys_2->get_base()->center_camera(system_manage);
             state = 2;
         }
 
@@ -870,22 +923,26 @@ int main()
 
         debug_menu({test_ship});
 
+        handle_camera(window, system_manage);
+
         if(state == 1)
         {
-            battle.set_view(window);
             debug_battle(battle, window, lclick);
+
             battle.draw(window);
         }
         if(state == 0)
         {
-            sun->center_camera(window);
+            //sun->center_camera(window);
             debug_system(system_manage, window, lclick, rclick, popup, player_empire);
+
             base->draw(window, player_empire);
         }
         if(state == 2)
         {
-            sys_2->get_base()->center_camera(window);
-            debug_system(system_manage, window,lclick, rclick, popup, player_empire);
+            //sys_2->get_base()->center_camera(window);
+            debug_system(system_manage, window, lclick, rclick, popup, player_empire);
+
             sys_2->draw(window, player_empire);
         }
 

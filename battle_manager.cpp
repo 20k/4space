@@ -1,5 +1,6 @@
 #include "battle_manager.hpp"
 #include <SFML/Graphics.hpp>
+#include "system_manager.hpp"
 
 void projectile::load(int type)
 {
@@ -367,7 +368,7 @@ ship* battle_manager::get_ship_under(vec2f pos)
     return nullptr;
 }
 
-void battle_manager::set_view(sf::RenderWindow& win)
+void battle_manager::set_view(system_manager& system_manage)
 {
     vec2f avg = {0,0};
     int num = 0;
@@ -382,8 +383,10 @@ void battle_manager::set_view(sf::RenderWindow& win)
     if(num > 0)
         avg = avg / num;
 
-    sf::View v1 = win.getDefaultView();
+    /*sf::View v1 = win.getDefaultView();
     v1.setCenter(avg.x(), avg.y());
 
-    win.setView(v1);
+    win.setView(v1);*/
+
+    system_manage.camera = avg;
 }
