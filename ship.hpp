@@ -262,6 +262,8 @@ struct ship : positional
     void use(component& c);
 
     std::vector<component> fire();
+    bool can_use_warp_drives();
+    void use_warp_drives();
 
     void add(const component& c);
 
@@ -296,6 +298,9 @@ private:
     //void fire();
 };
 
+struct orbital_system;
+struct orbital;
+
 ///can be used as a fleet
 struct ship_manager
 {
@@ -323,6 +328,8 @@ struct ship_manager
     float get_move_system_speed();
 
     void draw_alerts(sf::RenderWindow& win, vec2f abs_pos);
+
+    void try_warp(orbital_system* fin, orbital_system* cur, orbital* o);
 };
 
 struct empire_manager;

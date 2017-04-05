@@ -160,6 +160,8 @@ struct orbital_system
     void tick(float step_s);
 
     void destroy(orbital*);
+    ///non destructively reparent
+    void steal(orbital*, orbital_system* s);
 
     ///currently viewed empire is drawn differently, see
     void draw(sf::RenderWindow& win, empire* viewer_empire);
@@ -177,14 +179,19 @@ struct orbital_system
     void generate_full_random_system();
 
     bool highlight = false;
+
 };
 
 struct system_manager
 {
     std::vector<orbital_system*> systems;
     orbital_system* currently_viewed = nullptr;
+    orbital_system* hovered_system = nullptr;
 
     orbital_system* make_new();
+
+    ///perf issue?
+    orbital_system* get_parent(orbital* o);
 
     void tick(float step_s);
 

@@ -483,6 +483,22 @@ void orbital_system::destroy(orbital* o)
     }
 }
 
+void orbital_system::steal(orbital* o, orbital_system* s)
+{
+    for(int i=0; i<s->orbitals.size(); i++)
+    {
+        if(s->orbitals[i] == o)
+        {
+            s->orbitals.erase(s->orbitals.begin() + i);
+            break;
+        }
+    }
+
+    orbitals.push_back(o);
+
+    o->parent = get_base();
+}
+
 ///need to figure out higher positioning, but whatever
 void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
 {
@@ -725,6 +741,20 @@ orbital_system* system_manager::make_new()
     return sys;
 }
 
+orbital_system* system_manager::get_parent(orbital* o)
+{
+    for(auto& i : systems)
+    {
+        for(auto& m : i->orbitals)
+        {
+            if(m == o)
+                return i;
+        }
+    }
+
+    return nullptr;
+}
+
 void system_manager::tick(float step_s)
 {
     for(auto& i : systems)
@@ -875,8 +905,12 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
 void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
 {
+    hovered_system = currently_viewed;
+
     if(in_system_view())
         return;
+
+    hovered_system = nullptr;
 
     sf::Mouse mouse;
 
@@ -894,6 +928,8 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
         if((tpos - apos).length() < sun_universe_rad)
         {
             s->highlight = true;
+
+            hovered_system = s;
 
             if(lclick)
             {

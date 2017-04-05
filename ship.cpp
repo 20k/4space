@@ -2,6 +2,7 @@
 #include "battle_manager.hpp"
 #include "empire.hpp"
 #include "text.hpp"
+#include "system_manager.hpp"
 
 int ship::gid;
 
@@ -1069,6 +1070,36 @@ std::vector<component> ship::fire()
     return ret;
 }
 
+bool ship::can_use_warp_drives()
+{
+    for(component& c : entity_list)
+    {
+        if(c.has_element(ship_component_element::WARP_POWER))
+        {
+            if(!can_use(c))
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+void ship::use_warp_drives()
+{
+    for(component& c : entity_list)
+    {
+        if(c.has_element(ship_component_element::WARP_POWER))
+        {
+            if(can_use(c))
+            {
+                use(c);
+            }
+        }
+    }
+}
+
 void ship::distribute_resources(std::map<ship_component_element, float> res)
 {
     std::map<ship_component_element, float> available_capacities = get_available_capacities();
@@ -1533,6 +1564,35 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     //printf("fpos %f %f\n", final_pos.x(), final_pos.y());
 
     text_manager::render(win, alert_symbol, abs_pos + (vec2f){8, -20}, alert_colour);
+}
+
+void ship_manager::try_warp(orbital_system* fin, orbital_system* cur, orbital* o)
+{
+    bool all_use = true;
+
+    for(ship* s : ships)
+    {
+        if(!s->can_use_warp_drives())
+            all_use = false;
+    }
+
+    if(!all_use)
+        return;
+
+    for(ship* s : ships)
+    {
+        s->use_warp_drives();
+    }
+
+    vec2f my_pos = cur->universe_pos;
+    vec2f their_pos = fin->universe_pos;
+
+    vec2f arrive_dir = (their_pos - my_pos).norm() * 500;
+
+    fin->steal(o, cur);
+
+    o->absolute_pos = arrive_dir;
+    o->set_orbit(arrive_dir);
 }
 
 ship_manager* fleet_manager::make_new()

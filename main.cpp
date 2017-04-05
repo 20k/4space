@@ -440,7 +440,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
 
-    if(lclick && !lshift)
+    if(lclick && !lshift && system_manage.in_system_view())
     {
         popup.going = false;
 
@@ -453,14 +453,14 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     for(orbital_system* sys : system_manage.systems)
     {
-        if(!system_manage.in_system_view())
-            continue;
+        //if(!system_manage.in_system_view())
+        //    continue;
 
         bool term = false;
 
         for(orbital* orb : sys->orbitals)
         {
-            if(orb->point_within({transformed.x, transformed.y}))
+            if(system_manage.in_system_view() && orb->point_within({transformed.x, transformed.y}))
             {
                 if(first)
                 {
@@ -513,26 +513,52 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         }
     }
 
-    if(selected.size() > 0 && popup.going && system_manage.in_system_view())
+    if(selected.size() > 0 && popup.going)
     {
-        for(auto& kk : selected)
+        if(system_manage.in_system_view())
         {
-            popup_element* elem = popup.fetch(kk);
-
-            if(elem == nullptr)
-                continue;
-
-            elem->header = orbital_info::names[kk->type];
-
-            elem->data = kk->get_info_str();
-
-            if(popup.going)
+            for(auto& kk : selected)
             {
-                kk->highlight = true;
+                popup_element* elem = popup.fetch(kk);
 
-                if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire)
+                if(elem == nullptr)
+                    continue;
+
+                elem->header = orbital_info::names[kk->type];
+
+                elem->data = kk->get_info_str();
+
+                if(popup.going)
                 {
-                    kk->request_transfer({transformed.x, transformed.y});
+                    kk->highlight = true;
+
+                    if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire)
+                    {
+                        kk->request_transfer({transformed.x, transformed.y});
+                    }
+                }
+            }
+        }
+
+        if(system_manage.hovered_system != nullptr)
+        {
+            for(orbital* o : selected)
+            {
+                if(o->type != orbital_info::FLEET)
+                    continue;
+
+                orbital_system* parent = system_manage.get_parent(o);
+
+                if(parent == system_manage.hovered_system || parent == nullptr)
+                    continue;
+
+                ship_manager* sm = (ship_manager*)o->data;
+
+                if(rclick)
+                {
+                    sm->try_warp(system_manage.hovered_system, parent, o);
+
+                    printf("Trying warp\n");
                 }
             }
         }
