@@ -1453,7 +1453,7 @@ void ship::apply_disengage_penalty()
 
 bool ship::can_disengage()
 {
-    const float mandatory_combat_time_s = 30.f;
+    const float mandatory_combat_time_s = combat_variables::mandatory_combat_time_s;
 
     if(time_in_combat_s < mandatory_combat_time_s)
         return false;
@@ -1463,7 +1463,7 @@ bool ship::can_disengage()
 
 bool ship::can_engage()
 {
-    const float disengagement_timer_s = 30;
+    const float disengagement_timer_s = combat_variables::disengagement_time_s;
 
     if(is_disengaging)
     {
@@ -1582,6 +1582,7 @@ void ship_manager::tick_all(float step_s)
     for(ship* s : ships)
     {
         s->tick_all_components(step_s);
+        s->tick_other_systems(step_s);
     }
 }
 

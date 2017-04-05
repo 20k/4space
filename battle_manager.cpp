@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "system_manager.hpp"
 #include "empire.hpp"
+#include "util.hpp"
 
 void projectile::load(int type)
 {
@@ -223,6 +224,8 @@ void battle_manager::tick(float step_s)
     {
         for(auto& s : i.second)
         {
+            s->tick_combat(step_s);
+
             std::vector<component> fired = s->fire();
 
             for(component& kk : fired)
@@ -437,6 +440,21 @@ void battle_manager::set_view(system_manager& system_manage)
 
 bool battle_manager::can_disengage(empire* disengaging_empire)
 {
+    if(disengaging_empire == nullptr)
+        return true;
+
+    for(auto& i : ships)
+    {
+        for(ship* s : i.second)
+        {
+            if(s->team != disengaging_empire->team_id)
+                continue;
+
+            if(!s->can_disengage())
+                return false;
+        }
+    }
+
     return true;
 }
 
@@ -458,6 +476,24 @@ void battle_manager::do_disengage(empire* disengaging_empire)
             s->apply_disengage_penalty();
         }
     }
+}
+
+std::string battle_manager::get_disengage_str(empire* disengaging_empire)
+{
+    if(disengaging_empire == nullptr)
+        return "";
+
+    float time_remaining = 0.f;
+
+    for(auto& i : ships)
+    {
+        for(ship* s : i.second)
+        {
+            time_remaining = std::max(time_remaining, combat_variables::mandatory_combat_time_s - s->time_in_combat_s);
+        }
+    }
+
+    return to_string_with_enforced_variable_dp(time_remaining) + "s";
 }
 
 bool battle_manager::any_in_fleet_involved(ship_manager* sm)
@@ -608,6 +644,9 @@ battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
 
 void all_battles_manager::disengage(battle_manager* bm, empire* disengaging_empire)
 {
+    if(!bm->can_disengage(disengaging_empire))
+        return;
+
     bm->do_disengage(disengaging_empire);
 
     bm->projectile_manage.destroy_all();

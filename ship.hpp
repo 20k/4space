@@ -103,6 +103,12 @@ namespace ship_component_elements
     std::map<resource::types, float> component_storage_to_resources(types& type);
 }
 
+namespace combat_variables
+{
+    static float mandatory_combat_time_s = 30.f;
+    static float disengagement_time_s = 30.f;
+}
+
 ///misc tags
 namespace component_tag
 {

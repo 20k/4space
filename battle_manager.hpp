@@ -64,10 +64,13 @@ struct battle_manager
 
     bool can_disengage(empire* disengaging_empire);
     void do_disengage(empire* disengaging_empire); ///apply it to ships
+    std::string get_disengage_str(empire* disengaging_empire);
 
     bool any_in_fleet_involved(ship_manager* sm);
 
     void destructive_merge_into_me(battle_manager* bm);
+
+    ///to show the player why they can't disengage
 };
 
 struct orbital;

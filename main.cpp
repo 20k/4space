@@ -403,7 +403,7 @@ struct popup_info
     bool going = false;
 };
 
-void debug_menu(const std::vector<ship*>& ships)
+/*void debug_menu(const std::vector<ship*>& ships)
 {
     ImGui::Begin("Debug");
 
@@ -416,7 +416,7 @@ void debug_menu(const std::vector<ship*>& ships)
     }
 
     ImGui::End();
-}
+}*/
 
 void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick)
 {
@@ -471,20 +471,39 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             }
         }
 
-        ImGui::Text("(Jump To)");
+        ///will be incorrect for a frame when combat changes
+        std::string jump_to_str = "(Jump To)";
+
+        ImGui::PushID((jump_to_str + std::to_string(i)).c_str());
+        ImGui::Text(jump_to_str.c_str());
+        ImGui::PopID();
 
         if(ImGui::IsItemClicked())
         {
             all_battles.set_viewing(bm, system_manage);
         }
 
-        ImGui::Text("(Disengage)");
+        std::string disengage_str = bm->get_disengage_str(player_empire);
+
+        if(disengage_str == "")
+        {
+            disengage_str = "(Emergency Disengage!)";
+        }
+
+        //std::string disengage_str = std::string("(Disengage) ") + bm->get_disengage_str(player_empire) + "##" +
+
+        ImGui::PushID((disengage_str + std::to_string(i)).c_str());
+        ImGui::Text(disengage_str.c_str());
+        ImGui::PopID();
 
         if(ImGui::IsItemClicked())
         {
-            all_battles.disengage(bm, player_empire);
-            i--;
-            continue;
+            if(bm->can_disengage(player_empire))
+            {
+                all_battles.disengage(bm, player_empire);
+                i--;
+                continue;
+            }
         }
     }
 
@@ -1087,7 +1106,7 @@ int main()
 
         //display_ship_info(*test_ship);
 
-        debug_menu({test_ship});
+        //debug_menu({test_ship});
 
         handle_camera(window, system_manage);
 
