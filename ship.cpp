@@ -1,5 +1,6 @@
 #include "ship.hpp"
 #include "battle_manager.hpp"
+#include "empire.hpp"
 
 int ship::gid;
 
@@ -1277,6 +1278,11 @@ ship::~ship()
 {
     if(intermediate_texture)
         delete intermediate_texture;
+}
+
+void ship::resupply(empire& emp)
+{
+
 }
 
 ship* ship_manager::make_new(int team)

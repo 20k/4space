@@ -12,8 +12,8 @@ component make_default_crew()
     oxygen.drained_per_s = 0.5f;
     oxygen.max_amount = 5.f;
 
-    component_attribute repair;
-    repair.produced_per_s = 0.2f;
+    //component_attribute repair;
+    //repair.produced_per_s = 0.2f;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;
@@ -26,7 +26,7 @@ component make_default_crew()
     component crew;
     crew.add(ship_component_element::COMMAND, command);
     crew.add(ship_component_element::OXYGEN, oxygen);
-    crew.add(ship_component_element::REPAIR, repair);
+    //crew.add(ship_component_element::REPAIR, repair);
     crew.add(ship_component_element::HP, hp);
     crew.add(ship_component_element::ARMOUR, armour);
 

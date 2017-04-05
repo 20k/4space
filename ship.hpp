@@ -5,6 +5,7 @@
 #include <vector>
 #include <vec/vec.hpp>
 #include <SFML/Graphics.hpp>
+#include "resource_manager.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -42,7 +43,7 @@ namespace ship_component_elements
         //PROJECTILE, ///outputting damage. Have a receive damage as well component? Integrity AND hp?
         COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
         STEALTH,
-        REPAIR, ///this is dumb, just make crew produce hp
+        //REPAIR, ///this is dumb, just make crew produce hp
         RAILGUN,
         TORPEDO,
         PLASMAGUN,
@@ -67,7 +68,7 @@ namespace ship_component_elements
         //"PROJECTILE",
         "COMMAND",
         "STEALTH",
-        "REPAIR",
+        //"REPAIR",
         "RAILGUN",
         "TORPEDO",
         "PLASMAGUN",
@@ -96,6 +97,8 @@ namespace ship_component_elements
         "WP",
         "WC",
     };
+
+    resource::types component_storage_to_resource(types& type);
 }
 
 ///misc tags
@@ -278,6 +281,8 @@ struct ship : positional
 
     bool display_ui = false;
 
+    void resupply(empire& emp);
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
@@ -302,8 +307,7 @@ struct ship_manager
     ///from other ship manager
     void steal(ship* const s);
 
-        empire* parent_empire = nullptr;
-
+    empire* parent_empire = nullptr;
 };
 
 ///manages fleets
