@@ -939,6 +939,8 @@ void system_manager::set_zoom(float zoom)
     if(is_in_system_view && !was_in_system_view)
     {
         camera = camera - currently_viewed->universe_pos * universe_scale;
+
+        //currently_viewed->get_base()->center_camera(*this);
     }
     if(was_in_system_view && !is_in_system_view)
     {
