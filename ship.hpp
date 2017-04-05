@@ -243,6 +243,12 @@ struct ship : positional
 
     ///returns extra resources for us to handle
     std::map<ship_component_element, float> tick_all_components(float step_s);
+    void tick_other_systems(float step_s);
+
+    void tick_combat(float step_s);
+    void enter_combat();
+    void leave_combat();
+    bool in_combat();
 
     //std::map<ship_component_element, float> last_left_over;
 
@@ -267,7 +273,6 @@ struct ship : positional
 
     void add(const component& c);
 
-
     void hit(projectile* p);
 
     void check_load(vec2i dim);
@@ -291,9 +296,15 @@ struct ship : positional
     bool can_move_in_system();
     float get_move_system_speed();
 
-    void apply_disengage();
+    void apply_disengage_penalty();
     bool can_disengage();
     bool can_engage();
+
+    float disengage_clock_s = 0.f;
+    bool is_disengaging = false;
+
+    float time_in_combat_s = 0.f;
+    bool currently_in_combat = false;
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
@@ -336,7 +347,10 @@ struct ship_manager
     void try_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     bool can_warp(orbital_system* fin, orbital_system* cur, orbital* o);
 
-    void apply_disengage();
+    void leave_combat();
+    void enter_combat();
+
+    void apply_disengage_penalty();
 };
 
 struct empire_manager;

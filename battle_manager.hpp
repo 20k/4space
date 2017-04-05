@@ -88,6 +88,7 @@ struct all_battles_manager
 
     battle_manager* make_new_battle(std::vector<orbital*> t1);
 
+    ///disengaging empire can be nullptr
     void disengage(battle_manager* bm, empire* disengaging_empire);
 };
 

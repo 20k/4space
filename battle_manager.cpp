@@ -348,6 +348,8 @@ void battle_manager::add_ship(ship* s)
         }
     }
 
+    s->enter_combat();
+
     int prev_num = ships[s->team].size();
 
     ships[s->team].push_back(s);
@@ -444,10 +446,16 @@ void battle_manager::do_disengage(empire* disengaging_empire)
     {
         for(ship* s : i.second)
         {
+            s->leave_combat();
+
+            ///nobody initiated this, ie we're leaving combat in an acceptable way
+            if(disengaging_empire == nullptr)
+                continue;
+
             if(s->team != disengaging_empire->team_id)
                 continue;
 
-            s->apply_disengage();
+            s->apply_disengage_penalty();
         }
     }
 }

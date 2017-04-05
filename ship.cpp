@@ -886,6 +886,35 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
     return left_over;
 }
 
+void ship::tick_other_systems(float step_s)
+{
+    disengage_clock_s += step_s;
+}
+
+void ship::tick_combat(float step_s)
+{
+    time_in_combat_s += step_s;
+}
+
+void ship::enter_combat()
+{
+    if(currently_in_combat)
+        return;
+
+    time_in_combat_s = 0.f;
+    currently_in_combat = true;
+}
+
+void ship::leave_combat()
+{
+    currently_in_combat = false;
+}
+
+bool ship::in_combat()
+{
+    return currently_in_combat;
+}
+
 std::map<ship_component_element, float> ship::get_available_capacities()
 {
     std::map<ship_component_element, float> ret;
@@ -1397,7 +1426,7 @@ bool ship::can_move_in_system()
     return false;
 }
 
-void ship::apply_disengage()
+void ship::apply_disengage_penalty()
 {
     std::map<ship_component_elements::types, float> damage_fractions;
 
@@ -1418,15 +1447,32 @@ void ship::apply_disengage()
     }
 
     add_negative_resources(to_apply_negative);
+
+    is_disengaging = true;
 }
 
 bool ship::can_disengage()
 {
+    const float mandatory_combat_time_s = 30.f;
+
+    if(time_in_combat_s < mandatory_combat_time_s)
+        return false;
+
     return true;
 }
 
 bool ship::can_engage()
 {
+    const float disengagement_timer_s = 30;
+
+    if(is_disengaging)
+    {
+        if(disengage_clock_s < disengagement_timer_s)
+            return false;
+
+        return true;
+    }
+
     return true;
 }
 
@@ -1665,11 +1711,27 @@ bool ship_manager::can_warp(orbital_system* fin, orbital_system* cur, orbital* o
     return all_use;
 }
 
-void ship_manager::apply_disengage()
+void ship_manager::enter_combat()
 {
     for(ship* s : ships)
     {
-        s->apply_disengage();
+        s->enter_combat();
+    }
+}
+
+void ship_manager::leave_combat()
+{
+    for(ship* s : ships)
+    {
+        s->leave_combat();
+    }
+}
+
+void ship_manager::apply_disengage_penalty()
+{
+    for(ship* s : ships)
+    {
+        s->apply_disengage_penalty();
     }
 }
 

@@ -196,7 +196,14 @@ void display_ship_info(ship& s)
         elements.insert(i.first);
     }
 
-    ImGui::Begin(s.name.c_str(), &s.display_ui);
+    std::string name_str = s.name;
+
+    if(s.in_combat())
+    {
+        name_str += " (In Combat)";
+    }
+
+    ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui);
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;

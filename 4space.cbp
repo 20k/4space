@@ -32,6 +32,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add option="-std=gnu++14" />
+			<Add option="-Wno-narrowing" />
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32" />
