@@ -811,8 +811,11 @@ int main()
     hostile_empire->take_ownership(fleet2);
     hostile_empire->take_ownership(ohostile_fleet);
 
+    //orbital_system* sys_2 = system_manage.make_new();
+    //sys_2->generate_random_system(3, 100, 3, 5);
+
     orbital_system* sys_2 = system_manage.make_new();
-    sys_2->generate_random_system(3, 100, 3, 5);
+    sys_2->generate_full_random_system();
 
 
     popup_info popup;
