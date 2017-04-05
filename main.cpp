@@ -206,6 +206,11 @@ void display_ship_info(ship& s)
         name_str += " (In Combat)";
     }
 
+    if(s.fully_disabled())
+    {
+        name_str += " (Derelict)";
+    }
+
     ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui);
 
     std::vector<std::string> headers;
@@ -598,7 +603,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     ///disabling merging here and resupply invalides all fleet actions except moving atm
                     ///unexpected fix to fleet merging problem
                     ///disable resupply if in combat
-                    if(orb->type == orbital_info::FLEET && orb->parent_empire == player_empire && !sm->any_in_combat())
+                    if(orb->type == orbital_info::FLEET && orb->parent_empire == player_empire)
                     {
                         elem.mergeable = true;
 
@@ -642,6 +647,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 else
                 {
                     elem.buttons_map.erase(popup_element_type::ENGAGE_COOLDOWN);
+                }
+
+                if(orb->type == orbital_info::FLEET && sm->any_in_combat())
+                {
+                    elem.buttons_map.erase(popup_element_type::RESUPPLY);
                 }
 
                 selected.push_back(orb);
