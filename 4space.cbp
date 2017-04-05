@@ -58,6 +58,8 @@
 		</Linker>
 		<Unit filename="battle_manager.cpp" />
 		<Unit filename="battle_manager.hpp" />
+		<Unit filename="empire.cpp" />
+		<Unit filename="empire.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="resource_manager.cpp" />
 		<Unit filename="resource_manager.hpp" />
@@ -66,6 +68,8 @@
 		<Unit filename="ship_definitions.hpp" />
 		<Unit filename="system_manager.cpp" />
 		<Unit filename="system_manager.hpp" />
+		<Unit filename="text.cpp" />
+		<Unit filename="text.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

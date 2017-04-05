@@ -829,6 +829,25 @@ void system_manager::set_viewed_system(orbital_system* s)
     }
 }
 
+void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire)
+{
+    //printf("zoom %f\n", zoom_level);
+
+    if(zoom_level < 10)
+        return;
+
+    sf::CircleShape circle;
+
+    for(int i=0; i<systems.size(); i++)
+    {
+        orbital_system* os = systems[i];
+
+        vec2f pos = os->universe_pos * 100.f;
+
+        circle.setPosition({pos.x(), pos.y()});
+    }
+}
+
 void system_manager::change_zoom(float zoom)
 {
     float min_zoom = 1.f / 1000.f;

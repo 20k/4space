@@ -780,7 +780,6 @@ int main()
     orbital* planet = base->make_new(orbital_info::PLANET, 5.f, 10);
     planet->parent = sun;
 
-    sun->absolute_pos = {500, 500};
     sun->rotation_velocity_ps = 2*M_PI/60.f;
 
     planet->orbital_length = 150.f;
@@ -938,6 +937,7 @@ int main()
             debug_system(system_manage, window, lclick, rclick, popup, player_empire);
 
             system_manage.draw_viewed_system(window, player_empire);
+            system_manage.draw_universe_map(window, player_empire);
         }
 
         //printf("ui\n");

@@ -199,6 +199,8 @@ struct system_manager
 
     void set_viewed_system(orbital_system* s);
 
+    void draw_universe_map(sf::RenderWindow& win, empire* viewer_empire);
+
     ///camera. Set here because zoom will be useful
     ///Camera panning should also probably go here
     void change_zoom(float zoom);
