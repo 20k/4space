@@ -61,7 +61,7 @@ component make_default_life_support()
 component make_default_ammo_store()
 {
     component_attribute ammo;
-    ammo.max_amount = 1000.f;
+    ammo.max_amount = 10.f;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;

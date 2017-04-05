@@ -784,6 +784,11 @@ int main()
             state = (state + 1) % 2;
         }
 
+        if(once<sf::Keyboard::F2>())
+        {
+            test_ship->resupply(player_empire);
+        }
+
         bool lclick = once<sf::Mouse::Left>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
         bool rclick = once<sf::Mouse::Right>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
 
