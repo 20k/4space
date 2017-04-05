@@ -891,6 +891,11 @@ int main()
 
         handle_camera(window, system_manage);
 
+        if(once<sf::Keyboard::M>() && focused)
+        {
+            system_manage.enter_universe_view();
+        }
+
         if(once<sf::Keyboard::F1>())
         {
             state = (state + 1) % 2;
@@ -902,6 +907,7 @@ int main()
             if(state == 1)
             {
                 battle.set_view(system_manage);
+                system_manage.set_viewed_system(nullptr);
             }
         }
 

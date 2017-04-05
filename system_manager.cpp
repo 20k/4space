@@ -829,13 +829,13 @@ void system_manager::set_viewed_system(orbital_system* s)
 
     zoom_level = 1.f;
 
-    if(s->get_base())
+    if(s != nullptr && s->get_base())
     {
         s->get_base()->center_camera(*this);
     }
     else
     {
-        printf("Warning no base object!\n");
+        //printf("Warning no base object!\n");
     }
 }
 
@@ -852,7 +852,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     {
         orbital_system* os = systems[i];
 
-        vec2f pos = os->universe_pos * 100.f;
+        vec2f pos = os->universe_pos * universe_scale;
 
         circle.setPosition({pos.x(), pos.y()});
         circle.setFillColor(sf::Color(255, 200, 50));
@@ -865,6 +865,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
 void system_manager::change_zoom(float zoom)
 {
+    bool was_in_system_view = in_system_view();
+
     float min_zoom = 1.f / 1000.f;
     float max_zoom = 5.f;
 
@@ -881,6 +883,20 @@ void system_manager::change_zoom(float zoom)
 
     if(zoom_level < min_zoom)
         zoom_level = min_zoom;
+
+    bool is_in_system_view = in_system_view();
+
+    if(currently_viewed == nullptr)
+        return;
+
+    if(is_in_system_view && !was_in_system_view)
+    {
+        camera = camera - currently_viewed->universe_pos * universe_scale;
+    }
+    if(was_in_system_view && !is_in_system_view)
+    {
+        camera = camera + currently_viewed->universe_pos * universe_scale;
+    }
 }
 
 void system_manager::pan_camera(vec2f dir)
@@ -893,7 +909,7 @@ bool system_manager::in_system_view()
     return zoom_level < 10;
 }
 
-void system_manager::enter_system_view()
+void system_manager::enter_universe_view()
 {
     zoom_level = 10;
 }
