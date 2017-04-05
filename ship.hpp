@@ -312,6 +312,14 @@ struct ship : positional
     float time_in_combat_s = 0.f;
     bool currently_in_combat = false;
 
+    ///what does this represent? That the crew is dead?
+    ///For the moment it means that the ship won't autorepair
+    bool fully_disabled();
+    void force_fully_disabled(bool disabled);
+    void test_set_disabled();
+
+    bool is_fully_disabled = false;
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 

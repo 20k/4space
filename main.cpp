@@ -605,7 +605,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 ///if orb not a fleet, this is empty
                 std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
 
-                if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage())
+                if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat())
                 {
                     elem.buttons_map[popup_element_type::ENGAGE].name = "Engage Fleets";
                 }

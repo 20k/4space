@@ -655,6 +655,14 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
     std::map<ship_component_element, float> produced = get_produced_resources(step_s);
     std::map<ship_component_element, float> stored = get_stored_resources();
 
+
+    ///HACK ALERT
+    if(fully_disabled())
+    {
+        produced[ship_component_elements::HP] = 0;
+    }
+    ///DIRTY HACK ALERT
+
     std::map<ship_component_element, float> to_apply_prop;
 
     for(auto& i : needed)
@@ -890,6 +898,8 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 void ship::tick_other_systems(float step_s)
 {
     disengage_clock_s += step_s;
+
+    test_set_disabled();
 }
 
 void ship::tick_combat(float step_s)
@@ -1020,6 +1030,9 @@ std::map<ship_component_element, float> ship::get_max_resources()
 
 bool ship::can_use(component& c)
 {
+    if(fully_disabled())
+        return false;
+
     std::map<ship_component_element, float> requirements;
 
     ///+ve means we need input from the ship to power it
@@ -1102,6 +1115,9 @@ std::vector<component> ship::fire()
 
 bool ship::can_use_warp_drives()
 {
+    if(fully_disabled())
+        return false;
+
     for(component& c : entity_list)
     {
         if(c.has_element(ship_component_element::WARP_POWER))
@@ -1411,6 +1427,9 @@ void ship::resupply(empire& emp, int num)
 
 bool ship::can_move_in_system()
 {
+    if(fully_disabled())
+        return false;
+
     float threshold_working_efficiency = 0.75f;
 
     for(component& c : entity_list)
@@ -1455,6 +1474,9 @@ void ship::apply_disengage_penalty()
 
 bool ship::can_disengage()
 {
+    if(fully_disabled())
+        return false;
+
     const float mandatory_combat_time_s = combat_variables::mandatory_combat_time_s;
 
     if(time_in_combat_s < mandatory_combat_time_s)
@@ -1465,6 +1487,9 @@ bool ship::can_disengage()
 
 bool ship::can_engage()
 {
+    if(fully_disabled())
+        return false;
+
     const float disengagement_timer_s = combat_variables::disengagement_time_s;
 
     if(is_disengaging)
@@ -1476,6 +1501,71 @@ bool ship::can_engage()
     }
 
     return true;
+}
+
+bool ship::fully_disabled()
+{
+    return is_fully_disabled;
+}
+
+void ship::force_fully_disabled(bool disabled)
+{
+    is_fully_disabled = disabled;
+}
+
+void ship::test_set_disabled()
+{
+    float cur_hp = get_stored_resources()[ship_component_element::HP];
+    float max_hp = get_max_resources()[ship_component_element::HP];
+
+    bool full_disabled = false;
+
+    if(max_hp < 0.0001f)
+    {
+        full_disabled = true;
+    }
+
+    float disabled_frac = 0.1f;
+
+    if((cur_hp / max_hp) < disabled_frac)
+    {
+        full_disabled = true;
+    }
+
+    float avg_efficiency = 0.f;
+    int num_components = 0;
+
+    for(component& c : entity_list)
+    {
+        float ceff = 0.f;
+        int cnum = 0;
+
+        for(auto& kk : c.components)
+        {
+            ceff += kk.second.cur_efficiency;
+            cnum++;
+        }
+
+        if(cnum > 0)
+        {
+            ceff /= cnum;
+
+            avg_efficiency += ceff;
+            num_components++;
+        }
+    }
+
+    if(num_components > 0)
+    {
+        avg_efficiency /= num_components;
+    }
+
+    if(avg_efficiency < disabled_frac)
+    {
+        full_disabled = true;
+    }
+
+    force_fully_disabled(full_disabled);
 }
 
 ship* ship_manager::make_new(int team)
@@ -1657,6 +1747,24 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
 
     if(any_immobile)
         alert_symbol = "!";
+
+
+    bool any_fully_disabled = false;
+
+    for(ship* s : ships)
+    {
+        if(s->fully_disabled())
+        {
+            any_fully_disabled = true;
+        }
+    }
+
+    if(any_fully_disabled)
+    {
+        alert_symbol = "!";
+
+        alert_colour = {1, 0, 1};
+    }
 
     if(alert_symbol == "")
         return;
