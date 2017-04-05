@@ -90,3 +90,24 @@ void empire::generate_resource_from_owned(float step_s)
         resources.resources[i].amount += res[i];
     }
 }
+
+float empire::dispense_resource(resource::types type, float requested)
+{
+    float available = resources.resources[(int)type].amount;
+
+    float real = requested;
+
+    if(available < requested)
+    {
+        real = available;
+    }
+
+    float& ramount = resources.resources[(int)type].amount;
+
+    ramount -= real;
+
+    if(ramount < 0)
+        ramount = 0;
+
+    return real;
+}

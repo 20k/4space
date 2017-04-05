@@ -374,6 +374,14 @@ void orbital::make_random_resource_planet(float total_ps)
     is_resource_object = true;
 }
 
+bool orbital::can_dispense_resources()
+{
+    if(is_resource_object || orbital_info::PLANET)
+        return true;
+
+    return false;
+}
+
 orbital* orbital_system::get_base()
 {
     for(auto& i : orbitals)

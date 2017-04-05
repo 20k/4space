@@ -28,6 +28,9 @@ struct empire
     bool owns(orbital* o);
 
     void generate_resource_from_owned(float step_s);
+
+    ///returns real amount
+    float dispense_resource(resource::types type, float requested);
 };
 
 #endif // EMPIRE_HPP_INCLUDED
