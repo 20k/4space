@@ -74,6 +74,7 @@ struct sprite_renderable
 };
 
 struct empire;
+struct empire_manager;
 
 struct orbital
 {
@@ -153,7 +154,7 @@ struct orbital_system
 
     void draw(sf::RenderWindow& win);
 
-    void cull_empty_orbital_fleets();
+    void cull_empty_orbital_fleets(empire_manager& empire_manage);
 
     orbital* get_by_element(void* element);
 
@@ -173,7 +174,7 @@ struct system_manager
 
     void repulse_fleets();
 
-    void cull_empty_orbital_fleets();
+    void cull_empty_orbital_fleets(empire_manager& empire_manage);
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

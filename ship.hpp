@@ -281,7 +281,7 @@ struct ship : positional
 
     bool display_ui = false;
 
-    void resupply(empire& emp);
+    void resupply(empire& emp, int num = 1);
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
@@ -308,7 +308,11 @@ struct ship_manager
     void steal(ship* const s);
 
     empire* parent_empire = nullptr;
+
+    void resupply();
 };
+
+struct empire_manager;
 
 ///manages fleets
 struct fleet_manager
@@ -319,7 +323,7 @@ struct fleet_manager
 
     void destroy(ship_manager*);
 
-    void cull_dead();
+    void cull_dead(empire_manager& empire_manage);
 };
 
 #endif // SHIP_HPP_INCLUDED

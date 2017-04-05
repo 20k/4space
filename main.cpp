@@ -340,8 +340,11 @@ struct popup_element
 
     std::string header;
     std::vector<std::string> data;
-    std::deque<bool> checked; ///screw you idiotic language
+    std::deque<bool> checked;
     bool mergeable = false;
+
+    std::vector<std::string> buttons;
+    std::deque<bool> buttons_pressed;
 
     void* element = nullptr;
 };
@@ -472,12 +475,16 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 {
                     popup.going = true;
 
+                    ///do buttons here
                     popup_element elem;
                     elem.element = orb;
 
                     if(orb->type == orbital_info::FLEET)
                     {
                         elem.mergeable = true;
+
+                        elem.buttons.push_back("Resupply");
+                        elem.buttons_pressed.push_back(false);
                     }
 
                     popup.elements.push_back(elem);
@@ -525,11 +532,28 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 }
             }
         }
+    }
 
+    for(popup_element& elem : popup.elements)
+    {
+        assert(elem.buttons.size() == elem.buttons_pressed.size());
+
+        for(int i=0; i<elem.buttons.size(); i++)
+        {
+            ///this seems the least hitler method we have so far to handle this
+            if(elem.buttons[i] == "Resupply" && elem.buttons_pressed[i])
+            {
+                orbital* o = (orbital*)elem.element;
+
+                ship_manager* sm = (ship_manager*)o->data;
+
+                sm->resupply();
+            }
+        }
     }
 }
 
-void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system)
+void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires)
 {
     if(popup.elements.size() == 0)
         popup.going = false;
@@ -545,10 +569,12 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
     sf::Keyboard key;
 
+    int g_elem_id = 0;
+
     ///remember we'll need to make an orbital associated with the new fleet
     ///going to need the ability to drag and drop these
     ///nah use checkboxes
-    for(auto& i : popup.elements)
+    for(popup_element& i : popup.elements)
     {
         int id = i.id;
 
@@ -615,8 +641,16 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
                 num++;
             }
-
         }
+
+        assert(i.buttons.size() == i.buttons_pressed.size());
+
+        for(int kk=0; kk<i.buttons.size(); kk++)
+        {
+            i.buttons_pressed[kk] = ImGui::Button((i.buttons[kk] + "##" + std::to_string(kk) + std::to_string(g_elem_id)).c_str());
+        }
+
+        g_elem_id++;
     }
 
     if(potential_new_fleet.size() > 0)
@@ -629,13 +663,18 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
             float fleet_angle = 0;
             float fleet_length = 200;
+            empire* parent = nullptr;
 
             for(ship* i : potential_new_fleet)
             {
+                ///we don't want to free associated orbital if it still exists from empire
+                ///only an issue if we cull, which is why ownership is culled there
                 orbital* real = current_system->get_by_element((void*)i->owned_by);
 
                 if(real != nullptr)
                 {
+                    parent = real->parent_empire;
+
                     fleet_pos = real->absolute_pos;
 
                     fleet_angle = real->orbital_angle;
@@ -650,21 +689,26 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             associated->set_orbit(fleet_pos);
             associated->data = ns;
 
+            parent->take_ownership(associated);
+            parent->take_ownership(ns);
+
             popup.elements.clear();
             popup.going = false;
         }
     }
 
-    all_systems.cull_empty_orbital_fleets();
-    fleet_manage.cull_dead();
+    all_systems.cull_empty_orbital_fleets(empires);
+    fleet_manage.cull_dead(empires);
 
     ImGui::End();
 }
 
 int main()
 {
-    empire player_empire;
-    player_empire.name = "Glorious Azerbaijanian Conglomerate";
+    empire_manager empire_manage;
+
+    empire* player_empire = empire_manage.make_new();
+    player_empire->name = "Glorious Azerbaijanian Conglomerate";
 
     fleet_manager fleet_manage;
 
@@ -749,9 +793,9 @@ int main()
     base->generate_asteroids(100, 3, 5);
     base->generate_planet_resources(2.f);
 
-    player_empire.take_ownership_of_all(base);
-    player_empire.take_ownership(fleet1);
-    player_empire.take_ownership(fleet3);
+    player_empire->take_ownership_of_all(base);
+    player_empire->take_ownership(fleet1);
+    player_empire->take_ownership(fleet3);
 
 
     popup_info popup;
@@ -786,7 +830,7 @@ int main()
 
         if(once<sf::Keyboard::F2>())
         {
-            test_ship->resupply(player_empire);
+            test_ship->resupply(*player_empire);
         }
 
         bool lclick = once<sf::Mouse::Left>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
@@ -812,6 +856,8 @@ int main()
             base->draw(window);
         }
 
+        //printf("ui\n");
+
         for(ship_manager* smanage : fleet_manage.fleets)
         {
             for(ship* s : smanage->ships)
@@ -823,15 +869,26 @@ int main()
             }
         }
 
+        //printf("premanage\n");
+
         system_manage.tick(diff_s);
 
-        do_popup(popup, fleet_manage, system_manage, base);
+        //printf("prepp\n");
 
-        system_manage.cull_empty_orbital_fleets();
-        fleet_manage.cull_dead();
+        do_popup(popup, fleet_manage, system_manage, base, empire_manage);
 
-        player_empire.resources.draw_ui(window);
-        player_empire.generate_resource_from_owned(diff_s);
+        //printf("precull\n");
+
+        system_manage.cull_empty_orbital_fleets(empire_manage);
+        fleet_manage.cull_dead(empire_manage);
+
+        //printf("predrawres\n");
+
+        player_empire->resources.draw_ui(window);
+        //printf("Pregen\n");
+        player_empire->generate_resource_from_owned(diff_s);
+
+        //printf("Prerender\n");
 
         ImGui::Render();
         window.display();

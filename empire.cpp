@@ -120,7 +120,7 @@ float empire::dispense_resource(resource::types type, float requested)
     return real;
 }
 
-std::map<resource::types, float> empire::dispense_resources_proportionally(const std::map<resource::types, float>& type, float& frac_out)
+std::map<resource::types, float> empire::dispense_resources_proportionally(const std::map<resource::types, float>& type, float take_fraction, float& frac_out)
 {
     float min_frac = 1.f;
 
@@ -152,10 +152,43 @@ std::map<resource::types, float> empire::dispense_resources_proportionally(const
 
     for(auto& i : type)
     {
-        ret[i.first] = dispense_resource(i.first, i.second * min_frac);
+        ret[i.first] = dispense_resource(i.first, i.second * min_frac * take_fraction);
     }
+
+    ///so eg if this is 0.5 but we requested 2,
+    //frac_out = min_frac / take_fraction;
+
+    //frac_out = clamp(frac_out, 0.f, 1.f);
+
+    if(take_fraction < 0.0001f)
+        min_frac = 0.f;
 
     frac_out = min_frac;
 
     return ret;
+}
+
+empire* empire_manager::make_new()
+{
+    empire* e = new empire;
+
+    empires.push_back(e);
+
+    return e;
+}
+
+void empire_manager::notify_removal(orbital* o)
+{
+    for(auto& i : empires)
+    {
+        i->release_ownership(o);
+    }
+}
+
+void empire_manager::notify_removal(ship_manager* s)
+{
+    for(auto& i : empires)
+    {
+        i->release_ownership(s);
+    }
 }

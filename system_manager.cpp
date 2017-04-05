@@ -3,6 +3,7 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include "ship.hpp"
 #include "util.hpp"
+#include "empire.hpp"
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
@@ -458,7 +459,7 @@ void orbital_system::draw(sf::RenderWindow& win)
     }
 }
 
-void orbital_system::cull_empty_orbital_fleets()
+void orbital_system::cull_empty_orbital_fleets(empire_manager& empire_manage)
 {
     //for(orbital* o : orbitals)
     for(int i=0; i<orbitals.size(); i++)
@@ -472,6 +473,8 @@ void orbital_system::cull_empty_orbital_fleets()
             if(smanage->ships.size() == 0)
             {
                 //printf("culled");
+
+                empire_manage.notify_removal(o);
 
                 destroy(o);
                 i--;
@@ -664,10 +667,10 @@ void system_manager::repulse_fleets()
     }
 }
 
-void system_manager::cull_empty_orbital_fleets()
+void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage)
 {
     for(auto& i : systems)
     {
-        i->cull_empty_orbital_fleets();
+        i->cull_empty_orbital_fleets(empire_manage);
     }
 }

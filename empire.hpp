@@ -32,7 +32,19 @@ struct empire
 
     ///returns real amount
     float dispense_resource(resource::types type, float requested);
-    std::map<resource::types, float> dispense_resources_proportionally(const std::map<resource::types, float>& type, float& frac_out);
+    ///take fraction is fraction to actually take, frac_out is the proportion of initial resources we were able to take
+    ///type is the amount of resources we are requesting
+    std::map<resource::types, float> dispense_resources_proportionally(const std::map<resource::types, float>& type, float take_fraction, float& frac_out);
+};
+
+struct empire_manager
+{
+    std::vector<empire*> empires;
+
+    empire* make_new();
+
+    void notify_removal(orbital* o);
+    void notify_removal(ship_manager* s);
 };
 
 #endif // EMPIRE_HPP_INCLUDED

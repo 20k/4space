@@ -1308,7 +1308,7 @@ ship::~ship()
         delete intermediate_texture;
 }
 
-void ship::resupply(empire& emp)
+void ship::resupply(empire& emp, int num)
 {
     std::vector<ship_component_elements::types> types =
     {
@@ -1324,12 +1324,13 @@ void ship::resupply(empire& emp)
 
         std::map<resource::types, float> requested_resource_amounts = ship_component_elements::component_storage_to_resources(type);
 
+        ///so we request twice as much... but we'll only take vanilla amounts
         for(auto& i : requested_resource_amounts)
-            i.second *= current_capacity;
+            i.second *= current_capacity*num;
 
         float efficiency_frac;
 
-        std::map<resource::types, float> gotten = emp.dispense_resources_proportionally(requested_resource_amounts, efficiency_frac);
+        std::map<resource::types, float> gotten = emp.dispense_resources_proportionally(requested_resource_amounts, 1.f/num, efficiency_frac);
 
         std::map<ship_component_elements::types, float> to_add;
         to_add[type] = efficiency_frac * current_capacity;
@@ -1424,6 +1425,21 @@ void ship_manager::steal(ship* const s)
     ships.push_back(s);
 }
 
+void ship_manager::resupply()
+{
+    if(parent_empire == nullptr)
+        return;
+
+    int num = ships.size();
+
+    for(ship* s : ships)
+    {
+        s->resupply(*parent_empire, num);
+
+        num--;
+    }
+}
+
 ship_manager* fleet_manager::make_new()
 {
     ship_manager* ns = new ship_manager;
@@ -1448,13 +1464,15 @@ void fleet_manager::destroy(ship_manager* ns)
     }
 }
 
-void fleet_manager::cull_dead()
+void fleet_manager::cull_dead(empire_manager& empire_manage)
 {
     for(int i=0; i < fleets.size(); i++)
     {
         if(fleets[i]->ships.size() == 0)
         {
             auto m = fleets[i];
+
+            empire_manage.notify_removal(m);
 
             fleets.erase(fleets.begin() + i);
 
