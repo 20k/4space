@@ -359,6 +359,8 @@ struct ship_manager
     bool can_engage();
 
     void apply_disengage_penalty();
+
+    std::string get_engage_str();
 };
 
 struct empire_manager;

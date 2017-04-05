@@ -3,6 +3,7 @@
 #include "empire.hpp"
 #include "text.hpp"
 #include "system_manager.hpp"
+#include "util.hpp"
 
 int ship::gid;
 
@@ -1449,6 +1450,7 @@ void ship::apply_disengage_penalty()
     add_negative_resources(to_apply_negative);
 
     is_disengaging = true;
+    disengage_clock_s = 0;
 }
 
 bool ship::can_disengage()
@@ -1756,6 +1758,21 @@ void ship_manager::apply_disengage_penalty()
     {
         s->apply_disengage_penalty();
     }
+}
+
+std::string ship_manager::get_engage_str()
+{
+    if(can_engage())
+        return "(Engage)";
+
+    float min_time_remaining = 0.f;
+
+    for(ship* s : ships)
+    {
+        min_time_remaining = std::max(min_time_remaining, combat_variables::disengagement_time_s - s->disengage_clock_s);
+    }
+
+    return "(On Cooldown) " + to_string_with_enforced_variable_dp(min_time_remaining) + "s";
 }
 
 ship_manager* fleet_manager::make_new()
