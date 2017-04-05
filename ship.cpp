@@ -1525,7 +1525,7 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     vec3f rcol = {1, 0.1, 0};
     vec3f ycol = {1, 0.9, 0};
 
-    std::string alert_symbol = "!";
+    std::string alert_symbol;
 
     vec3f alert_colour;
     bool any_alert = false;
@@ -1554,7 +1554,29 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
         }
     }
 
-    if(!any_alert)
+    //if(!any_alert)
+    //    return;
+
+    if(any_alert)
+        alert_symbol += "!";
+
+    bool any_immobile = false;
+
+    ///implement mixed colours later
+    for(ship* s : ships)
+    {
+        if(!s->can_move_in_system())
+        {
+            any_immobile = true;
+
+            alert_colour = rcol;
+        }
+    }
+
+    if(any_immobile)
+        alert_symbol = "!";
+
+    if(alert_symbol == "")
         return;
 
     //auto transfd = win.mapCoordsToPixel({abs_pos.x(), abs_pos.y()});

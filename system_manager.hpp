@@ -145,7 +145,7 @@ struct orbital
 
     empire* parent_empire = nullptr;
 
-    void draw_alerts(sf::RenderWindow& win);
+    void draw_alerts(sf::RenderWindow& win, empire* viewer_empire);
 
     orbital_system* parent_system = nullptr;
 };
@@ -176,7 +176,7 @@ struct orbital_system
     void generate_asteroids(int n, int num_belts, int num_resource_asteroids);
     void generate_planet_resources(float max_ps);
 
-    void draw_alerts(sf::RenderWindow& win);
+    void draw_alerts(sf::RenderWindow& win, empire* viewing_empire);
 
     void generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids);
     void generate_full_random_system();
@@ -208,7 +208,7 @@ struct system_manager
     void cull_empty_orbital_fleets(empire_manager& empire_manage);
 
 
-    void draw_alerts(sf::RenderWindow& win);
+    void draw_alerts(sf::RenderWindow& win, empire* viewing_empire);
 
     void draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire);
 

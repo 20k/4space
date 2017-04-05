@@ -338,6 +338,15 @@ void battle_manager::draw(sf::RenderWindow& win)
 
 void battle_manager::add_ship(ship* s)
 {
+    for(auto& i : ships)
+    {
+        for(auto& sh : i.second)
+        {
+            if(s == sh)
+                return;
+        }
+    }
+
     int prev_num = ships[s->team].size();
 
     ships[s->team].push_back(s);
@@ -428,6 +437,39 @@ bool battle_manager::can_disengage()
     return true;
 }
 
+bool battle_manager::any_in_fleet_involved(ship_manager* sm)
+{
+    for(auto& i : ships)
+    {
+        for(ship* s : i.second)
+        {
+            for(ship* s2 : sm->ships)
+            {
+                if(s == s2)
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void battle_manager::destructive_merge_into_me(battle_manager* bm)
+{
+    for(auto& i : bm->projectile_manage.projectiles)
+    {
+        projectile_manage.projectiles.push_back(i);
+    }
+
+    for(auto& i : bm->ships)
+    {
+        for(auto& sh : i.second)
+        {
+            add_ship(sh);
+        }
+    }
+}
+
 battle_manager* all_battles_manager::make_new()
 {
     battle_manager* bm = new battle_manager;
@@ -487,6 +529,39 @@ void all_battles_manager::set_viewing(battle_manager* bm, system_manager& system
 battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
 {
     battle_manager* bm = make_new();
+
+    //for(battle_manager* bfind : battles)
+    for(int i=0; i<battles.size(); i++)
+    {
+        battle_manager* bfind = battles[i];
+
+        bool term = false;
+
+        for(orbital* o : t1)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(bfind->any_in_fleet_involved(sm))
+            {
+                bm->destructive_merge_into_me(bfind);
+
+                destroy(bfind);
+
+                i--;
+
+                term = true;
+
+                break;
+            }
+        }
+
+        if(term)
+            break;
+    }
+
 
     int nships = 0;
 

@@ -1131,7 +1131,7 @@ int main()
         system_manage.cull_empty_orbital_fleets(empire_manage);
         fleet_manage.cull_dead(empire_manage);
 
-        system_manage.draw_alerts(window);
+        system_manage.draw_alerts(window, player_empire);
 
         fleet_manage.tick_all(diff_s);
 

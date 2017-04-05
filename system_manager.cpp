@@ -411,9 +411,12 @@ bool orbital::can_dispense_resources()
     return false;
 }
 
-void orbital::draw_alerts(sf::RenderWindow& win)
+void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 {
     if(type != orbital_info::FLEET)
+        return;
+
+    if(parent_empire != viewing_empire)
         return;
 
     ship_manager* sm = (ship_manager*)data;
@@ -648,11 +651,11 @@ void orbital_system::generate_planet_resources(float max_ps)
     }
 }
 
-void orbital_system::draw_alerts(sf::RenderWindow& win)
+void orbital_system::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 {
     for(orbital* o : orbitals)
     {
-        o->draw_alerts(win);
+        o->draw_alerts(win, viewing_empire);
     }
 }
 
@@ -879,7 +882,7 @@ void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage)
     }
 }
 
-void system_manager::draw_alerts(sf::RenderWindow& win)
+void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 {
     ///change this so that later we see alerts from the overall map
     ///would be like, totally useful like!
@@ -888,7 +891,7 @@ void system_manager::draw_alerts(sf::RenderWindow& win)
 
     for(auto& i : systems)
     {
-        i->draw_alerts(win);
+        i->draw_alerts(win, viewing_empire);
     }
 }
 

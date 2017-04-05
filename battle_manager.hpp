@@ -63,6 +63,10 @@ struct battle_manager
     void set_view(system_manager& system_manage);
 
     bool can_disengage();
+
+    bool any_in_fleet_involved(ship_manager* sm);
+
+    void destructive_merge_into_me(battle_manager* bm);
 };
 
 struct orbital;
