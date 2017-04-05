@@ -316,6 +316,9 @@ struct ship_manager
     void resupply();
 
     void tick_all(float step_s);
+
+    bool can_move_in_system();
+    float get_move_system_speed();
 };
 
 struct empire_manager;

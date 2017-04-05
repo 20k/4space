@@ -338,6 +338,17 @@ void orbital::transfer(vec2f pos)
     transfer(rel.length(), rel.angle());
 }
 
+void orbital::request_transfer(vec2f pos)
+{
+    if(type != orbital_info::FLEET)
+        return transfer(pos);
+
+    ship_manager* sm = (ship_manager*)data;
+
+    if(sm->can_move_in_system())
+        transfer(pos);
+}
+
 void orbital::make_random_resource_asteroid(float total_ps)
 {
     ///[1, 4]

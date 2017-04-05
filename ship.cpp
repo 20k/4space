@@ -1474,6 +1474,17 @@ void ship_manager::tick_all(float step_s)
     }
 }
 
+bool ship_manager::can_move_in_system()
+{
+    for(ship* s : ships)
+    {
+        if(!s->can_move_in_system())
+            return false;
+    }
+
+    return true;
+}
+
 ship_manager* fleet_manager::make_new()
 {
     ship_manager* ns = new ship_manager;

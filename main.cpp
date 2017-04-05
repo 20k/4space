@@ -529,7 +529,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire)
                 {
-                    kk->transfer({transformed.x, transformed.y});
+                    kk->request_transfer({transformed.x, transformed.y});
                 }
             }
         }

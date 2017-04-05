@@ -126,6 +126,10 @@ struct orbital
     void transfer(float new_rad, float new_angle);
     void transfer(vec2f pos);
 
+    ///only transfers if some underlying thing says yes
+    ///eg for fleets, only if they have fuel
+    void request_transfer(vec2f pos);
+
     vec3f col = {1,1,1};
 
     ///change to produces resources so we can apply to planets
