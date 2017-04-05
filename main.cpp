@@ -905,10 +905,10 @@ int main()
 
     all_battles_manager all_battles;
 
-    battle_manager* battle = all_battles.make_new();
+    //battle_manager* battle = all_battles.make_new();
 
-    battle->add_ship(test_ship);
-    battle->add_ship(test_ship2);
+    //battle->add_ship(test_ship);
+    //battle->add_ship(test_ship2);
 
     system_manager system_manage;
 
@@ -1044,7 +1044,7 @@ int main()
             if(state == 1)
             {
                 ///need way to view any battle
-                battle->set_view(system_manage);
+                //battle->set_view(system_manage);
                 system_manage.set_viewed_system(nullptr);
             }
         }

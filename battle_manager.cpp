@@ -86,21 +86,27 @@ void projectile_manager::tick(battle_manager& manage, float step_s)
 
         for(auto& i : manage.ships)
         {
+            bool term = false;
+
             std::vector<ship*>& slist = i.second;
 
-            for(auto& kk : slist)
+            for(ship* found_ship : slist)
             {
-                if(projectile_within_ship(p, kk))
+                if(projectile_within_ship(p, found_ship))
                 {
                     //printf("hi\n");
 
-                    kk->hit(p);
+                    found_ship->hit(p);
 
                     destroy(p);
                     kk--;
+                    term = true;
                     break;
                 }
             }
+
+            if(term)
+                break;
         }
     }
 }
@@ -208,7 +214,7 @@ void battle_manager::tick(float step_s)
         {
             std::vector<component> fired = s->fire();
 
-            for(auto& kk : fired)
+            for(component& kk : fired)
             {
                 vec2f cpos = s->local_pos;
 
@@ -329,11 +335,15 @@ void battle_manager::draw(sf::RenderWindow& win)
 
 void battle_manager::add_ship(ship* s)
 {
+    int prev_num = ships[s->team].size();
+
     ships[s->team].push_back(s);
 
     vec2f team_positions[2] = {{500, 40}, {500, 400}};
 
     s->local_pos = team_positions[s->team];
+
+    s->local_pos.x() += prev_num * 50;
 
     s->dim = {100, 40};
 
@@ -436,6 +446,11 @@ void all_battles_manager::tick(float step_s)
     for(auto& i : battles)
     {
         i->tick(step_s);
+    }
+
+    if(currently_viewing == nullptr && battles.size() > 0)
+    {
+        currently_viewing = battles[0];
     }
 }
 
