@@ -947,6 +947,7 @@ int main()
 
             system_manage.draw_viewed_system(window, player_empire);
             system_manage.draw_universe_map(window, player_empire);
+            system_manage.process_universe_map(window, lclick);
         }
 
         //printf("ui\n");

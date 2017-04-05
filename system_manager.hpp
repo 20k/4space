@@ -175,6 +175,8 @@ struct orbital_system
 
     void generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids);
     void generate_full_random_system();
+
+    bool highlight = false;
 };
 
 struct system_manager
@@ -200,10 +202,12 @@ struct system_manager
     void set_viewed_system(orbital_system* s);
 
     void draw_universe_map(sf::RenderWindow& win, empire* viewer_empire);
+    void process_universe_map(sf::RenderWindow& win, bool lclick);
 
     ///camera. Set here because zoom will be useful
     ///Camera panning should also probably go here
     void change_zoom(float zoom);
+    void set_zoom(float zoom);
     void pan_camera(vec2f dir);
 
     bool in_system_view();
@@ -212,6 +216,7 @@ struct system_manager
     float zoom_level = 1.f;
     vec2f camera;
     float universe_scale = 100.f;
+    float sun_universe_rad = 200;
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

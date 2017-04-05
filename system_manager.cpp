@@ -65,6 +65,8 @@ void sprite_renderable::load(const std::string& str)
 {
     img.loadFromFile(str);
     tex.loadFromImage(img);
+    //tex.setSmooth(true);
+    ///smooth rendering causes issues, we'll have to go high res or constructive
 }
 
 void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
@@ -827,10 +829,10 @@ void system_manager::set_viewed_system(orbital_system* s)
 {
     currently_viewed = s;
 
-    zoom_level = 1.f;
-
     if(s != nullptr && s->get_base())
     {
+        set_zoom(1.f);
+
         s->get_base()->center_camera(*this);
     }
     else
@@ -856,20 +858,55 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         circle.setPosition({pos.x(), pos.y()});
         circle.setFillColor(sf::Color(255, 200, 50));
-        circle.setRadius(200.f);
+
+        if(os->highlight)
+        {
+            circle.setFillColor(sf::Color(255, 255, 150));
+        }
+
+        circle.setRadius(sun_universe_rad);
         circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
 
         win.draw(circle);
+
+        os->highlight = false;
+    }
+}
+
+void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
+{
+    if(in_system_view())
+        return;
+
+    sf::Mouse mouse;
+
+    int x = mouse.getPosition(win).x;
+    int y = mouse.getPosition(win).y;
+
+    auto transformed = win.mapPixelToCoords({x, y});
+
+    vec2f tpos = {transformed.x, transformed.y};
+
+    for(orbital_system* s : systems)
+    {
+        vec2f apos = s->universe_pos * universe_scale;
+
+        if((tpos - apos).length() < sun_universe_rad)
+        {
+            s->highlight = true;
+
+            if(lclick)
+            {
+                set_viewed_system(s);
+
+                lclick = false;
+            }
+        }
     }
 }
 
 void system_manager::change_zoom(float zoom)
 {
-    bool was_in_system_view = in_system_view();
-
-    float min_zoom = 1.f / 1000.f;
-    float max_zoom = 5.f;
-
     float scale = zoom_level;
 
     zoom *= 0.4f;
@@ -879,7 +916,17 @@ void system_manager::change_zoom(float zoom)
     else
         zoom = scale/2 * zoom;
 
-    zoom_level = zoom_level - zoom;
+    set_zoom(zoom_level - zoom);
+}
+
+void system_manager::set_zoom(float zoom)
+{
+    bool was_in_system_view = in_system_view();
+
+    float min_zoom = 1.f / 1000.f;
+    float max_zoom = 5.f;
+
+    zoom_level = zoom;
 
     if(zoom_level < min_zoom)
         zoom_level = min_zoom;
@@ -906,7 +953,7 @@ void system_manager::pan_camera(vec2f dir)
 
 bool system_manager::in_system_view()
 {
-    return zoom_level < 10;
+    return zoom_level < 8;
 }
 
 void system_manager::enter_universe_view()
