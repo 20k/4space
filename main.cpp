@@ -74,8 +74,11 @@ std::string get_component_display_string(component& c)
     if(c.components.begin() != c.components.end())
         efficiency = c.components.begin()->second.cur_efficiency * 100.f;
 
+    if(efficiency < 0.001f)
+        efficiency = 0.f;
+
     if(efficiency < 99.9f)
-        eff = "Efficiency %%: " + to_string_with_precision(efficiency, 3) + "\n";
+        eff = "Efficiency %%: " + to_string_with_enforced_variable_dp(efficiency) + "\n";
 
     component_str += eff;
 
