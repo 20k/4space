@@ -442,7 +442,7 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win, bool lclick)
     ImGui::End();
 }
 
-void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire)
+void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles)
 {
     sf::Mouse mouse;
 
@@ -522,18 +522,20 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             {
                 orbital_system* parent_system = sys;
 
+                popup_element& elem = *popup.fetch(orb);
+
                 ///if orb not a fleet, this is empty
                 std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
 
                 if(hostile_fleets.size() > 0)
                 {
-                    popup.fetch(orb)->buttons_map[popup_element_type::ENGAGE] = {"Engage Fleets", false};
+                    elem.buttons_map[popup_element_type::ENGAGE].name = "Engage Fleets";
                 }
                 else
                 {
                     ///make if if we don't have it
-                    popup.fetch(orb)->buttons_map[popup_element_type::ENGAGE];
-                    popup.fetch(orb)->buttons_map.erase(popup_element_type::ENGAGE);
+                    elem.buttons_map[popup_element_type::ENGAGE];
+                    elem.buttons_map.erase(popup_element_type::ENGAGE);
                 }
 
                 selected.push_back(orb);
@@ -614,6 +616,21 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 ship_manager* sm = (ship_manager*)o->data;
 
                 sm->resupply();
+            }
+
+            if(map_element.first == popup_element_type::ENGAGE && map_element.second.pressed)
+            {
+                orbital* o = (orbital*)elem.element;
+
+                ship_manager* sm = (ship_manager*)o->data;
+
+                orbital_system* parent = o->parent_system;
+
+                std::vector<orbital*> hostile_fleets = parent->get_fleets_within_engagement_range(o);
+
+                hostile_fleets.push_back(o);
+
+                all_battles.make_new_battle(hostile_fleets);
             }
         }
     }
@@ -853,10 +870,12 @@ int main()
     float last_time_s = 0.f;
     float diff_s = 0.f;
 
-    battle_manager battle;
+    all_battles_manager all_battles;
 
-    battle.add_ship(test_ship);
-    battle.add_ship(test_ship2);
+    battle_manager* battle = all_battles.make_new();
+
+    battle->add_ship(test_ship);
+    battle->add_ship(test_ship2);
 
     system_manager system_manage;
 
@@ -971,9 +990,7 @@ int main()
         ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME
         if(key.isKeyPressed(sf::Keyboard::Num1))
         {
-            battle.tick(diff_s);
-
-            //printf("Timestep %f\n", diff_s);
+            all_battles.tick(diff_s);
         }
 
         handle_camera(window, system_manage);
@@ -993,7 +1010,8 @@ int main()
             }
             if(state == 1)
             {
-                battle.set_view(system_manage);
+                ///need way to view any battle
+                battle->set_view(system_manage);
                 system_manage.set_viewed_system(nullptr);
             }
         }
@@ -1023,14 +1041,14 @@ int main()
 
         if(state == 1)
         {
-            debug_battle(battle, window, lclick);
+            debug_battle(*battle, window, lclick);
 
-            battle.draw(window);
+            battle->draw(window);
         }
 
         if(state == 0 || state == 2)
         {
-            debug_system(system_manage, window, lclick, rclick, popup, player_empire);
+            debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles);
 
             system_manage.draw_viewed_system(window, player_empire);
             system_manage.draw_universe_map(window, player_empire);

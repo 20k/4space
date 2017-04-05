@@ -62,4 +62,19 @@ struct battle_manager
     void set_view(system_manager& system_manage);
 };
 
+struct orbital;
+
+struct all_battles_manager
+{
+    std::vector<battle_manager*> battles;
+
+    battle_manager* make_new();
+
+    void destroy(battle_manager* bm);
+
+    void tick(float step_s);
+
+    battle_manager* make_new_battle(std::vector<orbital*> t1);
+};
+
 #endif // BATTLE_MANAGER_HPP_INCLUDED

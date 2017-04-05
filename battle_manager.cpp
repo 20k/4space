@@ -390,3 +390,52 @@ void battle_manager::set_view(system_manager& system_manage)
 
     system_manage.camera = avg;
 }
+
+battle_manager* all_battles_manager::make_new()
+{
+    battle_manager* bm = new battle_manager;
+
+    battles.push_back(bm);
+
+    return bm;
+}
+
+void all_battles_manager::destroy(battle_manager* bm)
+{
+    for(int i=0; i<battles.size(); i++)
+    {
+        if(battles[i] == bm)
+        {
+            delete bm;
+            return;
+        }
+    }
+}
+
+void all_battles_manager::tick(float step_s)
+{
+    for(auto& i : battles)
+    {
+        i->tick(step_s);
+    }
+}
+
+battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
+{
+    battle_manager* bm = make_new();
+
+    for(orbital* o : t1)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        for(ship* s : sm->ships)
+        {
+            bm->add_ship(s);
+        }
+    }
+
+    printf("made new battle with %i\n", t1.size());
+}
