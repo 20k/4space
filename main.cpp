@@ -828,6 +828,7 @@ int main()
     sys_2->generate_full_random_system();
     sys_2->universe_pos = {10, 10};
 
+    system_manage.set_viewed_system(base);
 
     popup_info popup;
 
@@ -894,7 +895,7 @@ int main()
 
             if(state == 0)
             {
-                sun->center_camera(system_manage);
+                system_manage.set_viewed_system(base);
             }
             if(state == 1)
             {
@@ -904,7 +905,7 @@ int main()
 
         if(once<sf::Keyboard::F3>())
         {
-            sys_2->get_base()->center_camera(system_manage);
+            system_manage.set_viewed_system(sys_2);
             state = 2;
         }
 
@@ -931,19 +932,12 @@ int main()
 
             battle.draw(window);
         }
-        if(state == 0)
+
+        if(state == 0 || state == 2)
         {
-            //sun->center_camera(window);
             debug_system(system_manage, window, lclick, rclick, popup, player_empire);
 
-            base->draw(window, player_empire);
-        }
-        if(state == 2)
-        {
-            //sys_2->get_base()->center_camera(window);
-            debug_system(system_manage, window, lclick, rclick, popup, player_empire);
-
-            sys_2->draw(window, player_empire);
+            system_manage.draw_viewed_system(window, player_empire);
         }
 
         //printf("ui\n");

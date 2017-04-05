@@ -807,6 +807,28 @@ void system_manager::draw_alerts(sf::RenderWindow& win)
     }
 }
 
+void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire)
+{
+    if(currently_viewed == nullptr)
+        return;
+
+    currently_viewed->draw(win, viewer_empire);
+}
+
+void system_manager::set_viewed_system(orbital_system* s)
+{
+    currently_viewed = s;
+
+    if(s->get_base())
+    {
+        s->get_base()->center_camera(*this);
+    }
+    else
+    {
+        printf("Warning no base object!\n");
+    }
+}
+
 void system_manager::change_zoom(float zoom)
 {
     float min_zoom = 1.f / 1000.f;

@@ -180,6 +180,7 @@ struct orbital_system
 struct system_manager
 {
     std::vector<orbital_system*> systems;
+    orbital_system* currently_viewed = nullptr;
 
     orbital_system* make_new();
 
@@ -191,7 +192,12 @@ struct system_manager
 
     void cull_empty_orbital_fleets(empire_manager& empire_manage);
 
+
     void draw_alerts(sf::RenderWindow& win);
+
+    void draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire);
+
+    void set_viewed_system(orbital_system* s);
 
     ///camera. Set here because zoom will be useful
     ///Camera panning should also probably go here
