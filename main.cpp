@@ -844,6 +844,8 @@ int main()
     {
         sf::Event event;
 
+        bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
+
         float scrollwheel_delta = 0;
 
         while(window.pollEvent(event))
@@ -878,7 +880,9 @@ int main()
             cdir.x() -= 1;
 
         system_manage.pan_camera(cdir);
-        system_manage.change_zoom(scrollwheel_delta);
+
+        if(no_suppress_mouse)
+            system_manage.change_zoom(scrollwheel_delta);
 
         ///BATTLE MANAGER IS NO LONGER TICKING SHIP COMPONENTS, IT IS ASSUMED TO BE DONE GLOBALLY WHICH WE WONT WANT
         ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME
@@ -922,8 +926,8 @@ int main()
             test_ship->resupply(*player_empire);
         }*/
 
-        bool lclick = once<sf::Mouse::Left>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
-        bool rclick = once<sf::Mouse::Right>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
+        bool lclick = once<sf::Mouse::Left>() && no_suppress_mouse;
+        bool rclick = once<sf::Mouse::Right>() && no_suppress_mouse;
 
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);

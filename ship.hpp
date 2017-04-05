@@ -51,6 +51,8 @@ namespace ship_component_elements
         NONE,
     };
 
+    ///we could just take the inverse of cooling_potential when displaying
+    ///might be more friendly for the player
     static std::vector<std::string> display_strings
     {
         "COOLING_POTENTIAL",

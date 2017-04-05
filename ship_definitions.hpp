@@ -6,7 +6,7 @@
 component make_default_crew()
 {
     component_attribute command;
-    command.produced_per_s = 3.f;
+    command.produced_per_s = 4.f;
 
     component_attribute oxygen;
     oxygen.drained_per_s = 0.5f;
@@ -177,6 +177,49 @@ component make_default_heatsink()
     return heatsink;
 }
 
+component make_default_warp_drive()
+{
+    component_attribute cooling;
+    cooling.drained_per_s = 0.1f;
+    cooling.drained_per_use = 10.f;
+
+    component_attribute power;
+    power.drained_per_use = 80;
+
+    component_attribute command;
+    command.drained_per_s = 0.5f;
+
+    component_attribute hp;
+    hp.max_amount = default_room_hp/4.f;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute warp_power;
+    warp_power.produced_per_s = 0.25f;
+    warp_power.drained_per_use = 10.f;
+    warp_power.max_amount = 10.f;
+    warp_power.cur_amount = warp_power.max_amount * 0.25f;
+
+    component_attribute fuel;
+    fuel.drained_per_use = 1.f;
+
+    ///what I'd really like to do here is say "if we don't have enough shields, drain hp"
+    ///but this is too complex to express at the moment
+    //component_attribute shield;
+    //shield.drained_per_use = 5;
+
+    component warp_drive;
+    warp_drive.add(ship_component_element::COOLING_POTENTIAL, cooling);
+    warp_drive.add(ship_component_element::ENERGY, power);
+    warp_drive.add(ship_component_element::COMMAND, command);
+    warp_drive.add(ship_component_element::HP, hp);
+    warp_drive.add(ship_component_element::WARP_POWER, warp_power);
+    warp_drive.add(ship_component_element::FUEL, fuel);
+
+    warp_drive.name = "Warp Drive";
+
+    return warp_drive;
+}
+
 component make_default_railgun()
 {
     ///...the railgun literally produces railgun
@@ -298,8 +341,9 @@ ship make_default()
     test_ship.add(make_default_shields());
     test_ship.add(make_default_power_core());
     test_ship.add(make_default_engines());
-    test_ship.add(make_default_railgun());
+    test_ship.add(make_default_warp_drive());
     test_ship.add(make_default_heatsink());
+    test_ship.add(make_default_railgun());
     test_ship.add(make_default_torpedo());
 
     return test_ship;
