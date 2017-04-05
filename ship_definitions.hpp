@@ -194,7 +194,7 @@ component make_default_warp_drive()
     hp.cur_amount = hp.max_amount;
 
     component_attribute warp_power;
-    warp_power.produced_per_s = 0.25f;
+    warp_power.produced_per_s = 10.25f;
     warp_power.drained_per_use = 10.f;
     warp_power.max_amount = 10.f;
     warp_power.cur_amount = warp_power.max_amount * 0.25f;

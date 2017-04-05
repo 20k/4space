@@ -1587,12 +1587,27 @@ void ship_manager::try_warp(orbital_system* fin, orbital_system* cur, orbital* o
     vec2f my_pos = cur->universe_pos;
     vec2f their_pos = fin->universe_pos;
 
-    vec2f arrive_dir = (their_pos - my_pos).norm() * 500;
+    vec2f arrive_dir = (my_pos - their_pos).norm() * 500;
 
     fin->steal(o, cur);
 
+    o->transferring = false;
+
     o->absolute_pos = arrive_dir;
     o->set_orbit(arrive_dir);
+}
+
+bool ship_manager::can_warp(orbital_system* fin, orbital_system* cur, orbital* o)
+{
+    bool all_use = true;
+
+    for(ship* s : ships)
+    {
+        if(!s->can_use_warp_drives())
+            all_use = false;
+    }
+
+    return all_use;
 }
 
 ship_manager* fleet_manager::make_new()

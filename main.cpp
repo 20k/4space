@@ -515,6 +515,36 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     if(selected.size() > 0 && popup.going)
     {
+        if(system_manage.hovered_system != nullptr)
+        {
+            for(orbital* o : selected)
+            {
+                if(o->type != orbital_info::FLEET)
+                    continue;
+
+                orbital_system* parent = system_manage.get_parent(o);
+
+                if(parent == system_manage.hovered_system || parent == nullptr)
+                    continue;
+
+                ship_manager* sm = (ship_manager*)o->data;
+
+                if(!sm->can_warp(system_manage.hovered_system, parent, o))
+                {
+                    ImGui::SetTooltip("Cannot Warp");
+                }
+                else
+                {
+                    ImGui::SetTooltip("Right click to Warp");
+                }
+
+                if(rclick)
+                {
+                    sm->try_warp(system_manage.hovered_system, parent, o);
+                }
+            }
+        }
+
         if(system_manage.in_system_view())
         {
             for(auto& kk : selected)
@@ -536,29 +566,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     {
                         kk->request_transfer({transformed.x, transformed.y});
                     }
-                }
-            }
-        }
-
-        if(system_manage.hovered_system != nullptr)
-        {
-            for(orbital* o : selected)
-            {
-                if(o->type != orbital_info::FLEET)
-                    continue;
-
-                orbital_system* parent = system_manage.get_parent(o);
-
-                if(parent == system_manage.hovered_system || parent == nullptr)
-                    continue;
-
-                ship_manager* sm = (ship_manager*)o->data;
-
-                if(rclick)
-                {
-                    sm->try_warp(system_manage.hovered_system, parent, o);
-
-                    printf("Trying warp\n");
                 }
             }
         }

@@ -330,6 +330,7 @@ struct ship_manager
     void draw_alerts(sf::RenderWindow& win, vec2f abs_pos);
 
     void try_warp(orbital_system* fin, orbital_system* cur, orbital* o);
+    bool can_warp(orbital_system* fin, orbital_system* cur, orbital* o);
 };
 
 struct empire_manager;
