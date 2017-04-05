@@ -508,7 +508,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
         if(ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip("Warning, this has steep penalties!");
+            ImGui::SetTooltip("Warning, this fleet will take heavy damage!");
         }
     }
 
