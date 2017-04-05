@@ -142,6 +142,8 @@ struct orbital
     bool can_dispense_resources();
 
     empire* parent_empire = nullptr;
+
+    void draw_alerts(sf::RenderWindow& win);
 };
 
 struct orbital_system
@@ -165,6 +167,8 @@ struct orbital_system
 
     void generate_asteroids(int n, int num_belts, int num_resource_asteroids);
     void generate_planet_resources(float max_ps);
+
+    void draw_alerts(sf::RenderWindow& win);
 };
 
 struct system_manager
@@ -180,6 +184,8 @@ struct system_manager
     void repulse_fleets();
 
     void cull_empty_orbital_fleets(empire_manager& empire_manage);
+
+    void draw_alerts(sf::RenderWindow& win);
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

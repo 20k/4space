@@ -405,6 +405,16 @@ bool orbital::can_dispense_resources()
     return false;
 }
 
+void orbital::draw_alerts(sf::RenderWindow& win)
+{
+    if(type != orbital_info::FLEET)
+        return;
+
+    ship_manager* sm = (ship_manager*)data;
+
+    sm->draw_alerts(win, absolute_pos);
+}
+
 orbital* orbital_system::get_base()
 {
     for(auto& i : orbitals)
@@ -612,6 +622,14 @@ void orbital_system::generate_planet_resources(float max_ps)
     }
 }
 
+void orbital_system::draw_alerts(sf::RenderWindow& win)
+{
+    for(orbital* o : orbitals)
+    {
+        o->draw_alerts(win);
+    }
+}
+
 orbital_system* system_manager::make_new()
 {
     orbital_system* sys = new orbital_system;
@@ -694,5 +712,13 @@ void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage)
     for(auto& i : systems)
     {
         i->cull_empty_orbital_fleets(empire_manage);
+    }
+}
+
+void system_manager::draw_alerts(sf::RenderWindow& win)
+{
+    for(auto& i : systems)
+    {
+        i->draw_alerts(win);
     }
 }

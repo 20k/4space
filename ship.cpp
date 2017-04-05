@@ -1,6 +1,7 @@
 #include "ship.hpp"
 #include "battle_manager.hpp"
 #include "empire.hpp"
+#include "text.hpp"
 
 int ship::gid;
 
@@ -1483,6 +1484,55 @@ bool ship_manager::can_move_in_system()
     }
 
     return true;
+}
+
+void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
+{
+    float fuel_yellow_alert = 0.2f;
+    float fuel_red_alert = 0.1f;
+
+    vec3f rcol = {1, 0.1, 0};
+    vec3f ycol = {1, 0.9, 0};
+
+    std::string alert_symbol = "!";
+
+    vec3f alert_colour;
+    bool any_alert = false;
+
+    for(ship* s : ships)
+    {
+        float stored = s->get_stored_resources()[ship_component_element::FUEL];
+        float max_store = s->get_max_resources()[ship_component_element::FUEL];
+
+        if(max_store < 0.001f)
+        {
+            continue;
+        }
+
+        float frac = stored / max_store;
+
+        if(frac < fuel_yellow_alert)
+        {
+            alert_colour = ycol;
+            any_alert = true;
+        }
+
+        if(frac < fuel_red_alert)
+        {
+            alert_colour = rcol;
+        }
+    }
+
+    if(!any_alert)
+        return;
+
+    //auto transfd = win.mapCoordsToPixel({abs_pos.x(), abs_pos.y()});
+
+    //vec2f final_pos = (vec2f){transfd.x, transfd.y} + (vec2f){10, -10};
+
+    //printf("fpos %f %f\n", final_pos.x(), final_pos.y());
+
+    text_manager::render(win, alert_symbol, abs_pos + (vec2f){8, -20}, alert_colour);
 }
 
 ship_manager* fleet_manager::make_new()

@@ -319,6 +319,8 @@ struct ship_manager
 
     bool can_move_in_system();
     float get_move_system_speed();
+
+    void draw_alerts(sf::RenderWindow& win, vec2f abs_pos);
 };
 
 struct empire_manager;
