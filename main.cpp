@@ -459,6 +459,8 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
     for(int i=0; i<all_battles.battles.size(); i++)
     {
+        std::string id_str = std::to_string(i);
+
         battle_manager* bm = all_battles.battles[i];
 
         for(auto& i : bm->ships)
@@ -475,7 +477,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         ///will be incorrect for a frame when combat changes
         std::string jump_to_str = "(Jump To)";
 
-        ImGui::PushID((jump_to_str + std::to_string(i)).c_str());
+        ImGui::PushID((jump_to_str + id_str).c_str());
         ImGui::Text(jump_to_str.c_str());
         ImGui::PopID();
 
@@ -484,30 +486,46 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             all_battles.set_viewing(bm, system_manage);
         }
 
-        std::string disengage_str = bm->get_disengage_str(player_empire);
-
-        if(bm->can_disengage(player_empire))
+        if(!bm->can_end_battle_peacefully(player_empire))
         {
-            disengage_str = "(Emergency Disengage!)";
-        }
+            std::string disengage_str = bm->get_disengage_str(player_empire);
 
-        ImGui::PushID((disengage_str + std::to_string(i)).c_str());
-        ImGui::Text(disengage_str.c_str());
-        ImGui::PopID();
-
-        if(ImGui::IsItemClicked())
-        {
             if(bm->can_disengage(player_empire))
             {
-                all_battles.disengage(bm, player_empire);
-                i--;
-                continue;
+                disengage_str = "(Emergency Disengage!)";
+            }
+
+            ImGui::PushID((disengage_str + id_str).c_str());
+            ImGui::Text(disengage_str.c_str());
+            ImGui::PopID();
+
+            if(ImGui::IsItemClicked())
+            {
+                if(bm->can_disengage(player_empire))
+                {
+                    all_battles.disengage(bm, player_empire);
+                    i--;
+                    continue;
+                }
+            }
+
+            if(ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Warning, this fleet will take heavy damage!");
             }
         }
-
-        if(ImGui::IsItemHovered())
+        else
         {
-            ImGui::SetTooltip("Warning, this fleet will take heavy damage!");
+            std::string leave_str = "(Leave Battle)";
+
+            ImGui::PushID((leave_str + id_str).c_str());
+            ImGui::Text(leave_str.c_str());
+            ImGui::PopID();
+
+            if(ImGui::IsItemClicked())
+            {
+                all_battles.end_battle_peacefully(bm);
+            }
         }
     }
 

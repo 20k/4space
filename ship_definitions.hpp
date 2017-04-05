@@ -126,7 +126,7 @@ component make_default_power_core()
 
 component make_default_engines()
 {
-    float max_bad_engine_lifetime_s = 1000;
+    float max_bad_engine_lifetime_s = 50;
 
     component_attribute fuel;
     fuel.max_amount = 10.f;

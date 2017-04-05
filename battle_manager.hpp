@@ -68,6 +68,10 @@ struct battle_manager
     void do_disengage(empire* disengaging_empire); ///apply it to ships
     std::string get_disengage_str(empire* disengaging_empire);
 
+    bool can_end_battle_peacefully(empire* leaving_empire);
+    void end_battle_peacefully(); ///don't call on its own
+
+
     bool any_in_fleet_involved(ship_manager* sm);
 
     void destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles);
@@ -95,6 +99,7 @@ struct all_battles_manager
 
     ///disengaging empire can be nullptr
     void disengage(battle_manager* bm, empire* disengaging_empire);
+    void end_battle_peacefully(battle_manager* bm);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

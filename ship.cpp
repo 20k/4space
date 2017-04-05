@@ -1525,7 +1525,8 @@ void ship::test_set_disabled()
         full_disabled = true;
     }
 
-    float disabled_frac = 0.1f;
+    float disabled_frac = 0.15f;
+    float eff_disabled_frac = 0.15f;
 
     if((cur_hp / max_hp) < disabled_frac)
     {
@@ -1540,9 +1541,13 @@ void ship::test_set_disabled()
         float ceff = 0.f;
         int cnum = 0;
 
-        for(auto& kk : c.components)
+        //for(auto& kk : c.components)
+
+        if(c.components.size() > 0)
         {
-            ceff += kk.second.cur_efficiency;
+            component_attribute& attr = c.components.begin()->second;
+
+            ceff += attr.cur_efficiency;
             cnum++;
         }
 
@@ -1560,7 +1565,7 @@ void ship::test_set_disabled()
         avg_efficiency /= num_components;
     }
 
-    if(avg_efficiency < disabled_frac)
+    if(avg_efficiency < eff_disabled_frac)
     {
         full_disabled = true;
     }
@@ -1697,6 +1702,9 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     vec3f rcol = {1, 0.1, 0};
     vec3f ycol = {1, 0.9, 0};
 
+    vec3f fuel_bad_col = {1, 1, 1};
+    vec3f fuel_poor_col = {0.4, 0.4, 0.4};
+
     std::string alert_symbol;
 
     vec3f alert_colour;
@@ -1716,13 +1724,13 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
 
         if(frac < fuel_yellow_alert)
         {
-            alert_colour = ycol;
+            alert_colour = fuel_poor_col;
             any_alert = true;
         }
 
         if(frac < fuel_red_alert)
         {
-            alert_colour = rcol;
+            alert_colour = fuel_bad_col;
         }
     }
 

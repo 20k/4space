@@ -496,6 +496,31 @@ std::string battle_manager::get_disengage_str(empire* disengaging_empire)
     return to_string_with_enforced_variable_dp(time_remaining) + "s";
 }
 
+///when we implement alliances, this will need to change
+bool battle_manager::can_end_battle_peacefully(empire* leaving_empire)
+{
+    for(auto& i : ships)
+    {
+        for(ship* s : i.second)
+        {
+            if(s->team == leaving_empire->team_id)
+                continue;
+
+            if(!s->fully_disabled())
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+void battle_manager::end_battle_peacefully()
+{
+    do_disengage(nullptr);
+}
+
 bool battle_manager::any_in_fleet_involved(ship_manager* sm)
 {
     for(auto& i : ships)
@@ -660,4 +685,9 @@ void all_battles_manager::disengage(battle_manager* bm, empire* disengaging_empi
         currently_viewing = nullptr;
 
     destroy(bm);
+}
+
+void all_battles_manager::end_battle_peacefully(battle_manager* bm)
+{
+    disengage(bm, nullptr);
 }
