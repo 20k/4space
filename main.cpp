@@ -578,7 +578,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             ///not necessarily valid
             ship_manager* sm = (ship_manager*)orb->data;
 
-            if(system_manage.in_system_view() && orb->point_within({transformed.x, transformed.y}))
+            if(system_manage.in_system_view() && orb->point_within({transformed.x, transformed.y}) && system_manage.currently_viewed == sys)
             {
                 if(first)
                 {
