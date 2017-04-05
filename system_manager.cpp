@@ -801,6 +801,11 @@ void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage)
 
 void system_manager::draw_alerts(sf::RenderWindow& win)
 {
+    ///change this so that later we see alerts from the overall map
+    ///would be like, totally useful like!
+    if(!in_system_view())
+        return;
+
     for(auto& i : systems)
     {
         i->draw_alerts(win);
@@ -821,6 +826,8 @@ void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_em
 void system_manager::set_viewed_system(orbital_system* s)
 {
     currently_viewed = s;
+
+    zoom_level = 1.f;
 
     if(s->get_base())
     {
@@ -884,4 +891,9 @@ void system_manager::pan_camera(vec2f dir)
 bool system_manager::in_system_view()
 {
     return zoom_level < 10;
+}
+
+void system_manager::enter_system_view()
+{
+    zoom_level = 10;
 }
