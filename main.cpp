@@ -533,8 +533,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 }
                 else
                 {
-                    ///make if if we don't have it
-                    elem.buttons_map[popup_element_type::ENGAGE];
                     elem.buttons_map.erase(popup_element_type::ENGAGE);
                 }
 
