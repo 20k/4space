@@ -490,8 +490,6 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             disengage_str = "(Emergency Disengage!)";
         }
 
-        //std::string disengage_str = std::string("(Disengage) ") + bm->get_disengage_str(player_empire) + "##" +
-
         ImGui::PushID((disengage_str + std::to_string(i)).c_str());
         ImGui::Text(disengage_str.c_str());
         ImGui::PopID();
