@@ -1,6 +1,7 @@
 #include "battle_manager.hpp"
 #include <SFML/Graphics.hpp>
 #include "system_manager.hpp"
+#include "empire.hpp"
 
 void projectile::load(int type)
 {
@@ -432,9 +433,23 @@ void battle_manager::set_view(system_manager& system_manage)
     system_manage.camera = avg;
 }
 
-bool battle_manager::can_disengage()
+bool battle_manager::can_disengage(empire* disengaging_empire)
 {
     return true;
+}
+
+void battle_manager::do_disengage(empire* disengaging_empire)
+{
+    for(auto& i : ships)
+    {
+        for(ship* s : i.second)
+        {
+            if(s->team != disengaging_empire->team_id)
+                continue;
+
+            s->apply_disengage();
+        }
+    }
 }
 
 bool battle_manager::any_in_fleet_involved(ship_manager* sm)
@@ -583,8 +598,10 @@ battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
     //printf("made new battle with %i %i\n", t1.size(), nships);
 }
 
-void all_battles_manager::disengage(battle_manager* bm)
+void all_battles_manager::disengage(battle_manager* bm, empire* disengaging_empire)
 {
+    bm->do_disengage(disengaging_empire);
+
     bm->projectile_manage.destroy_all();
 
     if(bm == currently_viewing)

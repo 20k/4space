@@ -291,6 +291,10 @@ struct ship : positional
     bool can_move_in_system();
     float get_move_system_speed();
 
+    void apply_disengage();
+    bool can_disengage();
+    bool can_engage();
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
@@ -331,6 +335,8 @@ struct ship_manager
 
     void try_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     bool can_warp(orbital_system* fin, orbital_system* cur, orbital* o);
+
+    void apply_disengage();
 };
 
 struct empire_manager;

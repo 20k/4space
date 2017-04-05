@@ -10,6 +10,9 @@ struct ship_manager;
 
 struct empire
 {
+    int team_id = team_gid++;
+    static int team_gid;
+
     std::string name;
 
     resource_manager resources;

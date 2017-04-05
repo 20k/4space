@@ -445,7 +445,7 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick)
     ImGui::End();
 }
 
-void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage)
+void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire)
 {
     ImGui::Begin("Ongoing Battles");
 
@@ -475,7 +475,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
         if(ImGui::IsItemClicked())
         {
-            all_battles.disengage(bm);
+            all_battles.disengage(bm, player_empire);
             i--;
             continue;
         }
@@ -878,12 +878,12 @@ int main()
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
 
-    ship* test_ship = fleet1->make_new_from(0, make_default());
-    ship* test_ship3 = fleet1->make_new_from(0, make_default());
+    ship* test_ship = fleet1->make_new_from(player_empire->team_id, make_default());
+    ship* test_ship3 = fleet1->make_new_from(player_empire->team_id, make_default());
 
-    ship* test_ship2 = fleet2->make_new_from(1, make_default());
+    ship* test_ship2 = fleet2->make_new_from(hostile_empire->team_id, make_default());
 
-    ship* test_ship4 = fleet3->make_new_from(0, make_default());
+    ship* test_ship4 = fleet3->make_new_from(player_empire->team_id, make_default());
 
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
@@ -1084,7 +1084,7 @@ int main()
 
         handle_camera(window, system_manage);
 
-        debug_all_battles(all_battles, window, lclick, system_manage);
+        debug_all_battles(all_battles, window, lclick, system_manage, player_empire);
 
         if(state == 1)
         {

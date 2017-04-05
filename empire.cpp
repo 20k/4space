@@ -2,6 +2,8 @@
 #include "system_manager.hpp"
 #include "ship.hpp"
 
+int empire::team_gid = 0;
+
 void empire::take_ownership(orbital* o)
 {
     for(auto& i : owned)

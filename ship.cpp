@@ -1397,6 +1397,51 @@ bool ship::can_move_in_system()
     return false;
 }
 
+void ship::apply_disengage()
+{
+    std::map<ship_component_elements::types, float> damage_fractions;
+
+    damage_fractions[ship_component_elements::HP] = 0.45f;
+    damage_fractions[ship_component_elements::WARP_POWER] = 0.5f;
+    damage_fractions[ship_component_elements::SHIELD_POWER] = 0.5f;
+    damage_fractions[ship_component_elements::FUEL] = 0.3f;
+
+    /*float hp_damage_frac = 0.25f;
+
+    float hp_left = get_available_capacities()[ship_component_elements::HP];
+
+    float hp_subtract = hp_damage_frac * hp_left;
+
+    ///needs to be negative!
+    std::map<ship_component_elements::types, float> to_subtract;
+    to_subtract[ship_component_elements::HP] = -hp_subtract;
+
+    float*/
+
+    std::map<ship_component_elements::types, float> to_apply_negative;
+
+    for(auto& i : damage_fractions)
+    {
+        float val = get_stored_resources()[i.first];
+
+        float real_neg = - val * i.second;
+
+        to_apply_negative[i.first] = real_neg;
+    }
+
+    add_negative_resources(to_apply_negative);
+}
+
+bool ship::can_disengage()
+{
+    return true;
+}
+
+bool ship::can_engage()
+{
+    return true;
+}
+
 ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;
@@ -1630,6 +1675,14 @@ bool ship_manager::can_warp(orbital_system* fin, orbital_system* cur, orbital* o
     }
 
     return all_use;
+}
+
+void ship_manager::apply_disengage()
+{
+    for(ship* s : ships)
+    {
+        s->apply_disengage();
+    }
 }
 
 ship_manager* fleet_manager::make_new()

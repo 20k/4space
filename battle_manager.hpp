@@ -62,7 +62,8 @@ struct battle_manager
 
     void set_view(system_manager& system_manage);
 
-    bool can_disengage();
+    bool can_disengage(empire* disengaging_empire);
+    void do_disengage(empire* disengaging_empire); ///apply it to ships
 
     bool any_in_fleet_involved(ship_manager* sm);
 
@@ -87,7 +88,7 @@ struct all_battles_manager
 
     battle_manager* make_new_battle(std::vector<orbital*> t1);
 
-    void disengage(battle_manager* bm);
+    void disengage(battle_manager* bm, empire* disengaging_empire);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED
