@@ -1406,18 +1406,6 @@ void ship::apply_disengage()
     damage_fractions[ship_component_elements::SHIELD_POWER] = 0.5f;
     damage_fractions[ship_component_elements::FUEL] = 0.3f;
 
-    /*float hp_damage_frac = 0.25f;
-
-    float hp_left = get_available_capacities()[ship_component_elements::HP];
-
-    float hp_subtract = hp_damage_frac * hp_left;
-
-    ///needs to be negative!
-    std::map<ship_component_elements::types, float> to_subtract;
-    to_subtract[ship_component_elements::HP] = -hp_subtract;
-
-    float*/
-
     std::map<ship_component_elements::types, float> to_apply_negative;
 
     for(auto& i : damage_fractions)
