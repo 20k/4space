@@ -520,6 +520,22 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             ///dis me
             if(popup.fetch(orb) != nullptr)
             {
+                orbital_system* parent_system = sys;
+
+                ///if orb not a fleet, this is empty
+                std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
+
+                if(hostile_fleets.size() > 0)
+                {
+                    popup.fetch(orb)->buttons_map[popup_element_type::ENGAGE] = {"Engage Fleets", false};
+                }
+                else
+                {
+                    ///make if if we don't have it
+                    popup.fetch(orb)->buttons_map[popup_element_type::ENGAGE];
+                    popup.fetch(orb)->buttons_map.erase(popup_element_type::ENGAGE);
+                }
+
                 selected.push_back(orb);
             }
 

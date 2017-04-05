@@ -438,6 +438,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
 
     n->type = type;
     n->rad = rad;
+    n->parent_system = this;
     //n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
 
     if(type == orbital_info::ASTEROID)
@@ -497,6 +498,7 @@ void orbital_system::steal(orbital* o, orbital_system* s)
     orbitals.push_back(o);
 
     o->parent = get_base();
+    o->parent_system = this;
 }
 
 ///need to figure out higher positioning, but whatever
@@ -730,6 +732,38 @@ void orbital_system::generate_full_random_system()
     rasteroids += randf_s(0.f, 50.f) * rbelts;
 
     return generate_random_system(rplanets, rasteroids, rbelts, rresource);
+}
+
+std::vector<orbital*> orbital_system::get_fleets_within_engagement_range(orbital* me)
+{
+    std::vector<orbital*> ret;
+
+    if(me->type != orbital_info::FLEET)
+        return ret;
+
+    vec2f ref_pos = me->absolute_pos;
+
+    float engagement_rad = 40.f;
+
+    for(orbital* o : orbitals)
+    {
+        if(me->parent_empire == o->parent_empire)
+            continue;
+
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        vec2f their_pos = o->absolute_pos;
+
+        float dist = (their_pos - ref_pos).length();
+
+        if(dist < engagement_rad)
+        {
+            ret.push_back(o);
+        }
+    }
+
+    return ret;
 }
 
 orbital_system* system_manager::make_new()

@@ -76,6 +76,7 @@ struct sprite_renderable
 struct empire;
 struct empire_manager;
 struct system_manager;
+struct orbital_system;
 
 struct orbital
 {
@@ -145,6 +146,8 @@ struct orbital
     empire* parent_empire = nullptr;
 
     void draw_alerts(sf::RenderWindow& win);
+
+    orbital_system* parent_system = nullptr;
 };
 
 struct orbital_system
@@ -180,6 +183,8 @@ struct orbital_system
 
     bool highlight = false;
 
+    ///hostile fleets
+    std::vector<orbital*> get_fleets_within_engagement_range(orbital* me);
 };
 
 struct system_manager
