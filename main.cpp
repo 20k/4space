@@ -485,7 +485,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
         std::string disengage_str = bm->get_disengage_str(player_empire);
 
-        if(disengage_str == "")
+        if(bm->can_disengage(player_empire))
         {
             disengage_str = "(Emergency Disengage!)";
         }
@@ -504,6 +504,11 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 i--;
                 continue;
             }
+        }
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("Warning, this has steep penalties!");
         }
     }
 
@@ -1157,7 +1162,8 @@ int main()
         system_manage.cull_empty_orbital_fleets(empire_manage);
         fleet_manage.cull_dead(empire_manage);
 
-        system_manage.draw_alerts(window, player_empire);
+        if(state != 1)
+            system_manage.draw_alerts(window, player_empire);
 
         fleet_manage.tick_all(diff_s);
 
