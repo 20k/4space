@@ -46,7 +46,7 @@ struct battle_manager
     projectile_manager projectile_manage;
 
     ///team -> ship
-    std::map<int, ship*> ships;
+    std::map<int, std::vector<ship*>> ships;
 
     void tick(float step_s);
 
@@ -67,12 +67,15 @@ struct orbital;
 struct all_battles_manager
 {
     std::vector<battle_manager*> battles;
+    battle_manager* currently_viewing = nullptr;
 
     battle_manager* make_new();
 
     void destroy(battle_manager* bm);
 
     void tick(float step_s);
+
+    void draw_viewing(sf::RenderWindow& win);
 
     battle_manager* make_new_battle(std::vector<orbital*> t1);
 };

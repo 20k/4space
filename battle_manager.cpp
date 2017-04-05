@@ -86,15 +86,20 @@ void projectile_manager::tick(battle_manager& manage, float step_s)
 
         for(auto& i : manage.ships)
         {
-            if(projectile_within_ship(p, i.second))
+            std::vector<ship*>& slist = i.second;
+
+            for(auto& kk : slist)
             {
-                //printf("hi\n");
+                if(projectile_within_ship(p, kk))
+                {
+                    //printf("hi\n");
 
-                i.second->hit(p);
+                    kk->hit(p);
 
-                destroy(p);
-                kk--;
-                break;
+                    destroy(p);
+                    kk--;
+                    break;
+                }
             }
         }
     }
@@ -186,9 +191,10 @@ void tick_ai(battle_manager& battle_manage, float step_s)
     {
         int team = i.first;
 
-        ship& s = *i.second;
+        std::vector<ship*> slist = i.second;
 
-        tick_ship_ai(battle_manage, s, step_s);
+        for(ship* s : slist)
+            tick_ship_ai(battle_manage, *s, step_s);
     }
 }
 
@@ -198,37 +204,40 @@ void battle_manager::tick(float step_s)
 
     for(auto& i : ships)
     {
-        ship& s = *i.second;
+        for(auto& s : i.second)
+        {
+            std::vector<component> fired = s->fire();
+
+            for(auto& kk : fired)
+            {
+                vec2f cpos = s->local_pos;
+
+                projectile* p = projectile_manage.make_new();
+
+                p->local_pos = cpos;
+                p->local_rot = s->local_rot;
+
+                p->dim = {3, 2};
+
+                float roffset = randf_s(-0.025f, 0.025f);
+
+                p->local_rot += roffset;
+
+                p->pteam = s->team;
+
+                p->base = kk;
+
+                float speed = kk.get_tag(component_tag::SPEED);
+
+                p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
+
+                p->load(kk.get_weapon_type());
+            }
+        }
+        //ship& s = *i.second;
 
         //s.tick_all_components(step_s);
 
-        std::vector<component> fired = s.fire();
-
-        for(auto& i : fired)
-        {
-            vec2f cpos = s.local_pos;
-
-            projectile* p = projectile_manage.make_new();
-
-            p->local_pos = cpos;
-            p->local_rot = s.local_rot;
-
-            p->dim = {3, 2};
-
-            float roffset = randf_s(-0.025f, 0.025f);
-
-            p->local_rot += roffset;
-
-            p->pteam = s.team;
-
-            p->base = i;
-
-            float speed = i.get_tag(component_tag::SPEED);
-
-            p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
-
-            p->load(i.get_weapon_type());
-        }
     }
 
     projectile_manage.tick(*this, step_s);
@@ -264,62 +273,63 @@ void battle_manager::draw(sf::RenderWindow& win)
 
     for(auto& p : ships)
     {
-        ship* s = p.second;
-
-        sf::Texture& tex = s->tex;
-
-        sf::Sprite spr(tex);
-
-        spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
-        spr.setPosition({s->local_pos.x(), s->local_pos.y()});
-        spr.setRotation(r2d(s->local_rot));
-
-        if(s->highlight)
+        for(ship* s : p.second)
         {
-            /*float xlen = s->dim.x();
-            float ylen = s->dim.y();
+            sf::Texture& tex = s->tex;
 
-            int highlight_width = 5;
+            sf::Sprite spr(tex);
 
-            float xpixel = (xlen + highlight_width) / xlen;
-            float ypixel = (ylen + highlight_width) / ylen;
+            spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+            spr.setPosition({s->local_pos.x(), s->local_pos.y()});
+            spr.setRotation(r2d(s->local_rot));
 
-            spr.setColor(sf::Color(0, 128, 255));
-            spr.setScale(1.f * xpixel, 1.f * ypixel);
+            if(s->highlight)
+            {
+                /*float xlen = s->dim.x();
+                float ylen = s->dim.y();
+
+                int highlight_width = 5;
+
+                float xpixel = (xlen + highlight_width) / xlen;
+                float ypixel = (ylen + highlight_width) / ylen;
+
+                spr.setColor(sf::Color(0, 128, 255));
+                spr.setScale(1.f * xpixel, 1.f * ypixel);
+
+                win.draw(spr);
+
+                spr.setColor(sf::Color(255, 255, 255));
+                spr.setScale(1, 1);*/
+
+                spr.setColor(sf::Color(0, 128, 255));
+
+                int hw = 2;
+
+                for(int y=-hw; y<=hw; y++)
+                {
+                    for(int x=-hw; x<=hw; x++)
+                    {
+                        spr.setPosition(s->local_pos.x() + x, s->local_pos.y() + y);
+
+                        win.draw(spr);
+                    }
+                }
+
+                spr.setColor(sf::Color(255, 255, 255));
+
+                spr.setPosition(s->local_pos.x(), s->local_pos.y());
+            }
 
             win.draw(spr);
 
-            spr.setColor(sf::Color(255, 255, 255));
-            spr.setScale(1, 1);*/
-
-            spr.setColor(sf::Color(0, 128, 255));
-
-            int hw = 2;
-
-            for(int y=-hw; y<=hw; y++)
-            {
-                for(int x=-hw; x<=hw; x++)
-                {
-                    spr.setPosition(s->local_pos.x() + x, s->local_pos.y() + y);
-
-                    win.draw(spr);
-                }
-            }
-
-            spr.setColor(sf::Color(255, 255, 255));
-
-            spr.setPosition(s->local_pos.x(), s->local_pos.y());
+            s->highlight = false;
         }
-
-        win.draw(spr);
-
-        s->highlight = false;
     }
 }
 
 void battle_manager::add_ship(ship* s)
 {
-    ships[s->team] = s;
+    ships[s->team].push_back(s);
 
     vec2f team_positions[2] = {{500, 40}, {500, 400}};
 
@@ -339,18 +349,21 @@ ship* battle_manager::get_nearest_hostile(ship* s)
 
     for(auto& i : ships)
     {
-        if(i.second->team == team)
-            continue;
-
-        vec2f my_pos = s->local_pos;
-        vec2f their_pos = i.second->local_pos;
-
-        float dist = (my_pos - their_pos).length();
-
-        if(dist < min_dist)
+        for(ship* os : i.second)
         {
-            min_dist = dist;
-            found_ship = i.second;
+            if(os->team == team)
+                continue;
+
+            vec2f my_pos = s->local_pos;
+            vec2f their_pos = os->local_pos;
+
+            float dist = (my_pos - their_pos).length();
+
+            if(dist < min_dist)
+            {
+                min_dist = dist;
+                found_ship = os;
+            }
         }
     }
 
@@ -361,8 +374,11 @@ ship* battle_manager::get_ship_under(vec2f pos)
 {
     for(auto& i : ships)
     {
-        if(point_within_ship(pos, i.second))
-            return i.second;
+        for(auto& kk : i.second)
+        {
+            if(point_within_ship(pos, kk))
+                return kk;
+        }
     }
 
     return nullptr;
@@ -375,9 +391,12 @@ void battle_manager::set_view(system_manager& system_manage)
 
     for(auto& i : ships)
     {
-        avg += i.second->local_pos;
+        for(auto& kk : i.second)
+        {
+            avg += kk->local_pos;
 
-        num++;
+            num++;
+        }
     }
 
     if(num > 0)
@@ -420,9 +439,19 @@ void all_battles_manager::tick(float step_s)
     }
 }
 
+void all_battles_manager::draw_viewing(sf::RenderWindow& win)
+{
+    if(currently_viewing == nullptr)
+        return;
+
+    currently_viewing->draw(win);
+}
+
 battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
 {
     battle_manager* bm = make_new();
+
+    int nships = 0;
 
     for(orbital* o : t1)
     {
@@ -434,8 +463,10 @@ battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
         for(ship* s : sm->ships)
         {
             bm->add_ship(s);
+
+            nships++;
         }
     }
 
-    printf("made new battle with %i\n", t1.size());
+    printf("made new battle with %i %i\n", t1.size(), nships);
 }

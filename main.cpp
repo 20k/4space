@@ -411,8 +411,11 @@ void debug_menu(const std::vector<ship*>& ships)
     ImGui::End();
 }
 
-void debug_battle(battle_manager& battle, sf::RenderWindow& win, bool lclick)
+void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick)
 {
+    if(battle == nullptr)
+        return;
+
     sf::Mouse mouse;
 
     int x = mouse.getPosition(win).x;
@@ -420,7 +423,7 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win, bool lclick)
 
     auto transformed = win.mapPixelToCoords({x, y});
 
-    ship* s = battle.get_ship_under({transformed.x, transformed.y});
+    ship* s = battle->get_ship_under({transformed.x, transformed.y});
 
     if(s)
     {
@@ -436,8 +439,40 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win, bool lclick)
 
     if(ImGui::Button("Step Battle 1s"))
     {
-        battle.tick(1.f);
+        battle->tick(1.f);
     }
+
+    ImGui::End();
+}
+
+void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick)
+{
+    ImGui::Begin("Ongoing Battles");
+
+    for(int i=0; i<all_battles.battles.size(); i++)
+    {
+        battle_manager* bm = all_battles.battles[i];
+
+        for(auto& i : bm->ships)
+        {
+            for(ship* kk : i.second)
+            {
+                std::string name = kk->name;
+                std::string team = std::to_string(kk->team);
+
+                ImGui::Text((team + " | " + name).c_str());
+            }
+        }
+
+        ImGui::Text("(Jump To)");
+
+        if(ImGui::IsItemClicked())
+        {
+            all_battles.currently_viewing = bm;
+        }
+    }
+
+    debug_battle(all_battles.currently_viewing, win, lclick);
 
     ImGui::End();
 }
@@ -1037,11 +1072,16 @@ int main()
 
         handle_camera(window, system_manage);
 
+        debug_all_battles(all_battles, window, lclick);
+
         if(state == 1)
         {
-            debug_battle(*battle, window, lclick);
+            //debug_battle(*battle, window, lclick);
 
-            battle->draw(window);
+
+            all_battles.draw_viewing(window);
+
+            //battle->draw(window);
         }
 
         if(state == 0 || state == 2)
