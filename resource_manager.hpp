@@ -92,9 +92,9 @@ struct resource_manager
     void draw_ui(sf::RenderWindow& win);
 
     std::string get_unprocessed_str();
-    std::string get_processed_str();
+    std::string get_processed_str(bool can_skip);
 
-    std::string get_formatted_str();
+    std::string get_formatted_str(bool can_skip = true);
 
     bool has_any_processed();
 };

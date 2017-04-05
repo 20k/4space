@@ -112,7 +112,7 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
 
     ImGui::EndGroup();*/
 
-    auto str = get_formatted_str();
+    auto str = get_formatted_str(false);
 
     ImGui::Text(str.c_str());
 
@@ -150,7 +150,7 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
     return ret;
 }*/
 
-std::string resource_manager::get_processed_str()
+std::string resource_manager::get_processed_str(bool can_skip)
 {
     std::vector<std::string> names;
     std::vector<std::string> vals;
@@ -161,7 +161,7 @@ std::string resource_manager::get_processed_str()
 
         std::string val = "(" + to_string_with_enforced_variable_dp(elem.amount) + ")";
 
-        if(fabs(elem.amount) <= 0.001f)
+        if(can_skip && fabs(elem.amount) <= 0.001f)
             continue;
 
         names.push_back(name);
@@ -187,9 +187,9 @@ std::string resource_manager::get_processed_str()
     return ret;
 }
 
-std::string resource_manager::get_formatted_str()
+std::string resource_manager::get_formatted_str(bool can_skip)
 {
-    return get_processed_str();
+    return get_processed_str(can_skip);
 
     #if 0
 
