@@ -333,6 +333,22 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }
 
+namespace popup_element_type
+{
+    enum types
+    {
+        RESUPPLY,
+        ENGAGE,
+        COUNT
+    };
+}
+
+struct button_element
+{
+    std::string name;
+    bool pressed = false;
+};
+
 struct popup_element
 {
     static int gid;
@@ -343,8 +359,7 @@ struct popup_element
     std::deque<bool> checked;
     bool mergeable = false;
 
-    std::vector<std::string> buttons;
-    std::deque<bool> buttons_pressed;
+    std::map<popup_element_type::types, button_element> buttons_map;
 
     void* element = nullptr;
 };
@@ -488,8 +503,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     {
                         elem.mergeable = true;
 
-                        elem.buttons.push_back("Resupply");
-                        elem.buttons_pressed.push_back(false);
+                        elem.buttons_map[popup_element_type::RESUPPLY] = {"Resupply", false};
                     }
 
                     popup.elements.push_back(elem);
@@ -503,6 +517,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 }
             }
 
+            ///dis me
             if(popup.fetch(orb) != nullptr)
             {
                 selected.push_back(orb);
@@ -573,12 +588,10 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     for(popup_element& elem : popup.elements)
     {
-        assert(elem.buttons.size() == elem.buttons_pressed.size());
-
-        for(int i=0; i<elem.buttons.size(); i++)
+        for(auto& map_element : elem.buttons_map)
         {
             ///this seems the least hitler method we have so far to handle this
-            if(elem.buttons[i] == "Resupply" && elem.buttons_pressed[i])
+            if(map_element.first == popup_element_type::RESUPPLY && map_element.second.pressed)
             {
                 orbital* o = (orbital*)elem.element;
 
@@ -676,11 +689,13 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             }
         }
 
-        assert(i.buttons.size() == i.buttons_pressed.size());
+        int kk = 0;
 
-        for(int kk=0; kk<i.buttons.size(); kk++)
+        for(auto& map_element : i.buttons_map)
         {
-            i.buttons_pressed[kk] = ImGui::Button((i.buttons[kk] + "##" + std::to_string(kk) + std::to_string(g_elem_id)).c_str());
+            map_element.second.pressed = ImGui::Button((map_element.second.name + "##" + std::to_string(kk) + std::to_string(g_elem_id)).c_str());
+
+            kk++;
         }
 
         g_elem_id++;
