@@ -484,6 +484,12 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                     term = true;
                 }
+
+
+                if(orb->is_resource_object)
+                {
+                    ImGui::SetTooltip(orb->produced_resources_ps.get_formatted_str().c_str());
+                }
             }
 
             if(popup.fetch(orb) != nullptr)
