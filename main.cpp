@@ -690,43 +690,62 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
     {
         if(ImGui::Button("Make New Fleet"))
         {
-            ship_manager* ns = fleet_manage.make_new();
+            bool bad = false;
 
-            vec2f fleet_pos;
+            ship* test_ship = (*potential_new_fleet.begin());
 
-            float fleet_angle = 0;
-            float fleet_length = 200;
-            empire* parent = nullptr;
+            orbital_system* test_parent = all_systems.get_by_element(test_ship->owned_by);
 
             for(ship* i : potential_new_fleet)
             {
-                ///we don't want to free associated orbital if it still exists from empire
-                ///only an issue if we cull, which is why ownership is culled there
-                orbital* real = current_system->get_by_element((void*)i->owned_by);
-
-                if(real != nullptr)
-                {
-                    parent = real->parent_empire;
-
-                    fleet_pos = real->absolute_pos;
-
-                    fleet_angle = real->orbital_angle;
-                    fleet_length = real->orbital_length;
-                }
-
-                ns->steal(i);
+                if(all_systems.get_by_element(i->owned_by) != test_parent)
+                    bad = true;
             }
 
-            orbital* associated = current_system->make_new(orbital_info::FLEET, 5.f);
-            associated->parent = current_system->get_base();
-            associated->set_orbit(fleet_pos);
-            associated->data = ns;
+            if(!bad)
+            {
+                ship_manager* ns = fleet_manage.make_new();
 
-            parent->take_ownership(associated);
-            parent->take_ownership(ns);
+                vec2f fleet_pos;
 
-            popup.elements.clear();
-            popup.going = false;
+                float fleet_angle = 0;
+                float fleet_length = 200;
+                empire* parent = nullptr;
+
+                for(ship* i : potential_new_fleet)
+                {
+                    ///we don't want to free associated orbital if it still exists from empire
+                    ///only an issue if we cull, which is why ownership is culled there
+                    orbital* real = current_system->get_by_element((void*)i->owned_by);
+
+                    if(real != nullptr)
+                    {
+                        parent = real->parent_empire;
+
+                        fleet_pos = real->absolute_pos;
+
+                        fleet_angle = real->orbital_angle;
+                        fleet_length = real->orbital_length;
+                    }
+
+                    ns->steal(i);
+                }
+
+                orbital* associated = current_system->make_new(orbital_info::FLEET, 5.f);
+                associated->parent = current_system->get_base();
+                associated->set_orbit(fleet_pos);
+                associated->data = ns;
+
+                parent->take_ownership(associated);
+                parent->take_ownership(ns);
+
+                popup.elements.clear();
+                popup.going = false;
+            }
+            else
+            {
+                printf("Tried to create fleets cross systems\c");
+            }
         }
     }
 
@@ -1006,7 +1025,7 @@ int main()
 
         //printf("prepp\n");
 
-        do_popup(popup, fleet_manage, system_manage, base, empire_manage);
+        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage);
 
         //printf("precull\n");
 

@@ -755,6 +755,20 @@ orbital_system* system_manager::get_parent(orbital* o)
     return nullptr;
 }
 
+orbital_system* system_manager::get_by_element(void* ptr)
+{
+    for(auto& i : systems)
+    {
+        for(auto& m : i->orbitals)
+        {
+            if(m->data == ptr)
+                return i;
+        }
+    }
+
+    return nullptr;
+}
+
 void system_manager::tick(float step_s)
 {
     for(auto& i : systems)
