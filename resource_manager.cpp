@@ -4,9 +4,14 @@
 #include "util.hpp"
 #include <vec/vec.hpp>
 
-resource::types resource::get_random_unprocessed()
+/*resource::types resource::get_random_unprocessed()
 {
     return (resource::types)randf_s(0.f, resource::unprocessed_end);
+}*/
+
+resource::types resource::get_random_processed()
+{
+    return (resource::types)randf_s(resource::unprocessed_end, resource::COUNT);
 }
 
 bool resource::is_processed(resource::types type)
@@ -39,7 +44,7 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
 {
     ImGui::Begin("Resources");
 
-    std::vector<std::string> names_up;
+    /*std::vector<std::string> names_up;
     std::vector<std::string> vals_up;
 
     std::vector<std::string> names_p;
@@ -105,12 +110,16 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
         }
     }
 
-    ImGui::EndGroup();
+    ImGui::EndGroup();*/
+
+    auto str = get_formatted_str();
+
+    ImGui::Text(str.c_str());
 
     ImGui::End();
 }
 
-std::string resource_manager::get_unprocessed_str()
+/*std::string resource_manager::get_unprocessed_str()
 {
     std::vector<std::string> names;
     std::vector<std::string> vals;
@@ -139,7 +148,7 @@ std::string resource_manager::get_unprocessed_str()
     }
 
     return ret;
-}
+}*/
 
 std::string resource_manager::get_processed_str()
 {
@@ -150,7 +159,7 @@ std::string resource_manager::get_processed_str()
     {
         std::string name = resource::short_names[elem.type];
 
-        std::string val = "(" + to_string_with_variable_prec(elem.amount) + ")";
+        std::string val = "(" + to_string_with_enforced_variable_dp(elem.amount) + ")";
 
         if(fabs(elem.amount) <= 0.001f)
             continue;
@@ -180,6 +189,10 @@ std::string resource_manager::get_processed_str()
 
 std::string resource_manager::get_formatted_str()
 {
+    return get_processed_str();
+
+    #if 0
+
     std::vector<std::string> names_up;
     std::vector<std::string> vals_up;
 
@@ -248,6 +261,7 @@ std::string resource_manager::get_formatted_str()
     }
 
     return ret;
+    #endif
 }
 
 bool resource_manager::has_any_processed()

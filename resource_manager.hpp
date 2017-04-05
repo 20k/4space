@@ -8,12 +8,12 @@ namespace resource
 {
     enum types
     {
-        ICE,
+        /*ICE,
         COPPER_ORE,
         NITRATES,
         IRON_ORE,
         TITANIUM_ORE,
-        URANIUM_ORE,
+        URANIUM_ORE,*/
 
         OXYGEN,
         COPPER,
@@ -26,12 +26,12 @@ namespace resource
 
     static std::vector<std::string> names =
     {
-        "Ice",
+        /*"Ice",
         "Copper Sulfide",
         "Nitrates", ///? Maybe good for coolant? Farming and civics?
         "Meteoric Iron",
         "Titanium Dioxide", ///has oxygen
-        "Uraninite", ///has oxygen
+        "Uraninite", ///has oxygen*/
 
         "Oxygen",
         "Copper",
@@ -44,12 +44,12 @@ namespace resource
 
     static std::vector<std::string> short_names =
     {
-        "H20(s)",
+        /*"H20(s)",
         "CuS",
         "NO2",
         "FE,NI",
         "TiO2",
-        "UO2",
+        "UO2",*/
 
         "O2",
         "Cu",
@@ -60,7 +60,8 @@ namespace resource
         "WTF",
     };
 
-    types get_random_unprocessed();
+    //types get_random_unprocessed();
+    types get_random_processed();
 
     static types unprocessed_end = OXYGEN;
 

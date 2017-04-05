@@ -333,7 +333,7 @@ void orbital::make_random_resource_asteroid(float total_ps)
 
     for(int i=0; i<num_resources; i++)
     {
-        int rand_res = (int)resource::get_random_unprocessed();
+        int rand_res = (int)resource::get_random_processed();
 
         produced_resources_ps.resources[rand_res].amount += randf_s(0.25f, total_ps);
     }
@@ -352,12 +352,12 @@ void orbital::make_random_resource_planet(float total_ps)
 
     std::map<resource::types, float> ore_mults;
 
-    ore_mults[resource::ICE] = 1.f;
+    /*ore_mults[resource::ICE] = 1.f;
     ore_mults[resource::COPPER_ORE] = 0.2;
     ore_mults[resource::NITRATES] = 1.f;
     ore_mults[resource::IRON_ORE] = 0.3;
     ore_mults[resource::TITANIUM_ORE] = 0.1;
-    ore_mults[resource::URANIUM_ORE] = 0.1;
+    ore_mults[resource::URANIUM_ORE] = 0.1;*/
 
     ore_mults[resource::OXYGEN] = 2.f;
     ore_mults[resource::COPPER] = 0.05f;
