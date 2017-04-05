@@ -1728,6 +1728,28 @@ void ship_manager::leave_combat()
     }
 }
 
+bool ship_manager::any_in_combat()
+{
+    for(ship* s : ships)
+    {
+        if(s->in_combat())
+            return true;
+    }
+
+    return false;
+}
+
+bool ship_manager::can_engage()
+{
+    for(ship* s : ships)
+    {
+        if(s->can_engage())
+            return true;
+    }
+
+    return false;
+}
+
 void ship_manager::apply_disengage_penalty()
 {
     for(ship* s : ships)

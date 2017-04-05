@@ -355,6 +355,8 @@ struct ship_manager
 
     void leave_combat();
     void enter_combat();
+    bool any_in_combat();
+    bool can_engage();
 
     void apply_disengage_penalty();
 };

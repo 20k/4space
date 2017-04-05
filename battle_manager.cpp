@@ -513,7 +513,7 @@ bool battle_manager::any_in_fleet_involved(ship_manager* sm)
     return false;
 }
 
-void battle_manager::destructive_merge_into_me(battle_manager* bm)
+void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles)
 {
     for(auto& i : bm->projectile_manage.projectiles)
     {
@@ -526,6 +526,11 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm)
         {
             add_ship(sh);
         }
+    }
+
+    if(all_battles.currently_viewing == bm)
+    {
+        all_battles.currently_viewing = this;
     }
 }
 
@@ -605,7 +610,7 @@ battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
 
             if(bfind->any_in_fleet_involved(sm))
             {
-                bm->destructive_merge_into_me(bfind);
+                bm->destructive_merge_into_me(bfind, *this);
 
                 destroy(bfind);
 

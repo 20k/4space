@@ -42,6 +42,8 @@ struct projectile_manager
     void draw(sf::RenderWindow& win);
 };
 
+struct all_battles_manager;
+
 struct battle_manager
 {
     projectile_manager projectile_manage;
@@ -68,7 +70,7 @@ struct battle_manager
 
     bool any_in_fleet_involved(ship_manager* sm);
 
-    void destructive_merge_into_me(battle_manager* bm);
+    void destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles);
 
     ///to show the player why they can't disengage
 };

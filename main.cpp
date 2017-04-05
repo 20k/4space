@@ -346,6 +346,7 @@ namespace popup_element_type
     {
         RESUPPLY,
         ENGAGE,
+        ENGAGE_COOLDOWN,
         COUNT
     };
 }
@@ -548,6 +549,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
         for(orbital* orb : sys->orbitals)
         {
+            ///not necessarily valid
+            ship_manager* sm = (ship_manager*)orb->data;
+
             if(system_manage.in_system_view() && orb->point_within({transformed.x, transformed.y}))
             {
                 if(first)
@@ -572,7 +576,8 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                     ///disabling merging here and resupply invalides all fleet actions except moving atm
                     ///unexpected fix to fleet merging problem
-                    if(orb->type == orbital_info::FLEET && orb->parent_empire == player_empire)
+                    ///disable resupply if in combat
+                    if(orb->type == orbital_info::FLEET && orb->parent_empire == player_empire && !sm->any_in_combat())
                     {
                         elem.mergeable = true;
 
@@ -600,13 +605,22 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 ///if orb not a fleet, this is empty
                 std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
 
-                if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire)
+                if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage())
                 {
                     elem.buttons_map[popup_element_type::ENGAGE].name = "Engage Fleets";
                 }
                 else
                 {
                     elem.buttons_map.erase(popup_element_type::ENGAGE);
+                }
+
+                if(orb->type == orbital_info::FLEET && !sm->can_engage())
+                {
+                    elem.buttons_map[popup_element_type::ENGAGE_COOLDOWN].name = "Test";
+                }
+                else
+                {
+                    elem.buttons_map.erase(popup_element_type::ENGAGE_COOLDOWN);
                 }
 
                 selected.push_back(orb);
@@ -693,9 +707,15 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             {
                 orbital* o = (orbital*)elem.element;
 
+                assert(o);
+
                 ship_manager* sm = (ship_manager*)o->data;
 
+                assert(sm);
+
                 orbital_system* parent = o->parent_system;
+
+                assert(parent);
 
                 std::vector<orbital*> hostile_fleets = parent->get_fleets_within_engagement_range(o);
 
