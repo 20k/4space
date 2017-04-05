@@ -127,6 +127,16 @@ void projectile_manager::destroy(projectile* proj)
     }
 }
 
+void projectile_manager::destroy_all()
+{
+    for(auto& i : projectiles)
+    {
+        delete i;
+    }
+
+    projectiles.clear();
+}
+
 void projectile_manager::draw(sf::RenderWindow& win)
 {
     /*sf::RectangleShape rect;
@@ -413,6 +423,11 @@ void battle_manager::set_view(system_manager& system_manage)
     system_manage.camera = avg;
 }
 
+bool battle_manager::can_disengage()
+{
+    return true;
+}
+
 battle_manager* all_battles_manager::make_new()
 {
     battle_manager* bm = new battle_manager;
@@ -429,6 +444,9 @@ void all_battles_manager::destroy(battle_manager* bm)
         if(battles[i] == bm)
         {
             delete bm;
+            battles.erase(battles.begin() + i);
+            i--;
+
             return;
         }
     }
@@ -487,5 +505,15 @@ battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
         }
     }
 
-    printf("made new battle with %i %i\n", t1.size(), nships);
+    //printf("made new battle with %i %i\n", t1.size(), nships);
+}
+
+void all_battles_manager::disengage(battle_manager* bm)
+{
+    bm->projectile_manage.destroy_all();
+
+    if(bm == currently_viewing)
+        currently_viewing = nullptr;
+
+    destroy(bm);
 }

@@ -37,6 +37,7 @@ struct projectile_manager
     void tick(battle_manager& manager, float step_s);
 
     void destroy(projectile* proj);
+    void destroy_all();
 
     void draw(sf::RenderWindow& win);
 };
@@ -60,6 +61,8 @@ struct battle_manager
     ship* get_ship_under(vec2f pos);
 
     void set_view(system_manager& system_manage);
+
+    bool can_disengage();
 };
 
 struct orbital;
@@ -79,6 +82,8 @@ struct all_battles_manager
     void set_viewing(battle_manager* bm, system_manager& system_manage, bool jump = false);
 
     battle_manager* make_new_battle(std::vector<orbital*> t1);
+
+    void disengage(battle_manager* bm);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

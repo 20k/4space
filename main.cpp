@@ -470,6 +470,15 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         {
             all_battles.set_viewing(bm, system_manage);
         }
+
+        ImGui::Text("(Disengage)");
+
+        if(ImGui::IsItemClicked())
+        {
+            all_battles.disengage(bm);
+            i--;
+            continue;
+        }
     }
 
     debug_battle(all_battles.currently_viewing, win, lclick);
@@ -562,7 +571,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 ///if orb not a fleet, this is empty
                 std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
 
-                if(hostile_fleets.size() > 0)
+                if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire)
                 {
                     elem.buttons_map[popup_element_type::ENGAGE].name = "Engage Fleets";
                 }
