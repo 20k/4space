@@ -477,8 +477,17 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             {
                 std::string name = kk->name;
                 std::string team = std::to_string(kk->team);
+                float damage = kk->get_stored_resources()[ship_component_elements::HP];
+                float damage_max = kk->get_max_resources()[ship_component_elements::HP];
 
-                ImGui::Text((team + " | " + name).c_str());
+                std::string damage_str = "(" + to_string_with_enforced_variable_dp(damage) + "/" + to_string_with_enforced_variable_dp(damage_max) + ")";
+
+                ImGui::Text((team + " | " + name + " " + damage_str).c_str());
+
+                if(ImGui::IsItemClicked())
+                {
+                    kk->display_ui = !kk->display_ui;
+                }
             }
         }
 
