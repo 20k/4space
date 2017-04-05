@@ -1310,7 +1310,32 @@ ship::~ship()
 
 void ship::resupply(empire& emp)
 {
+    std::vector<ship_component_elements::types> types =
+    {
+        ship_component_elements::AMMO,
+        ship_component_elements::FUEL,
+        ship_component_elements::ARMOUR,
+        ship_component_elements::HP
+    };
 
+    for(ship_component_elements::types& type : types)
+    {
+        float current_capacity = get_available_capacities()[type];
+
+        std::map<resource::types, float> requested_resource_amounts = ship_component_elements::component_storage_to_resources(type);
+
+        for(auto& i : requested_resource_amounts)
+            i.second *= current_capacity;
+
+        float efficiency_frac;
+
+        std::map<resource::types, float> gotten = emp.dispense_resources_proportionally(requested_resource_amounts, efficiency_frac);
+
+        std::map<ship_component_elements::types, float> to_add;
+        to_add[type] = efficiency_frac * current_capacity;
+
+        distribute_resources(to_add);
+    }
 }
 
 ship* ship_manager::make_new(int team)

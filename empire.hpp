@@ -2,6 +2,7 @@
 #define EMPIRE_HPP_INCLUDED
 
 #include "resource_manager.hpp"
+#include <map>
 
 struct orbital;
 struct orbital_system;
@@ -31,6 +32,7 @@ struct empire
 
     ///returns real amount
     float dispense_resource(resource::types type, float requested);
+    std::map<resource::types, float> dispense_resources_proportionally(const std::map<resource::types, float>& type, float& frac_out);
 };
 
 #endif // EMPIRE_HPP_INCLUDED

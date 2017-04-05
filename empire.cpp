@@ -119,3 +119,43 @@ float empire::dispense_resource(resource::types type, float requested)
 
     return real;
 }
+
+std::map<resource::types, float> empire::dispense_resources_proportionally(const std::map<resource::types, float>& type, float& frac_out)
+{
+    float min_frac = 1.f;
+
+    for(auto& i : type)
+    {
+        float available = resources.resources[(int)i.first].amount;
+
+        float requested = i.second;
+
+        if(available < 0.001f)
+        {
+            min_frac = 0;
+            continue;
+        }
+
+        if(requested < 0.001f)
+        {
+            continue;
+        }
+
+        ///so if available > requested for all, we'll request requested
+        ///of available < requested, we'll get eg 0.5 / 1.f = 0.5, and all will request 50% of their request
+        min_frac = std::min(min_frac, available / requested);
+    }
+
+    min_frac = std::min(min_frac, 1.f);
+
+    std::map<resource::types, float> ret;
+
+    for(auto& i : type)
+    {
+        ret[i.first] = dispense_resource(i.first, i.second * min_frac);
+    }
+
+    frac_out = min_frac;
+
+    return ret;
+}
