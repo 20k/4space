@@ -222,6 +222,7 @@ struct component
 
 struct projectile;
 struct ship_manager;
+struct empire;
 
 struct ship : positional
 {
@@ -300,6 +301,9 @@ struct ship_manager
 
     ///from other ship manager
     void steal(ship* const s);
+
+        empire* parent_empire = nullptr;
+
 };
 
 ///manages fleets

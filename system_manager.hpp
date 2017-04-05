@@ -73,6 +73,8 @@ struct sprite_renderable
     void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col = {1,1,1}, bool highlight = false);
 };
 
+struct empire;
+
 struct orbital
 {
     float internal_time_s = 0.f;
@@ -133,6 +135,8 @@ struct orbital
     void make_random_resource_planet(float max_ps);
 
     bool can_dispense_resources();
+
+    empire* parent_empire = nullptr;
 };
 
 struct orbital_system

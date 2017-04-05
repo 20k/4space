@@ -10,6 +10,8 @@ void empire::take_ownership(orbital* o)
             return;
     }
 
+    o->parent_empire = this;
+
     owned.push_back(o);
 }
 
@@ -27,6 +29,8 @@ void empire::release_ownership(orbital* o)
     {
         if(*it == o)
         {
+            o->parent_empire = nullptr;
+
             owned.erase(it);
             return;
         }
@@ -41,6 +45,8 @@ void empire::take_ownership(ship_manager* o)
             return;
     }
 
+    o->parent_empire = this;
+
     owned_fleets.push_back(o);
 }
 
@@ -50,6 +56,8 @@ void empire::release_ownership(ship_manager* o)
     {
         if(*it == o)
         {
+            o->parent_empire = nullptr;
+
             owned_fleets.erase(it);
             return;
         }
