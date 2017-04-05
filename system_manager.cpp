@@ -335,7 +335,7 @@ void orbital::make_random_resource_asteroid(float total_ps)
     {
         int rand_res = (int)resource::get_random_processed();
 
-        produced_resources_ps.resources[rand_res].amount += randf_s(0.25f, total_ps);
+        produced_resources_ps.resources[rand_res].amount += randf_s(0.25f, total_ps) * resource::global_resource_multiplier;
     }
 
     col = {1, 0.8, 0};
@@ -368,7 +368,7 @@ void orbital::make_random_resource_planet(float total_ps)
 
     for(auto& i : ore_mults)
     {
-        produced_resources_ps.resources[i.first].amount += randf_s(0.55f, total_ps) * i.second;
+        produced_resources_ps.resources[i.first].amount += randf_s(0.55f, total_ps) * i.second * resource::global_resource_multiplier;
     }
 
     is_resource_object = true;

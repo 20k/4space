@@ -131,6 +131,11 @@ struct orbital
 
     void make_random_resource_asteroid(float max_ps);
     void make_random_resource_planet(float max_ps);
+
+    bool can_dispense_resources();
+
+    ///returns real amount
+    float dispense_resource(float requested, resource::types& type);
 };
 
 struct orbital_system

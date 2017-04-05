@@ -66,6 +66,8 @@ namespace resource
     static types unprocessed_end = OXYGEN;
 
     bool is_processed(types type);
+
+    static float global_resource_multiplier = 0.1f;
 }
 
 struct resource_element
