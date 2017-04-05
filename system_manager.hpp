@@ -169,6 +169,9 @@ struct orbital_system
     void generate_planet_resources(float max_ps);
 
     void draw_alerts(sf::RenderWindow& win);
+
+    void generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids);
+    void generate_full_random_system();
 };
 
 struct system_manager

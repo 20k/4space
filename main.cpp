@@ -811,6 +811,9 @@ int main()
     hostile_empire->take_ownership(fleet2);
     hostile_empire->take_ownership(ohostile_fleet);
 
+    orbital_system* sys_2 = system_manage.make_new();
+    sys_2->generate_random_system(3, 100, 3, 5);
+
 
     popup_info popup;
 
@@ -844,10 +847,15 @@ int main()
             state = (state + 1) % 2;
         }
 
-        if(once<sf::Keyboard::F2>())
+        if(once<sf::Keyboard::F3>())
+        {
+            state = 2;
+        }
+
+        /*if(once<sf::Keyboard::F2>())
         {
             test_ship->resupply(*player_empire);
-        }
+        }*/
 
         bool lclick = once<sf::Mouse::Left>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
         bool rclick = once<sf::Mouse::Right>() && !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
@@ -870,6 +878,12 @@ int main()
             sun->center_camera(window);
             debug_system(system_manage, window, lclick, rclick, popup, player_empire);
             base->draw(window, player_empire);
+        }
+        if(state == 2)
+        {
+            sys_2->get_base()->center_camera(window);
+            debug_system(system_manage, window,lclick, rclick, popup, player_empire);
+            sys_2->draw(window, player_empire);
         }
 
         //printf("ui\n");

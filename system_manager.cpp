@@ -7,6 +7,8 @@
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
+    vert_dist.clear();
+
     for(int i=0; i<n; i++)
     {
         vert_dist.push_back(randf_s(min_rad, max_rad));
@@ -248,7 +250,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     if(parent_empire != viewer_empire)
     {
         base_sprite_col = base_sprite_col * hostile_empire_mult;
-        current_simple_col = current_simple_col * hostile_empire_mult;
+        //current_simple_col = current_simple_col * hostile_empire_mult;
     }
 
     if(render_type == 0)
@@ -359,6 +361,12 @@ void orbital::make_random_resource_asteroid(float total_ps)
         int rand_res = (int)resource::get_random_processed();
 
         produced_resources_ps.resources[rand_res].amount += randf_s(0.25f, total_ps) * resource::global_resource_multiplier;
+    }
+
+    if(rad < 2.3)
+    {
+        simple_renderable.init(simple_renderable.vert_dist.size(), 2.3, 2.3);
+        rad = 2.3;
     }
 
     col = {1, 0.8, 0};
@@ -628,6 +636,60 @@ void orbital_system::draw_alerts(sf::RenderWindow& win)
     {
         o->draw_alerts(win);
     }
+}
+
+void orbital_system::generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids)
+{
+    float min_srad = 8.f;
+    float max_srad = 15.f;
+
+    orbital* sun = make_new(orbital_info::STAR, randf_s(min_srad, max_srad), 10);
+    sun->rotation_velocity_ps = randf_s(2*M_PI/120.f, 2*M_PI/8.f);
+    sun->absolute_pos = {0,0};
+
+    bool has_close_partner = randf_s(0.f, 1.f) < 0.3f;
+
+    float min_planet_distance = 60.f;
+
+    if(!has_close_partner)
+    {
+        min_planet_distance = 150.f;
+    }
+
+    float max_planet_distance = 400.f;
+
+    float randomness = 40.f;
+
+    int min_verts = 5;
+    int max_verts = 15;
+
+    float min_rad = 3.f;
+    float max_rad = 8.f;
+
+    for(int i=0; i<planets; i++)
+    {
+        orbital* planet = make_new(orbital_info::PLANET, randf_s(min_rad, max_rad), randf_s(min_verts, max_verts));
+
+        float nfrac = (float)i / planets;
+
+        float ndist = nfrac * (max_planet_distance - min_planet_distance) + min_planet_distance;
+
+        float rdist = ndist + randf_s(-randomness, randomness);
+
+        if(rdist < 60)
+        {
+            rdist = 60;
+        }
+
+        planet->orbital_length = rdist;
+        planet->orbital_angle = randf_s(0.f, 2*M_PI);
+        planet->rotation_velocity_ps = randf_s(0.f, 2*M_PI/10.f);
+
+        planet->parent = sun;
+    }
+
+    generate_asteroids(num_asteroids, num_belts, num_resource_asteroids);
+    generate_planet_resources(2.f);
 }
 
 orbital_system* system_manager::make_new()
