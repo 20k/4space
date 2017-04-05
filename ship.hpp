@@ -98,7 +98,7 @@ namespace ship_component_elements
         "WC",
     };
 
-    resource::types component_storage_to_resource(types& type);
+    std::map<resource::types, float> component_storage_to_resources(types& type);
 }
 
 ///misc tags

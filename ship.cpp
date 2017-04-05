@@ -4,6 +4,34 @@
 
 int ship::gid;
 
+std::map<resource::types, float> ship_component_elements::component_storage_to_resources(types& type)
+{
+    std::map<resource::types, float> ret;
+
+    if(type == AMMO)
+    {
+        ret[resource::IRON] = 1;
+    }
+
+    if(type == FUEL)
+    {
+        ret[resource::URANIUM] = 1;
+    }
+
+    if(type == ARMOUR)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 0.5f;
+    }
+
+    if(type == HP)
+    {
+        ret[resource::IRON] = 1;
+    }
+
+    return ret;
+}
+
 float component_attribute::add_amount(float amount)
 {
     cur_amount += amount;
