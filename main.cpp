@@ -445,7 +445,7 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick)
     ImGui::End();
 }
 
-void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick)
+void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage)
 {
     ImGui::Begin("Ongoing Battles");
 
@@ -468,7 +468,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
         if(ImGui::IsItemClicked())
         {
-            all_battles.currently_viewing = bm;
+            all_battles.set_viewing(bm, system_manage);
         }
     }
 
@@ -1045,6 +1045,9 @@ int main()
             {
                 ///need way to view any battle
                 //battle->set_view(system_manage);
+                if(all_battles.currently_viewing != nullptr)
+                    all_battles.currently_viewing->set_view(system_manage);
+
                 system_manage.set_viewed_system(nullptr);
             }
         }
@@ -1072,7 +1075,7 @@ int main()
 
         handle_camera(window, system_manage);
 
-        debug_all_battles(all_battles, window, lclick);
+        debug_all_battles(all_battles, window, lclick, system_manage);
 
         if(state == 1)
         {

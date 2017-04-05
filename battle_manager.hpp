@@ -76,6 +76,7 @@ struct all_battles_manager
     void tick(float step_s);
 
     void draw_viewing(sf::RenderWindow& win);
+    void set_viewing(battle_manager* bm, system_manager& system_manage, bool jump = false);
 
     battle_manager* make_new_battle(std::vector<orbital*> t1);
 };

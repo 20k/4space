@@ -277,59 +277,52 @@ void battle_manager::draw(sf::RenderWindow& win)
         win.draw(rect);
     }*/
 
+    std::vector<ship*> linear_vec;
+
     for(auto& p : ships)
     {
         for(ship* s : p.second)
         {
-            sf::Texture& tex = s->tex;
+            linear_vec.push_back(s);
+        }
+    }
 
-            sf::Sprite spr(tex);
+    for(int i = linear_vec.size()-1; i >= 0; i--)
+    {
+        ship* s = linear_vec[i];
 
-            spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
-            spr.setPosition({s->local_pos.x(), s->local_pos.y()});
-            spr.setRotation(r2d(s->local_rot));
+        sf::Texture& tex = s->tex;
 
-            if(s->highlight)
+        sf::Sprite spr(tex);
+
+        spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+        spr.setPosition({s->local_pos.x(), s->local_pos.y()});
+        spr.setRotation(r2d(s->local_rot));
+
+        if(s->highlight)
+        {
+            spr.setColor(sf::Color(0, 128, 255));
+
+            int hw = 2;
+
+            for(int y=-hw; y<=hw; y++)
             {
-                /*float xlen = s->dim.x();
-                float ylen = s->dim.y();
-
-                int highlight_width = 5;
-
-                float xpixel = (xlen + highlight_width) / xlen;
-                float ypixel = (ylen + highlight_width) / ylen;
-
-                spr.setColor(sf::Color(0, 128, 255));
-                spr.setScale(1.f * xpixel, 1.f * ypixel);
-
-                win.draw(spr);
-
-                spr.setColor(sf::Color(255, 255, 255));
-                spr.setScale(1, 1);*/
-
-                spr.setColor(sf::Color(0, 128, 255));
-
-                int hw = 2;
-
-                for(int y=-hw; y<=hw; y++)
+                for(int x=-hw; x<=hw; x++)
                 {
-                    for(int x=-hw; x<=hw; x++)
-                    {
-                        spr.setPosition(s->local_pos.x() + x, s->local_pos.y() + y);
+                    spr.setPosition(s->local_pos.x() + x, s->local_pos.y() + y);
 
-                        win.draw(spr);
-                    }
+                    win.draw(spr);
                 }
-
-                spr.setColor(sf::Color(255, 255, 255));
-
-                spr.setPosition(s->local_pos.x(), s->local_pos.y());
             }
 
-            win.draw(spr);
+            spr.setColor(sf::Color(255, 255, 255));
 
-            s->highlight = false;
+            spr.setPosition(s->local_pos.x(), s->local_pos.y());
         }
+
+        win.draw(spr);
+
+        s->highlight = false;
     }
 }
 
@@ -460,6 +453,17 @@ void all_battles_manager::draw_viewing(sf::RenderWindow& win)
         return;
 
     currently_viewing->draw(win);
+}
+
+void all_battles_manager::set_viewing(battle_manager* bm, system_manager& system_manage, bool jump)
+{
+    currently_viewing = bm;
+
+    if(bm == nullptr)
+        return;
+
+    if(jump)
+        bm->set_view(system_manage);
 }
 
 battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
