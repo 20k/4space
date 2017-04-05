@@ -199,7 +199,7 @@ void battle_manager::tick(float step_s)
     {
         ship& s = *i.second;
 
-        s.tick_all_components(step_s);
+        //s.tick_all_components(step_s);
 
         std::vector<component> fired = s.fire();
 

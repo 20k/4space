@@ -494,7 +494,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     term = true;
                 }
 
-
                 if(orb->is_resource_object)
                 {
                     ImGui::SetTooltip(orb->produced_resources_ps.get_formatted_str().c_str());
@@ -831,6 +830,8 @@ int main()
                 window.close();
         }
 
+        ///BATTLE MANAGER IS NO LONGER TICKING SHIP COMPONENTS, IT IS ASSUMED TO BE DONE GLOBALLY WHICH WE WONT WANT
+        ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME
         if(key.isKeyPressed(sf::Keyboard::Num1))
         {
             battle.tick(diff_s);
@@ -896,6 +897,8 @@ int main()
 
         system_manage.cull_empty_orbital_fleets(empire_manage);
         fleet_manage.cull_dead(empire_manage);
+
+        fleet_manage.tick_all(diff_s);
 
         //printf("predrawres\n");
 

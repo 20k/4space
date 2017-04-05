@@ -105,6 +105,11 @@ component make_default_power_core()
     power.produced_per_s = 80.f;
     power.max_amount = 80.f;
 
+    component_attribute fuel;
+    fuel.max_amount = 1.f;
+    fuel.cur_amount = 1.f;
+    fuel.drained_per_s = fuel.max_amount / 1000;
+
     component_attribute hp;
     hp.max_amount = default_room_hp;
     hp.cur_amount = hp.max_amount;
@@ -112,6 +117,7 @@ component make_default_power_core()
     component core;
     core.add(ship_component_element::ENERGY, power);
     core.add(ship_component_element::HP, hp);
+    core.add(ship_component_element::FUEL, fuel);
 
     core.name = "Power Core";
 
@@ -120,12 +126,15 @@ component make_default_power_core()
 
 component make_default_engines()
 {
+    float max_bad_engine_lifetime_s = 1000;
+
     component_attribute fuel;
-    fuel.drained_per_s = 1.f;
-    fuel.max_amount = 5.f;
+    fuel.max_amount = 10.f;
+    fuel.cur_amount = 2.f;
+    fuel.drained_per_s = fuel.max_amount/max_bad_engine_lifetime_s;
 
     component_attribute power;
-    power.drained_per_s = 40.f;
+    power.drained_per_s = 10.f;
 
     component_attribute command;
     command.drained_per_s = 0.5f;

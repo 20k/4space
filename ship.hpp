@@ -185,6 +185,7 @@ struct component
     std::map<component_tag::tag, float> tag_list;
 
     bool has_element(const ship_component_element& type);
+    component_attribute get_element(const ship_component_element& type);
 
     ///ie calculate all offsets
     std::map<ship_component_element, float> get_timestep_diff(float step_s);
@@ -283,6 +284,9 @@ struct ship : positional
 
     void resupply(empire& emp, int num = 1);
 
+    bool can_move_in_system();
+    float get_move_system_speed();
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
@@ -310,6 +314,8 @@ struct ship_manager
     empire* parent_empire = nullptr;
 
     void resupply();
+
+    void tick_all(float step_s);
 };
 
 struct empire_manager;
@@ -324,6 +330,8 @@ struct fleet_manager
     void destroy(ship_manager*);
 
     void cull_dead(empire_manager& empire_manage);
+
+    void tick_all(float step_s);
 };
 
 #endif // SHIP_HPP_INCLUDED

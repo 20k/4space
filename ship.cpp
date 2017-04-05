@@ -261,6 +261,14 @@ bool component::has_element(const ship_component_element& type)
     return components.find(type) != components.end();
 }
 
+component_attribute component::get_element(const ship_component_element& type)
+{
+    if(!has_element(type))
+        return component_attribute();
+
+    return components[type];
+}
+
 std::map<ship_component_element, float> merge_diffs(const std::map<ship_component_element, float>& one, const std::map<ship_component_element, float>& two)
 {
     std::map<ship_component_element, float> ret = one;
@@ -1339,6 +1347,24 @@ void ship::resupply(empire& emp, int num)
     }
 }
 
+bool ship::can_move_in_system()
+{
+    float threshold_working_efficiency = 0.75f;
+
+    for(component& c : entity_list)
+    {
+        if(c.has_element(ship_component_elements::ENGINE_POWER))
+        {
+            component_attribute elem = c.get_element(ship_component_elements::ENGINE_POWER);
+
+            if(elem.cur_efficiency >= threshold_working_efficiency)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;
@@ -1440,6 +1466,14 @@ void ship_manager::resupply()
     }
 }
 
+void ship_manager::tick_all(float step_s)
+{
+    for(ship* s : ships)
+    {
+        s->tick_all_components(step_s);
+    }
+}
+
 ship_manager* fleet_manager::make_new()
 {
     ship_manager* ns = new ship_manager;
@@ -1482,5 +1516,13 @@ void fleet_manager::cull_dead(empire_manager& empire_manage)
 
             continue;
         }
+    }
+}
+
+void fleet_manager::tick_all(float step_s)
+{
+    for(auto& i : fleets)
+    {
+        i->tick_all(step_s);
     }
 }
