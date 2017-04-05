@@ -453,6 +453,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     for(orbital_system* sys : system_manage.systems)
     {
+        if(!system_manage.in_system_view())
+            continue;
+
         bool term = false;
 
         for(orbital* orb : sys->orbitals)
@@ -510,7 +513,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         }
     }
 
-    if(selected.size() > 0 && popup.going)
+    if(selected.size() > 0 && popup.going && system_manage.in_system_view())
     {
         for(auto& kk : selected)
         {

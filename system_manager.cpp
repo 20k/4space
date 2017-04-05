@@ -812,6 +812,9 @@ void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_em
     if(currently_viewed == nullptr)
         return;
 
+    if(!in_system_view())
+        return;
+
     currently_viewed->draw(win, viewer_empire);
 }
 
@@ -833,7 +836,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 {
     //printf("zoom %f\n", zoom_level);
 
-    if(zoom_level < 10)
+    if(in_system_view())
         return;
 
     sf::CircleShape circle;
@@ -845,6 +848,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         vec2f pos = os->universe_pos * 100.f;
 
         circle.setPosition({pos.x(), pos.y()});
+        circle.setFillColor(sf::Color(255, 200, 50));
+        circle.setRadius(200.f);
+        circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
+
+        win.draw(circle);
     }
 }
 
@@ -871,4 +879,9 @@ void system_manager::change_zoom(float zoom)
 void system_manager::pan_camera(vec2f dir)
 {
     camera = camera - dir * zoom_level;
+}
+
+bool system_manager::in_system_view()
+{
+    return zoom_level < 10;
 }

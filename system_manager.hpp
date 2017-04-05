@@ -206,6 +206,8 @@ struct system_manager
     void change_zoom(float zoom);
     void pan_camera(vec2f dir);
 
+    bool in_system_view();
+
     float zoom_level = 1.f;
     vec2f camera;
 };
