@@ -115,7 +115,7 @@ struct orbital
 
     void tick(float step_s);
 
-    void draw(sf::RenderWindow& win);
+    void draw(sf::RenderWindow& win, empire* viewer_empire);
 
     void center_camera(sf::RenderWindow& win);
 
@@ -152,7 +152,8 @@ struct orbital_system
 
     void destroy(orbital*);
 
-    void draw(sf::RenderWindow& win);
+    ///currently viewed empire is drawn differently, see
+    void draw(sf::RenderWindow& win, empire* viewer_empire);
 
     void cull_empty_orbital_fleets(empire_manager& empire_manage);
 

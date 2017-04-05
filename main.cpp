@@ -427,7 +427,7 @@ void debug_battle(battle_manager& battle, sf::RenderWindow& win, bool lclick)
     ImGui::End();
 }
 
-void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup)
+void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire)
 {
     sf::Mouse mouse;
 
@@ -479,7 +479,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     popup_element elem;
                     elem.element = orb;
 
-                    if(orb->type == orbital_info::FLEET)
+                    ///disabling merging here and resupply invalides all fleet actions except moving atm
+                    ///unexpected fix to fleet merging problem
+                    if(orb->type == orbital_info::FLEET && orb->parent_empire == player_empire)
                     {
                         elem.mergeable = true;
 
@@ -526,7 +528,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             {
                 kk->highlight = true;
 
-                if(rclick && (kk->type == orbital_info::FLEET))
+                if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire)
                 {
                     kk->transfer({transformed.x, transformed.y});
                 }
@@ -562,8 +564,6 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
         return;
 
     ImGui::Begin(("Selected:###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
-
-    bool any_checkbox = false;
 
     std::set<ship*> potential_new_fleet;
 
@@ -630,8 +630,6 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
                 if(i.checked[kk])
                 {
-                    any_checkbox = true;
-
                     orbital* o = (orbital*)i.element;
 
                     ship_manager* smanage = (ship_manager*)o->data;
@@ -710,6 +708,13 @@ int main()
     empire* player_empire = empire_manage.make_new();
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
 
+    empire* hostile_empire = empire_manage.make_new();
+    hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
+
+    ///manages FLEETS, not SHIPS
+    ///this is fine. This is a global thing, the highest level of storage for FLEETS of ships
+    ///FLEEEEETS
+    ///Should have named this something better
     fleet_manager fleet_manage;
 
     ship_manager* fleet1 = fleet_manage.make_new();
@@ -797,6 +802,16 @@ int main()
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
 
+    orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
+    ohostile_fleet->orbital_angle = 0.f;
+    ohostile_fleet->orbital_length = 250;
+    ohostile_fleet->parent = sun;
+    ohostile_fleet->data = fleet2;
+
+    ///this ownership stuff is real dodgy
+    hostile_empire->take_ownership(fleet2);
+    hostile_empire->take_ownership(ohostile_fleet);
+
 
     popup_info popup;
 
@@ -852,8 +867,8 @@ int main()
         if(state == 0)
         {
             sun->center_camera(window);
-            debug_system(system_manage, window, lclick, rclick, popup);
-            base->draw(window);
+            debug_system(system_manage, window, lclick, rclick, popup, player_empire);
+            base->draw(window, player_empire);
         }
 
         //printf("ui\n");
