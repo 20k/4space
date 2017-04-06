@@ -12,6 +12,7 @@ namespace orbital_info
     {
         STAR,
         PLANET,
+        MOON,
         ASTEROID,
         FLEET,
         MISC,
@@ -22,6 +23,7 @@ namespace orbital_info
     {
         "STAR",
         "PLANET",
+        "MOON",
         "ASTEROID",
         "FLEET",
         "FLEET",
@@ -33,6 +35,7 @@ namespace orbital_info
         0,
         0,
         0,
+        0,
         1,
         1,
         0,
@@ -40,6 +43,7 @@ namespace orbital_info
 
     static std::vector<std::string> load_strs =
     {
+        "",
         "",
         "",
         "",
@@ -150,7 +154,7 @@ struct orbital
 
     empire* parent_empire = nullptr;
 
-    void draw_alerts(sf::RenderWindow& win, empire* viewer_empire);
+    void draw_alerts(sf::RenderWindow& win, empire* viewer_empire, system_manager& system_manage);
 
     orbital_system* parent_system = nullptr;
 };
@@ -181,7 +185,7 @@ struct orbital_system
     void generate_asteroids(int n, int num_belts, int num_resource_asteroids);
     void generate_planet_resources(float max_ps);
 
-    void draw_alerts(sf::RenderWindow& win, empire* viewing_empire);
+    void draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage);
 
     void generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids);
     void generate_full_random_system();

@@ -5,6 +5,7 @@
 #include "util.hpp"
 #include "empire.hpp"
 #include "procedural_text_generator.hpp"
+#include "../../render_projects/imgui/imgui.h"
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
@@ -430,12 +431,15 @@ bool orbital::can_dispense_resources()
     return false;
 }
 
-void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
+void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
 {
     if(type != orbital_info::FLEET)
         return;
 
     if(parent_empire != viewing_empire)
+        return;
+
+    if(parent_system != system_manage.currently_viewed)
         return;
 
     ship_manager* sm = (ship_manager*)data;
@@ -607,7 +611,11 @@ void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_a
 
     float max_belt = 500.f;
 
-    float exclusion_radius = 10.f;
+    float exclusion_radius = 60.f;
+
+    float max_randomness = 0.05f;
+
+    float max_random_radius = 20.f;
 
     int asteroids_per_belt = n / num_belts;
 
@@ -647,7 +655,7 @@ void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_a
         {
             float angle = ((float)kk / (asteroids_per_belt + 1)) * 2 * M_PI;
 
-            float len = rad * randf_s(0.9, 1.1);
+            float len = rad + randf_s(-max_random_radius, max_random_radius);//rad * randf_s(1 - max_randomness, 1 + max_randomness);
 
             orbital* o = make_new(orbital_info::ASTEROID, 2.f * randf_s(0.5f, 1.5f), 5);
             o->orbital_angle = angle + randf_s(0.f, M_PI*2/16.f);
@@ -688,12 +696,28 @@ void orbital_system::generate_planet_resources(float max_ps)
     }
 }
 
-void orbital_system::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
+void orbital_system::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
 {
     for(orbital* o : orbitals)
     {
-        o->draw_alerts(win, viewing_empire);
+        o->draw_alerts(win, viewing_empire, system_manage);
     }
+}
+
+std::string scifi_name(int num)
+{
+    if(num == 0)
+        return "I";
+    if(num == 1)
+        return "II";
+    if(num == 2)
+        return "III";
+    if(num == 4)
+        return "IV";
+    if(num == 5)
+        return "V";
+
+    return "";
 }
 
 void orbital_system::generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids)
@@ -716,7 +740,7 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
 
     float max_planet_distance = 400.f;
 
-    float randomness = 40.f;
+    float randomness = 20.f;
 
     int min_verts = 5;
     int max_verts = 25;
@@ -744,6 +768,31 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
         planet->rotation_velocity_ps = randf_s(0.f, 2*M_PI/10.f);
 
         planet->parent = sun;
+
+        int moons = randf_s(0, 3);
+
+        for(int moon_num = 0; moon_num < moons; moon_num++)
+        {
+            orbital* moon = make_new(orbital_info::MOON, randf_s(min_rad/5, max_rad/5), randf_s(min_verts, max_verts));
+
+            float mfrac = (float)moon_num / moons;
+
+            float min_dist = 15.f;
+            float max_dist = 30.f;
+
+            //float moon_rad = randf_s(0.f, 1.f) * (max_dist - min_dist) + min_dist;
+
+            float moon_rad = mfrac * (max_dist - min_dist) + min_dist + randf_s(0.f, min_dist);
+
+            moon->orbital_length = moon_rad;
+            moon->orbital_angle = randf_s(0.f, 2 * M_PI);
+
+            moon->rotation_velocity_ps = randf_s(0.f, 2*M_PI/10.f);
+
+            moon->parent = planet;
+
+            moon->name = planet->name + " (" + scifi_name(moon_num) + ")";
+        }
     }
 
     generate_asteroids(num_asteroids, num_belts, num_resource_asteroids);
@@ -755,8 +804,8 @@ void orbital_system::generate_full_random_system()
     int min_planets = 0;
     int max_planets = 5;
 
-    int min_asteroids = 0;
-    int max_asterids = 300;
+    int min_asteroids = 50;
+    int max_asteroids = 300;
 
     int min_belts = 1;
     int max_belts = 6;
@@ -765,11 +814,11 @@ void orbital_system::generate_full_random_system()
     int max_resource_asteroids = 6;
 
     int rplanets = randf_s(min_planets, max_planets + 1);
-    int rasteroids = randf_s(min_asteroids, max_asterids + 1);
+    int rasteroids = randf_s(min_asteroids, max_asteroids + 1);
     int rbelts = randf_s(min_belts, max_belts + 1);
     int rresource = randf_s(min_resource_asteroids, max_resource_asteroids + 1);
 
-    rasteroids += randf_s(0.f, 50.f) * rbelts;
+    rasteroids += randf_s(20.f, 50.f) * rbelts;
 
     return generate_random_system(rplanets, rasteroids, rbelts, rresource);
 }
@@ -894,6 +943,12 @@ void system_manager::repulse_fleets()
     {
         for(orbital* o : sys->orbitals)
         {
+            ///this is pretty funny though
+            if(o->type != orbital_info::FLEET)
+            {
+                continue;
+            }
+
             for(orbital* k : sys->orbitals)
             {
                 if(k == o)
@@ -928,7 +983,7 @@ void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 
     for(auto& i : systems)
     {
-        i->draw_alerts(win, viewing_empire);
+        i->draw_alerts(win, viewing_empire, *this);
     }
 }
 
@@ -1019,6 +1074,9 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
             s->highlight = true;
 
             hovered_system = s;
+
+            if(s->get_base() != nullptr)
+                ImGui::SetTooltip(s->get_base()->name.c_str());
 
             if(lclick)
             {
