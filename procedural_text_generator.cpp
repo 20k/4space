@@ -86,25 +86,6 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
         },
     };
 
-    /*int element_num = 0;
-    float max_elem = 0.f;
-
-    for(int i=0; i<o->produced_resources_ps.resources.size(); i++)
-    {
-        resource_element& elem = o->produced_resources_ps.resources[i];
-
-        if(elem.amount > max_elem)
-        {
-            max_elem = elem.amount;
-            element_num = elem.type;
-        }
-    }
-
-    if(o->produced_resources_ps.resources.size() == 0)
-    {
-        element_num = randf_s(0.f, majority_element_to_description.size());
-    }*/
-
     std::vector<std::string> vec = majority_element_to_description[o->resource_type_for_flavour_text];
 
     std::random_shuffle(vec.begin(), vec.end());
@@ -113,7 +94,7 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
 
     std::string name = o->name;
 
-    std::string description = generate_planet_description_text(name, vec[0], vec[1]);
+    std::string description = generate_planet_description_text(name, vec[0], vec[1]) + " " + std::to_string(o->resource_type_for_flavour_text);
 
     return description;
 }

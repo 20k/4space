@@ -414,6 +414,8 @@ void orbital::make_random_resource_planet(float total_ps)
 
     resource_type_for_flavour_text = max_elem;
 
+    //printf("%i\n", resource_type_for_flavour_text);
+
     is_resource_object = true;
 }
 
@@ -735,7 +737,7 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
     }
 
     generate_asteroids(num_asteroids, num_belts, num_resource_asteroids);
-    generate_planet_resources(2.f);
+    //generate_planet_resources(2.f);
 }
 
 void orbital_system::generate_full_random_system()

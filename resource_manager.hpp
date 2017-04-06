@@ -67,7 +67,7 @@ namespace resource
 
     bool is_processed(types type);
 
-    static float global_resource_multiplier = 0.1f;
+    static float global_resource_multiplier = 0.2f;
 }
 
 struct resource_element
