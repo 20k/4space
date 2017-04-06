@@ -37,9 +37,29 @@ int pick_random(int minx, int maxx)
     return randf_s(minx, maxx);
 }
 
+bool is_vowel(uint8_t c)
+{
+    c = tolower(c);
+
+    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+}
+
 std::string fix_grammar(std::string str)
 {
+    for(int sid = 1; sid < str.length()-3; sid++)
+    {
+        if(str.substr(sid, 3) == " a ")
+        {
+            uint8_t next = str[sid + 3];
 
+            if(!is_vowel(next))
+                continue;
+
+            str.insert(str.begin() + 2 + sid, 'n');
+        }
+    }
+
+    return str;
 }
 
 std::string generate_planet_description_text(std::string n1, std::string d1, std::string d2)
@@ -94,7 +114,7 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
 
     std::string name = o->name;
 
-    std::string description = generate_planet_description_text(name, vec[0], vec[1]) + " " + std::to_string(o->resource_type_for_flavour_text);
+    std::string description = generate_planet_description_text(name, vec[0], vec[1]);// + " " + std::to_string(o->resource_type_for_flavour_text);
 
-    return description;
+    return fix_grammar(description);
 }
