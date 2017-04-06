@@ -80,6 +80,8 @@ struct orbital_system;
 
 struct orbital
 {
+    std::string name;
+
     float internal_time_s = 0.f;
 
     bool highlight = false;

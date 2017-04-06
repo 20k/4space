@@ -712,7 +712,10 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 if(elem == nullptr)
                     continue;
 
-                elem->header = orbital_info::names[kk->type];
+                elem->header = kk->name;
+
+                if(elem->header == "")
+                    elem->header = orbital_info::names[kk->type];
 
                 elem->data = kk->get_info_str();
 

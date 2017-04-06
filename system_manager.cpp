@@ -4,6 +4,7 @@
 #include "ship.hpp"
 #include "util.hpp"
 #include "empire.hpp"
+#include "procedural_text_generator.hpp"
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
@@ -443,6 +444,11 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     n->rad = rad;
     n->parent_system = this;
     //n->simple_renderable.init(10, n->rad * 0.85f, n->rad * 1.2f);
+
+    procedural_text_generator generator;
+
+    if(type == orbital_info::PLANET)
+        n->name = generator.generate_planetary_name();
 
     if(type == orbital_info::ASTEROID)
     {
