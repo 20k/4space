@@ -170,6 +170,16 @@ std::map<resource::types, float> empire::dispense_resources_proportionally(const
     return ret;
 }
 
+void empire::tick(float step_s)
+{
+    research_tech_level.tick(step_s);
+}
+
+void empire::draw_ui()
+{
+    research_tech_level.draw_ui(this);
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;
@@ -192,5 +202,13 @@ void empire_manager::notify_removal(ship_manager* s)
     for(auto& i : empires)
     {
         i->release_ownership(s);
+    }
+}
+
+void empire_manager::tick_all(float step_s)
+{
+    for(empire* emp : empires)
+    {
+        emp->tick(step_s);
     }
 }

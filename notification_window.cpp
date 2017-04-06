@@ -4,6 +4,31 @@
 
 #include "../../render_projects/imgui/imgui.h"
 
+void notification_window::tick_draw(sf::RenderWindow& win)
+{
+    ImGui::Begin(title.c_str());
+
+    for(int id = 0; id < (int)elements.size(); id++)
+    {
+        text_element& elem = elements[id];
+
+        ImGui::Text(elem.text.c_str());
+
+        if(ImGui::IsItemClicked())
+        {
+            elem.pressed = true;
+
+            elem.toggle_state = !elem.toggle_state;
+        }
+        else
+        {
+            elem.pressed = false;
+        }
+    }
+
+    ImGui::End();
+}
+
 notification_window* notification_manager::make_new()
 {
     notification_window* win = new notification_window;

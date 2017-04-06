@@ -126,6 +126,9 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
         {
             "Radioactive", "Irradiated", "Rocky", "Dangerous", "Hazardous",
         },
+        {
+            "Curious", "Teeming", "Alien", "intriguing", "Strange",
+        },
     };
 
     std::vector<std::string> vec = majority_element_to_description[o->resource_type_for_flavour_text];

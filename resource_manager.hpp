@@ -21,6 +21,7 @@ namespace resource
         IRON,
         TITANIUM,
         URANIUM,
+        RESEARCH,
         COUNT
     };
 
@@ -39,6 +40,7 @@ namespace resource
         "Iron",
         "Titanium",
         "Uranium",
+        "Research",
         "Error",
     };
 
@@ -57,6 +59,7 @@ namespace resource
         "Fe",
         "Ti",
         "U",
+        "Re",
         "WTF",
     };
 

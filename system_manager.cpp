@@ -399,6 +399,8 @@ void orbital::make_random_resource_planet(float total_ps)
     ore_mults[resource::IRON] = 0.1f;
     ore_mults[resource::TITANIUM] = 0.025;
     ore_mults[resource::URANIUM] = 0.01f;
+    ore_mults[resource::RESEARCH] = 1.f;
+
 
     float max_val = 0.f;
     int max_elem = 0;
@@ -407,7 +409,7 @@ void orbital::make_random_resource_planet(float total_ps)
     {
         float val = randf_s(0.55f, total_ps);
 
-        if(val > max_val)
+        if(val > max_val)//? && i.first != resource::RESEARCH)
         {
             max_val = val;
             max_elem = i.first;
@@ -469,6 +471,8 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
 
     procedural_text_generator generator;
 
+    n->name = orbital_info::names[type];
+
     if(type == orbital_info::PLANET)
     {
         n->make_random_resource_planet(2.f);
@@ -478,14 +482,14 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
         n->description = generator.generate_planetary_text(n);
     }
 
-    if(type == orbital_info::STAR)
+    else if(type == orbital_info::STAR)
     {
         n->name = generator.generate_star_name();
 
         n->description = generator.generate_star_text(n);
     }
 
-    if(type == orbital_info::ASTEROID)
+    else if(type == orbital_info::ASTEROID)
     {
         n->col = {1, 1, 1};
     }

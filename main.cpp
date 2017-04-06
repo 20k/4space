@@ -12,6 +12,7 @@
 #include "util.hpp"
 
 #include "empire.hpp"
+#include "research.hpp"
 
 template<sf::Keyboard::Key k>
 bool once()
@@ -168,7 +169,6 @@ std::vector<std::string> get_components_display_string(ship& s)
 
     return display_str;
 }
-
 
 void display_ship_info(ship& s)
 {
@@ -624,9 +624,14 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     term = true;
                 }
 
+                if(orb->type == orbital_info::STAR)
+                {
+                    ImGui::SetTooltip((orb->name + "\n" + orb->description).c_str());
+                }
+
                 if(orb->is_resource_object)
                 {
-                    ImGui::SetTooltip(orb->produced_resources_ps.get_formatted_str().c_str());
+                    ImGui::SetTooltip((orb->name + "\n" + orb->produced_resources_ps.get_formatted_str()).c_str());
                 }
             }
 
@@ -929,7 +934,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             }
             else
             {
-                printf("Tried to create fleets cross systems\c");
+                printf("Tried to create fleets cross systems\n");
             }
         }
     }
@@ -1102,6 +1107,14 @@ int main()
 
             if(event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
                 scrollwheel_delta += event.mouseWheelScroll.delta;
+
+            if(event.type == sf::Event::Resized)
+            {
+                int x = event.size.width;
+                int y = event.size.height;
+
+                window.create(sf::VideoMode(x, y), "Wowee", sf::Style::Default, settings);
+            }
         }
 
         vec2f cdir = {0,0};
@@ -1241,6 +1254,9 @@ int main()
         player_empire->resources.draw_ui(window);
         //printf("Pregen\n");
         player_empire->generate_resource_from_owned(diff_s);
+
+        player_empire->draw_ui();
+        empire_manage.tick_all(diff_s);
 
         //printf("Prerender\n");
 

@@ -3,6 +3,7 @@
 
 #include "resource_manager.hpp"
 #include <map>
+#include "research.hpp"
 
 struct orbital;
 struct orbital_system;
@@ -10,12 +11,13 @@ struct ship_manager;
 
 struct empire
 {
+    research research_tech_level;
+    resource_manager resources;
+
     int team_id = team_gid++;
     static int team_gid;
 
     std::string name;
-
-    resource_manager resources;
 
     std::vector<orbital*> owned;
     std::vector<ship_manager*> owned_fleets;
@@ -38,6 +40,9 @@ struct empire
     ///take fraction is fraction to actually take, frac_out is the proportion of initial resources we were able to take
     ///type is the amount of resources we are requesting
     std::map<resource::types, float> dispense_resources_proportionally(const std::map<resource::types, float>& type, float take_fraction, float& frac_out);
+
+    void tick(float step_s);
+    void draw_ui();
 };
 
 struct empire_manager
@@ -48,6 +53,8 @@ struct empire_manager
 
     void notify_removal(orbital* o);
     void notify_removal(ship_manager* s);
+
+    void tick_all(float step_s);
 };
 
 #endif // EMPIRE_HPP_INCLUDED
