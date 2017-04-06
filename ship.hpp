@@ -10,6 +10,8 @@
 
 #define FLOAT_BOUND 0.00000001f
 
+struct empire;
+
 struct positional
 {
     ///game map etc, temporary atm
@@ -199,6 +201,10 @@ struct component_attribute
 
     void calculate_efficiency(float step_s);
 
+    void set_tech_level_from_empire(int type, empire* e);
+    void set_tech_level(float level);
+    float get_tech_level();
+
 private:
     float currently_drained = 0.f;
 };
@@ -258,6 +264,12 @@ struct component
     float get_tag(component_tag::tag tag);
 
     void set_tag(component_tag::tag tag, float val);
+
+    ///BLANKET SETS ALL SUB COMPONENTS TO TECH LEVEL
+    void set_tech_level(float tech_level);
+    void set_tech_level_from_empire(empire* e);
+    void set_tech_level_of_element(ship_component_elements::types type, float tech_level);
+    float get_tech_level_of_element(ship_component_elements::types type);
 
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;
@@ -350,6 +362,9 @@ struct ship : positional
     void test_set_disabled();
 
     bool is_fully_disabled = false;
+
+    void set_tech_level_of_component(int component_offset, float tech_level);
+    void set_tech_level_from_empire(empire* e);
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;

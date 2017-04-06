@@ -177,6 +177,23 @@ void component_attribute::calculate_efficiency(float step_s)
     cur_efficiency = currently_drained / (drained_per_s * step_s);
 }
 
+void component_attribute::set_tech_level_from_empire(int type, empire* e)
+{
+    int appropriate_tech = ship_component_elements::component_element_to_research_type[type];
+
+    tech_level = e->research_tech_level.categories[appropriate_tech].amount;
+}
+
+void component_attribute::set_tech_level(float ctech_level)
+{
+    tech_level = ctech_level;
+}
+
+float component_attribute::get_tech_level()
+{
+    return tech_level;
+}
+
 float component_attribute::consume_from(component_attribute& other, float max_proportion, float step_s)
 {
     if(drained_per_s <= FLOAT_BOUND)
@@ -581,6 +598,38 @@ float component::get_tag(component_tag::tag tag)
 void component::set_tag(component_tag::tag tag, float val)
 {
     tag_list[tag] = val;
+}
+
+void component::set_tech_level(float tech_level)
+{
+    for(auto& i : components)
+    {
+        i.second.set_tech_level(tech_level);
+    }
+}
+
+void component::set_tech_level_from_empire(empire* e)
+{
+    for(auto& i : components)
+    {
+        i.second.set_tech_level_from_empire(i.first, e);
+    }
+}
+
+void component::set_tech_level_of_element(ship_component_elements::types type, float tech_level)
+{
+    if(!has_element(type))
+        return;
+
+    components[type].set_tech_level(tech_level);
+}
+
+float component::get_tech_level_of_element(ship_component_elements::types type)
+{
+    if(!has_element(type))
+        return -1;
+
+    return components[type].get_tech_level();
 }
 
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
@@ -1571,6 +1620,22 @@ void ship::test_set_disabled()
     }
 
     force_fully_disabled(full_disabled);
+}
+
+/*void ship::set_tech_level_of_component(int component_offset, float tech_level)
+{
+    if(component_offset < 0 || component_offset >= entity_list.size())
+        return;
+
+    component_offset[i].set_tech_level
+}*/
+
+void ship::set_tech_level_from_empire(empire* e)
+{
+    for(component& c : entity_list)
+    {
+        c.set_tech_level_from_empire(e);
+    }
 }
 
 ship* ship_manager::make_new(int team)
