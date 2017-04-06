@@ -143,7 +143,10 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
 
 std::string procedural_text_generator::generate_star_text(orbital* o)
 {
-    float temperature = randf_s(2000.f, 60000.f);
+    float mint = 2000.f;
+    float maxt = 40000.f;
+
+    float temperature = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * (maxt - mint) + mint;
 
     std::vector<int> lower_bounds = {0, 3500, 5000, 6000, 7500, 10000, 30000};
 
@@ -151,12 +154,21 @@ std::string procedural_text_generator::generate_star_text(orbital* o)
 
     for(int i=0; i<lower_bounds.size(); i++)
     {
-        if(temperature >= lower_bounds[i])
+        bool b1 = temperature >= lower_bounds[i];
+        bool b2 = true;
+
+        if(i < lower_bounds.size()-1)
+        {
+            b2 = temperature < lower_bounds[i+1];
+        }
+
+        if(b1 && b2)
         {
             bound = i;
             break;
         }
     }
+
 
     std::vector<std::string> spectral_class = {"M", "K", "G", "F", "A", "B", "O"};
 
