@@ -6,6 +6,7 @@
 
 struct empire;
 
+///more research types? Stealth?
 namespace research_info
 {
     enum types

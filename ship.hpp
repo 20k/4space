@@ -6,6 +6,7 @@
 #include <vec/vec.hpp>
 #include <SFML/Graphics.hpp>
 #include "resource_manager.hpp"
+#include "research.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -99,6 +100,34 @@ namespace ship_component_elements
         "WP",
         "WC",
     };
+
+    ///Ok... we might want more research types
+    static std::vector<research_info::types> component_element_to_research_type
+    {
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+
+        research_info::PROPULSION,
+        research_info::PROPULSION,
+
+        research_info::SCANNERS,
+
+        research_info::MATERIALS,
+        research_info::MATERIALS,
+
+        research_info::WEAPONS,
+        research_info::WEAPONS,
+        research_info::WEAPONS,
+        research_info::WEAPONS,
+    }
 
     std::map<resource::types, float> component_storage_to_resources(types& type);
 }
