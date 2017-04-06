@@ -294,6 +294,9 @@ std::vector<std::string> orbital::get_info_str()
 
         std::string pstr = "Position: " + to_string_with_enforced_variable_dp(rpos.x()) + " " + to_string_with_enforced_variable_dp(rpos.y());
 
+        if(type == orbital_info::STAR)
+            pstr = "";
+
         std::string rstr = "";
 
         if(is_resource_object)
