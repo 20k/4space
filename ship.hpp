@@ -127,7 +127,7 @@ namespace ship_component_elements
         research_info::WEAPONS,
         research_info::WEAPONS,
         research_info::WEAPONS,
-    }
+    };
 
     std::map<resource::types, float> component_storage_to_resources(types& type);
 }
@@ -169,6 +169,8 @@ struct component_attribute
     float cur_amount = 0;
 
     float cur_efficiency = 1.f;
+
+    float tech_level = 0.f;
 
     float add_amount(float amount);
     bool can_use();

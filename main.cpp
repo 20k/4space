@@ -101,6 +101,8 @@ std::string get_component_display_string(component& c)
         float max_amount = attr.max_amount;
         float cur_amount = attr.cur_amount;
 
+        float tech_level = attr.tech_level;
+
         std::string use_string = "" + to_string_with_precision(net_usage, 3) + "/s";
         std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "/use";
 
@@ -113,6 +115,8 @@ std::string get_component_display_string(component& c)
         //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
 
         std::string storage_str = "(" + to_string_with_enforced_variable_dp(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
+
+        std::string tech_str = "(Tech " + std::to_string((int)tech_level) + ")";
 
         //std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
 
@@ -136,6 +140,8 @@ std::string get_component_display_string(component& c)
 
         if(max_amount > 0)
             component_str += " " + storage_str;
+
+        component_str += " " + tech_str;
 
         //if(attr.cur_efficiency < 0.99999f)
         //    component_str += "\n" + efficiency_str;
