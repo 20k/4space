@@ -83,6 +83,8 @@ struct orbital
     std::string name;
     std::string description;
 
+    int resource_type_for_flavour_text = 0;
+
     float internal_time_s = 0.f;
 
     bool highlight = false;

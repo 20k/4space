@@ -396,10 +396,23 @@ void orbital::make_random_resource_planet(float total_ps)
     ore_mults[resource::TITANIUM] = 0.025;
     ore_mults[resource::URANIUM] = 0.01f;
 
+    float max_val = 0.f;
+    int max_elem = 0;
+
     for(auto& i : ore_mults)
     {
-        produced_resources_ps.resources[i.first].amount += randf_s(0.55f, total_ps) * i.second * resource::global_resource_multiplier;
+        float val = randf_s(0.55f, total_ps);
+
+        if(val > max_val)
+        {
+            max_val = val;
+            max_elem = i.first;
+        }
+
+        produced_resources_ps.resources[i.first].amount += val * i.second * resource::global_resource_multiplier;
     }
+
+    resource_type_for_flavour_text = max_elem;
 
     is_resource_object = true;
 }
@@ -449,6 +462,8 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
 
     if(type == orbital_info::PLANET)
     {
+        n->make_random_resource_planet(2.f);
+
         n->name = generator.generate_planetary_name();
 
         n->description = generator.generate_planetary_text(n);

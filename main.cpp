@@ -1046,7 +1046,7 @@ int main()
     tplanet->parent = sun;
 
     base->generate_asteroids(100, 3, 5);
-    base->generate_planet_resources(2.f);
+    //base->generate_planet_resources(2.f);
 
     player_empire->take_ownership_of_all(base);
     player_empire->take_ownership(fleet1);
