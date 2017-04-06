@@ -607,6 +607,133 @@ void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_a
         }
     }
 
+    //float min_belt = 50.f;
+
+    //float max_belt = 500.f;
+
+    //float exclusion_radius = 60.f;
+
+    //float max_randomness = 0.05f;
+
+    float max_random_radius = 15.f;
+
+    int asteroids_per_belt = n / num_belts;
+
+    std::vector<orbital*> cur_orbitals;
+
+    for(int i=0; i<exclusion_radiuses.size(); i++)
+    {
+        if(randf_s(0.f, 1.f) < 0.3f)
+            continue;
+
+        float min_rad = exclusion_radiuses[i] + 30;
+
+        float max_rad = min_rad + 80;
+
+        if(i < exclusion_radiuses.size() - 1)
+            max_rad = exclusion_radiuses[i+1] - 30;
+
+        float rad = randf_s(min_rad, max_rad);
+
+        rad = (min_rad + max_rad)/2;
+
+        for(int kk=0; kk<asteroids_per_belt; kk++)
+        {
+            float angle = ((float)kk / (asteroids_per_belt + 1)) * 2 * M_PI;
+
+            float len = rad + randf_s(-max_random_radius, max_random_radius);//rad * randf_s(1 - max_randomness, 1 + max_randomness);
+
+            orbital* o = make_new(orbital_info::ASTEROID, 2.f * randf_s(0.5f, 1.5f), 5);
+            o->orbital_angle = angle + randf_s(0.f, M_PI*2/16.f);
+            o->orbital_length = len;
+
+            o->parent = get_base();
+            o->rotation_velocity_ps = 2 * M_PI / randf_s(10.f, 1000.f);
+
+            cur_orbitals.push_back(o);
+        }
+    }
+
+    /*for(int i=0; i<num_belts; i++)
+    {
+        float rad = 0.f;
+
+        bool bad = false;
+
+        int max_tries = 10;
+        int cur_tries = 0;
+
+        do
+        {
+            bad = false;
+
+            rad = randf_s(min_belt, max_belt);
+
+            for(auto& i : exclusion_radiuses)
+            {
+                if(fabs(rad - i) < exclusion_radius)
+                {
+                    bad = true;
+                    break;
+                }
+            }
+
+            cur_tries++;
+        }
+        while(bad && cur_tries < max_tries);
+
+        exclusion_radiuses.push_back(rad);
+
+        for(int kk=0; kk<asteroids_per_belt; kk++)
+        {
+            float angle = ((float)kk / (asteroids_per_belt + 1)) * 2 * M_PI;
+
+            float len = rad + randf_s(-max_random_radius, max_random_radius);//rad * randf_s(1 - max_randomness, 1 + max_randomness);
+
+            orbital* o = make_new(orbital_info::ASTEROID, 2.f * randf_s(0.5f, 1.5f), 5);
+            o->orbital_angle = angle + randf_s(0.f, M_PI*2/16.f);
+            o->orbital_length = len;
+
+            o->parent = get_base();
+            o->rotation_velocity_ps = 2 * M_PI / randf_s(10.f, 1000.f);
+
+            cur_orbitals.push_back(o);
+        }
+    }*/
+
+    if(cur_orbitals.size() == 0)
+        return;
+
+    int c = 0;
+    int max_c = 100;
+
+    for(int i=0; i<num_resource_asteroids && c < max_c; i++, c++)
+    {
+        int n = randf_s(0.f, cur_orbitals.size());
+
+        if(cur_orbitals[n]->is_resource_object)
+        {
+            i--;
+            continue;
+        }
+
+        cur_orbitals[n]->make_random_resource_asteroid(1.f);
+    }
+}
+
+#if 0
+void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_asteroids)
+{
+    std::vector<float> exclusion_radiuses;
+
+    for(auto& i : orbitals)
+    {
+        if(i->type == orbital_info::PLANET)
+        {
+            exclusion_radiuses.push_back(i->orbital_length);
+        }
+    }
+
     float min_belt = 50.f;
 
     float max_belt = 500.f;
@@ -684,6 +811,7 @@ void orbital_system::generate_asteroids(int n, int num_belts, int num_resource_a
         cur_orbitals[n]->make_random_resource_asteroid(1.f);
     }
 }
+#endif
 
 void orbital_system::generate_planet_resources(float max_ps)
 {
@@ -738,9 +866,9 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
         min_planet_distance = 150.f;
     }
 
-    float max_planet_distance = 400.f;
+    float max_planet_distance = 700.f;
 
-    float randomness = 20.f;
+    float randomness = 10.f;
 
     int min_verts = 5;
     int max_verts = 25;
@@ -804,8 +932,8 @@ void orbital_system::generate_full_random_system()
     int min_planets = 0;
     int max_planets = 5;
 
-    int min_asteroids = 50;
-    int max_asteroids = 300;
+    int min_asteroids = 500;
+    int max_asteroids = 3000;
 
     int min_belts = 1;
     int max_belts = 6;

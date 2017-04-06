@@ -1213,6 +1213,11 @@ int main()
             }
         }
 
+        if(key.isKeyPressed(sf::Keyboard::N))
+        {
+            printf("%f\n", diff_s * 1000.f);
+        }
+
         //printf("premanage\n");
 
         system_manage.tick(diff_s);
