@@ -32,7 +32,88 @@ std::string procedural_text_generator::generate_planetary_name()
     return procedural_text::planet_names[(int)randf_s(0.f, procedural_text::planet_names.size())];
 }
 
-std::string procedural_text_generator::generate_planetary_text(orbital* o)
+int pick_random(int minx, int maxx)
+{
+    return randf_s(minx, maxx);
+}
+
+std::string fix_grammar(std::string str)
 {
 
+}
+
+std::string generate_planet_description_text(std::string n1, std::string d1, std::string d2)
+{
+    int pick = pick_random(0, 2);
+
+    std::string ret;
+
+    if(pick == 0)
+    {
+        ret = n1 + " is a " + d1 + ", " + d2 + " world";
+    }
+    if(pick == 1)
+    {
+        ret = "The planet " + n1 + " is " + d1 + " and " + d2;
+    }
+
+    return ret;
+}
+
+///So, we can then use this sysetm to actually generate relevant information about a planet
+///EG a large battle occured here scarring the terrain, life, homeworld
+std::string procedural_text_generator::generate_planetary_text(orbital* o)
+{
+    std::vector<std::vector<std::string>> majority_element_to_description
+    {
+        {
+            "Green", "Luscious", "Joyful", "Bountiful", "Temperate", "Rich", "Earth-like",
+        },
+        {
+            "Acrid", "Acidic", "Hostile", "Sulphurous", "Rocky",
+        },
+        {
+            "Gaseous", "Inflammable", "Flammable", "Hot",
+        },
+        {
+            "Metallic", "Rocky", "Brown",
+        },
+        {
+            "Metallic", "Gleaming", "White",
+        },
+        {
+            "Radioactive", "Irradiated", "Rocky", "Dangerous", "Hazardous",
+        },
+    };
+
+    int element_num = 0;
+    float max_elem = 0.f;
+
+    for(int i=0; i<o->produced_resources_ps.resources.size(); i++)
+    {
+        resource_element& elem = o->produced_resources_ps.resources[i];
+
+        if(elem.amount > max_elem)
+        {
+            max_elem = elem.amount;
+            element_num = elem.type;
+        }
+    }
+
+    if(o->produced_resources_ps.resources.size() == 0)
+    {
+        element_num = randf_s(0.f, majority_element_to_description.size());
+    }
+
+    std::vector<std::string> vec = majority_element_to_description[element_num];
+
+    std::random_shuffle(vec.begin(), vec.end());
+
+    vec.resize(2);
+
+    std::string name = o->name;
+
+    std::string description = generate_planet_description_text(name, vec[0], vec[1]);
+
+    return description;
 }

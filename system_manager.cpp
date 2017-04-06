@@ -448,7 +448,11 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     procedural_text_generator generator;
 
     if(type == orbital_info::PLANET)
+    {
         n->name = generator.generate_planetary_name();
+
+        n->description = generator.generate_planetary_text(n);
+    }
 
     if(type == orbital_info::ASTEROID)
     {

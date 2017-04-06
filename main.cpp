@@ -719,6 +719,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 elem->data = kk->get_info_str();
 
+                if(kk->description != "")
+                    elem->data.push_back(kk->description);
+
                 if(popup.going)
                 {
                     kk->highlight = true;

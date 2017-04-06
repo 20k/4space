@@ -81,6 +81,7 @@ struct orbital_system;
 struct orbital
 {
     std::string name;
+    std::string description;
 
     float internal_time_s = 0.f;
 
