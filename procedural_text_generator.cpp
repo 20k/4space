@@ -1,6 +1,7 @@
 #include "procedural_text_generator.hpp"
 #include "system_manager.hpp"
 #include <fstream>
+#include "util.hpp"
 
 std::vector<std::string> procedural_text::parse_planet_names()
 {
@@ -27,9 +28,30 @@ std::vector<std::string> procedural_text::parse_planet_names()
     return ret;
 }
 
+std::vector<std::string> procedural_text::parse_star_names()
+{
+    std::vector<std::string> ret;
+
+    std::ifstream in("data/stars.txt");
+
+    std::string str;
+
+    while(std::getline(in, str))
+    {
+        ret.push_back(str);
+    }
+
+    return ret;
+}
+
 std::string procedural_text_generator::generate_planetary_name()
 {
     return procedural_text::planet_names[(int)randf_s(0.f, procedural_text::planet_names.size())];
+}
+
+std::string procedural_text_generator::generate_star_name()
+{
+    return procedural_text::star_names[(int)randf_s(0.f, procedural_text::star_names.size())];
 }
 
 int pick_random(int minx, int maxx)
@@ -117,4 +139,31 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
     std::string description = generate_planet_description_text(name, vec[0], vec[1]);// + " " + std::to_string(o->resource_type_for_flavour_text);
 
     return fix_grammar(description);
+}
+
+std::string procedural_text_generator::generate_star_text(orbital* o)
+{
+    float temperature = randf_s(2000.f, 60000.f);
+
+    std::vector<int> lower_bounds = {0, 3500, 5000, 6000, 7500, 10000, 30000};
+
+    int bound = 0;
+
+    for(int i=0; i<lower_bounds.size(); i++)
+    {
+        if(temperature >= lower_bounds[i])
+        {
+            bound = i;
+            break;
+        }
+    }
+
+    std::vector<std::string> spectral_class = {"M", "K", "G", "F", "A", "B", "O"};
+
+    std::string ret;
+
+    ret = "Spectral Class: " + spectral_class[bound] + "\n" +
+           "Temperature: " + to_string_with_precision(round(temperature / 100)*100, 6) + "K";
+
+    return ret;
 }

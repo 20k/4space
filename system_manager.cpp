@@ -471,6 +471,13 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
         n->description = generator.generate_planetary_text(n);
     }
 
+    if(type == orbital_info::STAR)
+    {
+        n->name = generator.generate_star_name();
+
+        n->description = generator.generate_star_text(n);
+    }
+
     if(type == orbital_info::ASTEROID)
     {
         n->col = {1, 1, 1};

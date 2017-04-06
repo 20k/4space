@@ -73,6 +73,7 @@
 		<Unit filename="system_manager.hpp" />
 		<Unit filename="text.cpp" />
 		<Unit filename="text.hpp" />
+		<Unit filename="util.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
