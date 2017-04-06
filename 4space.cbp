@@ -62,6 +62,8 @@
 		<Unit filename="empire.cpp" />
 		<Unit filename="empire.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="procedural_text_generator.cpp" />
+		<Unit filename="procedural_text_generator.hpp" />
 		<Unit filename="resource_manager.cpp" />
 		<Unit filename="resource_manager.hpp" />
 		<Unit filename="ship.cpp" />
