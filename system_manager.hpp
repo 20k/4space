@@ -182,7 +182,8 @@ struct orbital_system
 
     orbital* get_by_element(void* element);
 
-    void generate_asteroids(int n, int num_belts, int num_resource_asteroids);
+    void generate_asteroids_new(int n, int num_belts, int num_resource_asteroids);
+    void generate_asteroids_old(int n, int num_belts, int num_resource_asteroids);
     void generate_planet_resources(float max_ps);
 
     void draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage);

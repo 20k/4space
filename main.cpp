@@ -992,7 +992,7 @@ int main()
     test_ship.tick_all_components(1.f);*/
 
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    settings.antialiasingLevel = 4;
 
     sf::RenderWindow window;
 
@@ -1045,7 +1045,7 @@ int main()
     tplanet->orbital_length = 50.f;
     tplanet->parent = sun;
 
-    base->generate_asteroids(100, 3, 5);
+    base->generate_asteroids_old(100, 3, 5);
     //base->generate_planet_resources(2.f);
 
     player_empire->take_ownership_of_all(base);
@@ -1118,7 +1118,7 @@ int main()
         if(key.isKeyPressed(sf::Keyboard::D))
             cdir.x() -= 1;
 
-        system_manage.pan_camera(cdir);
+        system_manage.pan_camera(cdir * diff_s * 300);
 
         if(no_suppress_mouse)
             system_manage.change_zoom(scrollwheel_delta);
