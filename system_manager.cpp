@@ -21,6 +21,9 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 {
     col = col * 255.f;
 
+    sf::RectangleShape shape;
+    shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+
     for(int i=0; i<vert_dist.size(); i++)
     {
         int cur = i;
@@ -41,7 +44,6 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         l1 += absolute_pos;
         l2 += absolute_pos;
 
-        sf::RectangleShape shape;
 
         float width = (l1 - l2).length();
         float height = 1;
@@ -51,8 +53,6 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         shape.setSize({width, height});
 
         shape.setRotation(r2d((l2 - l1).angle()));
-
-        shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
 
         #ifdef HOLLOWISH
         if((i % 2) == 0)
