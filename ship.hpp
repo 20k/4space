@@ -302,6 +302,11 @@ struct component
 
     ///not including armour
     ///we need a get_real_resource_cost etc as well for current resource cost base
+    ///including tech
+    ///not including HP
+    std::map<resource::types, float> get_resource_cost();
+    ///ie how much they're worth
+    std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_needed_to_repair();
 
     ///for ui stuff. Its better to keep this internally in case we add new components
@@ -412,6 +417,7 @@ struct ship : positional
 
     std::map<resource::types, float> resources_needed_to_recrew_total();
     std::map<resource::types, float> resources_needed_to_repair_total();
+    std::map<resource::types, float> resources_received_when_scrapped();
 
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);

@@ -667,6 +667,50 @@ float component::get_real_component_cost()
     return get_component_cost() * (hp_element.cur_amount / hp_element.max_amount);
 }
 
+std::map<resource::types, float> component::get_resource_cost()
+{
+    std::map<resource::types, float> res;
+
+    if(!has_element(ship_component_elements::HP))
+        return res;
+
+    component_attribute& hp_elem = components[ship_component_elements::HP];
+
+    if(hp_elem.max_amount < 0.001f)
+        return res;
+
+    res = ship_component_elements::component_storage_to_resources(ship_component_elements::HP);
+
+    for(auto& i : res)
+    {
+        i.second *= get_component_cost();
+    }
+
+    return res;
+}
+
+std::map<resource::types, float> component::resources_received_when_scrapped()
+{
+    std::map<resource::types, float> res;
+
+    if(!has_element(ship_component_elements::HP))
+        return res;
+
+    component_attribute& hp_elem = components[ship_component_elements::HP];
+
+    if(hp_elem.max_amount < 0.001f)
+        return res;
+
+    res = ship_component_elements::component_storage_to_resources(ship_component_elements::HP);
+
+    for(auto& i : res)
+    {
+        i.second *= get_real_component_cost();
+    }
+
+    return res;
+}
+
 ///wtf, HP always costs iron to repair? WE'VE DUN FUCKED UP
 std::map<resource::types, float> component::resources_needed_to_repair()
 {
@@ -691,6 +735,7 @@ std::map<resource::types, float> component::resources_needed_to_repair()
 
     return res;
 }
+
 
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
@@ -1752,6 +1797,24 @@ std::map<resource::types, float> ship::resources_needed_to_repair_total()
 
     return ret;
 }
+
+std::map<resource::types, float> ship::resources_received_when_scrapped()
+{
+    std::map<resource::types, float> ret;
+
+    for(component& c : entity_list)
+    {
+        auto res = c.resources_received_when_scrapped();
+
+        for(auto& i : res)
+        {
+            ret[i.first] += i.second;
+        }
+    }
+
+    return ret;
+}
+
 
 void ship::recrew_derelict(empire* owner, empire* claiming)
 {
