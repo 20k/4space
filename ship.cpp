@@ -2045,6 +2045,18 @@ float get_default_scanning_power(ship* s)
 
 float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 {
+    float empire_culture_distance = owned_by->parent_empire->empire_culture_distance(s->original_owning_race);
+
+    ///0 = not far, > 1 = far
+    empire_culture_distance = clamp(1.f - empire_culture_distance, 0.f, 1.f);
+
+    float culture_distance_mod = 0.f;
+
+    if(empire_culture_distance < 0.5f)
+        culture_distance_mod = -(empire_culture_distance) * 0.10f;
+    if(empire_culture_distance >= 0.5f)
+        culture_distance_mod = (empire_culture_distance - 0.5f) * 0.10f;
+
     bool has_stealth = false;
     float max_tech_stealth_system_modified = 0.f;
 
@@ -2070,7 +2082,7 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 
     float end_val = default_scanning_power_curve(modified_scanning_power - max_tech_stealth_system_modified);
 
-    end_val += disabled_mod;
+    end_val += disabled_mod + culture_distance_mod;
 
     end_val = clamp(end_val, 0.f, 1.f);
 
