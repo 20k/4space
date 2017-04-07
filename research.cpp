@@ -4,7 +4,7 @@
 
 #include "../../render_projects/imgui/imgui.h"
 
-float research_info::get_research_level_cost(int level)
+float research_info::get_research_level_cost(int level, float cost)
 {
     #define TESTING
     #ifdef TESTING
@@ -12,9 +12,14 @@ float research_info::get_research_level_cost(int level)
     #endif
 
     if(level == 0)
-        return 50;
+        return cost;
 
-    return get_research_level_cost(level - 1) * 4.f * 50.f + 50;
+    return get_research_level_cost(level - 1) * 4.f * cost;
+}
+
+float research_info::get_cost_scaling(float level, float base_cost)
+{
+    return get_research_level_cost(level, base_cost);
 }
 
 research::research()

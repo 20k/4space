@@ -42,7 +42,9 @@ namespace research_info
     ///fifth level: 12800
     ///so simply 50 * 4 * research_level + researches below, where 4 is scaling
 
-    float get_research_level_cost(int level);
+    ///base cost of research expensiveness is 50
+    float get_research_level_cost(int level, float cost = 50.f);
+    float get_cost_scaling(float level, float cost);
 }
 
 struct research_category

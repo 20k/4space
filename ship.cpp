@@ -637,6 +637,22 @@ float component::get_tech_level_of_primary()
     return get_tech_level_of_element(primary_attribute);
 }
 
+float component::get_base_component_cost()
+{
+    if(primary_attribute == ship_component_elements::NONE)
+        return 0.f;
+
+    return ship_component_elements::base_cost_of_component_with_this_primary_attribute[primary_attribute];
+}
+
+float component::get_component_cost()
+{
+    float tech_level = get_tech_level_of_primary();
+    float base_cost = get_base_component_cost();
+
+    return research_info::get_cost_scaling(tech_level, base_cost);
+}
+
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
     //if(step_s < 0.1)

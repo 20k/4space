@@ -295,6 +295,8 @@ struct component
     float get_tech_level_of_element(ship_component_elements::types type);
 
     float get_tech_level_of_primary();
+    float get_base_component_cost();
+    float get_component_cost();
 
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;
@@ -302,6 +304,7 @@ struct component
     bool skip_in_derelict_calculations = false;
 
     ship_component_elements::types primary_attribute = ship_component_elements::NONE;
+
 };
 
 struct projectile;
