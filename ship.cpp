@@ -2008,7 +2008,7 @@ bool ship::can_recrew(empire* claiming)
 
 float default_scanning_power_curve(float scanner_modified_power)
 {
-    if(scanner_modified_power < 0)
+    /*if(scanner_modified_power < 0)
         return 0.f;
 
     if(scanner_modified_power < 0.5f)
@@ -2018,7 +2018,15 @@ float default_scanning_power_curve(float scanner_modified_power)
         return 0.75f;
 
     if(scanner_modified_power >= 1.5f)
-        return 1.f;
+        return 1.f;*/
+
+    if(scanner_modified_power < 0)
+        return 0.f;
+
+    //if(scanner_modified_power > 1.f)
+    //    return 1.f;
+
+    return scanner_modified_power;
 }
 
 float get_default_scanning_power(ship* s)
@@ -2067,7 +2075,7 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
         if(c.primary_attribute != ship_component_elements::STEALTH)
             continue;
 
-        float tech_level = c.get_tech_level_of_primary();
+        float tech_level = c.get_tech_level_of_primary() + 0.5f;
 
         tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
 
@@ -2099,7 +2107,7 @@ float ship::get_scanning_power_on(orbital* o, int difficulty_modifier)
     {
         float scanner_modified_power = get_default_scanning_power(this) - difficulty_modifier;
 
-        return default_scanning_power_curve(scanner_modified_power);
+        return clamp(default_scanning_power_curve(scanner_modified_power), 0.f, 1.f);
     }
     else
     {

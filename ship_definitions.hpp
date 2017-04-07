@@ -233,6 +233,39 @@ component make_default_warp_drive()
     return warp_drive;
 }
 
+component make_default_stealth()
+{
+    component_attribute cooling;
+    cooling.drained_per_s = 0.2f;
+
+    component_attribute power;
+    power.drained_per_s = 10.f;
+
+    component_attribute command;
+    command.drained_per_s = 0.5f;
+
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute stealth;
+    stealth.produced_per_s = 1.f;
+
+    component stealth_drive;
+    stealth_drive.add(ship_component_element::COOLING_POTENTIAL, cooling);
+    stealth_drive.add(ship_component_element::ENERGY, power);
+    stealth_drive.add(ship_component_element::COMMAND, command);
+    stealth_drive.add(ship_component_element::HP, hp);
+    stealth_drive.add(ship_component_element::STEALTH, stealth);
+
+    stealth_drive.scanning_difficulty = clamp(stealth_drive.scanning_difficulty*2, 0.f, 1.f);
+
+    stealth_drive.name = "Stealth Systems";
+    stealth_drive.primary_attribute = ship_component_element::STEALTH;
+
+    return stealth_drive;
+}
+
 component make_default_scanner()
 {
     component_attribute cooling;
@@ -393,6 +426,7 @@ ship make_default()
     test_ship.add(make_default_heatsink());
     test_ship.add(make_default_railgun());
     test_ship.add(make_default_torpedo());
+    test_ship.add(make_default_stealth());
 
     return test_ship;
 }
