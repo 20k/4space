@@ -183,6 +183,13 @@ void tick_ship_ai(battle_manager& battle_manage, ship& s, float step_s)
 {
     ship* nearest = battle_manage.get_nearest_hostile(&s);
 
+    ///this is what caused the crash if no hostiles
+    if(nearest == nullptr)
+        return;
+
+    if(s.fully_disabled())
+        return;
+
     //vec2f their_pos = nearest->local_pos;
     //vec2f my_pos = s.local_pos;
 
@@ -380,6 +387,9 @@ ship* battle_manager::get_nearest_hostile(ship* s)
         for(ship* os : i.second)
         {
             if(os->team == team)
+                continue;
+
+            if(os->fully_disabled())
                 continue;
 
             vec2f my_pos = s->local_pos;
