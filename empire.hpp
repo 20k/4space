@@ -9,6 +9,8 @@
 struct orbital;
 struct orbital_system;
 struct ship_manager;
+struct ship;
+struct system_manager;
 
 struct empire
 {
@@ -63,6 +65,9 @@ struct empire
     float empire_culture_distance(empire* e);
 
     float get_research_level(research_info::types type);
+
+    float available_scanning_power_on(orbital* o);
+    float available_scanning_power_on(ship* s, system_manager& system_manage);
 };
 
 struct empire_manager

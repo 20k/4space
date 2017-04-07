@@ -232,6 +232,64 @@ float empire::get_research_level(research_info::types type)
     return research_tech_level.categories[(int)type].amount;
 }
 
+float empire::available_scanning_power_on(orbital* passed_other)
+{
+    if(passed_other->parent_empire == this)
+        return 1.f;
+
+    orbital_system* os = passed_other->parent_system;
+
+    float max_scanning_power = 0.f;
+
+    for(orbital* o : os->orbitals)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* found_sm = (ship_manager*)o->data;
+
+        if(found_sm->parent_empire != this)
+            continue;
+
+        for(ship* s : found_sm->ships)
+        {
+            max_scanning_power = std::max(max_scanning_power, s->get_scanning_power_on(passed_other));
+        }
+    }
+
+    return max_scanning_power;
+}
+
+float empire::available_scanning_power_on(ship* s, system_manager& system_manage)
+{
+    ship_manager* sm = s->owned_by;
+
+    if(sm->parent_empire == this)
+        return 1.f;
+
+    orbital_system* os = system_manage.get_by_element(sm);
+
+    float max_scanning_power = 0.f;
+
+    for(orbital* o : os->orbitals)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* found_sm = (ship_manager*)o->data;
+
+        if(found_sm->parent_empire != this)
+            continue;
+
+        for(ship* ns : found_sm->ships)
+        {
+            max_scanning_power = std::max(max_scanning_power, ns->get_scanning_power_on_ship(s));
+        }
+    }
+
+    return max_scanning_power;
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;

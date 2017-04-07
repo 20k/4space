@@ -250,7 +250,7 @@ std::vector<std::string> get_components_display_string(ship& s)
 }
 
 ///claiming_empire for salvage, can be nullptr
-void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
+void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
 {
     auto produced = s.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = s.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -391,6 +391,13 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
 
         c_id++;
     }
+
+    float scanning_power = player_empire->available_scanning_power_on(&s, system_manage);
+
+    std::string scanning_str = "Information: " + std::to_string((int)(scanning_power * 100.f)) + "%%";
+
+    ImGui::Text(scanning_str.c_str());
+
 
     float research_left = s.research_left_from_crewing.units_to_currency(false);
 
@@ -1414,7 +1421,7 @@ int main()
             {
                 if(s->display_ui)
                 {
-                    display_ship_info(*s, smanage->parent_empire, player_empire, system_manage, fleet_manage, empire_manage, popup);
+                    display_ship_info(*s, smanage->parent_empire, player_empire, player_empire, system_manage, fleet_manage, empire_manage, popup);
                 }
             }
         }
