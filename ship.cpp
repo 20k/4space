@@ -1971,6 +1971,8 @@ void ship::recrew_derelict(empire* owner, empire* claiming)
         {
             research_left_from_crewing = past_owners_research_left[claiming];
         }
+
+        team = claiming->team_id;
     }
 
     auto res_needed = resources_needed_to_recrew_total();

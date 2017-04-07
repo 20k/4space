@@ -431,12 +431,12 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
 
         for(auto& i : res)
         {
-            rm.resources[i.first].amount = i.second;
+            rm.resources[i.first].amount = -i.second;
         }
 
         std::string rstr = rm.get_formatted_str(true);
 
-        rstr += "Potential Gained Re: " + std::to_string((int)recrew_research_currenct);
+        rstr += "Potential Re: " + std::to_string((int)recrew_research_currenct);
 
         if(ImGui::IsItemHovered())
         {
@@ -446,6 +446,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
         ///if originating empire is not the claiming empire, get some tech
         if(ImGui::IsItemClicked())
         {
+            ///depletes resources
+            ///should probably pull the resource stuff outside of here as there might be other sources of recrewing
             s.recrew_derelict(owner, claiming_empire);
 
             ship_manager* parent_fleet = s.owned_by;
@@ -1127,6 +1129,9 @@ void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 
 int main()
 {
+    randf_s();
+    randf_s();
+
     empire_manager empire_manage;
 
     empire* player_empire = empire_manage.make_new();
