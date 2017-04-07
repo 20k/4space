@@ -14,6 +14,9 @@ struct empire
 {
     ///a two dimensional vector that we can use to determine our similarity to other empires
     ///used for determining tech and ship operating capability
+    ///we need some way for getting less tech once we learn a lot from the culture
+    ///maybe just adjust our culture similarity closer to theirs?
+    ///that way we'd only get the 1 dimensional upgrade from the difference between our tech and theirs
     vec2f culture_similarity;
 
     research research_tech_level;

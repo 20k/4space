@@ -273,6 +273,8 @@ struct component
 
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;
+
+    bool skip_in_derelict_calculations = false;
 };
 
 struct projectile;
@@ -349,7 +351,7 @@ struct ship : positional
     bool can_disengage();
     bool can_engage();
 
-    float disengage_clock_s = 0.f;
+    float disengage_clock_s = 9999.f;
     bool is_disengaging = false;
 
     float time_in_combat_s = 0.f;
@@ -365,6 +367,9 @@ struct ship : positional
 
     void set_tech_level_of_component(int component_offset, float tech_level);
     void set_tech_level_from_empire(empire* e);
+
+    ///damages the ship until derelict
+    void randomise_make_derelict();
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;

@@ -1587,6 +1587,9 @@ void ship::test_set_disabled()
 
     for(component& c : entity_list)
     {
+        if(c.skip_in_derelict_calculations)
+            continue;
+
         float ceff = 0.f;
         int cnum = 0;
 
@@ -1635,6 +1638,23 @@ void ship::set_tech_level_from_empire(empire* e)
     for(component& c : entity_list)
     {
         c.set_tech_level_from_empire(e);
+    }
+}
+
+void ship::randomise_make_derelict()
+{
+    while(!is_fully_disabled)
+    {
+        int cid = randf_s(0.f, entity_list.size());
+
+        component& c = entity_list[cid];
+
+        if(!c.has_element(ship_component_elements::HP))
+            continue;
+
+        c.components[ship_component_elements::HP].cur_amount /= randf_s(5.f, 10.f);
+
+        test_set_disabled();
     }
 }
 
@@ -1946,14 +1966,28 @@ std::string ship_manager::get_engage_str()
     if(can_engage())
         return "(Engage)";
 
+    bool any_derelict = false;
+
     float min_time_remaining = 0.f;
 
     for(ship* s : ships)
     {
         min_time_remaining = std::max(min_time_remaining, combat_variables::disengagement_time_s - s->disengage_clock_s);
+
+        if(s->fully_disabled())
+        {
+            any_derelict = true;
+        }
     }
 
-    return "(On Cooldown) " + to_string_with_enforced_variable_dp(min_time_remaining) + "s";
+    std::string cooldown_str = "(On Cooldown) " + to_string_with_enforced_variable_dp(min_time_remaining) + "s";
+
+    if(any_derelict)
+    {
+        cooldown_str = "Ship Derelict";
+    }
+
+    return cooldown_str;
 }
 
 ship_manager* fleet_manager::make_new()

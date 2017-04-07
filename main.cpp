@@ -987,6 +987,7 @@ int main()
     ship_manager* fleet1 = fleet_manage.make_new();
     ship_manager* fleet2 = fleet_manage.make_new();
     ship_manager* fleet3 = fleet_manage.make_new();
+    ship_manager* fleet4 = fleet_manage.make_new();
 
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
@@ -998,10 +999,14 @@ int main()
 
     ship* test_ship4 = fleet3->make_new_from(player_empire->team_id, make_default());
 
+    ship* derelict_ship = fleet4->make_new_from(hostile_empire->team_id, make_default());
+
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
     test_ship3->name = "SS Duplicate";
     test_ship4->name = "SS Secondary";
+
+    derelict_ship->name = "SS Dereliction";
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
@@ -1076,9 +1081,20 @@ int main()
     ohostile_fleet->parent = sun;
     ohostile_fleet->data = fleet2;
 
+    orbital* oderelict_fleet = base->make_new(orbital_info::FLEET, 5.f);
+    oderelict_fleet->orbital_angle = M_PI/16.f;
+    oderelict_fleet->orbital_length = 200;
+    oderelict_fleet->parent = sun;
+    oderelict_fleet->data = fleet4;
+
     ///this ownership stuff is real dodgy
     hostile_empire->take_ownership(fleet2);
     hostile_empire->take_ownership(ohostile_fleet);
+
+    hostile_empire->take_ownership(fleet4);
+    hostile_empire->take_ownership(oderelict_fleet);
+
+    derelict_ship->randomise_make_derelict();
 
     //orbital_system* sys_2 = system_manage.make_new();
     //sys_2->generate_random_system(3, 100, 3, 5);

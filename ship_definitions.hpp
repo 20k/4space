@@ -72,6 +72,7 @@ component make_default_ammo_store()
     ammo_store.add(ship_component_element::HP, hp);
 
     ammo_store.name = "Ammo Store";
+    ammo_store.skip_in_derelict_calculations = true;
 
     return ammo_store;
 }
@@ -173,6 +174,7 @@ component make_default_heatsink()
     heatsink.add(ship_component_element::HP, hp);
 
     heatsink.name = "Heatsink";
+    heatsink.skip_in_derelict_calculations = true;
 
     return heatsink;
 }
