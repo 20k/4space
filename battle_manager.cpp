@@ -428,7 +428,7 @@ void battle_manager::set_view(system_manager& system_manage)
     }
 
     if(num > 0)
-        avg = avg / num;
+        avg = avg / (float)num;
 
     /*sf::View v1 = win.getDefaultView();
     v1.setCenter(avg.x(), avg.y());

@@ -153,7 +153,7 @@ namespace ship_component_elements
         research_info::WEAPONS,
     };
 
-    std::map<resource::types, float> component_storage_to_resources(types& type);
+    std::map<resource::types, float> component_storage_to_resources(const types& type);
 }
 
 namespace combat_variables
@@ -299,11 +299,13 @@ struct component
     float get_component_cost(); ///static including tech
     float get_real_component_cost(); ///above including HP
 
+    std::map<resource::types, float> resources_needed_to_repair();
+
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;
 
     bool skip_in_derelict_calculations = false;
-    bool rapair_this_when_recrewing = false; ///when you recrew a ship, repair this component
+    bool repair_this_when_recrewing = false; ///when you recrew a ship, repair this component
 
     ship_component_elements::types primary_attribute = ship_component_elements::NONE;
 };
@@ -404,6 +406,8 @@ struct ship : positional
 
     float get_total_cost();
     float get_real_total_cost();
+
+    std::map<resource::types, float> resources_needed_to_recrew_total();
 
     void recrew_derelict(empire* owner, empire* claiming);
 
