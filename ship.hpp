@@ -493,7 +493,7 @@ struct ship_manager
     void leave_combat();
     void enter_combat();
     bool any_in_combat();
-    bool can_engage();
+    bool can_engage(); ///and be engaged
 
     void apply_disengage_penalty();
 

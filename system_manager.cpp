@@ -925,6 +925,11 @@ std::vector<orbital*> orbital_system::get_fleets_within_engagement_range(orbital
         if(o->type != orbital_info::FLEET)
             continue;
 
+        ship_manager* sm = (ship_manager*)o->data;
+
+        if(!sm->can_engage())
+            continue;
+
         vec2f their_pos = o->absolute_pos;
 
         float dist = (their_pos - ref_pos).length();
