@@ -13,6 +13,7 @@
 
 #include "empire.hpp"
 #include "research.hpp"
+#include "event_system.hpp"
 
 template<sf::Keyboard::Key k>
 bool once()
@@ -1344,6 +1345,8 @@ int main()
 
     popup_info popup;
 
+    game_event_manager test_event(sun);
+
     sf::Keyboard key;
 
     int state = 0;
@@ -1526,6 +1529,8 @@ int main()
 
         player_empire->draw_ui();
         empire_manage.tick_all(diff_s);
+
+        test_event.draw_ui();
 
         //printf("Prerender\n");
 

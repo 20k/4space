@@ -1,6 +1,9 @@
 #ifndef EVENT_SYSTEM_HPP_INCLUDED
 #define EVENT_SYSTEM_HPP_INCLUDED
 
+#include <vector>
+#include <vec/vec.hpp>
+
 namespace game_event_info
 {
     ///star trek
@@ -26,13 +29,54 @@ namespace game_event_info
         ///AI being born
         ///AI revolt (tie into above?)
         ///something wrong with the star
+
+        COUNT,
     };
 }
 
-///
+struct orbital;
+struct orbital_system;
+struct game_event_manager;
+
+///Ok. This is basically a branching sequence of events, each event may trigger a new event depending on the circumstances
+///so we need an event history, and the current event, which can just be the last event in the history
+///that can be under event manager
+///a game event is ONE single event
 struct game_event
 {
+    int arc_type;
+    int event_num;
 
+    float scanning_difficulty = randf_s(0.f, 1.f);
+
+    orbital* alert_location = nullptr;
+
+    void draw_ui();
+
+    game_event_manager* parent = nullptr;
+};
+
+///lets get a very basic interaction system going. "A thing has happened click between two options"
+///then implement followon
+///this manages one particularly game event, which is composed of sub game events
+///will definitely need a regular tick
+struct game_event_manager
+{
+    ///event_history.back() == current event
+    std::vector<game_event> event_history;
+
+    int arc_type;
+    ///basically determines the difficulty of this arc
+    ///we may need to distribute this more intelligently than just prng
+    float overall_tech_level = randf_s(0.f, 9.f);
+
+    game_event make_next_event();
+
+    game_event_manager(orbital* o);
+
+    //notification_window window;
+
+    void draw_ui();
 };
 
 #endif // EVENT_SYSTEM_HPP_INCLUDED

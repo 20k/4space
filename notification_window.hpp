@@ -23,7 +23,7 @@ struct notification_window
 
     std::vector<text_element> elements;
 
-    void tick_draw(sf::RenderWindow& win);
+    void tick_draw();
 };
 
 ///I'm not sure this is necessary, each system can own its notification window

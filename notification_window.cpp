@@ -4,7 +4,7 @@
 
 #include "../../render_projects/imgui/imgui.h"
 
-void notification_window::tick_draw(sf::RenderWindow& win)
+void notification_window::tick_draw()
 {
     ImGui::Begin(title.c_str());
 
