@@ -451,8 +451,8 @@ struct ship : positional
     std::map<empire*, research> past_owners_research_left;
 
     ///1 = total information, 0 = absolutely none
-    float get_scanning_power_on(orbital* o);
-    float get_scanning_power_on_ship(ship* s);
+    float get_scanning_power_on(orbital* o, int difficulty_modifier = 0);
+    float get_scanning_power_on_ship(ship* s, int difficulty_modifier = 0);
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;

@@ -2008,6 +2008,9 @@ bool ship::can_recrew(empire* claiming)
 
 float default_scanning_power_curve(float scanner_modified_power)
 {
+    if(scanner_modified_power < 0)
+        return 0.f;
+
     if(scanner_modified_power < 0.5f)
         return 0.25f;
 
@@ -2040,7 +2043,7 @@ float get_default_scanning_power(ship* s)
     return scanner_modified_power;
 }
 
-float ship::get_scanning_power_on_ship(ship* s)
+float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 {
     bool has_stealth = false;
     float max_tech_stealth_system_modified = 0.f;
@@ -2061,7 +2064,7 @@ float ship::get_scanning_power_on_ship(ship* s)
         has_stealth = true;
     }
 
-    float modified_scanning_power = get_default_scanning_power(s);
+    float modified_scanning_power = get_default_scanning_power(s) - difficulty_modifier;
 
     if(!has_stealth)
     {
@@ -2071,17 +2074,18 @@ float ship::get_scanning_power_on_ship(ship* s)
     return default_scanning_power_curve(modified_scanning_power - max_tech_stealth_system_modified);
 }
 
-float ship::get_scanning_power_on(orbital* o)
+float ship::get_scanning_power_on(orbital* o, int difficulty_modifier)
 {
     ///naive
     ///if my == theirs, total information
     ///if my == theirs stealth, little to no information
     ///for every level of difference, we lose 50%. 2 levels below we get very little? 50% of remaining 50%?
 
-    float scanner_modified_power = get_default_scanning_power(this);
 
     if(o->type != orbital_info::FLEET)
     {
+        float scanner_modified_power = get_default_scanning_power(this) - difficulty_modifier;
+
         return default_scanning_power_curve(scanner_modified_power);
     }
     else
@@ -2092,7 +2096,7 @@ float ship::get_scanning_power_on(orbital* o)
 
         for(ship* s : sm->ships)
         {
-            max_emissions = std::max(max_emissions, get_scanning_power_on_ship(s));
+            max_emissions = std::max(max_emissions, get_scanning_power_on_ship(s, difficulty_modifier));
         }
 
         return max_emissions;

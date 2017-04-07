@@ -1239,7 +1239,7 @@ int main()
     tplanet->orbital_length = 50.f;
     tplanet->parent = sun;
 
-    base->generate_asteroids_old(100, 3, 5);
+    base->generate_asteroids_old(500, 3, 5);
     //base->generate_planet_resources(2.f);
 
     player_empire->take_ownership_of_all(base);
