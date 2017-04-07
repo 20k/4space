@@ -38,6 +38,14 @@ struct orbital;
 struct orbital_system;
 struct game_event_manager;
 
+struct dialogue_node
+{
+    std::string header;
+    std::string text;
+    std::vector<std::string> options;
+    std::vector<dialogue_node*> travel;
+};
+
 ///Ok. This is basically a branching sequence of events, each event may trigger a new event depending on the circumstances
 ///so we need an event history, and the current event, which can just be the last event in the history
 ///that can be under event manager
@@ -50,6 +58,8 @@ struct game_event
     float scanning_difficulty = randf_s(0.f, 1.f);
 
     orbital* alert_location = nullptr;
+
+    dialogue_node dialogue;
 
     void draw_ui();
 

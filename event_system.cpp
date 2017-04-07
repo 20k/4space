@@ -3,6 +3,27 @@
 #include "../../render_projects/imgui/imgui.h"
 #include "util.hpp"
 
+dialogue_node resolution =
+{
+    "Resolution",
+    "Test resolution",
+};
+
+dialogue_node dia_first =
+{
+    "Hi",
+    "Hello there you look like fun",
+    {
+        "Die die die aliens",
+        "Oh you're totally right",
+        "I like cereal",
+    },
+    {
+        &resolution, &resolution, &resolution,
+    }
+};
+
+
 int present_dialogue(const std::vector<std::string>& options)
 {
     int selected = -1;
@@ -34,7 +55,7 @@ int present_dialogue(const std::vector<std::string>& options)
 }
 
 ///somehow implement branching in here. Maybe we should literally make like a ptr structure of dialogue options?
-std::vector<std::string> get_dialogue_and_options(int arc_type, int event_offset)
+/*std::vector<std::string> get_dialogue_and_options(int arc_type, int event_offset)
 {
     if(event_offset == 0)
     {
@@ -48,11 +69,14 @@ std::vector<std::string> get_dialogue_and_options(int arc_type, int event_offset
     }
 
     return {""};
-}
+}*/
 
 void game_event::draw_ui()
 {
-    ImGui::Begin("Hello", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    if(dialogue.header == "")
+        return;
+
+    ImGui::Begin((dialogue.header + "###DLOGUE").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     //ImGui::Text("Sample Dialogue here, also there, and everywhere");
 
@@ -66,13 +90,29 @@ void game_event::draw_ui()
         "I'm not very good at writing, we're all going to die",
     };*/
 
-    auto dialogue_options = get_dialogue_and_options(arc_type, event_num);
+    std::vector<std::string> dialogue_options = {dialogue.text};
+
+    ///patch dialogue options here if necessary
+    for(auto& i : dialogue.options)
+    {
+        dialogue_options.push_back(i);
+    }
+
+    if(dialogue.options.size() == 0)
+    {
+        dialogue_options.push_back("Ok");
+    }
 
     int selected = present_dialogue(dialogue_options);
 
-    if(selected >= 0)
+    if(selected >= 1)
     {
         game_event next = parent->make_next_event();
+
+        if(selected < dialogue.travel.size())
+        {
+            next.dialogue = *(dialogue.travel[selected]);
+        }
 
         parent->event_history.push_back(next);
     }
@@ -100,6 +140,7 @@ game_event_manager::game_event_manager(orbital* o)
     first.arc_type = arc_type;
     first.parent = this;
     first.event_num = 0;
+    first.dialogue = dia_first; ///set from map the starting dialogues?
 
     event_history.push_back(first);
 }
