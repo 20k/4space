@@ -47,6 +47,8 @@ struct empire
 
     bool can_fully_dispense(const std::map<resource::types, float>& res);
 
+    void add_resource(resource::types type, float amount);
+
     ///returns real amount
     float dispense_resource(resource::types type, float requested);
     ///take fraction is fraction to actually take, frac_out is the proportion of initial resources we were able to take

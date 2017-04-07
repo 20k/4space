@@ -415,6 +415,22 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
     {
         ImGui::Text("(Recrew)");
 
+        auto res = s.resources_needed_to_recrew_total();
+
+        resource_manager rm;
+
+        for(auto& i : res)
+        {
+            rm.resources[i.first].amount = i.second;
+        }
+
+        std::string rstr = rm.get_formatted_str(true);
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip(rstr.c_str());
+        }
+
         ///if originating empire is not the claiming empire, get some tech
         if(ImGui::IsItemClicked())
         {
@@ -440,6 +456,45 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
             new_sm->steal(&s);
 
             o->data = new_sm;
+
+            popup.going = false;
+            popup.elements.clear();
+        }
+    }
+
+
+    if(s.fully_disabled() && claiming_empire != nullptr)
+    {
+        auto res = s.resources_received_when_scrapped();
+
+        resource_manager rm;
+
+        for(auto& i : res)
+        {
+            rm.resources[i.first].amount = i.second;
+        }
+
+        std::string text = "(Scrap for resources)";
+
+        ImGui::Text(text.c_str());
+
+        std::string rstr = rm.get_formatted_str(true);
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip(rstr.c_str());
+        }
+
+        if(ImGui::IsItemClicked())
+        {
+            ///destroy ship?
+
+            for(auto& i : res)
+            {
+                claiming_empire->add_resource(i.first, i.second);
+            }
+
+            s.cleanup = true;
 
             popup.going = false;
             popup.elements.clear();

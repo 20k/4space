@@ -417,10 +417,13 @@ struct ship : positional
 
     std::map<resource::types, float> resources_needed_to_recrew_total();
     std::map<resource::types, float> resources_needed_to_repair_total();
+    ///calculate research separately as it needs empire, both sides
     std::map<resource::types, float> resources_received_when_scrapped();
 
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);
+
+    bool cleanup = false;
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
@@ -469,6 +472,8 @@ struct ship_manager
     bool can_engage();
 
     void apply_disengage_penalty();
+
+    void cull_invalid();
 
     std::string get_engage_str();
 };

@@ -117,6 +117,11 @@ bool empire::can_fully_dispense(const std::map<resource::types, float>& res)
     return true;
 }
 
+void empire::add_resource(resource::types type, float amount)
+{
+    resources.resources[(int)type].amount += amount;
+}
+
 float empire::dispense_resource(resource::types type, float requested)
 {
     float available = resources.resources[(int)type].amount;

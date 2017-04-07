@@ -2165,6 +2165,19 @@ void ship_manager::apply_disengage_penalty()
     }
 }
 
+void ship_manager::cull_invalid()
+{
+    for(int i=0; i<ships.size(); i++)
+    {
+        if(ships[i]->cleanup)
+        {
+            ships.erase(ships.begin() + i);
+            i--;
+            continue;
+        }
+    }
+}
+
 std::string ship_manager::get_engage_str()
 {
     if(can_engage())
@@ -2222,6 +2235,8 @@ void fleet_manager::cull_dead(empire_manager& empire_manage)
 {
     for(int i=0; i < fleets.size(); i++)
     {
+        fleets[i]->cull_invalid();
+
         if(fleets[i]->ships.size() == 0)
         {
             auto m = fleets[i];
