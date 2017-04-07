@@ -667,7 +667,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     elem.buttons_map.erase(popup_element_type::ENGAGE);
                 }
 
-                if(orb->type == orbital_info::FLEET && !sm->can_engage())
+                if(orb->type == orbital_info::FLEET && !sm->can_engage() && sm->parent_empire == player_empire)
                 {
                     elem.buttons_map[popup_element_type::ENGAGE_COOLDOWN].name = sm->get_engage_str();
                 }
