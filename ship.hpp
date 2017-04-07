@@ -301,6 +301,7 @@ struct component
     float get_real_component_cost(); ///above including HP
 
     ///not including armour
+    ///we need a get_real_resource_cost etc as well for current resource cost base
     std::map<resource::types, float> resources_needed_to_repair();
 
     ///for ui stuff. Its better to keep this internally in case we add new components
