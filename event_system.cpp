@@ -103,9 +103,9 @@ void game_event::draw_ui()
         dialogue_options.push_back("Ok");
     }
 
-    int selected = present_dialogue(dialogue_options);
+    int selected = present_dialogue(dialogue_options) - 1;
 
-    if(selected >= 1)
+    if(selected >= 0)
     {
         game_event next = parent->make_next_event();
 
