@@ -1457,21 +1457,7 @@ void ship::resupply(empire& emp, int num)
         ship_component_elements::ARMOUR,
     };
 
-    std::map<resource::types, float> hp_repair_costs;
-
-    for(component& c : entity_list)
-    {
-        if(!c.has_element(ship_component_elements::HP))
-            continue;
-
-        ///good thing is, once we do hp repair costs properly this will be seamless
-        auto repair_costs = c.resources_needed_to_repair();
-
-        for(auto& i : repair_costs)
-        {
-            hp_repair_costs[i.first] += i.second;
-        }
-    }
+    std::map<resource::types, float> hp_repair_costs = resources_needed_to_repair_total();
 
     for(ship_component_elements::types& type : types)
     {
@@ -1743,6 +1729,23 @@ std::map<resource::types, float> ship::resources_needed_to_recrew_total()
             {
                 ret[i.first] += i.second;
             }
+        }
+    }
+
+    return ret;
+}
+
+std::map<resource::types, float> ship::resources_needed_to_repair_total()
+{
+    std::map<resource::types, float> ret;
+
+    for(component& c : entity_list)
+    {
+        auto res = c.resources_needed_to_repair();
+
+        for(auto& i : res)
+        {
+            ret[i.first] += i.second;
         }
     }
 

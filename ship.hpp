@@ -409,6 +409,7 @@ struct ship : positional
     float get_real_total_cost();
 
     std::map<resource::types, float> resources_needed_to_recrew_total();
+    std::map<resource::types, float> resources_needed_to_repair_total();
 
     void recrew_derelict(empire* owner, empire* claiming);
 
