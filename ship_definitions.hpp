@@ -31,6 +31,7 @@ component make_default_crew()
     crew.add(ship_component_element::ARMOUR, armour);
 
     crew.name = "Crew";
+    crew.primary_attribute = ship_component_elements::COMMAND;
 
     return crew;
 }
@@ -54,6 +55,7 @@ component make_default_life_support()
     life_support.add(ship_component_element::HP, hp);
 
     life_support.name = "Life Support";
+    life_support.primary_attribute = ship_component_elements::OXYGEN;
 
     return life_support;
 }
@@ -73,6 +75,7 @@ component make_default_ammo_store()
 
     ammo_store.name = "Ammo Store";
     ammo_store.skip_in_derelict_calculations = true;
+    ammo_store.primary_attribute = ship_component_elements::AMMO;
 
     return ammo_store;
 }
@@ -96,6 +99,7 @@ component make_default_shields()
     shields.add(ship_component_element::HP, hp);
 
     shields.name = "Shield Generator";
+    shields.primary_attribute = ship_component_elements::SHIELD_POWER;
 
     return shields;
 }
@@ -121,6 +125,7 @@ component make_default_power_core()
     core.add(ship_component_element::FUEL, fuel);
 
     core.name = "Power Core";
+    core.primary_attribute = ship_component_elements::ENERGY;
 
     return core;
 }
@@ -155,6 +160,7 @@ component make_default_engines()
     thruster.add(ship_component_element::HP, hp);
 
     thruster.name = "Thruster";
+    thruster.primary_attribute = ship_component_elements::ENGINE_POWER;
 
     return thruster;
 }
@@ -175,6 +181,7 @@ component make_default_heatsink()
 
     heatsink.name = "Heatsink";
     heatsink.skip_in_derelict_calculations = true;
+    heatsink.primary_attribute = ship_component_elements::COOLING_POTENTIAL;
 
     return heatsink;
 }
@@ -218,6 +225,7 @@ component make_default_warp_drive()
     warp_drive.add(ship_component_element::FUEL, fuel);
 
     warp_drive.name = "Warp Drive";
+    warp_drive.primary_attribute = ship_component_elements::WARP_POWER;
 
     return warp_drive;
 }
@@ -259,6 +267,7 @@ component make_default_railgun()
     gun.set_tag(component_tag::SCALE, 0.5f);
 
     gun.name = "Railgun";
+    gun.primary_attribute = ship_component_elements::RAILGUN;
 
     return gun;
 }
@@ -297,6 +306,7 @@ component make_default_torpedo()
     torp.set_tag(component_tag::SCALE, 0.5f);
 
     torp.name = "Torpedo";
+    torp.primary_attribute = ship_component_elements::TORPEDO;
 
     return torp;
 }

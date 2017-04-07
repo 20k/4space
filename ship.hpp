@@ -214,6 +214,7 @@ std::map<ship_component_element, float> merge_diffs(const std::map<ship_componen
 ///ie what can things do
 ///this is a ship entity for the moment.. but could likely describe a character as well
 ///float get_current_functionality
+///maybe component attributes should not have a tech level, but components overall
 struct component
 {
     /*component_attribute heat;
@@ -275,6 +276,8 @@ struct component
     bool clicked = false;
 
     bool skip_in_derelict_calculations = false;
+
+    ship_component_elements::types primary_attribute = ship_component_elements::NONE;
 };
 
 struct projectile;
