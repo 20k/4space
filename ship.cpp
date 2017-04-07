@@ -642,62 +642,6 @@ std::map<ship_component_element, float> ship::tick_all_components(float step_s)
     //if(step_s < 0.1)
     //    step_s = 0.1;
 
-    /*std::map<ship_component_element, float> total_production;
-
-    for(component& c : entity_list)
-    {
-        auto diff = c.get_timestep_production_diff(step_s);
-
-        total_production = merge_diffs(total_production, diff);
-    }
-
-    //printf("%f POWER\n", total_to_apply[ship_component_element::ENERGY]);
-
-    std::map<ship_component_element, float> available_capacities = get_available_capacities();
-
-    ///how to apply the output to systems fairly? Try and distribute evenly? Proportionally?
-    ///proportional seems reasonable atm
-    ///ok so this step distributes to all the individual storage
-    for(component& c : entity_list)
-    {
-        std::map<ship_component_element, float> this_entity_available = c.get_available_capacities();
-
-        for(auto& i : this_entity_available)
-        {
-            if(available_capacities[i.first] <= 0.001f)
-                continue;
-
-            float proportion = i.second / available_capacities[i.first];
-
-            float applying_to_this = proportion * total_production[i.first];
-
-            std::map<ship_component_element, float> tmap;
-
-            tmap[i.first] = applying_to_this;
-
-            auto r = c.apply_diff(tmap);
-
-            ///can be none left over as we're using available capacities
-            auto left_over = r;
-        }
-    }
-
-    ///so amount left over is total_to_apply - available_capacities
-
-    std::map<ship_component_element, float> left_over;
-
-    for(auto& i : total_production)
-    {
-        left_over[i.first] = i.second - available_capacities[i.first];
-    }
-
-
-
-
-    ///so now we've put production into storage,
-
-    return left_over;*/
-
     for(auto& i : entity_list)
     {
         i.update_time(step_s);

@@ -103,6 +103,28 @@ namespace ship_component_elements
         "WC",
     };
 
+    static std::vector<float> base_cost_of_component_with_this_primary_attribute
+    {
+        3.f,
+        15.f,
+        5.f,
+        2.f,
+        1.f,
+        1.f,
+        20.f,
+        4.f,
+        0.5f,
+        10.f,
+        30.f,
+        5.f,
+        2.f,
+        80.f,
+        30.f,
+        30.f,
+        25.f,
+        20.f
+    }
+
     ///Ok... we might want more research types
     static std::vector<research_info::types> component_element_to_research_type
     {
