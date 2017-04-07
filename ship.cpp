@@ -1862,6 +1862,20 @@ std::map<resource::types, float> ship::resources_received_when_scrapped()
     return ret;
 }
 
+research ship::get_research_base_for_empire(empire* owner, empire* claiming)
+{
+    research r;
+
+    for(component& c : entity_list)
+    {
+        research_category cat = c.get_research_base_for_empire(owner, claiming);
+
+        r.add_amount(cat);
+    }
+
+    return r;
+}
+
 research ship::get_research_real_for_empire(empire* owner, empire* claiming)
 {
     research r;
@@ -1883,6 +1897,17 @@ void ship::recrew_derelict(empire* owner, empire* claiming)
 
     if(!can_recrew(claiming))
         return;
+
+    ///this is not a sufficient check to prevent research exploits... you could pass an alien ship
+    ///back and forth between two races to get more and more research
+    if(claiming != original_owning_race && owner != claiming)
+    {
+        is_alien = true;
+
+        crew_effectiveness = 1.f - clamp(claiming->empire_culture_distance(claiming), 0.0f, 0.8f);
+
+        research_left_from_crewing = get_research_base_for_empire(original_owning_race, claiming).units_to_currency()/2.f;
+    }
 
     auto res_needed = resources_needed_to_recrew_total();
 

@@ -392,6 +392,13 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
         c_id++;
     }
 
+    float research_left = s.research_left_from_crewing;
+
+    std::string research_left_str = "Research left from crewing: " + std::to_string((int)research_left);
+
+    if(research_left > 0)
+        ImGui::Text(research_left_str.c_str());
+
     float cost = s.get_real_total_cost();
 
     std::string cost_str = "Cost: " + std::to_string((int)cost);

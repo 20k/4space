@@ -54,6 +54,14 @@ void empire::take_ownership(ship_manager* o)
 
     o->parent_empire = this;
 
+    for(ship* s : o->ships)
+    {
+        s->team = team_id;
+
+        if(s->original_owning_race == nullptr)
+            s->original_owning_race = this;
+    }
+
     owned_fleets.push_back(o);
 }
 
@@ -211,6 +219,11 @@ void empire::draw_ui()
 
 float empire::empire_culture_distance(empire* s)
 {
+    if(s == nullptr)
+    {
+        return 0.5f;
+    }
+
     return (s->culture_similarity - culture_similarity).length();
 }
 

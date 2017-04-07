@@ -427,12 +427,20 @@ struct ship : positional
     std::map<resource::types, float> resources_received_when_scrapped();
 
     ///requires raw research, not tech currency
+    research get_research_base_for_empire(empire* owner, empire* claiming);
     research get_research_real_for_empire(empire* owner, empire* claiming);
 
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);
 
     bool cleanup = false;
+
+    ///If we crew a ship, we get research gradually from the experience
+    float research_left_from_crewing = 0.f;
+    bool is_alien = false;
+    float crew_effectiveness = 1.f;
+
+    empire* original_owning_race = nullptr;
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
