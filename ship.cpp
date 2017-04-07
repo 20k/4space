@@ -2243,9 +2243,14 @@ void ship_manager::tick_all(float step_s)
         {
             research r = s->tick_drain_research_from_crew(step_s);
 
+            empire* original_empire = s->original_owning_race;
+
+            float research_currency = r.units_to_currency(false);
+
             if(parent_empire != nullptr)
             {
-                parent_empire->add_resource(resource::RESEARCH, r.units_to_currency(false));
+                parent_empire->add_resource(resource::RESEARCH, research_currency);
+                parent_empire->culture_shift(research_info::culture_shift_distance_per_unit_research * research_currency, original_empire);
             }
         }
     }

@@ -53,6 +53,8 @@ struct empire
 
     void add_research(const research& r);
 
+    void culture_shift(float culture_units, empire* destination);
+
     ///returns real amount
     float dispense_resource(resource::types type, float requested);
     ///take fraction is fraction to actually take, frac_out is the proportion of initial resources we were able to take

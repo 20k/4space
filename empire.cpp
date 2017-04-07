@@ -138,6 +138,18 @@ void empire::add_research(const research& r)
     }
 }
 
+void empire::culture_shift(float culture_units, empire* destination)
+{
+    if(destination == nullptr)
+        return;
+
+    vec2f to_destination = (destination->culture_similarity - culture_similarity).norm() * culture_units;
+
+    culture_similarity = culture_similarity + to_destination;
+
+    //printf("%f %f culture\n", culture_similarity.x(), culture_similarity.y());
+}
+
 float empire::dispense_resource(resource::types type, float requested)
 {
     float available = resources.resources[(int)type].amount;
