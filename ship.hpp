@@ -123,7 +123,7 @@ namespace ship_component_elements
         30.f,
         25.f,
         20.f
-    }
+    };
 
     ///Ok... we might want more research types
     static std::vector<research_info::types> component_element_to_research_type
