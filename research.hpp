@@ -53,6 +53,9 @@ namespace research_info
     float get_cost_scaling(float level, float cost);
 
     float tech_unit_to_research_currency(float tech_unit, bool has_minimum_value);
+
+    ///10000 units of research will shift our culture across the whole map if necessary
+    float culture_shift_distance_per_unit_research = 1/10000.f;
 }
 
 struct research_category

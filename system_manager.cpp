@@ -1219,7 +1219,8 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
     }
     if(was_in_system_view && !is_in_system_view)
     {
-        camera = camera + currently_viewed->universe_pos * universe_scale;
+        camera = currently_viewed->universe_pos * universe_scale;
+        //camera = camera + currently_viewed->universe_pos * universe_scale;
     }
 }
 
