@@ -881,9 +881,12 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                     smanage->ships[num]->display_ui = !smanage->ships[num]->display_ui;
                 }
 
-                if((ImGui::IsItemHovered() || hovered) && i.mergeable)
+                if(ImGui::IsItemHovered() || hovered)
                 {
-                    ImGui::SetTooltip("Shift-Click to add to fleet");
+                    if(can_open_window)
+                        ImGui::SetTooltip("Left Click to view fleet");
+                    if(i.mergeable)
+                        ImGui::SetTooltip("Shift-Click to add to fleet");
                 }
 
                 if(i.checked[kk])
