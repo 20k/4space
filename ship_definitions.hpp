@@ -32,6 +32,7 @@ component make_default_crew()
 
     crew.name = "Crew";
     crew.primary_attribute = ship_component_elements::COMMAND;
+    crew.rapair_this_when_recrewing = true;
 
     return crew;
 }
@@ -56,6 +57,7 @@ component make_default_life_support()
 
     life_support.name = "Life Support";
     life_support.primary_attribute = ship_component_elements::OXYGEN;
+    life_support.rapair_this_when_recrewing = true;
 
     return life_support;
 }
@@ -126,6 +128,7 @@ component make_default_power_core()
 
     core.name = "Power Core";
     core.primary_attribute = ship_component_elements::ENERGY;
+    core.rapair_this_when_recrewing = true;
 
     return core;
 }

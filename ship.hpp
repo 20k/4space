@@ -303,9 +303,9 @@ struct component
     bool clicked = false;
 
     bool skip_in_derelict_calculations = false;
+    bool rapair_this_when_recrewing = false; ///when you recrew a ship, repair this component
 
     ship_component_elements::types primary_attribute = ship_component_elements::NONE;
-
 };
 
 struct projectile;
