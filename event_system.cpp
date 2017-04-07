@@ -13,8 +13,14 @@ int present_dialogue(const std::vector<std::string>& options)
         //std::string display_str = "(" + std::to_string(num + 1) + ") " + str;
         std::string display_str = str;
 
-        if(display_str.length() > 0)
+        if(display_str.length() > 0 && num != 0)
             ImGui::BulletText(display_str.c_str());
+
+        if(display_str.length() > 0 && num == 0)
+        {
+            ImGui::Text(display_str.c_str());
+            ImGui::NewLine();
+        }
 
         if(ImGui::IsItemClicked())
         {
@@ -28,11 +34,11 @@ int present_dialogue(const std::vector<std::string>& options)
 }
 
 ///somehow implement branching in here. Maybe we should literally make like a ptr structure of dialogue options?
-std::vector<std::string> get_dialogue_options(int arc_type, int event_offset)
+std::vector<std::string> get_dialogue_and_options(int arc_type, int event_offset)
 {
     if(event_offset == 0)
     {
-        return {"Ruh roh, click this to not die!",
+        return {"Sample Dialogue here, also there, etc i'm tired ok", "Ruh roh, click this to not die!",
         "Well.... I guess this is dialogue",
         "I'm not very good at writing, we're all going to die",};
     }
@@ -48,9 +54,9 @@ void game_event::draw_ui()
 {
     ImGui::Begin("Hello", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::Text("Sample Dialogue here, also there, and everywhere");
+    //ImGui::Text("Sample Dialogue here, also there, and everywhere");
 
-    ImGui::NewLine();
+    //ImGui::NewLine();
 
     ///we'll have to manually format this
     /*std::vector<std::string> dialogue_options
@@ -60,7 +66,7 @@ void game_event::draw_ui()
         "I'm not very good at writing, we're all going to die",
     };*/
 
-    auto dialogue_options = get_dialogue_options(arc_type, event_num);
+    auto dialogue_options = get_dialogue_and_options(arc_type, event_num);
 
     int selected = present_dialogue(dialogue_options);
 
