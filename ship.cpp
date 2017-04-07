@@ -1421,14 +1421,15 @@ ship::~ship()
         delete intermediate_texture;
 }
 
+///resupply probably needs to distribute fairly from global, or use different resources
 void ship::resupply(empire& emp, int num)
 {
     std::vector<ship_component_elements::types> types =
     {
-        ship_component_elements::AMMO,
+        ship_component_elements::HP,
         ship_component_elements::FUEL,
+        ship_component_elements::AMMO,
         ship_component_elements::ARMOUR,
-        ship_component_elements::HP
     };
 
     for(ship_component_elements::types& type : types)
@@ -1642,7 +1643,12 @@ void ship::randomise_make_derelict()
         if(!c.has_element(ship_component_elements::HP))
             continue;
 
-        c.components[ship_component_elements::HP].cur_amount /= randf_s(5.f, 10.f);
+        component_attribute& hp_attr = c.components[ship_component_elements::HP];
+
+        hp_attr.cur_amount /= randf_s(5.f, 10.f);
+
+        if(hp_attr.cur_amount < 0)
+            hp_attr.cur_amount = 0.f;
 
         test_set_disabled();
     }
@@ -1774,8 +1780,6 @@ void ship_manager::resupply()
 {
     if(parent_empire == nullptr)
         return;
-
-    printf("resupply\n");
 
     int num = ships.size();
 

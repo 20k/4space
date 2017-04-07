@@ -61,6 +61,71 @@ bool once()
 
 #include "ship_definitions.hpp"
 
+namespace popup_element_type
+{
+    enum types
+    {
+        RESUPPLY,
+        ENGAGE,
+        ENGAGE_COOLDOWN,
+        COUNT
+    };
+}
+
+struct button_element
+{
+    std::string name;
+    bool pressed = false;
+};
+
+struct popup_element
+{
+    static int gid;
+    int id = gid++;
+
+    std::string header;
+    std::vector<std::string> data;
+    std::deque<bool> checked;
+    bool mergeable = false;
+    bool toggle_clickable = false;
+
+    std::map<popup_element_type::types, button_element> buttons_map;
+
+    void* element = nullptr;
+};
+
+int popup_element::gid;
+
+struct popup_info
+{
+    std::vector<popup_element> elements;
+
+    popup_element* fetch(void* element)
+    {
+        for(auto& i : elements)
+        {
+            if(i.element == element)
+                return &i;
+        }
+
+        return nullptr;
+    }
+
+    void rem(void* element)
+    {
+        for(int i=0; i<elements.size(); i++)
+        {
+            if(elements[i].element == element)
+            {
+                elements.erase(elements.begin() + i);
+                return;
+            }
+        }
+    }
+
+    bool going = false;
+};
+
 ///so display this (ish) on mouseover for a component
 std::string get_component_display_string(component& c)
 {
@@ -185,7 +250,7 @@ std::vector<std::string> get_components_display_string(ship& s)
 }
 
 ///claiming_empire for salvage, can be nullptr
-void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage)
+void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
 {
     auto produced = s.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = s.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -375,6 +440,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
             new_sm->steal(&s);
 
             o->data = new_sm;
+
+            popup.going = false;
+            popup.elements.clear();
         }
     }
 
@@ -418,70 +486,6 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }
 
-namespace popup_element_type
-{
-enum types
-{
-    RESUPPLY,
-    ENGAGE,
-    ENGAGE_COOLDOWN,
-    COUNT
-};
-}
-
-struct button_element
-{
-    std::string name;
-    bool pressed = false;
-};
-
-struct popup_element
-{
-    static int gid;
-    int id = gid++;
-
-    std::string header;
-    std::vector<std::string> data;
-    std::deque<bool> checked;
-    bool mergeable = false;
-    bool toggle_clickable = false;
-
-    std::map<popup_element_type::types, button_element> buttons_map;
-
-    void* element = nullptr;
-};
-
-int popup_element::gid;
-
-struct popup_info
-{
-    std::vector<popup_element> elements;
-
-    popup_element* fetch(void* element)
-    {
-        for(auto& i : elements)
-        {
-            if(i.element == element)
-                return &i;
-        }
-
-        return nullptr;
-    }
-
-    void rem(void* element)
-    {
-        for(int i=0; i<elements.size(); i++)
-        {
-            if(elements[i].element == element)
-            {
-                elements.erase(elements.begin() + i);
-                return;
-            }
-        }
-    }
-
-    bool going = false;
-};
 
 /*void debug_menu(const std::vector<ship*>& ships)
 {
@@ -1332,7 +1336,7 @@ int main()
             {
                 if(s->display_ui)
                 {
-                    display_ship_info(*s, smanage->parent_empire, player_empire, system_manage, fleet_manage, empire_manage);
+                    display_ship_info(*s, smanage->parent_empire, player_empire, system_manage, fleet_manage, empire_manage, popup);
                 }
             }
         }
