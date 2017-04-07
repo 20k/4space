@@ -92,3 +92,15 @@ void research::add_amount(const research_category& category)
 {
     categories[category.type].amount += category.amount;
 }
+
+float research::units_to_currency()
+{
+    float accum = 0;
+
+    for(auto& i : categories)
+    {
+        accum += research_info::tech_unit_to_research_currency(i.amount);
+    }
+
+    return accum;
+}

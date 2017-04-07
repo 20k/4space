@@ -71,6 +71,10 @@ struct research
     void tick(float step_s);
 
     void add_amount(const research_category& category);
+
+    ///this doesn't convert tech LEVELS to currency, this converts tech UNITS to currency
+    ///levels are exponential, units are linear
+    float units_to_currency();
 };
 
 #endif // RESEARCH_HPP_INCLUDED
