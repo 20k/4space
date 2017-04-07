@@ -176,7 +176,7 @@ std::vector<std::string> get_components_display_string(ship& s)
     return display_str;
 }
 
-void display_ship_info(ship& s)
+void display_ship_info(ship& s, empire* owner)
 {
     auto produced = s.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = s.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -316,6 +316,13 @@ void display_ship_info(ship& s)
         }*/
 
         c_id++;
+    }
+
+    ImGui::Text("(Upgrade to latest Tech)");
+
+    if(ImGui::IsItemClicked())
+    {
+        s.set_tech_level_from_empire(owner);
     }
 
     ImGui::End();
@@ -1227,7 +1234,7 @@ int main()
             {
                 if(s->display_ui)
                 {
-                    display_ship_info(*s);
+                    display_ship_info(*s, smanage->parent_empire);
                 }
             }
         }
