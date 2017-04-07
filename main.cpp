@@ -249,6 +249,32 @@ std::vector<std::string> get_components_display_string(ship& s)
     return display_str;
 }
 
+/*std::string obfuscate(const std::string& str, bool should_obfuscate)
+{
+    if(!should_obfuscate)
+        return str;
+
+    return "??/??";
+}*/
+
+std::string obfuscate(const std::string& str, bool should_obfuscate)
+{
+    if(!should_obfuscate)
+        return str;
+
+    std::string ret = str;
+
+    for(int i=0; i<ret.length(); i++)
+    {
+        if(isalnum(ret[i]))
+        {
+            ret[i] = '?';
+        }
+    }
+
+    return ret;
+}
+
 ///claiming_empire for salvage, can be nullptr
 void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
 {
@@ -256,6 +282,11 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     auto consumed = s.get_needed_resources(1.f); ///not actually consumed, but requested
     auto stored = s.get_stored_resources();
     auto max_res = s.get_max_resources();
+
+    float known_information = player_empire->available_scanning_power_on(&s, system_manage);
+
+    //bool knows_prod = known_information >= 0.4f;
+    //bool knows_prod_exact = known_information >= 0.9f;
 
     std::set<ship_component_element> elements;
 
@@ -291,6 +322,15 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         name_str += " (Derelict)";
     }
 
+    std::map<ship_component_elements::types, bool> primary_obfuscated;
+
+    for(component& c : s.entity_list)
+    {
+        if(known_information < c.scanning_difficulty)
+            primary_obfuscated[c.primary_attribute] = true;
+    }
+
+
     ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> headers;
@@ -320,6 +360,16 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         std::string header_str = ship_component_elements::display_strings[id];
 
         //std::string res = header + ": " + display_str + "\n";
+
+        //bool knows = s.is_known_with_scanning_power(id, known_information);
+
+        bool obfuscd = primary_obfuscated[id];
+
+        header_str = obfuscate(header_str, obfuscd);
+        prod_str = obfuscate(prod_str, obfuscd);
+        cons_str = obfuscate(cons_str, obfuscd);
+        store_max_str = obfuscate(store_max_str, obfuscd);
+
 
         headers.push_back(header_str);
         prod_list.push_back(prod_str);
@@ -369,6 +419,10 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             name = "+" + name;
         }
 
+        bool knows = known_information >= c.scanning_difficulty;
+
+        name = obfuscate(name, !knows);
+
         ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
 
         if(ImGui::IsItemClicked())
@@ -376,11 +430,14 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             c.clicked = !c.clicked;
         }
 
+
         if(c.clicked)
         {
             ImGui::Indent();
 
-            ImGui::Text(get_component_display_string(c).c_str());
+            std::string str = get_component_display_string(c);
+
+            ImGui::Text(obfuscate(str, !knows).c_str());
             ImGui::Unindent();
         }
 
@@ -938,7 +995,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     }
 }
 
-void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires)
+void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires, empire* player_empire)
 {
     if(popup.elements.size() == 0)
         popup.going = false;
@@ -994,6 +1051,14 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                 {
                     can_open_window = true;
                 }
+
+                float scanning_capacity = player_empire->available_scanning_power_on(s, all_systems);
+
+                ///um. We probably want to adjust the scanner thing to return levels, not rando floats
+                if(scanning_capacity > 0.4f)
+                {
+                    can_open_window = true;
+                }
             }
 
             if(i.toggle_clickable)
@@ -1013,6 +1078,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                     i.checked[kk] = !i.checked[kk];
                 }
 
+                ///and sufficient information
                 if(non_shift_clicked && can_open_window)
                 {
                     orbital* o = (orbital*)i.element;
@@ -1440,7 +1506,7 @@ int main()
 
         //printf("prepp\n");
 
-        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage);
+        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire);
 
         //printf("precull\n");
 

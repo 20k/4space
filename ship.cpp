@@ -2027,7 +2027,7 @@ float get_default_scanning_power(ship* s)
 
     for(component& c : s->entity_list)
     {
-        if(!c.primary_attribute == ship_component_elements::SCANNING_POWER)
+        if(c.primary_attribute != ship_component_elements::SCANNING_POWER)
             continue;
 
         ///not operating well enough
@@ -2064,14 +2064,17 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
         has_stealth = true;
     }
 
-    float modified_scanning_power = get_default_scanning_power(s) - difficulty_modifier;
+    float modified_scanning_power = get_default_scanning_power(this) - difficulty_modifier;
 
-    if(!has_stealth)
-    {
-        return default_scanning_power_curve(modified_scanning_power);
-    }
+    float disabled_mod = s->fully_disabled() ? 0.25f : 0.f;
 
-    return default_scanning_power_curve(modified_scanning_power - max_tech_stealth_system_modified);
+    float end_val = default_scanning_power_curve(modified_scanning_power - max_tech_stealth_system_modified);
+
+    end_val += disabled_mod;
+
+    end_val = clamp(end_val, 0.f, 1.f);
+
+    return end_val;
 }
 
 float ship::get_scanning_power_on(orbital* o, int difficulty_modifier)
@@ -2080,8 +2083,6 @@ float ship::get_scanning_power_on(orbital* o, int difficulty_modifier)
     ///if my == theirs, total information
     ///if my == theirs stealth, little to no information
     ///for every level of difference, we lose 50%. 2 levels below we get very little? 50% of remaining 50%?
-
-
     if(o->type != orbital_info::FLEET)
     {
         float scanner_modified_power = get_default_scanning_power(this) - difficulty_modifier;

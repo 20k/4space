@@ -247,6 +247,8 @@ struct component
     component_attribute damage;
     component_attribute */
 
+    float scanning_difficulty = randf_s(0.f, 1.f);
+
     std::string name = "";
 
     std::map<ship_component_element, component_attribute> components;
