@@ -332,6 +332,12 @@ void display_ship_info(ship& s, empire* owner)
 
     ImGui::Text(cost_str.c_str());
 
+    if(ImGui::IsItemHovered() && s.fully_disabled())
+    {
+        ImGui::SetTooltip("Amount recovered through salvage");
+    }
+    ///have a recovery cost display?
+
     ImGui::Text("(Upgrade to latest Tech)");
 
     if(ImGui::IsItemClicked())
