@@ -122,6 +122,14 @@ void empire::add_resource(resource::types type, float amount)
     resources.resources[(int)type].amount += amount;
 }
 
+void empire::add_research(const research& r)
+{
+    for(int i=0; i<r.categories.size(); i++)
+    {
+        research_tech_level.categories[i].amount += r.categories[i].amount;
+    }
+}
+
 float empire::dispense_resource(resource::types type, float requested)
 {
     float available = resources.resources[(int)type].amount;
@@ -204,6 +212,11 @@ void empire::draw_ui()
 float empire::empire_culture_distance(empire* s)
 {
     return (s->culture_similarity - culture_similarity).length();
+}
+
+float empire::get_research_level(research_info::types type)
+{
+    return research_tech_level.categories[(int)type].amount;
 }
 
 empire* empire_manager::make_new()

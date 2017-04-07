@@ -302,12 +302,15 @@ struct component
 
     ///not including armour
     ///we need a get_real_resource_cost etc as well for current resource cost base
-    ///including tech
     ///not including HP
     std::map<resource::types, float> get_resource_cost();
     ///ie how much they're worth
     std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_needed_to_repair();
+
+    ///how much research would empire emp get if they could
+    research_category get_research_base_for_empire(empire* owner, empire* claiming_empire);
+    research_category get_research_real_for_empire(empire* owner, empire* claiming_empire);
 
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;
@@ -316,6 +319,9 @@ struct component
     bool repair_this_when_recrewing = false; ///when you recrew a ship, repair this component
 
     ship_component_elements::types primary_attribute = ship_component_elements::NONE;
+
+    ///does in * hp_cur / hp_max safely
+    float safe_hp_frac_modify(float in);
 };
 
 struct projectile;
@@ -419,6 +425,9 @@ struct ship : positional
     std::map<resource::types, float> resources_needed_to_repair_total();
     ///calculate research separately as it needs empire, both sides
     std::map<resource::types, float> resources_received_when_scrapped();
+
+    ///requires raw research, not tech currency
+    research get_research_real_for_empire(empire* owner, empire* claiming);
 
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);

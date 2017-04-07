@@ -49,6 +49,8 @@ struct empire
 
     void add_resource(resource::types type, float amount);
 
+    void add_research(const research& r);
+
     ///returns real amount
     float dispense_resource(resource::types type, float requested);
     ///take fraction is fraction to actually take, frac_out is the proportion of initial resources we were able to take
@@ -59,6 +61,8 @@ struct empire
     void draw_ui();
 
     float empire_culture_distance(empire* e);
+
+    float get_research_level(research_info::types type);
 };
 
 struct empire_manager

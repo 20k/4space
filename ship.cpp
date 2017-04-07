@@ -736,6 +736,53 @@ std::map<resource::types, float> component::resources_needed_to_repair()
     return res;
 }
 
+///MAIN DEFINITION OF TECH DISTANCES
+research_category component::get_research_base_for_empire(empire* owner, empire* claiming_empire)
+{
+    ///everything *essentially* should have a primary attribute
+    if(primary_attribute == ship_component_elements::NONE)
+        return {research_info::MATERIALS, 0.f};
+
+    float culture_distance_between_empires = claiming_empire->empire_culture_distance(owner);
+
+    float tech_level_of_component = get_tech_level_of_primary();
+
+    research_info::types research_type = ship_component_elements::component_element_to_research_type[primary_attribute];
+
+    float claiming_tech_level = claiming_empire->get_research_level(research_type);
+
+    float tech_distance = culture_distance_between_empires * (tech_level_of_component - claiming_tech_level + 2);
+
+    //float amount = research_info::tech_unit_to_research_currency(tech_distance);
+
+    float amount = tech_distance;
+
+    return {research_type, amount};
+}
+
+research_category component::get_research_real_for_empire(empire* owner, empire* claiming_empire)
+{
+    auto cat = get_research_base_for_empire(owner, claiming_empire);
+
+    cat.amount = safe_hp_frac_modify(cat.amount);
+
+    return cat;
+}
+
+float component::safe_hp_frac_modify(float in)
+{
+    if(!has_element(ship_component_elements::HP))
+        return in;
+
+    float max_val = components[ship_component_element::HP].max_amount;
+
+    if(max_val < 0.001f)
+        return in;
+
+    float cur_val = components[ship_component_element::HP].cur_amount;
+
+    return in * (cur_val / max_val);
+}
 
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
@@ -1815,6 +1862,19 @@ std::map<resource::types, float> ship::resources_received_when_scrapped()
     return ret;
 }
 
+research ship::get_research_real_for_empire(empire* owner, empire* claiming)
+{
+    research r;
+
+    for(component& c : entity_list)
+    {
+        research_category cat = c.get_research_real_for_empire(owner, claiming);
+
+        r.add_amount(cat);
+    }
+
+    return r;
+}
 
 void ship::recrew_derelict(empire* owner, empire* claiming)
 {

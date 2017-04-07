@@ -51,6 +51,8 @@ namespace research_info
     #endif // TESTING
 
     float get_cost_scaling(float level, float cost);
+
+    float tech_unit_to_research_currency(float tech_unit);
 }
 
 struct research_category
@@ -67,6 +69,8 @@ struct research
 
     void draw_ui(empire* emp);
     void tick(float step_s);
+
+    void add_amount(const research_category& category);
 };
 
 #endif // RESEARCH_HPP_INCLUDED

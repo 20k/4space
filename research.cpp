@@ -20,6 +20,15 @@ float research_info::get_cost_scaling(float level, float base_cost)
     return get_research_level_cost(level, base_cost, false);
 }
 
+float research_info::tech_unit_to_research_currency(float tech_unit)
+{
+    ///tech UNITS not currency, 1 is quite a long way
+    if(tech_unit < 1/20.f)
+        tech_unit = 1/20.f;
+
+    return tech_unit * 20.f;
+}
+
 research::research()
 {
     for(int i=0; i<(int)research_info::COUNT; i++)
@@ -77,4 +86,9 @@ void research::draw_ui(empire* emp)
 void research::tick(float step_s)
 {
 
+}
+
+void research::add_amount(const research_category& category)
+{
+    categories[category.type].amount += category.amount;
 }

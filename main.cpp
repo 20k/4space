@@ -465,7 +465,18 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
 
     if(s.fully_disabled() && claiming_empire != nullptr)
     {
+        research research_raw = s.get_research_real_for_empire(s.owned_by->parent_empire, claiming_empire);
+
+        float currency = 0.f;
+
+        for(auto& i : research_raw.categories)
+        {
+            currency += research_info::tech_unit_to_research_currency(i.amount);
+        }
+
         auto res = s.resources_received_when_scrapped();
+
+        res[resource::RESEARCH] = currency;
 
         resource_manager rm;
 
