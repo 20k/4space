@@ -272,6 +272,8 @@ struct component
     void set_tech_level_of_element(ship_component_elements::types type, float tech_level);
     float get_tech_level_of_element(ship_component_elements::types type);
 
+    float get_tech_level_of_primary();
+
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;
 

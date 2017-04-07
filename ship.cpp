@@ -632,6 +632,11 @@ float component::get_tech_level_of_element(ship_component_elements::types type)
     return components[type].get_tech_level();
 }
 
+float component::get_tech_level_of_primary()
+{
+    return get_tech_level_of_element(primary_attribute);
+}
+
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
     //if(step_s < 0.1)
