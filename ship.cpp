@@ -1464,6 +1464,7 @@ void ship::resupply(empire& emp, int num)
         if(!c.has_element(ship_component_elements::HP))
             continue;
 
+        ///good thing is, once we do hp repair costs properly this will be seamless
         auto repair_costs = c.resources_needed_to_repair();
 
         for(auto& i : repair_costs)
@@ -1471,8 +1472,6 @@ void ship::resupply(empire& emp, int num)
             hp_repair_costs[i.first] += i.second;
         }
     }
-
-    printf("hp %f\n", hp_repair_costs[resource::IRON]);
 
     for(ship_component_elements::types& type : types)
     {
