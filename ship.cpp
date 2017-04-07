@@ -653,6 +653,7 @@ float component::get_component_cost()
     return research_info::get_cost_scaling(tech_level, base_cost);
 }
 
+///fractional based on hp
 float component::get_real_component_cost()
 {
     if(!has_element(ship_component_elements::HP))
@@ -1754,7 +1755,41 @@ std::map<resource::types, float> ship::resources_needed_to_repair_total()
 
 void ship::recrew_derelict(empire* owner, empire* claiming)
 {
+    if(claiming == nullptr)
+        return;
 
+    if(!can_recrew(claiming))
+        return;
+
+    auto res_needed = resources_needed_to_recrew_total();
+
+    for(auto& i : res_needed)
+    {
+        claiming->dispense_resource(i.first, i.second);
+    }
+
+    for(component& c : entity_list)
+    {
+        if(!c.repair_this_when_recrewing)
+            continue;
+
+        if(!c.has_element(ship_component_elements::HP))
+            continue;
+
+        component_attribute& attr = c.components[ship_component_elements::HP];
+
+        attr.cur_amount = attr.max_amount;
+    }
+}
+
+bool ship::can_recrew(empire* claiming)
+{
+    if(claiming == nullptr)
+        return false;
+
+    auto res_needed = resources_needed_to_recrew_total();
+
+    return claiming->can_fully_dispense(res_needed);
 }
 
 ship* ship_manager::make_new(int team)

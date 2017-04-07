@@ -106,6 +106,17 @@ void empire::generate_resource_from_owned(float step_s)
     }
 }
 
+bool empire::can_fully_dispense(const std::map<resource::types, float>& res)
+{
+    for(auto& i : res)
+    {
+        if(resources.resources[i.first].amount < i.second)
+            return false;
+    }
+
+    return true;
+}
+
 float empire::dispense_resource(resource::types type, float requested)
 {
     float available = resources.resources[(int)type].amount;

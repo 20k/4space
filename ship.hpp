@@ -297,6 +297,7 @@ struct component
     float get_tech_level_of_primary();
     float get_base_component_cost(); ///static
     float get_component_cost(); ///static including tech
+    ///hp is done FRACTIONALLY not in real terms
     float get_real_component_cost(); ///above including HP
 
     ///not including armour
@@ -412,6 +413,7 @@ struct ship : positional
     std::map<resource::types, float> resources_needed_to_repair_total();
 
     void recrew_derelict(empire* owner, empire* claiming);
+    bool can_recrew(empire* claiming);
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;

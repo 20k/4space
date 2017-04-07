@@ -411,7 +411,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
         s.set_tech_level_from_empire(owner);
     }
 
-    if(s.fully_disabled() && claiming_empire != nullptr)
+    if(s.fully_disabled() && claiming_empire != nullptr && s.can_recrew(claiming_empire))
     {
         ImGui::Text("(Recrew)");
 
@@ -1060,6 +1060,8 @@ int main()
 
     empire* player_empire = empire_manage.make_new();
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
+
+    player_empire->resources.resources[resource::IRON].amount = 200.f;
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
