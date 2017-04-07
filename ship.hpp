@@ -327,6 +327,7 @@ struct component
 struct projectile;
 struct ship_manager;
 struct empire;
+struct orbital;
 
 struct ship : positional
 {
@@ -448,6 +449,10 @@ struct ship : positional
     empire* original_owning_race = nullptr;
 
     std::map<empire*, research> past_owners_research_left;
+
+    ///1 = total information, 0 = absolutely none
+    float get_scanning_power_on(orbital* o);
+    float get_scanning_power_on_ship(ship* s);
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;

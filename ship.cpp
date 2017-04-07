@@ -2006,6 +2006,99 @@ bool ship::can_recrew(empire* claiming)
     return claiming->can_fully_dispense(res_needed);
 }
 
+float default_scanning_power_curve(float scanner_modified_power)
+{
+    if(scanner_modified_power < 0.5f)
+        return 0.25f;
+
+    if(scanner_modified_power >= 0.5f && scanner_modified_power < 1.5f)
+        return 0.75f;
+
+    if(scanner_modified_power >= 1.5f)
+        return 1.f;
+}
+
+float get_default_scanning_power(ship* s)
+{
+    float scanner_modified_power = -1.f;
+
+    for(component& c : s->entity_list)
+    {
+        if(!c.primary_attribute == ship_component_elements::SCANNING_POWER)
+            continue;
+
+        ///not operating well enough
+        if(c.components[c.primary_attribute].cur_efficiency < 0.25f)
+            continue;
+
+        float tech_level = c.get_tech_level_of_primary();
+
+        tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
+        scanner_modified_power = std::max(scanner_modified_power, tech_level);
+    }
+
+    return scanner_modified_power;
+}
+
+float ship::get_scanning_power_on_ship(ship* s)
+{
+    bool has_stealth = false;
+    float max_tech_stealth_system_modified = 0.f;
+
+    for(int i=0; i<s->entity_list.size(); i++)
+    {
+        component& c = s->entity_list[i];
+
+        if(c.primary_attribute != ship_component_elements::STEALTH)
+            continue;
+
+        float tech_level = c.get_tech_level_of_primary();
+
+        tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
+
+        max_tech_stealth_system_modified = std::max(max_tech_stealth_system_modified, tech_level);
+
+        has_stealth = true;
+    }
+
+    float modified_scanning_power = get_default_scanning_power(s);
+
+    if(!has_stealth)
+    {
+        return default_scanning_power_curve(modified_scanning_power);
+    }
+
+    return default_scanning_power_curve(modified_scanning_power - max_tech_stealth_system_modified);
+}
+
+float ship::get_scanning_power_on(orbital* o)
+{
+    ///naive
+    ///if my == theirs, total information
+    ///if my == theirs stealth, little to no information
+    ///for every level of difference, we lose 50%. 2 levels below we get very little? 50% of remaining 50%?
+
+    float scanner_modified_power = get_default_scanning_power(this);
+
+    if(o->type != orbital_info::FLEET)
+    {
+        return default_scanning_power_curve(scanner_modified_power);
+    }
+    else
+    {
+        float max_emissions = 0.f;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        for(ship* s : sm->ships)
+        {
+            max_emissions = std::max(max_emissions, get_scanning_power_on_ship(s));
+        }
+
+        return max_emissions;
+    }
+}
+
 ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;
