@@ -465,9 +465,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
 
             ship_manager* new_sm = fleet_manage.make_new();
 
-            claiming_empire->take_ownership(new_sm);
-
             new_sm->steal(&s);
+
+            claiming_empire->take_ownership(new_sm);
 
             o->data = new_sm;
 
