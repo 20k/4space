@@ -326,12 +326,22 @@ void display_ship_info(ship& s, empire* owner)
         c_id++;
     }
 
+    float cost = s.get_real_total_cost();
+
+    std::string cost_str = "Cost: " + std::to_string((int)cost);
+
+    ImGui::Text(cost_str.c_str());
+
     ImGui::Text("(Upgrade to latest Tech)");
 
     if(ImGui::IsItemClicked())
     {
         s.set_tech_level_from_empire(owner);
     }
+
+    ///if derelict SALAGE BBZ or recapture YEAAAAAH
+    ///recapturing will take some resources to prop up the crew and some necessary systems
+    ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
 
     ImGui::End();
 }

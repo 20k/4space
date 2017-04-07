@@ -1648,6 +1648,18 @@ void ship::randomise_make_derelict()
     }
 }
 
+float ship::get_real_total_cost()
+{
+    float accum = 0.f;
+
+    for(component& c : entity_list)
+    {
+        accum += c.get_real_component_cost();
+    }
+
+    return accum;
+}
+
 ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;

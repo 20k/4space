@@ -402,6 +402,8 @@ struct ship : positional
     ///damages the ship until derelict
     void randomise_make_derelict();
 
+    float get_real_total_cost();
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
