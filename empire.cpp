@@ -2,6 +2,11 @@
 #include "system_manager.hpp"
 #include "ship.hpp"
 
+empire::empire()
+{
+    culture_similarity = {randf_s(0.f, 1.f), randf_s(0.f, 1.f)};
+}
+
 int empire::team_gid = 0;
 
 void empire::take_ownership(orbital* o)
@@ -178,6 +183,11 @@ void empire::tick(float step_s)
 void empire::draw_ui()
 {
     research_tech_level.draw_ui(this);
+}
+
+float empire::empire_culture_distance(empire* s)
+{
+    return (s->culture_similarity - culture_similarity).length();
 }
 
 empire* empire_manager::make_new()

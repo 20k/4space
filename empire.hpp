@@ -4,6 +4,7 @@
 #include "resource_manager.hpp"
 #include <map>
 #include "research.hpp"
+#include <vec/vec.hpp>
 
 struct orbital;
 struct orbital_system;
@@ -11,6 +12,10 @@ struct ship_manager;
 
 struct empire
 {
+    ///a two dimensional vector that we can use to determine our similarity to other empires
+    ///used for determining tech and ship operating capability
+    vec2f culture_similarity;
+
     research research_tech_level;
     resource_manager resources;
 
@@ -21,6 +26,8 @@ struct empire
 
     std::vector<orbital*> owned;
     std::vector<ship_manager*> owned_fleets;
+
+    empire();
 
     void take_ownership(orbital* o);
     void release_ownership(orbital* o);
@@ -43,6 +50,8 @@ struct empire
 
     void tick(float step_s);
     void draw_ui();
+
+    float empire_culture_distance(empire* e);
 };
 
 struct empire_manager
