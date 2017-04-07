@@ -418,7 +418,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
         s.set_tech_level_from_empire(owner);
     }
 
-    if(s.fully_disabled() && claiming_empire != nullptr && s.can_recrew(claiming_empire))
+    if(s.fully_disabled() && claiming_empire != nullptr && s.can_recrew(claiming_empire) && !s.owned_by->any_in_combat())
     {
         ImGui::Text("(Recrew)");
 
@@ -477,7 +477,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
     }
 
 
-    if(s.fully_disabled() && claiming_empire != nullptr)
+    if(s.fully_disabled() && claiming_empire != nullptr && !s.owned_by->any_in_combat())
     {
         research research_raw = s.get_research_real_for_empire(s.owned_by->parent_empire, claiming_empire);
 
