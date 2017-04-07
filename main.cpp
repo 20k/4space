@@ -184,7 +184,8 @@ std::vector<std::string> get_components_display_string(ship& s)
     return display_str;
 }
 
-void display_ship_info(ship& s, empire* owner)
+///claiming_empire for salvage, can be nullptr
+void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage)
 {
     auto produced = s.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = s.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -345,6 +346,38 @@ void display_ship_info(ship& s, empire* owner)
         s.set_tech_level_from_empire(owner);
     }
 
+    if(s.fully_disabled() && claiming_empire != nullptr)
+    {
+        ImGui::Text("(Recrew)");
+
+        ///if originating empire is not the claiming empire, get some tech
+        if(ImGui::IsItemClicked())
+        {
+            s.recrew_derelict(owner, claiming_empire);
+
+            ship_manager* parent_fleet = s.owned_by;
+
+            owner->release_ownership(parent_fleet);
+
+            orbital_system* os = system_manage.get_by_element(parent_fleet);
+
+            orbital* o = os->get_by_element(parent_fleet);
+
+            assert(o);
+
+            owner->release_ownership(o);
+            claiming_empire->take_ownership(o);
+
+            ship_manager* new_sm = fleet_manage.make_new();
+
+            claiming_empire->take_ownership(new_sm);
+
+            new_sm->steal(&s);
+
+            o->data = new_sm;
+        }
+    }
+
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
@@ -387,13 +420,13 @@ void display_ship_info_old(ship& s, float step_s)
 
 namespace popup_element_type
 {
-    enum types
-    {
-        RESUPPLY,
-        ENGAGE,
-        ENGAGE_COOLDOWN,
-        COUNT
-    };
+enum types
+{
+    RESUPPLY,
+    ENGAGE,
+    ENGAGE_COOLDOWN,
+    COUNT
+};
 }
 
 struct button_element
@@ -1299,10 +1332,13 @@ int main()
             {
                 if(s->display_ui)
                 {
-                    display_ship_info(*s, smanage->parent_empire);
+                    display_ship_info(*s, smanage->parent_empire, player_empire, system_manage, fleet_manage, empire_manage);
                 }
             }
         }
+
+        system_manage.cull_empty_orbital_fleets(empire_manage);
+        fleet_manage.cull_dead(empire_manage);
 
         if(key.isKeyPressed(sf::Keyboard::N))
         {

@@ -1672,6 +1672,11 @@ float ship::get_real_total_cost()
     return accum;
 }
 
+void ship::recrew_derelict(empire* owner, empire* claiming)
+{
+
+}
+
 ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;
@@ -1769,6 +1774,8 @@ void ship_manager::resupply()
 {
     if(parent_empire == nullptr)
         return;
+
+    printf("resupply\n");
 
     int num = ships.size();
 

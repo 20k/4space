@@ -405,6 +405,8 @@ struct ship : positional
     float get_total_cost();
     float get_real_total_cost();
 
+    void recrew_derelict(empire* owner, empire* claiming);
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
