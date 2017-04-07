@@ -666,6 +666,7 @@ float component::get_real_component_cost()
     return get_component_cost() * (hp_element.cur_amount / hp_element.max_amount);
 }
 
+///wtf, HP always costs iron to repair? WE'VE DUN FUCKED UP
 std::map<resource::types, float> component::resources_needed_to_repair()
 {
     std::map<resource::types, float> res;
@@ -682,7 +683,9 @@ std::map<resource::types, float> component::resources_needed_to_repair()
 
     for(auto& i : res)
     {
-        i.second *= std::max(hp_elem.max_amount - hp_elem.cur_amount, 0.f);
+        //i.second *= std::max(hp_elem.max_amount - hp_elem.cur_amount, 0.f);
+
+        i.second *= get_component_cost() - get_real_component_cost();
     }
 
     return res;
@@ -1454,15 +1457,42 @@ void ship::resupply(empire& emp, int num)
         ship_component_elements::ARMOUR,
     };
 
+    std::map<resource::types, float> hp_repair_costs;
+
+    for(component& c : entity_list)
+    {
+        if(!c.has_element(ship_component_elements::HP))
+            continue;
+
+        auto repair_costs = c.resources_needed_to_repair();
+
+        for(auto& i : repair_costs)
+        {
+            hp_repair_costs[i.first] += i.second;
+        }
+    }
+
+    printf("hp %f\n", hp_repair_costs[resource::IRON]);
+
     for(ship_component_elements::types& type : types)
     {
         float current_capacity = get_available_capacities()[type];
 
         std::map<resource::types, float> requested_resource_amounts = ship_component_elements::component_storage_to_resources(type);
 
+        ///need to integrate module costs in here somehow
+        ///can we apply this on the top for HP and armour?
+
         ///so we request twice as much... but we'll only take vanilla amounts
         for(auto& i : requested_resource_amounts)
+        {
             i.second *= current_capacity*num;
+        }
+
+        if(type == ship_component_elements::HP)
+        {
+            requested_resource_amounts = hp_repair_costs;
+        }
 
         float efficiency_frac;
 
