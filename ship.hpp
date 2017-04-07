@@ -342,11 +342,14 @@ struct ship : positional
     ///returns extra resources for us to handle
     std::map<ship_component_element, float> tick_all_components(float step_s);
     void tick_other_systems(float step_s);
+    research tick_drain_research_from_crew(float step_s);
 
     void tick_combat(float step_s);
     void enter_combat();
     void leave_combat();
     bool in_combat();
+
+    research get_crewing_research(float step_s);
 
     //std::map<ship_component_element, float> last_left_over;
 
@@ -430,17 +433,21 @@ struct ship : positional
     research get_research_base_for_empire(empire* owner, empire* claiming);
     research get_research_real_for_empire(empire* owner, empire* claiming);
 
+    research get_recrew_potential_research(empire* claiming);
+
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);
 
     bool cleanup = false;
 
     ///If we crew a ship, we get research gradually from the experience
-    float research_left_from_crewing = 0.f;
+    research research_left_from_crewing;
     bool is_alien = false;
     float crew_effectiveness = 1.f;
 
     empire* original_owning_race = nullptr;
+
+    std::map<empire*, research> past_owners_research_left;
 
 private:
     sf::RenderTexture* intermediate_texture = nullptr;

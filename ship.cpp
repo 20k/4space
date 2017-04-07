@@ -1045,6 +1045,37 @@ void ship::tick_other_systems(float step_s)
     disengage_clock_s += step_s;
 
     test_set_disabled();
+
+    if(is_alien)
+        past_owners_research_left[owned_by->parent_empire] = research_left_from_crewing;
+}
+
+research ship::tick_drain_research_from_crew(float step_s)
+{
+    research ret;
+
+    if(!is_alien)
+        return ret;
+
+    if(research_left_from_crewing.units_to_currency(false) <= 0.0001f)
+        return ret;
+
+    for(int i=0; i<research_left_from_crewing.categories.size(); i++)
+    {
+        research_category& cat = research_left_from_crewing.categories[i];
+
+        float amount_to_drain = 1.f * step_s * 0.01f;
+
+        amount_to_drain = std::min(amount_to_drain, cat.amount);
+
+        ret.add_amount(cat.type, amount_to_drain);
+
+        cat.amount -= amount_to_drain;
+
+        cat.amount = std::max(cat.amount, 0.f);
+    }
+
+    return ret;
 }
 
 void ship::tick_combat(float step_s)
@@ -1884,10 +1915,36 @@ research ship::get_research_real_for_empire(empire* owner, empire* claiming)
     {
         research_category cat = c.get_research_real_for_empire(owner, claiming);
 
+        if(past_owners_research_left.find(owned_by->parent_empire) != past_owners_research_left.end() && owned_by->parent_empire != nullptr)
+        {
+            const research& fr = past_owners_research_left[owned_by->parent_empire];
+
+            cat.amount = std::max(cat.amount, fr.categories[cat.type].amount);
+        }
+
         r.add_amount(cat);
     }
 
     return r;
+}
+
+research ship::get_recrew_potential_research(empire* claiming)
+{
+    research res;
+
+    if(claiming != original_owning_race)
+    {
+        if(past_owners_research_left.find(claiming) == past_owners_research_left.end())
+        {
+            res = get_research_base_for_empire(original_owning_race, claiming).div(2.f);
+        }
+        else
+        {
+            res = past_owners_research_left[claiming];
+        }
+    }
+
+    return res;
 }
 
 void ship::recrew_derelict(empire* owner, empire* claiming)
@@ -1898,15 +1955,22 @@ void ship::recrew_derelict(empire* owner, empire* claiming)
     if(!can_recrew(claiming))
         return;
 
-    ///this is not a sufficient check to prevent research exploits... you could pass an alien ship
-    ///back and forth between two races to get more and more research
-    if(claiming != original_owning_race && owner != claiming)
+    if(claiming != original_owning_race)
     {
         is_alien = true;
 
         crew_effectiveness = 1.f - clamp(claiming->empire_culture_distance(claiming), 0.0f, 0.8f);
 
-        research_left_from_crewing = get_research_base_for_empire(original_owning_race, claiming).units_to_currency()/2.f;
+        if(past_owners_research_left.find(claiming) == past_owners_research_left.end())
+        {
+            research_left_from_crewing = get_research_base_for_empire(original_owning_race, claiming).div(2.f);
+
+            past_owners_research_left[claiming] = research_left_from_crewing;
+        }
+        else
+        {
+            research_left_from_crewing = past_owners_research_left[claiming];
+        }
     }
 
     auto res_needed = resources_needed_to_recrew_total();
@@ -2054,6 +2118,16 @@ void ship_manager::tick_all(float step_s)
     {
         s->tick_all_components(step_s);
         s->tick_other_systems(step_s);
+
+        if(s->is_alien)
+        {
+            research r = s->tick_drain_research_from_crew(step_s);
+
+            if(parent_empire != nullptr)
+            {
+                parent_empire->add_resource(resource::RESEARCH, r.units_to_currency(false));
+            }
+        }
     }
 }
 

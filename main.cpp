@@ -392,7 +392,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
         c_id++;
     }
 
-    float research_left = s.research_left_from_crewing;
+    float research_left = s.research_left_from_crewing.units_to_currency(false);
 
     std::string research_left_str = "Research left from crewing: " + std::to_string((int)research_left);
 
@@ -424,6 +424,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
 
         auto res = s.resources_needed_to_recrew_total();
 
+        ///crew research has 0 bound, scrapped research has minimum bound
+        float recrew_research_currenct = s.get_recrew_potential_research(claiming_empire).units_to_currency(false);
+
         resource_manager rm;
 
         for(auto& i : res)
@@ -432,6 +435,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
         }
 
         std::string rstr = rm.get_formatted_str(true);
+
+        rstr += "Potential Gained Re: " + std::to_string((int)recrew_research_currenct);
 
         if(ImGui::IsItemHovered())
         {
@@ -476,7 +481,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, system_m
 
         auto res = s.resources_received_when_scrapped();
 
-        res[resource::RESEARCH] = research_raw.units_to_currency();
+        res[resource::RESEARCH] = research_raw.units_to_currency(true);
 
         resource_manager rm;
 

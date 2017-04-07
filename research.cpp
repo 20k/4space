@@ -20,11 +20,14 @@ float research_info::get_cost_scaling(float level, float base_cost)
     return get_research_level_cost(level, base_cost, false);
 }
 
-float research_info::tech_unit_to_research_currency(float tech_unit)
+float research_info::tech_unit_to_research_currency(float tech_unit, bool has_minimum_value)
 {
     ///tech UNITS not currency, 1 is quite a long way
-    if(tech_unit < 1/20.f)
+    if(tech_unit < 1/20.f && has_minimum_value)
         tech_unit = 1/20.f;
+
+    if(tech_unit < 0)
+        tech_unit = 0;
 
     return tech_unit * 20.f;
 }
@@ -93,14 +96,31 @@ void research::add_amount(const research_category& category)
     categories[category.type].amount += category.amount;
 }
 
-float research::units_to_currency()
+void research::add_amount(research_info::types type, float amount)
+{
+    categories[type].amount += amount;
+
+    categories[type].amount = std::max(categories[type].amount, 0.f);
+}
+
+float research::units_to_currency(bool has_minimum_value)
 {
     float accum = 0;
 
     for(auto& i : categories)
     {
-        accum += research_info::tech_unit_to_research_currency(i.amount);
+        accum += research_info::tech_unit_to_research_currency(i.amount, has_minimum_value);
     }
 
     return accum;
+}
+
+research research::div(float amount)
+{
+    for(auto& i : categories)
+    {
+        i.amount /= amount;
+    }
+
+    return *this;
 }

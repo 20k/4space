@@ -52,7 +52,7 @@ namespace research_info
 
     float get_cost_scaling(float level, float cost);
 
-    float tech_unit_to_research_currency(float tech_unit);
+    float tech_unit_to_research_currency(float tech_unit, bool has_minimum_value);
 }
 
 struct research_category
@@ -66,15 +66,21 @@ struct research
     std::vector<research_category> categories;
 
     research();
+    research& operator= ( const research & ) = default;
 
     void draw_ui(empire* emp);
     void tick(float step_s);
 
     void add_amount(const research_category& category);
+    void add_amount(research_info::types type, float amount);
 
     ///this doesn't convert tech LEVELS to currency, this converts tech UNITS to currency
     ///levels are exponential, units are linear
-    float units_to_currency();
+    ///ie research is always worth something
+    float units_to_currency(bool has_minimum_value);
+
+    ///MODIFIES UNDERLYING STORAGE
+    research div(float amount);
 };
 
 #endif // RESEARCH_HPP_INCLUDED
