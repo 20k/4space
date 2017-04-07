@@ -217,7 +217,7 @@ void display_ship_info(ship& s, empire* owner)
         name_str += " (Derelict)";
     }
 
-    ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui);
+    ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -387,6 +387,7 @@ struct popup_element
     std::vector<std::string> data;
     std::deque<bool> checked;
     bool mergeable = false;
+    bool toggle_clickable = false;
 
     std::map<popup_element_type::types, button_element> buttons_map;
 
@@ -632,6 +633,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                         elem.buttons_map[popup_element_type::RESUPPLY] = {"Resupply", false};
                     }
 
+                    if(orb->type == orbital_info::FLEET)
+                    {
+                        elem.toggle_clickable = true;
+                    }
+
                     popup.elements.push_back(elem);
 
                     term = true;
@@ -723,7 +729,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
         if(system_manage.in_system_view())
         {
-            for(auto& kk : selected)
+            for(orbital* kk : selected)
             {
                 popup_element* elem = popup.fetch(kk);
 
@@ -833,7 +839,23 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             bool non_shift_clicked = ImGui::IsItemClicked() && !lshift;
             bool hovered = ImGui::IsItemHovered();
 
-            if(i.mergeable)
+            bool can_open_window = i.mergeable;
+
+            if(i.toggle_clickable)
+            {
+                orbital* o = (orbital*)i.element;
+
+                ship_manager* smanage = (ship_manager*)o->data;
+
+                ship* s = smanage->ships[num];
+
+                if(s->fully_disabled())
+                {
+                    can_open_window = true;
+                }
+            }
+
+            if(i.toggle_clickable)
             {
                 ImGui::SameLine();
                 //ImGui::Checkbox(("###" + std::to_string(id) + std::to_string(num)).c_str(), &i.checked[kk]);
@@ -845,12 +867,12 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
                 ImGui::Text((label_str).c_str());
 
-                if((ImGui::IsItemClicked() && lshift) || shift_clicked)
+                if(((ImGui::IsItemClicked() && lshift) || shift_clicked) && i.mergeable)
                 {
                     i.checked[kk] = !i.checked[kk];
                 }
 
-                if(non_shift_clicked)
+                if(non_shift_clicked && can_open_window)
                 {
                     orbital* o = (orbital*)i.element;
 
@@ -859,7 +881,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                     smanage->ships[num]->display_ui = !smanage->ships[num]->display_ui;
                 }
 
-                if(ImGui::IsItemHovered() || hovered)
+                if((ImGui::IsItemHovered() || hovered) && i.mergeable)
                 {
                     ImGui::SetTooltip("Shift-Click to add to fleet");
                 }

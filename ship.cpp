@@ -1641,8 +1641,20 @@ void ship::set_tech_level_from_empire(empire* e)
     }
 }
 
+///randomise tech?
 void ship::randomise_make_derelict()
 {
+    for(component& c : entity_list)
+    {
+        if(c.has_element(ship_component_elements::COMMAND))
+        {
+            if(!c.has_element(ship_component_elements::HP))
+                continue;
+
+            c.components[ship_component_elements::HP].cur_amount = 0.f;
+        }
+    }
+
     while(!is_fully_disabled)
     {
         int cid = randf_s(0.f, entity_list.size());
@@ -1702,9 +1714,16 @@ std::vector<std::string> ship_manager::get_info_strs()
 {
     std::vector<std::string> ret;
 
-    for(auto& i : ships)
+    for(ship* s : ships)
     {
-        ret.push_back(i->name);
+        std::string name_str = s->name;
+
+        if(s->fully_disabled())
+        {
+            name_str += " (Derelict)";
+        }
+
+        ret.push_back(name_str);
     }
 
     return ret;
