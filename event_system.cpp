@@ -9,6 +9,10 @@ dialogue_node resolution =
     "Test resolution",
 };
 
+///we need to data drive the event system from here somehow
+///maybe have ptrs to bools that get set if we click one (or store internally)
+///that way the next event can see what the previous event picked
+///or like, trigger events somehow from here
 dialogue_node dia_first =
 {
     "Hi",
