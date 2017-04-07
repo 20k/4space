@@ -295,8 +295,9 @@ struct component
     float get_tech_level_of_element(ship_component_elements::types type);
 
     float get_tech_level_of_primary();
-    float get_base_component_cost();
-    float get_component_cost();
+    float get_base_component_cost(); ///static
+    float get_component_cost(); ///static including tech
+    float get_real_component_cost(); ///above including HP
 
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;

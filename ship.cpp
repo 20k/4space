@@ -653,6 +653,19 @@ float component::get_component_cost()
     return research_info::get_cost_scaling(tech_level, base_cost);
 }
 
+float component::get_real_component_cost()
+{
+    if(!has_element(ship_component_elements::HP))
+        return 0.f;
+
+    component_attribute& hp_element = components[ship_component_elements::HP];
+
+    if(hp_element.max_amount < 0.001f)
+        return 0.f;
+
+    return get_component_cost() * (hp_element.cur_amount / hp_element.max_amount);
+}
+
 std::map<ship_component_element, float> ship::tick_all_components(float step_s)
 {
     //if(step_s < 0.1)
