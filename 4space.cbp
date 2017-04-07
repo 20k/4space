@@ -46,6 +46,7 @@
 			<Add option="-fexceptions" />
 			<Add option="-std=gnu++14" />
 			<Add option="-Wno-narrowing" />
+			<Add option="-Wno-sign-compare" />
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32" />
