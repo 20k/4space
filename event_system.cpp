@@ -83,7 +83,7 @@ void give_random_research(game_event& event)
     interactor->add_resource(resource::RESEARCH, total_available_currency);
 }
 
-void give_research_currency_proportion(game_event& event)
+void give_research_currency_proportion_lo(game_event& event)
 {
     float research_frac = 0.05f;
 
@@ -97,6 +97,29 @@ void give_research_currency_proportion(game_event& event)
         total_currency = 50.f;
 
     interactor->add_resource(resource::RESEARCH, total_currency);
+}
+void give_research_currency_proportion_hi(game_event& event)
+{
+    float research_frac = 0.07f;
+
+    empire* interactor = event.parent->interacting_faction;
+
+    research& r = interactor->research_tech_level;
+
+    float total_currency = r.level_to_currency() * research_frac;
+
+    if(total_currency < 50)
+        total_currency = 50.f;
+
+    interactor->add_resource(resource::RESEARCH, total_currency);
+}
+
+void culture_shift(game_event& event)
+{
+    empire* derelict = event.parent->ancient_faction;
+    empire* interactor = event.parent->interacting_faction;
+
+    interactor->culture_shift(0.01f, derelict);
 }
 
 void hostile_interaction(game_event& event)
@@ -119,9 +142,10 @@ void damage_nearby_fleets(game_event& event)
 {
     empire* interactor = event.parent->interacting_faction;
 
-    ship_manager* sm = event.parent->get_nearest_fleet(interactor);
+    auto sms = event.parent->get_nearby_fleets(interactor, 60.f);
 
-    sm->random_damage_ships(0.6f);
+    for(auto& sm : sms)
+        sm->random_damage_ships(0.6f);
 }
 
 ship* spawn_ship_base(game_event& event)
@@ -372,12 +396,12 @@ namespace alien_precursor_technology
     dialogue_node explosion
     {
         "Alert!",
-        "We tripped their defences, a massive explosion has destroyed all traces of the facility and damaged some of our fleets",
+        "We tripped their defences, a massive explosion has destroyed all traces of the facility and any nearby fleet",
         {
 
         },
         {
-            both(terminate_quest, both(damage_nearby_fleets, hostile_interaction))
+            both(terminate_quest, hostile_interaction)
         }
     };
 
@@ -402,7 +426,7 @@ namespace alien_precursor_technology
             "Continue observation",
         },
         {
-            dlge(blow_it_up), wait(1.f, dlge(explosion))
+            dlge(blow_it_up), wait(5.f, both(dlge(explosion), damage_nearby_fleets))
         }
     };
 
@@ -424,7 +448,7 @@ namespace alien_precursor_technology
     {
         bool happens = randf_s(0.f, 1.f) < 0.7f;
 
-        if(happens)
+        if(!happens)
         {
             event.dialogue = nothing_happens_again;
         }
@@ -444,7 +468,7 @@ namespace alien_precursor_technology
             "Blow it up",
         },
         {
-            dlge(no_return), wait(1.f, anything_happens_space_post_ground), both(terminate_quest, hostile_interaction)
+            dlge(no_return), wait(10.f, anything_happens_space_post_ground), both(terminate_quest, hostile_interaction)
         }
     };
 
@@ -476,7 +500,7 @@ namespace alien_precursor_technology
             "Interesting",
         },
         {
-            both(dlge(mutated_f2), give_research_currency_proportion)
+            both(dlge(mutated_f2), give_research_currency_proportion_lo)
         }
     };
 
@@ -488,7 +512,7 @@ namespace alien_precursor_technology
             "Interesting",
         },
         {
-            both(dlge(mutated_f2), give_research_currency_proportion)
+            both(dlge(mutated_f2), both(give_research_currency_proportion_hi, culture_shift))
         }
     };
 
@@ -568,7 +592,7 @@ namespace alien_precursor_technology
             "Send in a ground team",
         },
         {
-            dlge(nothing_happens), wait(20.f, anything_happens_ground)
+            dlge(nothing_happens), wait(5.f, anything_happens_ground)
         }
     };
 
@@ -595,7 +619,7 @@ namespace alien_precursor_technology
             "Send in a ground team",
         },
         {
-            wait(1.f, anything_happens_space), wait(5.f, anything_happens_ground)
+            wait(10.f, anything_happens_space), wait(5.f, anything_happens_ground)
         },
     };
 
@@ -810,6 +834,45 @@ ship_manager* game_event_manager::get_nearby_fleet(empire* e)
     }
 
     return nullptr;
+}
+
+std::vector<ship_manager*> game_event_manager::get_nearby_fleets(empire* e, float dist)
+{
+    std::vector<ship_manager*> ret;
+
+    for(orbital* o : e->owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        bool any_valid = false;
+
+        for(ship* s : sm->ships)
+        {
+            if(!s->fully_disabled())
+            {
+                any_valid = true;
+                break;
+            }
+        }
+
+        if(!any_valid)
+            continue;
+
+        if(o->parent_system != event_history.back().alert_location->parent_system)
+            continue;
+
+        float interact_distance = dist;
+
+        if((o->absolute_pos - event_history.back().alert_location->absolute_pos).length() < interact_distance)
+        {
+            ret.push_back(sm);
+        }
+    }
+
+    return ret;
 }
 
 ship_manager* game_event_manager::get_nearest_fleet(empire* e)
