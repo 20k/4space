@@ -903,20 +903,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     term = true;
                 }
 
-                /*if(lclick && orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && nearest_colony_ship_of_empire(orb, player_empire) != nullptr)
-                {
-                    popup.going = true;
-
-                    popup_element elem;
-                    elem.element = orb;
-
-
-
-                    popup.elements.push_back(elem);
-
-                    term = true;
-                }*/
-
                 if(orb->type == orbital_info::STAR)
                 {
                     ImGui::SetTooltip((orb->name + "\n" + orb->description).c_str());
