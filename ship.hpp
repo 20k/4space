@@ -119,10 +119,10 @@ namespace ship_component_elements
         5.f,
         2.f,
         80.f,
-        30.f,
-        30.f,
-        25.f,
-        20.f
+        50.f,
+        50.f,
+        35.f,
+        30.f
     };
 
     ///Ok... we might want more research types

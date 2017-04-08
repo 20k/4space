@@ -1318,18 +1318,6 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     ImGui::Begin("Ship Construction", &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ship base_ship = make_default();
-
-    base_ship.set_tech_level_from_research(window_state.picked_research_levels);
-
-    auto cost = base_ship.resources_cost();
-
-    resource_manager rm;
-    rm.add(cost);
-
-    std::string str = rm.get_formatted_str(true);
-
-
     for(int i=0; i<window_state.picked_research_levels.categories.size(); i++)
     {
         research_category& category = window_state.picked_research_levels.categories[i];
@@ -1371,45 +1359,59 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
         }
     }
 
-
-    ImGui::Text("(Make Default Military Ship)");
-
-    bool clicked = ImGui::IsItemClicked();
-
-    /*if(ImGui::IsItemHovered())
+    std::vector<ship> ships
     {
-        ImGui::SetTooltip(str.c_str());
-    }*/
+        make_default(),
+        make_scout()
+    };
 
-    ImGui::Text(str.c_str());
-
-    if(clicked)
+    for(auto& test_ship : ships)
     {
-        if(player_empire->can_fully_dispense(cost))
+        test_ship.set_tech_level_from_research(window_state.picked_research_levels);
+
+        auto cost = test_ship.resources_cost();
+
+        resource_manager rm;
+        rm.add(cost);
+
+        std::string str_resources = rm.get_formatted_str(true);
+
+        std::string str = test_ship.name;
+
+        ImGui::Text(("(Make " + str + " Ship)").c_str());
+
+        bool clicked = ImGui::IsItemClicked();
+
+        ImGui::Text(str_resources.c_str());
+
+        if(clicked)
         {
-            player_empire->dispense_resources(cost);
+            if(player_empire->can_fully_dispense(cost))
+            {
+                player_empire->dispense_resources(cost);
 
-            orbital_system* os = o->parent_system;
+                orbital_system* os = o->parent_system;
 
-            ship_manager* new_fleet = fleet_manage.make_new();
+                ship_manager* new_fleet = fleet_manage.make_new();
 
-            ship* new_ship = new_fleet->make_new_from(player_empire->team_id, make_default());
-            new_ship->name = "SS Toimplement name generation";
+                ship* new_ship = new_fleet->make_new_from(player_empire->team_id, test_ship);
+                new_ship->name = "SS Toimplement name generation";
 
-            orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);
-            onew_fleet->orbital_angle = o->orbital_angle;
-            onew_fleet->orbital_length = o->orbital_length + 40;
-            onew_fleet->parent = os->get_base(); ///?
-            onew_fleet->data = new_fleet;
+                orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);
+                onew_fleet->orbital_angle = o->orbital_angle;
+                onew_fleet->orbital_length = o->orbital_length + 40;
+                onew_fleet->parent = os->get_base(); ///?
+                onew_fleet->data = new_fleet;
 
-            player_empire->take_ownership(onew_fleet);
-            player_empire->take_ownership(new_fleet);
+                player_empire->take_ownership(onew_fleet);
+                player_empire->take_ownership(new_fleet);
 
-            new_ship->set_tech_level_from_research(window_state.picked_research_levels);
+                new_ship->set_tech_level_from_research(window_state.picked_research_levels);
 
-            //new_ship->set_tech_level_from_empire(player_empire);
+                //new_ship->set_tech_level_from_empire(player_empire);
 
-            onew_fleet->tick(0.f);
+                onew_fleet->tick(0.f);
+            }
         }
     }
 

@@ -3,6 +3,16 @@
 
 #define default_room_hp 10.f
 
+static float efficiency_cost_exponent = 1.5f;
+
+inline float get_cost_mod(float cost)
+{
+    if(cost < 1)
+        return cost;
+
+    return pow(cost, efficiency_cost_exponent);
+}
+
 inline component make_default_crew()
 {
     component_attribute command;
@@ -103,7 +113,7 @@ inline component make_default_shields(float effectiveness = 1.f)
     shields.name = "Shield Generator";
     shields.primary_attribute = ship_component_elements::SHIELD_POWER;
 
-    shields.cost_mult = effectiveness;
+    shields.cost_mult = get_cost_mod(effectiveness);
 
     return shields;
 }
@@ -131,7 +141,7 @@ inline component make_default_power_core(float effectiveness = 1.f)
     core.name = "Power Core";
     core.primary_attribute = ship_component_elements::ENERGY;
     core.repair_this_when_recrewing = true;
-    core.cost_mult = effectiveness;
+    core.cost_mult = get_cost_mod(effectiveness);
 
     return core;
 }
@@ -171,11 +181,11 @@ inline component make_default_engines()
     return thruster;
 }
 
-inline component make_default_heatsink()
+inline component make_default_heatsink(float efficiency = 1.f)
 {
     component_attribute cooling;
-    cooling.max_amount = 80;
-    cooling.produced_per_s = 1.1f;
+    cooling.max_amount = 80 * efficiency;
+    cooling.produced_per_s = 1.1f * efficiency;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;
@@ -188,6 +198,7 @@ inline component make_default_heatsink()
     heatsink.name = "Heatsink";
     heatsink.skip_in_derelict_calculations = true;
     heatsink.primary_attribute = ship_component_elements::COOLING_POTENTIAL;
+    heatsink.cost_mult = get_cost_mod(efficiency);
 
     return heatsink;
 }
@@ -233,7 +244,7 @@ inline component make_default_warp_drive(float charge_rate = 1.f)
 
     warp_drive.name = "Warp Drive";
     warp_drive.primary_attribute = ship_component_elements::WARP_POWER;
-    warp_drive.cost_mult = charge_rate;
+    warp_drive.cost_mult = get_cost_mod(charge_rate);
 
     return warp_drive;
 }
@@ -267,7 +278,7 @@ inline component make_default_stealth(float effectiveness = 1.f)
 
     stealth_drive.name = "Stealth Systems";
     stealth_drive.primary_attribute = ship_component_element::STEALTH;
-    stealth_drive.cost_mult = effectiveness;
+    stealth_drive.cost_mult = get_cost_mod(effectiveness);
 
     return stealth_drive;
 }
@@ -300,7 +311,7 @@ inline component make_default_scanner(float effectiveness = 1.f)
 
     scanner.name = "Scanner";
     scanner.primary_attribute = ship_component_element::SCANNING_POWER;
-    scanner.cost_mult = effectiveness;
+    scanner.cost_mult = get_cost_mod(effectiveness);
 
     return scanner;
 }
@@ -425,7 +436,7 @@ inline ship make_default()
     test_ship.add(make_default_crew());
     test_ship.add(make_default_life_support());
     test_ship.add(make_default_ammo_store());
-    test_ship.add(make_default_shields(10.f));
+    test_ship.add(make_default_shields());
     test_ship.add(make_default_power_core());
     test_ship.add(make_default_engines());
     test_ship.add(make_default_warp_drive());
@@ -434,6 +445,8 @@ inline ship make_default()
     test_ship.add(make_default_railgun());
     test_ship.add(make_default_torpedo());
     test_ship.add(make_default_stealth());
+
+    test_ship.name = "Military Default";
 
     return test_ship;
 }
@@ -451,6 +464,8 @@ inline ship make_civilian()
     test_ship.add(make_default_scanner());
     test_ship.add(make_default_heatsink());
 
+    test_ship.name = "Civilian Default";
+
     return test_ship;
 }
 
@@ -460,14 +475,16 @@ inline ship make_scout()
     test_ship.add(make_default_crew());
     test_ship.add(make_default_life_support());
     test_ship.add(make_default_ammo_store());
-    test_ship.add(make_default_shields());
-    test_ship.add(make_default_power_core());
+    test_ship.add(make_default_shields(0.25f));
+    test_ship.add(make_default_power_core(0.8f));
     test_ship.add(make_default_engines());
-    test_ship.add(make_default_warp_drive());
-    test_ship.add(make_default_scanner());
-    test_ship.add(make_default_heatsink());
+    test_ship.add(make_default_warp_drive(1.25f));
+    test_ship.add(make_default_scanner(1.5f));
+    test_ship.add(make_default_heatsink(0.75f));
     test_ship.add(make_default_torpedo());
-    test_ship.add(make_default_stealth());
+    test_ship.add(make_default_stealth(1.5f));
+
+    test_ship.name = "Scout Default";
 
     return test_ship;
 }
