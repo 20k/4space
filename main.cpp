@@ -1251,7 +1251,12 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
     ImGui::End();
 }
 
-void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fleet_manage)
+struct construction_window_state
+{
+    research picked_research_levels;
+};
+
+void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fleet_manage, construction_window_state& window_state)
 {
     if(!o->construction_ui_open)
         return;
@@ -1260,6 +1265,8 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     ship base_ship = make_default();
 
+    base_ship.set_tech_level_from_research(window_state.picked_research_levels);
+
     auto cost = base_ship.resources_cost();
 
     resource_manager rm;
@@ -1267,14 +1274,61 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     std::string str = rm.get_formatted_str(true);
 
-    ImGui::Text("Make Ship");
 
-    if(ImGui::IsItemHovered())
+    for(int i=0; i<window_state.picked_research_levels.categories.size(); i++)
     {
-        ImGui::SetTooltip(str.c_str());
+        research_category& category = window_state.picked_research_levels.categories[i];
+
+        std::string text = format(research_info::names[i], research_info::names);
+
+        ImGui::Text((text + " | ").c_str());
+
+        ImGui::SameLine();
+
+        ImGui::Text("(-)");
+
+        if(ImGui::IsItemClicked())
+        {
+            category.amount -= 1.f;
+
+            category.amount = clamp(category.amount, 0.f, player_empire->research_tech_level.categories[i].amount);
+
+            category.amount = floor(category.amount);
+        }
+
+        ImGui::SameLine();
+
+        std::string dstr = std::to_string((int)category.amount);
+
+        ImGui::Text(dstr.c_str());
+
+        ImGui::SameLine();
+
+        ImGui::Text("(+)");
+
+        if(ImGui::IsItemClicked())
+        {
+            category.amount += 1.f;
+
+            category.amount = clamp(category.amount, 0.f, player_empire->research_tech_level.categories[i].amount);
+
+            category.amount = floor(category.amount);
+        }
     }
 
-    if(ImGui::IsItemClicked())
+
+    ImGui::Text("(Make Default Military Ship)");
+
+    bool clicked = ImGui::IsItemClicked();
+
+    /*if(ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip(str.c_str());
+    }*/
+
+    ImGui::Text(str.c_str());
+
+    if(clicked)
     {
         if(player_empire->can_fully_dispense(cost))
         {
@@ -1295,6 +1349,8 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
             player_empire->take_ownership(onew_fleet);
             player_empire->take_ownership(new_fleet);
+
+            new_ship->set_tech_level_from_research(window_state.picked_research_levels);
 
             //new_ship->set_tech_level_from_empire(player_empire);
 
@@ -1325,11 +1381,11 @@ int main()
     empire* player_empire = empire_manage.make_new();
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
 
-    player_empire->resources.resources[resource::IRON].amount = 200.f;
-    player_empire->resources.resources[resource::COPPER].amount = 200.f;
-    player_empire->resources.resources[resource::TITANIUM].amount = 200.f;
-    player_empire->resources.resources[resource::URANIUM].amount = 200.f;
-    player_empire->resources.resources[resource::RESEARCH].amount = 800.f;
+    player_empire->resources.resources[resource::IRON].amount = 500.f;
+    player_empire->resources.resources[resource::COPPER].amount = 500.f;
+    player_empire->resources.resources[resource::TITANIUM].amount = 500.f;
+    player_empire->resources.resources[resource::URANIUM].amount = 500.f;
+    player_empire->resources.resources[resource::RESEARCH].amount = 8000.f;
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
@@ -1465,6 +1521,8 @@ int main()
     sys_2->universe_pos = {10, 10};
 
     system_manage.set_viewed_system(base);
+
+    construction_window_state window_state;
 
     popup_info popup;
 
@@ -1631,7 +1689,7 @@ int main()
                 if(o->parent_empire != player_empire)
                     continue;
 
-                do_construction_window(o, player_empire, fleet_manage);
+                do_construction_window(o, player_empire, fleet_manage, window_state);
             }
         }
 

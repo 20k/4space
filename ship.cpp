@@ -303,6 +303,13 @@ void component_attribute::set_tech_level_from_empire(int type, empire* e)
     tech_level = e->research_tech_level.categories[appropriate_tech].amount;
 }
 
+void component_attribute::set_tech_level_from_research(int type, research& r)
+{
+    int appropriate_tech = ship_component_elements::component_element_to_research_type[type];
+
+    tech_level = r.categories[appropriate_tech].amount;
+}
+
 void component_attribute::set_tech_level(float ctech_level)
 {
     tech_level = ctech_level;
@@ -732,6 +739,14 @@ void component::set_tech_level_from_empire(empire* e)
     for(auto& i : components)
     {
         i.second.set_tech_level_from_empire(i.first, e);
+    }
+}
+
+void component::set_tech_level_from_research(research& r)
+{
+    for(auto& i : components)
+    {
+        i.second.set_tech_level_from_research(i.first, r);
     }
 }
 
@@ -1897,6 +1912,14 @@ void ship::set_tech_level_from_empire(empire* e)
     for(component& c : entity_list)
     {
         c.set_tech_level_from_empire(e);
+    }
+}
+
+void ship::set_tech_level_from_research(research& r)
+{
+    for(component& c : entity_list)
+    {
+        c.set_tech_level_from_research(r);
     }
 }
 

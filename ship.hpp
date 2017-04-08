@@ -227,6 +227,7 @@ struct component_attribute
     void calculate_efficiency(float step_s);
 
     void set_tech_level_from_empire(int type, empire* e);
+    void set_tech_level_from_research(int type, research& r);
     void set_tech_level(float level);
     float get_tech_level();
 
@@ -296,6 +297,7 @@ struct component
     ///BLANKET SETS ALL SUB COMPONENTS TO TECH LEVEL
     void set_tech_level(float tech_level);
     void set_tech_level_from_empire(empire* e);
+    void set_tech_level_from_research(research& r);
     void set_tech_level_of_element(ship_component_elements::types type, float tech_level);
     float get_tech_level_of_element(ship_component_elements::types type);
 
@@ -423,6 +425,7 @@ struct ship : positional
 
     void set_tech_level_of_component(int component_offset, float tech_level);
     void set_tech_level_from_empire(empire* e);
+    void set_tech_level_from_research(research& r);
 
     ///damages the ship until derelict
     void randomise_make_derelict();
