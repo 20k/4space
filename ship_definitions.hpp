@@ -3,7 +3,7 @@
 
 #define default_room_hp 10.f
 
-component make_default_crew()
+inline component make_default_crew()
 {
     component_attribute command;
     command.produced_per_s = 4.f;
@@ -37,7 +37,7 @@ component make_default_crew()
     return crew;
 }
 
-component make_default_life_support()
+inline component make_default_life_support()
 {
     component_attribute oxygen;
     oxygen.produced_per_s = 2.f;
@@ -62,7 +62,7 @@ component make_default_life_support()
     return life_support;
 }
 
-component make_default_ammo_store()
+inline component make_default_ammo_store()
 {
     component_attribute ammo;
     ammo.max_amount = 10.f;
@@ -82,7 +82,7 @@ component make_default_ammo_store()
     return ammo_store;
 }
 
-component make_default_shields()
+inline component make_default_shields()
 {
     component_attribute shield;
     shield.produced_per_s = 1.f;
@@ -106,7 +106,7 @@ component make_default_shields()
     return shields;
 }
 
-component make_default_power_core()
+inline component make_default_power_core()
 {
     component_attribute power;
     power.produced_per_s = 80.f;
@@ -133,7 +133,7 @@ component make_default_power_core()
     return core;
 }
 
-component make_default_engines()
+inline component make_default_engines()
 {
     float max_bad_engine_lifetime_s = 1000;
 
@@ -168,7 +168,7 @@ component make_default_engines()
     return thruster;
 }
 
-component make_default_heatsink()
+inline component make_default_heatsink()
 {
     component_attribute cooling;
     cooling.max_amount = 80;
@@ -189,7 +189,7 @@ component make_default_heatsink()
     return heatsink;
 }
 
-component make_default_warp_drive()
+inline component make_default_warp_drive()
 {
     component_attribute cooling;
     cooling.drained_per_s = 0.1f;
@@ -233,7 +233,7 @@ component make_default_warp_drive()
     return warp_drive;
 }
 
-component make_default_stealth()
+inline component make_default_stealth()
 {
     component_attribute cooling;
     cooling.drained_per_s = 0.2f;
@@ -266,7 +266,7 @@ component make_default_stealth()
     return stealth_drive;
 }
 
-component make_default_scanner()
+inline component make_default_scanner()
 {
     component_attribute cooling;
     cooling.drained_per_s = 0.1f;
@@ -298,7 +298,7 @@ component make_default_scanner()
     return scanner;
 }
 
-component make_default_railgun()
+inline component make_default_railgun()
 {
     ///...the railgun literally produces railgun
     component_attribute railgun;
@@ -340,7 +340,7 @@ component make_default_railgun()
     return gun;
 }
 
-component make_default_torpedo()
+inline component make_default_torpedo()
 {
     component_attribute torpedo;
     torpedo.produced_per_use = 1;
@@ -379,7 +379,7 @@ component make_default_torpedo()
     return torp;
 }
 
-ship make_default()
+inline ship make_default()
 {
     /*ship test_ship;
 

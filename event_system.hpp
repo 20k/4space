@@ -37,6 +37,9 @@ namespace game_event_info
 struct orbital;
 struct orbital_system;
 struct game_event_manager;
+struct game_event;
+struct empire;
+struct fleet_manager;
 
 struct dialogue_node
 {
@@ -44,6 +47,7 @@ struct dialogue_node
     std::string text;
     std::vector<std::string> options;
     std::vector<dialogue_node*> travel;
+    std::vector<void(*)(game_event&)> onclick;
 };
 
 ///Ok. This is basically a branching sequence of events, each event may trigger a new event depending on the circumstances
@@ -75,6 +79,10 @@ struct game_event_manager
     ///event_history.back() == current event
     std::vector<game_event> event_history;
 
+    ///could be one of many
+    empire* ancient_faction = nullptr;
+    fleet_manager* fleet_manage;
+
     int arc_type;
     ///basically determines the difficulty of this arc
     ///we may need to distribute this more intelligently than just prng
@@ -82,7 +90,9 @@ struct game_event_manager
 
     game_event make_next_event();
 
-    game_event_manager(orbital* o);
+    game_event_manager(orbital* o, fleet_manager& fm);
+
+    void set_facton(empire* e);
 
     //notification_window window;
 

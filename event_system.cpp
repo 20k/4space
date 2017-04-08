@@ -2,12 +2,42 @@
 #include "system_manager.hpp"
 #include "../../render_projects/imgui/imgui.h"
 #include "util.hpp"
+#include "ship.hpp"
+#include "ship_definitions.hpp"
+#include "empire.hpp"
 
 dialogue_node resolution =
 {
     "Resolution",
     "Test resolution",
 };
+
+void spawn_derelict(game_event& event)
+{
+    orbital* o = event.alert_location;
+    empire* owner_faction = event.parent->ancient_faction;
+    orbital_system* os = o->parent_system;
+    fleet_manager* fleet_manage = event.parent->fleet_manage;
+
+    ship_manager* derelict_fleet = fleet_manage->make_new();
+
+    ship* new_ship = derelict_fleet->make_new_from(owner_faction->team_id, make_default());
+    new_ship->name = "SS Toimplement name generation";
+
+    orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);
+    onew_fleet->orbital_angle = o->orbital_angle;
+    onew_fleet->orbital_length = o->orbital_length + 40;
+    onew_fleet->parent = os->get_base(); ///?
+    onew_fleet->data = derelict_fleet;
+
+    owner_faction->take_ownership(onew_fleet);
+    owner_faction->take_ownership(derelict_fleet);
+
+    new_ship->set_tech_level_from_empire(owner_faction);
+    new_ship->randomise_make_derelict();
+
+    onew_fleet->tick(0.f);
+}
 
 ///we need to data drive the event system from here somehow
 ///maybe have ptrs to bools that get set if we click one (or store internally)
@@ -24,6 +54,9 @@ dialogue_node dia_first =
     },
     {
         &resolution, &resolution, &resolution,
+    },
+    {
+        spawn_derelict, spawn_derelict, spawn_derelict
     }
 };
 
@@ -82,18 +115,6 @@ void game_event::draw_ui()
 
     ImGui::Begin((dialogue.header + "###DLOGUE").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    //ImGui::Text("Sample Dialogue here, also there, and everywhere");
-
-    //ImGui::NewLine();
-
-    ///we'll have to manually format this
-    /*std::vector<std::string> dialogue_options
-    {
-        "Ruh roh, click this to not die!",
-        "Well.... I guess this is dialogue",
-        "I'm not very good at writing, we're all going to die",
-    };*/
-
     std::vector<std::string> dialogue_options = {dialogue.text};
 
     ///patch dialogue options here if necessary
@@ -115,6 +136,14 @@ void game_event::draw_ui()
 
         if(selected < dialogue.travel.size())
         {
+            void (*fptr)(game_event&);
+
+            if(selected < dialogue.onclick.size() && dialogue.onclick[selected] != nullptr)
+            {
+                fptr = dialogue.onclick[selected];
+                fptr(*this);
+            }
+
             next.dialogue = *(dialogue.travel[selected]);
         }
 
@@ -135,7 +164,7 @@ game_event game_event_manager::make_next_event()
     return ret;
 }
 
-game_event_manager::game_event_manager(orbital* o)
+game_event_manager::game_event_manager(orbital* o, fleet_manager& pfleet_manage)
 {
     arc_type = randf_s(0.f, game_event_info::COUNT);
 
@@ -147,6 +176,14 @@ game_event_manager::game_event_manager(orbital* o)
     first.dialogue = dia_first; ///set from map the starting dialogues?
 
     event_history.push_back(first);
+
+    ///fleet manager never expires, so this is fine
+    fleet_manage = &pfleet_manage;
+}
+
+void game_event_manager::set_facton(empire* e)
+{
+    ancient_faction = e;
 }
 
 void game_event_manager::draw_ui()

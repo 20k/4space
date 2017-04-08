@@ -478,6 +478,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     ImGui::Text("(Upgrade to latest Tech)");
 
+    ///setting tech level currently does not have a cost associated with it
     if(ImGui::IsItemClicked())
     {
         s.set_tech_level_from_empire(owner);
@@ -1216,6 +1217,9 @@ int main()
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
 
+    empire* derelict_empire = empire_manage.make_new();
+    derelict_empire->name = "Test Ancient Faction";
+
     ///manages FLEETS, not SHIPS
     ///this is fine. This is a global thing, the highest level of storage for FLEETS of ships
     ///FLEEEEETS
@@ -1345,7 +1349,8 @@ int main()
 
     popup_info popup;
 
-    game_event_manager test_event(sun);
+    game_event_manager test_event(sun, fleet_manage);
+    test_event.set_facton(derelict_empire);
 
     sf::Keyboard key;
 
