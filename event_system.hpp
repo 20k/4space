@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <vec/vec.hpp>
+#include <functional>
 
 namespace game_event_info
 {
@@ -46,8 +47,8 @@ struct dialogue_node
     std::string header;
     std::string text;
     std::vector<std::string> options;
-    std::vector<dialogue_node*> travel;
-    std::vector<void(*)(game_event&)> onclick;
+    //std::vector<dialogue_node*> travel;
+    std::vector<std::function<void(game_event&)>> onclick;
 
     bool is_open = true;
 };

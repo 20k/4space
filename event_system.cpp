@@ -6,6 +6,16 @@
 #include "ship_definitions.hpp"
 #include "empire.hpp"
 
+void transition_dialogue(game_event& event, const dialogue_node& node)
+{
+    event.dialogue = node;
+}
+
+std::function<void(game_event&)> dlge(const dialogue_node& node)
+{
+    return std::bind(transition_dialogue, std::placeholders::_1, node);
+}
+
 void terminate_quest(game_event& event)
 {
     event.dialogue.is_open = false;
@@ -76,9 +86,6 @@ dialogue_node resolution_destroyed =
 
     },
     {
-
-    },
-    {
         destroy_spawn_derelict
     }
 };
@@ -92,9 +99,6 @@ dialogue_node observation =
     },
     {
 
-    },
-    {
-
     }
 };
 
@@ -102,9 +106,6 @@ dialogue_node salvage_resolution
 {
     "Resolution",
     "The ship appears badly damaged but could be made spaceworth again",
-    {
-
-    },
     {
 
     },
@@ -128,11 +129,8 @@ dialogue_node dia_first =
         "Assess it for salvage value",
     },
     {
-        &resolution_destroyed, &observation, &salvage_resolution,
+        dlge(resolution_destroyed), dlge(observation), dlge(salvage_resolution),
     },
-    {
-        //spawn_derelict, spawn_derelict, spawn_derelict
-    }
 };
 
 
@@ -214,16 +212,13 @@ void game_event::draw_ui()
 
         if(selected < dialogue.onclick.size() && dialogue.onclick[selected] != nullptr)
         {
-            void (*fptr)(game_event&);
-
-            fptr = dialogue.onclick[selected];
-            fptr(*this);
+            dialogue.onclick[selected](next);
         }
 
-        if(selected < dialogue.travel.size())
+        /*if(selected < dialogue.travel.size())
         {
             next.dialogue = *(dialogue.travel[selected]);
-        }
+        }*/
 
         parent->event_history.push_back(next);
     }
