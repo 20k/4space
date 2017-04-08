@@ -6,6 +6,7 @@
 #include "empire.hpp"
 #include "procedural_text_generator.hpp"
 #include "../../render_projects/imgui/imgui.h"
+#include "text.hpp"
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
@@ -435,14 +436,21 @@ bool orbital::can_dispense_resources()
 
 void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
 {
-    if(type != orbital_info::FLEET)
-        return;
-
     if(parent_empire != viewing_empire)
         return;
 
     if(parent_system != system_manage.currently_viewed)
         return;
+
+    if(type != orbital_info::FLEET)
+    {
+        if(has_quest_alert)
+        {
+            text_manager::render(win, "?", absolute_pos + (vec2f){8, -20}, {0.3, 1.0, 0.3});
+        }
+
+        return;
+    }
 
     ship_manager* sm = (ship_manager*)data;
 

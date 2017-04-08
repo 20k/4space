@@ -1349,7 +1349,7 @@ int main()
 
     popup_info popup;
 
-    game_event_manager test_event(sun, fleet_manage);
+    game_event_manager test_event(tplanet, fleet_manage);
     test_event.set_facton(derelict_empire);
 
     sf::Keyboard key;
@@ -1535,6 +1535,7 @@ int main()
         player_empire->draw_ui();
         empire_manage.tick_all(diff_s);
 
+        test_event.tick(diff_s);
         test_event.draw_ui();
 
         //printf("Prerender\n");

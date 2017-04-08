@@ -153,6 +153,11 @@ void game_event::draw_ui()
     ImGui::End();
 }
 
+void game_event::tick(float step_s)
+{
+    alert_location->has_quest_alert = true;
+}
+
 game_event game_event_manager::make_next_event()
 {
     game_event ret;
@@ -189,4 +194,11 @@ void game_event_manager::set_facton(empire* e)
 void game_event_manager::draw_ui()
 {
     event_history.back().draw_ui();
+}
+
+void game_event_manager::tick(float step_s)
+{
+    internal_time_s += step_s;
+
+    event_history.back().tick(step_s);
 }

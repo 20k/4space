@@ -157,6 +157,8 @@ struct orbital
     void draw_alerts(sf::RenderWindow& win, empire* viewer_empire, system_manager& system_manage);
 
     orbital_system* parent_system = nullptr;
+
+    bool has_quest_alert = false;
 };
 
 struct orbital_system

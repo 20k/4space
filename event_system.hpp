@@ -66,6 +66,7 @@ struct game_event
     dialogue_node dialogue;
 
     void draw_ui();
+    void tick(float step_s);
 
     game_event_manager* parent = nullptr;
 };
@@ -97,6 +98,9 @@ struct game_event_manager
     //notification_window window;
 
     void draw_ui();
+    void tick(float step_s);
+
+    float internal_time_s = 0.f;
 };
 
 #endif // EVENT_SYSTEM_HPP_INCLUDED

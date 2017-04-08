@@ -13,7 +13,7 @@ void text_manager::load()
     font.loadFromFile("VeraMono.ttf");
 }
 
-void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col)
+void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool rounding)
 {
     load();
 
@@ -21,7 +21,8 @@ void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f p
 
     col = clamp(col, 0.f, 255.f);
 
-    pos = round(pos);
+    if(rounding)
+        pos = round(pos);
 
     sf::Text text(str.c_str(), font);
 
