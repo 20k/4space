@@ -262,7 +262,8 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         //current_simple_col = current_simple_col * hostile_empire_mult;
     }
 
-    if(parent_empire->is_allied(viewer_empire))
+    ///if the orbital has no parent!
+    if(parent_empire != nullptr && parent_empire->is_allied(viewer_empire))
     {
         current_sprite_col = base_sprite_col * friendly_empire_mult;
     }
