@@ -485,7 +485,7 @@ struct ship_manager
 
     empire* parent_empire = nullptr;
 
-    void resupply();
+    void resupply(empire* from);
 
     void tick_all(float step_s);
 

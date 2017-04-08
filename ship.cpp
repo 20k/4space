@@ -2217,16 +2217,21 @@ void ship_manager::steal(ship* const s)
     ships.push_back(s);
 }
 
-void ship_manager::resupply()
+void ship_manager::resupply(empire* from)
 {
     if(parent_empire == nullptr)
         return;
+
+    if(from == nullptr)
+    {
+        from = parent_empire;
+    }
 
     int num = ships.size();
 
     for(ship* s : ships)
     {
-        s->resupply(*parent_empire, num);
+        s->resupply(*from, num);
 
         num--;
     }

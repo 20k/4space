@@ -844,9 +844,10 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     ///disabling merging here and resupply invalides all fleet actions except moving atm
                     ///unexpected fix to fleet merging problem
                     ///disable resupply if in combat
-                    if(orb->type == orbital_info::FLEET && orb->parent_empire == player_empire)
+                    if(orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)))
                     {
-                        elem.mergeable = true;
+                        if(orb->parent_empire == player_empire)
+                            elem.mergeable = true;
 
                         elem.buttons_map[popup_element_type::RESUPPLY] = {"Resupply", false};
                     }
@@ -988,7 +989,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 ship_manager* sm = (ship_manager*)o->data;
 
-                sm->resupply();
+                sm->resupply(player_empire);
             }
 
             if(map_element.first == popup_element_type::ENGAGE && map_element.second.pressed)
