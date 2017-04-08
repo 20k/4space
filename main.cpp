@@ -1196,7 +1196,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             {
                 ImGui::Text("(Requires nearby fleet to view alert)");
 
-                o->dialogue_open = false;
+                event->set_dialogue_state(false);
             }
             else
             {
@@ -1213,7 +1213,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                         ///set interacting fleet
                     }
 
-                    o->dialogue_open = !o->dialogue_open;
+                    event->toggle_dialogue_state();
                 }
             }
         }

@@ -396,7 +396,7 @@ namespace alien_precursor_technology
     dialogue_node explosion
     {
         "Alert!",
-        "We tripped their defences, a massive explosion has destroyed all traces of the facility and any nearby fleet",
+        "We tripped their defences, a massive explosion has destroyed all traces of the facility and damaged any nearby fleet",
         {
 
         },
@@ -495,7 +495,7 @@ namespace alien_precursor_technology
     dialogue_node mutated_flavour
     {
         "Information",
-        "The mutated team members appear to have died agonisingly",
+        "The mutated team members appear to have died agonisingly on the planet's surface",
         {
             "Interesting",
         },
@@ -561,7 +561,7 @@ namespace alien_precursor_technology
             return;
         }
 
-        bool massive_explosion = randf_s(0.f, 1.f) < 0.2f;
+        bool massive_explosion = randf_s(0.f, 1.f) < 0.05f;
 
         if(massive_explosion)
         {
@@ -644,7 +644,7 @@ int present_dialogue(const std::vector<std::string>& options)
 
         if(display_str.length() > 0 && num == 0)
         {
-            ImGui::Text(display_str.c_str());
+            ImGui::TextWrapped(display_str.c_str());
             ImGui::NewLine();
         }
 
@@ -699,7 +699,7 @@ void game_event::draw_ui()
 
     std::string header_str = dialogue.header + " (" + alert_location->name + ")";
 
-    ImGui::Begin((header_str + "###DLOGUE").c_str(), &dialogue.is_open, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin((header_str + "###DLOGUE").c_str(), &dialogue.is_open);
 
     std::vector<std::string> dialogue_options = {dialogue.text};
 
@@ -748,7 +748,7 @@ void game_event::tick(float step_s)
 
     time_alive_s += step_s;
 
-    set_dialogue_open_state(alert_location->dialogue_open);
+    //set_dialogue_open_state(alert_location->dialogue_open);
 }
 
 void game_event::set_dialogue_open_state(bool open)
@@ -777,6 +777,7 @@ game_event_manager::game_event_manager(orbital* o, fleet_manager& pfleet_manage)
     first.parent = this;
     first.event_num = 0;
     first.dialogue = alien_precursor_technology::get(); ///set from map the starting dialogues?
+    first.dialogue.is_open = false;
 
     event_history.push_back(first);
 
@@ -916,6 +917,16 @@ ship_manager* game_event_manager::get_nearest_fleet(empire* e)
     }
 
     return min_sm;
+}
+
+void game_event_manager::toggle_dialogue_state()
+{
+    event_history.back().dialogue.is_open = !event_history.back().dialogue.is_open;
+}
+
+void game_event_manager::set_dialogue_state(bool d)
+{
+    event_history.back().dialogue.is_open = d;
 }
 
 void game_event_manager::draw_ui()

@@ -132,6 +132,9 @@ struct game_event_manager
     std::vector<ship_manager*> get_nearby_fleets(empire* e, float dist = 120.f);
     ship_manager* get_nearest_fleet(empire* e);
 
+    void toggle_dialogue_state();
+    void set_dialogue_state(bool);
+
     void draw_ui();
     void tick(float step_s);
 
