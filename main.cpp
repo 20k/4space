@@ -1437,6 +1437,11 @@ int main()
             }
         }
 
+        if(focused && key.isKeyPressed(sf::Keyboard::F10))
+        {
+            window.close();
+        }
+
         vec2f cdir = {0,0};
 
         if(key.isKeyPressed(sf::Keyboard::W))
