@@ -2,6 +2,7 @@
 #define EVENT_SYSTEM_HPP_INCLUDED
 
 #include <vector>
+#include <deque>
 #include <vec/vec.hpp>
 #include <functional>
 
@@ -53,6 +54,21 @@ struct dialogue_node
     bool is_open = true;
 };
 
+struct waiting_event
+{
+    //dialogue_node node;
+
+    std::function<bool(game_event&)> is_finished;
+};
+
+extern dialogue_node resolution_destroyed;
+extern dialogue_node salvage_resolution;
+extern dialogue_node salvage_resolution_hostile;
+extern dialogue_node observation_resolution_hostile;
+extern dialogue_node observation_powerup;
+extern dialogue_node observation;
+extern dialogue_node dia_first;
+
 ///Ok. This is basically a branching sequence of events, each event may trigger a new event depending on the circumstances
 ///so we need an event history, and the current event, which can just be the last event in the history
 ///that can be under event manager
@@ -74,6 +90,11 @@ struct game_event
     void set_dialogue_open_state(bool open);
 
     game_event_manager* parent = nullptr;
+
+    ///since this game event was created
+    float time_alive_s = 0.f;
+
+    std::deque<waiting_event> waiting_events;
 };
 
 ///lets get a very basic interaction system going. "A thing has happened click between two options"

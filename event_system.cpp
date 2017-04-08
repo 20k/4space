@@ -6,6 +6,28 @@
 #include "ship_definitions.hpp"
 #include "empire.hpp"
 
+bool wait_ev(game_event& event, float time_s)
+{
+    if(event.time_alive_s >= time_s)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool transition_ev(game_event& event, float time_s, std::function<void(game_event&)> fevent)
+{
+    if(event.time_alive_s > time_s)
+    {
+        fevent(event);
+
+        return true;
+    }
+
+    return false;
+}
+
 void transition_dialogue(game_event& event, const dialogue_node& node)
 {
     event.dialogue = node;
@@ -23,7 +45,7 @@ void terminate_quest(game_event& event)
     event.alert_location->has_quest_alert = false;
 }
 
-ship* spawn_derelict_base(game_event& event)
+ship* spawn_ship_base(game_event& event)
 {
     orbital* o = event.alert_location;
     empire* owner_faction = event.parent->ancient_faction;
@@ -45,11 +67,18 @@ ship* spawn_derelict_base(game_event& event)
     owner_faction->take_ownership(derelict_fleet);
 
     new_ship->set_tech_level_from_empire(owner_faction);
-    new_ship->randomise_make_derelict();
 
     onew_fleet->tick(0.f);
 
     return new_ship;
+}
+
+ship* spawn_derelict_base(game_event& event)
+{
+    ship* s = spawn_ship_base(event);
+    s->randomise_make_derelict();
+
+    return s;
 }
 
 void spawn_derelict(game_event& event)
@@ -57,7 +86,19 @@ void spawn_derelict(game_event& event)
     spawn_derelict_base(event);
 }
 
-void destroy_spawn_derelict(game_event& event)
+void spawn_derelict_and_terminate(game_event& event)
+{
+    spawn_derelict_base(event);
+
+    event.parent->finished = true;
+}
+
+void spawn_hostile(game_event& event)
+{
+    spawn_ship_base(event);
+}
+
+void destroy_spawn_derelict_and_terminate(game_event& event)
 {
     ship* s = spawn_derelict_base(event);
 
@@ -76,19 +117,81 @@ void destroy_spawn_derelict(game_event& event)
     }
 
     s->cleanup = true;
+
+    event.parent->finished = true;
 }
 
-dialogue_node resolution_destroyed =
+void spawn_hostile_and_terminate(game_event& event)
 {
-    "Resolution",
-    "The ship was blown out of the sky, you collect materials from the remnants",
-    {
+    spawn_hostile(event);
 
+    event.parent->finished = true;
+}
+
+void do_salvage_resolution_hostile(game_event& event)
+{
+    event.dialogue = salvage_resolution_hostile;
+
+    spawn_hostile(event);
+}
+
+void do_observation_resolution_salvage(game_event& event)
+{
+    event.dialogue = salvage_resolution;
+
+    spawn_derelict(event);
+
+    event.parent->finished = true;
+}
+
+void do_observation_wait_2(game_event& event)
+{
+    waiting_event ev;
+
+    ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 5.f, dlge(observation_resolution_hostile));
+
+    event.waiting_events.push_back(ev);
+}
+
+dialogue_node observation_powerup
+{
+    "Ongoing",
+    "The derelict's power systems appear to be fluctuating",
+    {
+        "Take no chances, blow it up",
+        "Keep observing",
+        "Assess it for salvage value",
     },
     {
-        destroy_spawn_derelict
+        dlge(resolution_destroyed), do_observation_wait_2, do_salvage_resolution_hostile
     }
 };
+
+dialogue_node observation_powerdown
+{
+    "Ongoing",
+    "The derelict's power systems are completely flatlined",
+    {
+        "Assess it for salvage value",
+    },
+    {
+        do_observation_resolution_salvage
+    }
+};
+
+void observation_wait(game_event& event)
+{
+    bool hostile = randf_s(0.f, 1.f) < 0.5f;
+
+    waiting_event ev;
+
+    if(hostile)
+        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 5.f, dlge(observation_powerup));
+    else
+        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 5.f, dlge(observation_powerdown));
+
+    event.waiting_events.push_back(ev);
+}
 
 dialogue_node observation =
 {
@@ -98,11 +201,23 @@ dialogue_node observation =
 
     },
     {
-
+        observation_wait
     }
 };
 
-dialogue_node salvage_resolution
+dialogue_node resolution_destroyed =
+{
+    "Resolution",
+    "The ship was blown out of the sky, you collect materials from the remnants",
+    {
+
+    },
+    {
+        destroy_spawn_derelict_and_terminate
+    }
+};
+
+dialogue_node salvage_resolution =
 {
     "Resolution",
     "The ship appears badly damaged but could be made spaceworth again",
@@ -110,10 +225,49 @@ dialogue_node salvage_resolution
 
     },
     {
-        spawn_derelict
+        terminate_quest
     }
 };
 
+dialogue_node salvage_resolution_hostile =
+{
+    "Alert!",
+    "As the salvage drones approach the ship, it begins to power up and becomes hostile!",
+    {
+
+    },
+    {
+        terminate_quest
+    }
+};
+
+dialogue_node observation_resolution_hostile
+{
+    "Alert!",
+    "The power fluctuations rapidly stabilise, the ship is active and hostile!",
+    {
+
+    },
+    {
+        spawn_hostile_and_terminate
+    }
+};
+
+void decide_derelict_or_hostile(game_event& event)
+{
+    if(randf_s(0.f, 1.f) < 0.9f)
+    {
+        event.dialogue = salvage_resolution;
+
+        spawn_derelict(event);
+    }
+    else
+    {
+        event.dialogue = salvage_resolution_hostile;
+
+        spawn_hostile(event);
+    }
+}
 
 ///we need to data drive the event system from here somehow
 ///maybe have ptrs to bools that get set if we click one (or store internally)
@@ -129,10 +283,9 @@ dialogue_node dia_first =
         "Assess it for salvage value",
     },
     {
-        dlge(resolution_destroyed), dlge(observation), dlge(salvage_resolution),
+        dlge(resolution_destroyed), dlge(observation), decide_derelict_or_hostile,
     },
 };
-
 
 int present_dialogue(const std::vector<std::string>& options)
 {
@@ -183,11 +336,27 @@ int present_dialogue(const std::vector<std::string>& options)
 
 void game_event::draw_ui()
 {
+    for(int i=0; i<waiting_events.size(); i++)
+    {
+        if(waiting_events[i].is_finished(*this))
+        {
+            //dialogue = waiting_events[i].node;
+
+            waiting_events.erase(waiting_events.begin() + i);
+            i--;
+            continue;
+        }
+    }
+
+    if(waiting_events.size() > 0)
+        return;
+
     if(dialogue.header == "")
         return;
 
     if(!dialogue.is_open)
         return;
+
 
     ImGui::Begin((dialogue.header + "###DLOGUE").c_str(), &dialogue.is_open, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -242,6 +411,8 @@ void game_event::tick(float step_s)
 
         set_dialogue_open_state(!dialogue.is_open);
     }*/
+
+    time_alive_s += step_s;
 
     set_dialogue_open_state(alert_location->dialogue_open);
 }
