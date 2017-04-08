@@ -667,7 +667,7 @@ void orbital_system::generate_asteroids_new(int n, int num_belts, int num_resour
 
             float len = rad + randf_s(-max_random_radius, max_random_radius);//rad * randf_s(1 - max_randomness, 1 + max_randomness);
 
-            orbital* o = make_new(orbital_info::ASTEROID, 2.f * randf_s(0.5f, 1.5f), 5);
+            orbital* o = make_new(orbital_info::ASTEROID, 2.f * randf_s(0.5f, 1.5f), randf_s(4, 6));
             o->orbital_angle = angle + randf_s(0.f, M_PI*2/16.f);
             o->orbital_length = len;
 
