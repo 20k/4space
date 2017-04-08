@@ -123,6 +123,16 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
         ret[resource::URANIUM] = 0.2f;
     }
 
+    if(type == COLONISER)
+    {
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
+        ret[resource::URANIUM] = 1;
+        ret[resource::OXYGEN] = 1;
+        ret[resource::HYDROGEN] = 1;
+        ret[resource::IRON] = 1;
+    }
+
     if(type == RAILGUN)
     {
         ret[resource::IRON] = 1;

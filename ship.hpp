@@ -49,6 +49,7 @@ namespace ship_component_elements
         COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
         STEALTH,
         //REPAIR, ///this is dumb, just make crew produce hp
+        COLONISER,
         RAILGUN,
         TORPEDO,
         PLASMAGUN,
@@ -75,6 +76,7 @@ namespace ship_component_elements
         //"PROJECTILE",
         "COMMAND",
         "STEALTH",
+        "COLONISER",
         //"REPAIR",
         "RAILGUN",
         "TORPEDO",
@@ -98,6 +100,7 @@ namespace ship_component_elements
         "SN",
         "CM",
         "ST",
+        "CO",
         "RP",
         "WR",
         "WT",
@@ -121,6 +124,7 @@ namespace ship_component_elements
         5.f,
         2.f,
         80.f,
+        120.f,
         50.f,
         50.f,
         35.f,
@@ -148,6 +152,7 @@ namespace ship_component_elements
 
         research_info::MATERIALS,
         research_info::MATERIALS,
+        research_info::MATERIALS,
 
         research_info::WEAPONS,
         research_info::WEAPONS,
@@ -160,7 +165,7 @@ namespace ship_component_elements
     ///not cost, but if we multiply by cost we get the end cost
     std::map<resource::types, float> component_base_construction_ratio(const types& type);
 
-    static float tech_upgrade_effectiveness = 1.5f;
+    static float tech_upgrade_effectiveness = 1.3f;
     static float tech_cooldown_upgrade_effectiveness = 1.2f;
 
     void upgrade_component(component_attribute& in, int type, float old_tech, float new_tech);
