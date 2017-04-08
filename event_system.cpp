@@ -699,7 +699,7 @@ void game_event::draw_ui()
 
     std::string header_str = dialogue.header + " (" + alert_location->name + ")";
 
-    ImGui::Begin((header_str + "###DLOGUE").c_str(), &dialogue.is_open);
+    ImGui::Begin((header_str + "###DLOGUE" + alert_location->name).c_str(), &dialogue.is_open);
 
     std::vector<std::string> dialogue_options = {dialogue.text};
 
@@ -767,7 +767,7 @@ game_event game_event_manager::make_next_event()
     return ret;
 }
 
-game_event_manager::game_event_manager(orbital* o, fleet_manager& pfleet_manage)
+game_event_manager::game_event_manager(game_event_info::types type, orbital* o, fleet_manager& pfleet_manage)
 {
     arc_type = randf_s(0.f, game_event_info::COUNT);
 
@@ -776,7 +776,12 @@ game_event_manager::game_event_manager(orbital* o, fleet_manager& pfleet_manage)
     first.arc_type = arc_type;
     first.parent = this;
     first.event_num = 0;
-    first.dialogue = alien_precursor_technology::get(); ///set from map the starting dialogues?
+
+    if(type == game_event_info::ANCIENT_PRECURSOR)
+        first.dialogue = alien_precursor_technology::get(); ///set from map the starting dialogues?
+    else if(type == game_event_info::LONE_DERELICT)
+        first.dialogue = lone_derelict_dialogue::get();
+
     first.dialogue.is_open = false;
 
     event_history.push_back(first);
@@ -941,9 +946,9 @@ void game_event_manager::tick(float step_s)
     event_history.back().tick(step_s);
 }
 
-game_event_manager* all_events_manager::make_new(orbital* o, fleet_manager& fm)
+game_event_manager* all_events_manager::make_new(game_event_info::types type, orbital* o, fleet_manager& fm)
 {
-    game_event_manager* gem = new game_event_manager(o, fm);
+    game_event_manager* gem = new game_event_manager(type, o, fm);
 
     events.push_back(gem);
 
@@ -959,4 +964,20 @@ game_event_manager* all_events_manager::orbital_to_game_event(orbital* o)
     }
 
     return nullptr;
+}
+
+void all_events_manager::tick(float step_s)
+{
+    for(auto& i : events)
+    {
+        i->tick(step_s);
+    }
+}
+
+void all_events_manager::draw_ui()
+{
+    for(auto& i : events)
+    {
+        i->draw_ui();
+    }
 }

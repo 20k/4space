@@ -123,7 +123,7 @@ struct game_event_manager
 
     game_event make_next_event();
 
-    game_event_manager(orbital* o, fleet_manager& fm);
+    game_event_manager(game_event_info::types type, orbital* o, fleet_manager& fm);
 
     void set_faction(empire* e);
     void set_interacting_faction(empire* e);
@@ -147,9 +147,12 @@ struct all_events_manager
 {
     std::vector<game_event_manager*> events;
 
-    game_event_manager* make_new(orbital* o, fleet_manager& fm);
+    game_event_manager* make_new(game_event_info::types type, orbital* o, fleet_manager& fm);
 
     game_event_manager* orbital_to_game_event(orbital* o);
+
+    void tick(float step_s);
+    void draw_ui();
 };
 
 #endif // EVENT_SYSTEM_HPP_INCLUDED

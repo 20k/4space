@@ -1451,7 +1451,7 @@ int main()
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
 
-    player_empire->ally(hostile_empire);
+    //player_empire->ally(hostile_empire);
 
     empire* derelict_empire = empire_manage.make_new();
     derelict_empire->name = "Test Ancient Faction";
@@ -1603,9 +1603,13 @@ int main()
 
     all_events_manager all_events;
 
-    game_event_manager* test_event = all_events.make_new(tplanet, fleet_manage);
+    game_event_manager* test_event = all_events.make_new(game_event_info::ANCIENT_PRECURSOR, tplanet, fleet_manage);
 
     test_event->set_faction(derelict_empire);
+
+    game_event_manager* test_event2 = all_events.make_new(game_event_info::LONE_DERELICT, sun, fleet_manage);
+
+    test_event2->set_faction(derelict_empire);
 
     sf::Keyboard key;
 
@@ -1825,9 +1829,12 @@ int main()
         player_empire->draw_ui();
         empire_manage.tick_all(diff_s);
 
-        test_event->tick(diff_s);
-        test_event->draw_ui();
+        //test_event->tick(diff_s);
+        //test_event->draw_ui();
         //test_event->set_interacting_faction(player_empire);
+
+        all_events.draw_ui();
+        all_events.tick(diff_s);
 
         ///um ok. This is correct if slightly stupid
         ///we cull empty orbital fleets, then we cull the dead fleet itself
