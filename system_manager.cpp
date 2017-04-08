@@ -249,19 +249,28 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     vec3f base_sprite_col = {1,1,1};
     vec3f current_simple_col = col;
 
+    vec3f current_sprite_col = base_sprite_col;
+
 
     vec3f hostile_empire_mult = {1, 0, 0};
 
+    vec3f friendly_empire_mult = {0.5, 1, 0.5};
+
     if(parent_empire != viewer_empire)
     {
-        base_sprite_col = base_sprite_col * hostile_empire_mult;
+        current_sprite_col = base_sprite_col * hostile_empire_mult;
         //current_simple_col = current_simple_col * hostile_empire_mult;
+    }
+
+    if(parent_empire->is_allied(viewer_empire))
+    {
+        current_sprite_col = base_sprite_col * friendly_empire_mult;
     }
 
     if(render_type == 0)
         simple_renderable.draw(win, rotation, absolute_pos, current_simple_col);
     else if(render_type == 1)
-        sprite.draw(win, rotation, absolute_pos, base_sprite_col, highlight);
+        sprite.draw(win, rotation, absolute_pos, current_sprite_col, highlight);
 
     highlight = false;
 }
