@@ -159,6 +159,15 @@ void game_event::draw_ui()
 void game_event::tick(float step_s)
 {
     alert_location->has_quest_alert = true;
+
+    /*if(alert_location->clicked)
+    {
+        alert_location->clicked = false;
+
+        set_dialogue_open_state(!dialogue.is_open);
+    }*/
+
+    set_dialogue_open_state(alert_location->dialogue_open);
 }
 
 void game_event::set_dialogue_open_state(bool open)

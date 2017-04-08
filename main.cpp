@@ -1127,6 +1127,21 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             kk++;
         }
 
+        if(((orbital*)i.element)->has_quest_alert)
+        {
+            orbital* o = (orbital*)i.element;
+
+            if(o->dialogue_open)
+                ImGui::Text("(Hide Alert)");
+            else
+                ImGui::Text("(View Alert)");
+
+            if(ImGui::IsItemClicked())
+            {
+                o->dialogue_open = !o->dialogue_open;
+            }
+        }
+
         g_elem_id++;
     }
 

@@ -160,6 +160,7 @@ struct orbital
 
     bool has_quest_alert = false;
     bool clicked = false; ///for quest alert system
+    bool dialogue_open = false;
 };
 
 struct orbital_system
