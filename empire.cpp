@@ -222,6 +222,16 @@ std::map<resource::types, float> empire::dispense_resources_proportionally(const
 void empire::tick(float step_s)
 {
     research_tech_level.tick(step_s);
+
+    for(auto& i : relations_map)
+    {
+        if(!is_allied(i.first))
+            continue;
+
+        float culture_shift_ps = 1/10000.f;
+
+        culture_shift(culture_shift_ps * step_s, i.first);
+    }
 }
 
 void empire::draw_ui()
