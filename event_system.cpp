@@ -134,16 +134,16 @@ void game_event::draw_ui()
     {
         game_event next = parent->make_next_event();
 
-        if(selected < dialogue.travel.size())
+        if(selected < dialogue.onclick.size() && dialogue.onclick[selected] != nullptr)
         {
             void (*fptr)(game_event&);
 
-            if(selected < dialogue.onclick.size() && dialogue.onclick[selected] != nullptr)
-            {
-                fptr = dialogue.onclick[selected];
-                fptr(*this);
-            }
+            fptr = dialogue.onclick[selected];
+            fptr(*this);
+        }
 
+        if(selected < dialogue.travel.size())
+        {
             next.dialogue = *(dialogue.travel[selected]);
         }
 
