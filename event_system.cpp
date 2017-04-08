@@ -13,22 +13,7 @@ void terminate_quest(game_event& event)
     event.alert_location->has_quest_alert = false;
 }
 
-dialogue_node resolution =
-{
-    "Resolution",
-    "Test resolution",
-    {
-
-    },
-    {
-
-    },
-    {
-        terminate_quest
-    }
-};
-
-void spawn_derelict(game_event& event)
+ship* spawn_derelict_base(game_event& event)
 {
     orbital* o = event.alert_location;
     empire* owner_faction = event.parent->ancient_faction;
@@ -53,7 +38,81 @@ void spawn_derelict(game_event& event)
     new_ship->randomise_make_derelict();
 
     onew_fleet->tick(0.f);
+
+    return new_ship;
 }
+
+void spawn_derelict(game_event& event)
+{
+    spawn_derelict_base(event);
+}
+
+void destroy_spawn_derelict(game_event& event)
+{
+    ship* s = spawn_derelict_base(event);
+
+    research raw = s->get_research_real_for_empire(s->original_owning_race, event.parent->interacting_faction);
+    auto res = s->resources_received_when_scrapped();
+
+    res[resource::RESEARCH] = raw.units_to_currency(true);
+
+    float destruction_penalty = 0.5f;
+
+    for(auto& i : res)
+    {
+        i.second *= destruction_penalty;
+
+        event.parent->interacting_faction->add_resource(i.first, i.second);
+    }
+
+    s->cleanup = true;
+}
+
+dialogue_node resolution_destroyed =
+{
+    "Resolution",
+    "The ship was blown out of the sky, you collect materials from the remnants",
+    {
+
+    },
+    {
+
+    },
+    {
+        destroy_spawn_derelict
+    }
+};
+
+dialogue_node observation =
+{
+    "Ongoing",
+    "You begin to watch carefully from afar",
+    {
+
+    },
+    {
+
+    },
+    {
+
+    }
+};
+
+dialogue_node salvage_resolution
+{
+    "Resolution",
+    "The ship appears badly damaged but could be made spaceworth again",
+    {
+
+    },
+    {
+
+    },
+    {
+        spawn_derelict
+    }
+};
+
 
 ///we need to data drive the event system from here somehow
 ///maybe have ptrs to bools that get set if we click one (or store internally)
@@ -61,18 +120,18 @@ void spawn_derelict(game_event& event)
 ///or like, trigger events somehow from here
 dialogue_node dia_first =
 {
-    "Hi",
-    "Hello there you look like fun",
+    "Derelict Ship",
+    "A derelict ship was detected drifting lazily in orbit of the planet",
     {
-        "Die die die aliens",
-        "Oh you're totally right",
-        "I like cereal",
+        "Take no chances, blow it up",
+        "Observe it from a distance",
+        "Assess it for salvage value",
     },
     {
-        &resolution, &resolution, &resolution,
+        &resolution_destroyed, &observation, &salvage_resolution,
     },
     {
-        spawn_derelict, spawn_derelict, spawn_derelict
+        //spawn_derelict, spawn_derelict, spawn_derelict
     }
 };
 
@@ -225,9 +284,14 @@ game_event_manager::game_event_manager(orbital* o, fleet_manager& pfleet_manage)
     fleet_manage = &pfleet_manage;
 }
 
-void game_event_manager::set_facton(empire* e)
+void game_event_manager::set_faction(empire* e)
 {
     ancient_faction = e;
+}
+
+void game_event_manager::set_interacting_faction(empire* e)
+{
+    interacting_faction = e;
 }
 
 void game_event_manager::draw_ui()

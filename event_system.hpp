@@ -87,6 +87,7 @@ struct game_event_manager
 
     ///could be one of many
     empire* ancient_faction = nullptr;
+    empire* interacting_faction = nullptr;
     fleet_manager* fleet_manage;
 
     int arc_type;
@@ -98,7 +99,8 @@ struct game_event_manager
 
     game_event_manager(orbital* o, fleet_manager& fm);
 
-    void set_facton(empire* e);
+    void set_faction(empire* e);
+    void set_interacting_faction(empire* e);
 
     //notification_window window;
 

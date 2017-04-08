@@ -545,6 +545,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(s.fully_disabled() && claiming_empire != nullptr && !s.owned_by->any_in_combat())
     {
+        ///should this be originating empire?
         research research_raw = s.get_research_real_for_empire(s.owned_by->parent_empire, claiming_empire);
 
         auto res = s.resources_received_when_scrapped();
@@ -1210,6 +1211,8 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
     all_systems.cull_empty_orbital_fleets(empires);
     fleet_manage.cull_dead(empires);
+    all_systems.cull_empty_orbital_fleets(empires);
+    fleet_manage.cull_dead(empires);
 
     ImGui::End();
 }
@@ -1372,7 +1375,7 @@ int main()
     popup_info popup;
 
     game_event_manager test_event(tplanet, fleet_manage);
-    test_event.set_facton(derelict_empire);
+    test_event.set_faction(derelict_empire);
 
     sf::Keyboard key;
 
@@ -1524,6 +1527,8 @@ int main()
 
         system_manage.cull_empty_orbital_fleets(empire_manage);
         fleet_manage.cull_dead(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage);
+        fleet_manage.cull_dead(empire_manage);
 
         if(key.isKeyPressed(sf::Keyboard::N))
         {
@@ -1559,6 +1564,16 @@ int main()
 
         test_event.tick(diff_s);
         test_event.draw_ui();
+        test_event.set_interacting_faction(player_empire);
+
+        ///um ok. This is correct if slightly stupid
+        ///we cull empty orbital fleets, then we cull the dead fleet itself
+        ///ships might have been culled in cull_dead, so we then need to cull any fleets with nothing in them
+        ///and then actually remove those ships in the next cull dead
+        system_manage.cull_empty_orbital_fleets(empire_manage);
+        fleet_manage.cull_dead(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage);
+        fleet_manage.cull_dead(empire_manage);
 
         //printf("Prerender\n");
 
