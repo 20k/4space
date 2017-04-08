@@ -490,10 +490,41 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     {
         ImGui::Text("(Upgrade to latest Tech)");
 
+        ship c_cpy = s;
+
+        c_cpy.set_tech_level_from_empire(owner);
+
+        auto res_cost = c_cpy.resources_cost();
+
+        auto current_resources = s.resources_cost();
+
+        auto res_remaining = res_cost;
+
+        for(auto& i : current_resources)
+        {
+            res_remaining[i.first] -= i.second;
+        }
+
         ///setting tech level currently does not have a cost associated with it
         if(ImGui::IsItemClicked())
         {
-            s.set_tech_level_from_empire(owner);
+            if(owner->can_fully_dispense(res_remaining))
+            {
+                s.set_tech_level_from_empire(owner);
+            }
+        }
+
+        resource_manager rm;
+        rm.add(res_remaining);
+
+        for(auto& i : rm.resources)
+        {
+            i.amount = -i.amount;
+        }
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip(rm.get_formatted_str(true).c_str());
         }
     }
 
