@@ -490,6 +490,40 @@ void game_event_manager::set_interacting_faction(empire* e)
     interacting_faction = e;
 }
 
+bool game_event_manager::can_interact(empire* e)
+{
+    for(orbital* o : e->owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        bool any_valid = false;
+
+        for(ship* s : sm->ships)
+        {
+            if(!s->fully_disabled())
+            {
+                any_valid = true;
+                break;
+            }
+        }
+
+        if(!any_valid)
+            continue;
+
+        float interact_distance = 120.f;
+
+        if((o->absolute_pos - event_history.back().alert_location->absolute_pos).length() < interact_distance)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void game_event_manager::draw_ui()
 {
     event_history.back().draw_ui();
@@ -502,11 +536,22 @@ void game_event_manager::tick(float step_s)
     event_history.back().tick(step_s);
 }
 
-game_event_manager* all_events_manager::make_new()
+game_event_manager* all_events_manager::make_new(orbital* o, fleet_manager& fm)
 {
-    //game_event_manager* gem = new game_event_manager;
+    game_event_manager* gem = new game_event_manager(o, fm);
 
-    //events.push_back(gem);
+    events.push_back(gem);
 
-    //return gem;
+    return gem;
+}
+
+game_event_manager* all_events_manager::orbital_to_game_event(orbital* o)
+{
+    for(auto& i : events)
+    {
+        if(i->event_history.back().alert_location == o)
+            return i;
+    }
+
+    return nullptr;
 }

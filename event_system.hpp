@@ -125,8 +125,7 @@ struct game_event_manager
 
     void set_faction(empire* e);
     void set_interacting_faction(empire* e);
-
-    //notification_window window;
+    bool can_interact(empire* e);
 
     void draw_ui();
     void tick(float step_s);
@@ -140,10 +139,9 @@ struct all_events_manager
 {
     std::vector<game_event_manager*> events;
 
-    game_event_manager* make_new();
+    game_event_manager* make_new(orbital* o, fleet_manager& fm);
 
-    bool can_interact(empire* e);
-    void set_interacting(empire* e);
+    game_event_manager* orbital_to_game_event(orbital* o);
 };
 
 #endif // EVENT_SYSTEM_HPP_INCLUDED

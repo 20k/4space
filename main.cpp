@@ -1050,7 +1050,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     }
 }
 
-void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires, empire* player_empire)
+void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events)
 {
     if(popup.elements.size() == 0)
         popup.going = false;
@@ -1184,14 +1184,25 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
         {
             orbital* o = (orbital*)i.element;
 
-            if(o->dialogue_open)
-                ImGui::Text("(Hide Alert)");
-            else
-                ImGui::Text("(View Alert)");
+            game_event_manager* event = all_events.orbital_to_game_event(o);
 
-            if(ImGui::IsItemClicked())
+            if(event != nullptr && !event->can_interact(player_empire))
             {
-                o->dialogue_open = !o->dialogue_open;
+                ImGui::Text("(Requires nearby fleet to view alert)");
+
+                o->dialogue_open = false;
+            }
+            else
+            {
+                if(o->dialogue_open)
+                    ImGui::Text("(Hide Alert)");
+                else
+                    ImGui::Text("(View Alert)");
+
+                if(ImGui::IsItemClicked())
+                {
+                    o->dialogue_open = !o->dialogue_open;
+                }
             }
         }
 
@@ -1557,8 +1568,11 @@ int main()
 
     popup_info popup;
 
-    game_event_manager test_event(tplanet, fleet_manage);
-    test_event.set_faction(derelict_empire);
+    all_events_manager all_events;
+
+    game_event_manager* test_event = all_events.make_new(tplanet, fleet_manage);
+
+    test_event->set_faction(derelict_empire);
 
     sf::Keyboard key;
 
@@ -1740,7 +1754,7 @@ int main()
 
         //printf("prepp\n");
 
-        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire);
+        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events);
 
         //printf("precull\n");
 
@@ -1761,9 +1775,9 @@ int main()
         player_empire->draw_ui();
         empire_manage.tick_all(diff_s);
 
-        test_event.tick(diff_s);
-        test_event.draw_ui();
-        test_event.set_interacting_faction(player_empire);
+        test_event->tick(diff_s);
+        test_event->draw_ui();
+        test_event->set_interacting_faction(player_empire);
 
         ///um ok. This is correct if slightly stupid
         ///we cull empty orbital fleets, then we cull the dead fleet itself
