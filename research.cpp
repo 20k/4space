@@ -117,6 +117,18 @@ float research::units_to_currency(bool has_minimum_value)
     return accum;
 }
 
+float research::level_to_currency()
+{
+    float val = 0.f;
+
+    for(int i=0; i<categories.size(); i++)
+    {
+        val += research_info::get_research_level_cost(categories[i].amount);
+    }
+
+    return val;
+}
+
 research research::div(float amount)
 {
     for(auto& i : categories)

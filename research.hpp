@@ -81,6 +81,7 @@ struct research
     ///levels are exponential, units are linear
     ///ie research is always worth something
     float units_to_currency(bool has_minimum_value);
+    float level_to_currency();
 
     ///MODIFIES UNDERLYING STORAGE
     research div(float amount);

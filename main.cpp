@@ -1207,7 +1207,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
                 if(ImGui::IsItemClicked())
                 {
-                    if(o->dialogue_open && event->interacting_faction == nullptr)
+                    if(event->interacting_faction == nullptr)
                     {
                         event->set_interacting_faction(player_empire);
                         ///set interacting fleet

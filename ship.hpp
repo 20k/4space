@@ -383,6 +383,7 @@ struct ship : positional
     void add(const component& c);
 
     void hit(projectile* p);
+    void hit_raw_damage(float val);
 
     void check_load(vec2i dim);
     void generate_image(vec2i dim);
@@ -429,6 +430,7 @@ struct ship : positional
 
     ///damages the ship until derelict
     void randomise_make_derelict();
+    void random_damage(float frac);
 
     float get_total_cost();
     float get_real_total_cost();
@@ -508,6 +510,8 @@ struct ship_manager
     void enter_combat();
     bool any_in_combat();
     bool can_engage(); ///and be engaged
+
+    void random_damage_ships(float frac);
 
     void apply_disengage_penalty();
 

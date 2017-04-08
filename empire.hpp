@@ -16,6 +16,8 @@ struct faction_relations
 {
     bool allied = false;
     float friendliness = 0.5f; ///0 = v bad, 1 = best
+    float hostility = 0; ///For precursors, but also a generally 'pissed off' meter
+    float positivity = 0; ///For precursors, but also a generally short term happiness meter
 };
 
 struct empire
@@ -90,6 +92,9 @@ struct empire
 
     ///make sure all relations have valid values
     void clamp_relations();
+
+    void negative_interaction(empire* e);
+    void positive_interaction(empire* e);
 };
 
 struct empire_manager

@@ -1537,10 +1537,13 @@ void ship::add(const component& c)
 
 void ship::hit(projectile* p)
 {
+    return hit_raw_damage(p->base.get_tag(component_tag::DAMAGE));
+}
+
+void ship::hit_raw_damage(float damage)
+{
     float shields = get_stored_resources()[ship_component_element::SHIELD_POWER];
     float armour = get_stored_resources()[ship_component_element::ARMOUR];
-
-    float damage = p->base.get_tag(component_tag::DAMAGE);
 
     float sdamage = std::min(damage, shields);
 
@@ -1954,6 +1957,18 @@ void ship::randomise_make_derelict()
             hp_attr.cur_amount = 0.f;
 
         test_set_disabled();
+    }
+}
+
+void ship::random_damage(float frac)
+{
+    int cid = randf_s(0.f, entity_list.size());
+
+    float hp = get_stored_resources()[ship_component_elements::HP];
+
+    for(int i=0; i<10.f; i++)
+    {
+        hit_raw_damage(hp * frac / 10.f);
     }
 }
 
@@ -2603,6 +2618,14 @@ bool ship_manager::can_engage()
     }
 
     return false;
+}
+
+void ship_manager::random_damage_ships(float frac)
+{
+    for(ship* s : ships)
+    {
+        s->random_damage(frac);
+    }
 }
 
 void ship_manager::apply_disengage_penalty()

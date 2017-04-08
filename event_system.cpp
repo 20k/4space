@@ -64,6 +64,66 @@ void terminate_quest(game_event& event)
     event.alert_location->has_quest_alert = false;
 }
 
+void give_random_research(game_event& event)
+{
+    empire* derelict = event.parent->ancient_faction;
+    empire* interactor = event.parent->interacting_faction;
+
+    research& r = derelict->research_tech_level;
+
+    float total_available_currency = r.level_to_currency() - r.level_to_currency();
+
+    total_available_currency /= 10.f;
+
+    total_available_currency = clamp(total_available_currency, 0.f, r.level_to_currency() / 2.f);
+
+    if(total_available_currency < 50)
+        total_available_currency = 50;
+
+    interactor->add_resource(resource::RESEARCH, total_available_currency);
+}
+
+void give_research_currency_proportion(game_event& event)
+{
+    float research_frac = 0.05f;
+
+    empire* interactor = event.parent->interacting_faction;
+
+    research& r = interactor->research_tech_level;
+
+    float total_currency = r.level_to_currency() * research_frac;
+
+    if(total_currency < 50)
+        total_currency = 50.f;
+
+    interactor->add_resource(resource::RESEARCH, total_currency);
+}
+
+void hostile_interaction(game_event& event)
+{
+    empire* derelict = event.parent->ancient_faction;
+    empire* interactor = event.parent->interacting_faction;
+
+    derelict->negative_interaction(interactor);
+}
+
+void positive_interaction(game_event& event)
+{
+    empire* derelict = event.parent->ancient_faction;
+    empire* interactor = event.parent->interacting_faction;
+
+    derelict->positive_interaction(interactor);
+}
+
+void damage_nearby_fleets(game_event& event)
+{
+    empire* interactor = event.parent->interacting_faction;
+
+    ship_manager* sm = event.parent->get_nearest_fleet(interactor);
+
+    sm->random_damage_ships(0.6f);
+}
+
 ship* spawn_ship_base(game_event& event)
 {
     orbital* o = event.alert_location;
@@ -309,20 +369,240 @@ namespace lone_derelict_dialogue
 ///might spawn a new faction due to us helping them
 namespace alien_precursor_technology
 {
-    /*dialogue_node first
+    dialogue_node explosion
+    {
+        "Alert!",
+        "We tripped their defences, a massive explosion has destroyed all traces of the facility and damaged some of our fleets",
+        {
+
+        },
+        {
+            both(terminate_quest, both(damage_nearby_fleets, hostile_interaction))
+        }
+    };
+
+    dialogue_node blow_it_up
+    {
+        "Information",
+        "You wipe the structure off the face of the planet",
+        {
+            "Good riddance"
+        },
+        {
+            both(terminate_quest, hostile_interaction)
+        }
+    };
+
+    dialogue_node power_fluctuations
+    {
+        "Information",
+        "There appear to be massive power fluctuations originating from the surface",
+        {
+            "Blow it up from space",
+            "Continue observation",
+        },
+        {
+            dlge(blow_it_up), wait(1.f, dlge(explosion))
+        }
+    };
+
+
+    dialogue_node nothing_happens_again
+    {
+        "Resolution",
+        "With no signals from the ground, it seems likely that there's nothing further to be gained here",
+        {
+            "Leave it alone",
+            "Blow it up from space"
+        },
+        {
+            dlge(nothing_happens_again), dlge(blow_it_up)
+        }
+    };
+
+    void anything_happens_space_post_ground(game_event& event)
+    {
+        bool happens = randf_s(0.f, 1.f) < 0.7f;
+
+        if(happens)
+        {
+            event.dialogue = nothing_happens_again;
+        }
+        else
+        {
+            event.dialogue = power_fluctuations;
+        }
+    }
+
+    dialogue_node no_return
+    {
+        "Information",
+        "The ground team did not return, and we received no further signals or communication of any kind",
+        {
+            "Leave it alone",
+            "Observe from space",
+            "Blow it up",
+        },
+        {
+            dlge(no_return), wait(1.f, anything_happens_space_post_ground), both(terminate_quest, hostile_interaction)
+        }
+    };
+
+    dialogue_node found_technology
+    {
+        "Information",
+        "We found no life, but a wealth of technology from an ancient civilisation",
+        {
+
+        },
+        {
+            both(terminate_quest, both(give_random_research, positive_interaction)) ///shift culture, bump interaction count
+        }
+    };
+
+    dialogue_node mutated_f2
+    {
+        "Information",
+        "What next?",
+        no_return.options,
+        no_return.onclick
+    };
+
+    dialogue_node mutated_flavour
+    {
+        "Information",
+        "The mutated team members appear to have died agonisingly",
+        {
+            "Interesting",
+        },
+        {
+            both(dlge(mutated_f2), give_research_currency_proportion)
+        }
+    };
+
+    dialogue_node recovery
+    {
+        "Information",
+        "The crew members died slowly and painfully in quarantine",
+        {
+            "Interesting",
+        },
+        {
+            both(dlge(mutated_f2), give_research_currency_proportion)
+        }
+    };
+
+    dialogue_node team_mutated
+    {
+        "Information",
+        "The team has emerged from the structure... horrifically mutated. The comms are full of nothing but garbled moans",
+        {
+            "Destroy everything",
+            "Attempt to recover crew for study",
+            "Continue observing from space",
+        },
+        {
+            dlge(blow_it_up), dlge(recovery), dlge(mutated_flavour),
+        }
+    };
+
+
+    /*dialogue_node first_contact
+    {
+        "Information","
+        "We received garbled communication from the surface",
+        {
+            ""
+        }
+    }*/
+
+    ///if we've observed from space, make it more likely that nothing happens on that quest chain
+    void anything_happens_ground(game_event& event)
+    {
+        bool team_does_not_return = randf_s(0.f, 1.f) < 0.2f;
+
+        if(team_does_not_return)
+        {
+            event.dialogue = no_return;
+
+            return;
+        }
+
+        bool team_comes_back_horribly_mutated = randf_s(0.f, 1.f) < 0.1f;
+
+        if(team_comes_back_horribly_mutated)
+        {
+            event.dialogue = team_mutated;
+
+            return;
+        }
+
+        bool massive_explosion = randf_s(0.f, 1.f) < 0.2f;
+
+        if(massive_explosion)
+        {
+            event.dialogue = explosion;
+
+            return;
+        }
+
+        /*bool friendly_contact = randf_s(0.f, 1.f) < 0.2f;
+
+        ///make this dependent on empire culture and number of interactions
+        if(friendly_contact)
+        {
+            event.dialogue = first_contact;
+
+            return;
+        }*/
+
+        event.dialogue = found_technology;
+    }
+
+    dialogue_node nothing_happens
+    {
+        "Information",
+        "The appears to be no signals originating from the ground",
+        {
+            "Leave it alone",
+            "Send in a ground team",
+        },
+        {
+            dlge(nothing_happens), wait(20.f, anything_happens_ground)
+        }
+    };
+
+    void anything_happens_space(game_event& event)
+    {
+        bool happens = randf_s(0.f, 1.f) < 0.3f;
+
+        if(!happens)
+        {
+            event.dialogue = nothing_happens;
+        }
+        else
+        {
+            event.dialogue = power_fluctuations;
+        }
+    }
+
+    dialogue_node first
     {
         "Information",
         "We have detected traces of an ancient alien civilisation on this planet",
         {
             "Observe it from space",
             "Send in a ground team",
-        }
-    }*/
+        },
+        {
+            wait(1.f, anything_happens_space), wait(5.f, anything_happens_ground)
+        },
+    };
 
-    /*dialogue_node get()
+    dialogue_node get()
     {
         return first;
-    }*/
+    }
 }
 
 int present_dialogue(const std::vector<std::string>& options)
@@ -472,7 +752,7 @@ game_event_manager::game_event_manager(orbital* o, fleet_manager& pfleet_manage)
     first.arc_type = arc_type;
     first.parent = this;
     first.event_num = 0;
-    first.dialogue = lone_derelict_dialogue::get(); ///set from map the starting dialogues?
+    first.dialogue = alien_precursor_technology::get(); ///set from map the starting dialogues?
 
     event_history.push_back(first);
 

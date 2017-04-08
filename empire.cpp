@@ -337,6 +337,18 @@ bool empire::is_allied(empire* e)
     return relations_map[e].allied;
 }
 
+void empire::negative_interaction(empire* e)
+{
+    e->relations_map[this].hostility += 1.f;
+    relations_map[e].hostility += 1.f;
+}
+
+void empire::positive_interaction(empire* e)
+{
+    e->relations_map[this].positivity += 1.f;
+    relations_map[e].positivity += 1.f;
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;
