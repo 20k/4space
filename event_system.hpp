@@ -79,6 +79,7 @@ struct game_event
 ///then implement followon
 ///this manages one particularly game event, which is composed of sub game events
 ///will definitely need a regular tick
+///Don't ditch any quest history so we can have logs
 struct game_event_manager
 {
     ///event_history.back() == current event
@@ -105,6 +106,8 @@ struct game_event_manager
     void tick(float step_s);
 
     float internal_time_s = 0.f;
+
+    bool finished = false;
 };
 
 #endif // EVENT_SYSTEM_HPP_INCLUDED

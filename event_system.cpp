@@ -6,10 +6,26 @@
 #include "ship_definitions.hpp"
 #include "empire.hpp"
 
+void terminate_quest(game_event& event)
+{
+    event.dialogue.is_open = false;
+    event.parent->finished = true;
+    event.alert_location->has_quest_alert = false;
+}
+
 dialogue_node resolution =
 {
     "Resolution",
     "Test resolution",
+    {
+
+    },
+    {
+
+    },
+    {
+        terminate_quest
+    }
 };
 
 void spawn_derelict(game_event& event)
@@ -158,6 +174,12 @@ void game_event::draw_ui()
 
 void game_event::tick(float step_s)
 {
+    if(parent->finished)
+    {
+        alert_location->has_quest_alert = false;
+        return;
+    }
+
     alert_location->has_quest_alert = true;
 
     /*if(alert_location->clicked)
