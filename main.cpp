@@ -1367,7 +1367,8 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
     std::vector<ship> ships
     {
         make_default(),
-        make_scout()
+        make_scout(),
+        make_colony_ship()
     };
 
     for(auto& test_ship : ships)
@@ -1483,7 +1484,7 @@ int main()
 
     ship* derelict_ship = fleet4->make_new_from(hostile_empire->team_id, make_default());
 
-    ship* scout_ship = fleet5->make_new_from(player_empire->team_id, make_scout());
+    ship* scout_ship = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
 
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";

@@ -283,6 +283,43 @@ inline component make_default_stealth(float effectiveness = 1.f)
     return stealth_drive;
 }
 
+inline component make_default_coloniser()
+{
+    component_attribute cooling;
+    cooling.drained_per_s = 1.1f;
+
+    component_attribute power;
+    power.drained_per_use = 80;
+    power.drained_per_s = 70.f;
+
+    component_attribute command;
+    command.drained_per_s = 0.5f;
+
+    component_attribute hp;
+    hp.max_amount = default_room_hp/4.f;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute colony;
+    colony.produced_per_use = 1.f;
+
+    ///what I'd really like to do here is say "if we don't have enough shields, drain hp"
+    ///but this is too complex to express at the moment
+    //component_attribute shield;
+    //shield.drained_per_use = 5;
+
+    component coloniser;
+    coloniser.add(ship_component_element::COOLING_POTENTIAL, cooling);
+    coloniser.add(ship_component_element::ENERGY, power);
+    coloniser.add(ship_component_element::COMMAND, command);
+    coloniser.add(ship_component_element::HP, hp);
+    coloniser.add(ship_component_element::COLONISER, colony);
+
+    coloniser.name = "Coloniser";
+    coloniser.primary_attribute = ship_component_elements::COLONISER;
+
+    return coloniser;
+}
+
 inline component make_default_scanner(float effectiveness = 1.f)
 {
     component_attribute cooling;
@@ -485,6 +522,23 @@ inline ship make_scout()
     test_ship.add(make_default_stealth(1.5f));
 
     test_ship.name = "Scout Default";
+
+    return test_ship;
+}
+
+inline ship make_colony_ship()
+{
+    ship test_ship;
+    test_ship.add(make_default_crew());
+    test_ship.add(make_default_life_support());
+    test_ship.add(make_default_power_core(1.4f));
+    test_ship.add(make_default_engines());
+    test_ship.add(make_default_warp_drive(0.75f));
+    test_ship.add(make_default_scanner(0.5));
+    test_ship.add(make_default_heatsink());
+    test_ship.add(make_default_coloniser());
+
+    test_ship.name = "Colony Default";
 
     return test_ship;
 }
