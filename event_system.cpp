@@ -28,14 +28,33 @@ bool transition_ev(game_event& event, float time_s, std::function<void(game_even
     return false;
 }
 
-void transition_dialogue(game_event& event, const dialogue_node& node)
+void add_wait(waiting_event ev, game_event& event)
 {
-    event.dialogue = node;
+    event.waiting_events.push_back(ev);
 }
 
-std::function<void(game_event&)> dlge(const dialogue_node& node)
+std::function<void(game_event&)> wait(float time_s, std::function<void(game_event&)> func)
 {
-    return std::bind(transition_dialogue, std::placeholders::_1, node);
+    waiting_event ev;
+
+    ev.is_finished = std::bind(transition_ev, std::placeholders::_1, time_s, func);
+
+    return std::bind(add_wait, ev, std::placeholders::_1);
+}
+
+std::function<void(game_event&)> both(std::function<void(game_event&)> f1, std::function<void(game_event&)> f2)
+{
+    return [f1, f2](game_event& e){f1(e); f2(e);};
+}
+
+void transition_dialogue(game_event& event, dialogue_node* node)
+{
+    event.dialogue = *node;
+}
+
+std::function<void(game_event&)> dlge(dialogue_node& node)
+{
+    return std::bind(transition_dialogue, std::placeholders::_1, &node);
 }
 
 void terminate_quest(game_event& event)
@@ -121,12 +140,12 @@ void destroy_spawn_derelict_and_terminate(game_event& event)
     event.parent->finished = true;
 }
 
-void spawn_hostile_and_terminate(game_event& event)
+/*void spawn_hostile_and_terminate(game_event& event)
 {
     spawn_hostile(event);
 
     event.parent->finished = true;
-}
+}*/
 
 void do_salvage_resolution_hostile(game_event& event)
 {
@@ -144,15 +163,6 @@ void do_observation_resolution_salvage(game_event& event)
     event.parent->finished = true;
 }
 
-void do_observation_wait_2(game_event& event)
-{
-    waiting_event ev;
-
-    ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 5.f, dlge(observation_resolution_hostile));
-
-    event.waiting_events.push_back(ev);
-}
-
 dialogue_node observation_powerup
 {
     "Ongoing",
@@ -163,7 +173,7 @@ dialogue_node observation_powerup
         "Assess it for salvage value",
     },
     {
-        dlge(resolution_destroyed), do_observation_wait_2, do_salvage_resolution_hostile
+        dlge(resolution_destroyed), wait(5.f, both(dlge(observation_resolution_hostile), spawn_hostile)), do_salvage_resolution_hostile
     }
 };
 
@@ -182,6 +192,8 @@ dialogue_node observation_powerdown
 void observation_wait(game_event& event)
 {
     bool hostile = randf_s(0.f, 1.f) < 0.5f;
+
+    hostile = true;
 
     waiting_event ev;
 
@@ -249,7 +261,7 @@ dialogue_node observation_resolution_hostile
 
     },
     {
-        spawn_hostile_and_terminate
+        terminate_quest
     }
 };
 
