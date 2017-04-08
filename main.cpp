@@ -366,6 +366,11 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         bool obfuscd = primary_obfuscated[id];
 
+        if(s.owned_by->parent_empire->is_allied(player_empire))
+        {
+            obfuscd = false;
+        }
+
         header_str = obfuscate(header_str, obfuscd);
         prod_str = obfuscate(prod_str, obfuscd);
         cons_str = obfuscate(cons_str, obfuscd);
@@ -422,6 +427,11 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         bool knows = known_information >= c.scanning_difficulty;
 
+        if(s.owned_by->parent_empire->is_allied(player_empire))
+        {
+            knows = true;
+        }
+
         name = obfuscate(name, !knows);
 
         ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
@@ -452,7 +462,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     float scanning_power = player_empire->available_scanning_power_on(&s, system_manage);
 
-    std::string scanning_str = "Information: " + std::to_string((int)(scanning_power * 100.f)) + "%%";
+    std::string scanning_str = "Scanning Power: " + std::to_string((int)(scanning_power * 100.f)) + "%%";
 
     ImGui::Text(scanning_str.c_str());
 
@@ -1069,6 +1079,11 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                 {
                     can_open_window = true;
                 }
+
+                if(smanage->parent_empire->is_allied(player_empire))
+                {
+                    can_open_window = true;
+                }
             }
 
             if(i.toggle_clickable)
@@ -1241,6 +1256,8 @@ int main()
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
+
+    player_empire->ally(hostile_empire);
 
     empire* derelict_empire = empire_manage.make_new();
     derelict_empire->name = "Test Ancient Faction";
