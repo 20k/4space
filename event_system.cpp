@@ -113,7 +113,10 @@ void game_event::draw_ui()
     if(dialogue.header == "")
         return;
 
-    ImGui::Begin((dialogue.header + "###DLOGUE").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    if(!dialogue.is_open)
+        return;
+
+    ImGui::Begin((dialogue.header + "###DLOGUE").c_str(), &dialogue.is_open, ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> dialogue_options = {dialogue.text};
 
@@ -156,6 +159,11 @@ void game_event::draw_ui()
 void game_event::tick(float step_s)
 {
     alert_location->has_quest_alert = true;
+}
+
+void game_event::set_dialogue_open_state(bool open)
+{
+    dialogue.is_open = open;
 }
 
 game_event game_event_manager::make_next_event()

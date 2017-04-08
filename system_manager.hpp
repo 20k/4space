@@ -159,6 +159,7 @@ struct orbital
     orbital_system* parent_system = nullptr;
 
     bool has_quest_alert = false;
+    bool clicked = false; ///for quest alert system
 };
 
 struct orbital_system

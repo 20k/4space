@@ -633,9 +633,11 @@ void orbital_system::generate_asteroids_new(int n, int num_belts, int num_resour
 
     std::vector<orbital*> cur_orbitals;
 
+    int vnum = 0;
+
     for(int i=0; i<exclusion_radiuses.size(); i++)
     {
-        if(randf_s(0.f, 1.f) < 0.3f)
+        if(randf_s(0.f, 1.f) < 0.3f && vnum > 0)
             continue;
 
         float min_rad = exclusion_radiuses[i] + 30;
@@ -664,6 +666,8 @@ void orbital_system::generate_asteroids_new(int n, int num_belts, int num_resour
 
             cur_orbitals.push_back(o);
         }
+
+        vnum++;
     }
 
     if(cur_orbitals.size() == 0)

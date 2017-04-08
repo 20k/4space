@@ -48,6 +48,8 @@ struct dialogue_node
     std::vector<std::string> options;
     std::vector<dialogue_node*> travel;
     std::vector<void(*)(game_event&)> onclick;
+
+    bool is_open = true;
 };
 
 ///Ok. This is basically a branching sequence of events, each event may trigger a new event depending on the circumstances
@@ -67,6 +69,8 @@ struct game_event
 
     void draw_ui();
     void tick(float step_s);
+
+    void set_dialogue_open_state(bool open);
 
     game_event_manager* parent = nullptr;
 };
