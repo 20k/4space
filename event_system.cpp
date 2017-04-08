@@ -147,21 +147,21 @@ void destroy_spawn_derelict_and_terminate(game_event& event)
     event.parent->finished = true;
 }*/
 
-void do_salvage_resolution_hostile(game_event& event)
+/*void do_salvage_resolution_hostile(game_event& event)
 {
     event.dialogue = salvage_resolution_hostile;
 
     spawn_hostile(event);
-}
+}*/
 
-void do_observation_resolution_salvage(game_event& event)
+/*void do_observation_resolution_salvage(game_event& event)
 {
     event.dialogue = salvage_resolution;
 
     spawn_derelict(event);
 
     event.parent->finished = true;
-}
+}*/
 
 dialogue_node observation_powerup
 {
@@ -173,7 +173,7 @@ dialogue_node observation_powerup
         "Assess it for salvage value",
     },
     {
-        dlge(resolution_destroyed), wait(5.f, both(dlge(observation_resolution_hostile), spawn_hostile)), do_salvage_resolution_hostile
+        dlge(resolution_destroyed), wait(30.f, both(dlge(observation_resolution_hostile), spawn_hostile)), both(dlge(salvage_resolution_hostile), spawn_hostile)
     }
 };
 
@@ -185,7 +185,7 @@ dialogue_node observation_powerdown
         "Assess it for salvage value",
     },
     {
-        do_observation_resolution_salvage
+        both(dlge(salvage_resolution), spawn_derelict)
     }
 };
 
@@ -193,14 +193,12 @@ void observation_wait(game_event& event)
 {
     bool hostile = randf_s(0.f, 1.f) < 0.5f;
 
-    hostile = true;
-
     waiting_event ev;
 
     if(hostile)
-        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 5.f, dlge(observation_powerup));
+        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 30.f, dlge(observation_powerup));
     else
-        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 5.f, dlge(observation_powerdown));
+        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 30.f, dlge(observation_powerdown));
 
     event.waiting_events.push_back(ev);
 }
