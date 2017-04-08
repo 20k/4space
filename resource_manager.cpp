@@ -29,6 +29,14 @@ resource_manager::resource_manager()
     }
 }
 
+void resource_manager::add(const std::map<resource::types, float>& val)
+{
+    for(auto& i : val)
+    {
+        resources[i.first].amount += i.second;
+    }
+}
+
 resource_element& resource_manager::get_resource(resource::types type)
 {
     for(auto& i : resources)

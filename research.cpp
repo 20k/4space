@@ -12,7 +12,9 @@ float research_info::get_research_level_cost(int level, float cost, bool testing
     if(level == 0)
         return cost;
 
-    return get_research_level_cost(level - 1) * 4.f * cost;
+    float fv = get_research_level_cost(level - 1) * 4.f;
+
+    return fv;
 }
 
 float research_info::get_cost_scaling(float level, float base_cost)

@@ -125,6 +125,14 @@ bool empire::can_fully_dispense(const std::map<resource::types, float>& res)
     return true;
 }
 
+void empire::dispense_resources(const std::map<resource::types, float>& res)
+{
+    for(auto& i : res)
+    {
+        dispense_resource(i.first, i.second);
+    }
+}
+
 void empire::add_resource(resource::types type, float amount)
 {
     resources.resources[(int)type].amount += amount;

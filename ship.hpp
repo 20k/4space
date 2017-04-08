@@ -308,7 +308,7 @@ struct component
     ///not including armour
     ///we need a get_real_resource_cost etc as well for current resource cost base
     ///not including HP
-    //std::map<resource::types, float> get_resource_cost();
+    std::map<resource::types, float> resources_cost();
     ///ie how much they're worth
     std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_needed_to_repair();
@@ -434,6 +434,7 @@ struct ship : positional
     std::map<resource::types, float> resources_needed_to_repair_total();
     ///calculate research separately as it needs empire, both sides
     std::map<resource::types, float> resources_received_when_scrapped();
+    std::map<resource::types, float> resources_cost();
 
     ///requires raw research, not tech currency
     research get_research_base_for_empire(empire* owner, empire* claiming);

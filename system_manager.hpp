@@ -161,6 +161,9 @@ struct orbital
     bool has_quest_alert = false;
     bool clicked = false; ///for quest alert system
     bool dialogue_open = false;
+
+    bool can_construct_ships = true;
+    bool construction_ui_open = false;
 };
 
 struct orbital_system

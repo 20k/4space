@@ -786,7 +786,7 @@ float component::get_real_component_cost()
     return get_component_cost() * (hp_element.cur_amount / hp_element.max_amount);
 }
 
-/*std::map<resource::types, float> component::get_resource_cost()
+std::map<resource::types, float> component::resources_cost()
 {
     std::map<resource::types, float> res;
 
@@ -806,7 +806,7 @@ float component::get_real_component_cost()
     }
 
     return res;
-}*/
+}
 
 std::map<resource::types, float> component::resources_received_when_scrapped()
 {
@@ -2002,6 +2002,23 @@ std::map<resource::types, float> ship::resources_received_when_scrapped()
     for(component& c : entity_list)
     {
         auto res = c.resources_received_when_scrapped();
+
+        for(auto& i : res)
+        {
+            ret[i.first] += i.second;
+        }
+    }
+
+    return ret;
+}
+
+std::map<resource::types, float> ship::resources_cost()
+{
+    std::map<resource::types, float> ret;
+
+    for(component& c : entity_list)
+    {
+        auto res = c.resources_cost();
 
         for(auto& i : res)
         {

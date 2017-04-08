@@ -1147,7 +1147,9 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             kk++;
         }
 
-        if(((orbital*)i.element)->has_quest_alert)
+        orbital* o = (orbital*)i.element;
+
+        if(o->has_quest_alert)
         {
             orbital* o = (orbital*)i.element;
 
@@ -1159,6 +1161,19 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             if(ImGui::IsItemClicked())
             {
                 o->dialogue_open = !o->dialogue_open;
+            }
+        }
+
+        if(o->type == orbital_info::PLANET && o->can_construct_ships && o->parent_empire == player_empire)
+        {
+            if(o->construction_ui_open)
+                ImGui::Text("(Hide Construction Window)");
+            else
+                ImGui::Text("(Show Construction Window)");
+
+            if(ImGui::IsItemClicked())
+            {
+                o->construction_ui_open = !o->construction_ui_open;
             }
         }
 
@@ -1236,6 +1251,60 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
     ImGui::End();
 }
 
+void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fleet_manage)
+{
+    if(!o->construction_ui_open)
+        return;
+
+    ImGui::Begin("Ship Construction", &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
+
+    ship base_ship = make_default();
+
+    auto cost = base_ship.resources_cost();
+
+    resource_manager rm;
+    rm.add(cost);
+
+    std::string str = rm.get_formatted_str(true);
+
+    ImGui::Text("Make Ship");
+
+    if(ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip(str.c_str());
+    }
+
+    if(ImGui::IsItemClicked())
+    {
+        if(player_empire->can_fully_dispense(cost))
+        {
+            player_empire->dispense_resources(cost);
+
+            orbital_system* os = o->parent_system;
+
+            ship_manager* new_fleet = fleet_manage.make_new();
+
+            ship* new_ship = new_fleet->make_new_from(player_empire->team_id, make_default());
+            new_ship->name = "SS Toimplement name generation";
+
+            orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);
+            onew_fleet->orbital_angle = o->orbital_angle;
+            onew_fleet->orbital_length = o->orbital_length + 40;
+            onew_fleet->parent = os->get_base(); ///?
+            onew_fleet->data = new_fleet;
+
+            player_empire->take_ownership(onew_fleet);
+            player_empire->take_ownership(new_fleet);
+
+            //new_ship->set_tech_level_from_empire(player_empire);
+
+            onew_fleet->tick(0.f);
+        }
+    }
+
+    ImGui::End();
+}
+
 void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 {
     sf::View view = window.getDefaultView();
@@ -1257,6 +1326,10 @@ int main()
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
 
     player_empire->resources.resources[resource::IRON].amount = 200.f;
+    player_empire->resources.resources[resource::COPPER].amount = 200.f;
+    player_empire->resources.resources[resource::TITANIUM].amount = 200.f;
+    player_empire->resources.resources[resource::URANIUM].amount = 200.f;
+    player_empire->resources.resources[resource::RESEARCH].amount = 800.f;
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
@@ -1548,6 +1621,17 @@ int main()
                 {
                     display_ship_info(*s, smanage->parent_empire, player_empire, player_empire, system_manage, fleet_manage, empire_manage, popup);
                 }
+            }
+        }
+
+        for(orbital_system* os : system_manage.systems)
+        {
+            for(orbital* o : os->orbitals)
+            {
+                if(o->parent_empire != player_empire)
+                    continue;
+
+                do_construction_window(o, player_empire, fleet_manage);
             }
         }
 

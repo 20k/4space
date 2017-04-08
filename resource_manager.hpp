@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 namespace resource
 {
@@ -89,6 +90,8 @@ struct resource_manager
     resource_manager();
 
     std::vector<resource_element> resources;
+
+    void add(const std::map<resource::types, float>& val);
 
     resource_element& get_resource(resource::types type);
 

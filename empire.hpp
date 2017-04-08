@@ -56,6 +56,7 @@ struct empire
     void generate_resource_from_owned(float step_s);
 
     bool can_fully_dispense(const std::map<resource::types, float>& res);
+    void dispense_resources(const std::map<resource::types, float>& res);
 
     void add_resource(resource::types type, float amount);
 

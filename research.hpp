@@ -43,7 +43,7 @@ namespace research_info
     ///so simply 50 * 4 * research_level + researches below, where 4 is scaling
 
     ///base cost of research expensiveness is 50
-    #define TESTING
+    //#define TESTING
     #ifdef TESTING
     float get_research_level_cost(int level, float cost = 50.f, bool testing = true);
     #else
