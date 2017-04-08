@@ -25,6 +25,8 @@ struct positional
     vec2f dim;
 };
 
+struct component_attribute;
+
 ///we need components to require other components to function
 ///we need a tag system, for eg RECOIL or DAMAGE or ARC_OF_FIRE, ie isolated attributes
 namespace ship_component_elements
@@ -157,6 +159,11 @@ namespace ship_component_elements
 
     ///not cost, but if we multiply by cost we get the end cost
     std::map<resource::types, float> component_base_construction_ratio(const types& type);
+
+    static float tech_upgrade_effectiveness = 1.5f;
+    static float tech_cooldown_upgrade_effectiveness = 1.2f;
+
+    void upgrade_component(component_attribute& in, int type, float old_tech, float new_tech);
 }
 
 namespace combat_variables
@@ -225,6 +232,9 @@ struct component_attribute
     float consume_max_stored(float amount);
 
     void calculate_efficiency(float step_s);
+
+    ///perform actual upgrade
+    void upgrade_tech_level(int type, float from, float to);
 
     void set_tech_level_from_empire(int type, empire* e);
     void set_tech_level_from_research(int type, research& r);

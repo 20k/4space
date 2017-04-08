@@ -178,13 +178,13 @@ std::string get_component_display_string(component& c)
 
         //float tech_level = attr.tech_level;
 
-        std::string use_string = "" + to_string_with_precision(net_usage, 3) + "/s";
-        std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "/use";
+        std::string use_string = "" + to_string_with_precision(net_usage, 3) + "(/s)";
+        std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "(/use)";
 
         //std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
         //std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
 
-        std::string fire_time_remaining = "Time Left (s): " + to_string_with_precision(time_until_next_use, 3) + "/" + to_string_with_precision(time_between_uses, 3);
+        std::string fire_time_remaining = "Time Left (s): " + to_string_with_enforced_variable_dp(time_until_next_use) + "/" + to_string_with_precision(time_between_uses, 3);
 
         //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
         //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
@@ -511,6 +511,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         {
             if(owner->can_fully_dispense(res_remaining))
             {
+                owner->dispense_resources(res_remaining);
+
                 s.set_tech_level_from_empire(owner);
             }
         }
@@ -1440,10 +1442,10 @@ int main()
     empire* player_empire = empire_manage.make_new();
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
 
-    player_empire->resources.resources[resource::IRON].amount = 500.f;
-    player_empire->resources.resources[resource::COPPER].amount = 500.f;
-    player_empire->resources.resources[resource::TITANIUM].amount = 500.f;
-    player_empire->resources.resources[resource::URANIUM].amount = 500.f;
+    player_empire->resources.resources[resource::IRON].amount = 5000.f;
+    player_empire->resources.resources[resource::COPPER].amount = 5000.f;
+    player_empire->resources.resources[resource::TITANIUM].amount = 5000.f;
+    player_empire->resources.resources[resource::URANIUM].amount = 5000.f;
     player_empire->resources.resources[resource::RESEARCH].amount = 8000.f;
 
     empire* hostile_empire = empire_manage.make_new();

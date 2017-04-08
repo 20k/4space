@@ -154,6 +154,46 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
     return ret;
 }
 
+float get_tech_level_value(float level)
+{
+    if(level <= 0)
+        return ship_component_elements::tech_upgrade_effectiveness;
+
+    return get_tech_level_value(level-1) + ship_component_elements::tech_upgrade_effectiveness;
+}
+
+void ship_component_elements::upgrade_component(component_attribute& in, int type, float old_tech, float new_tech)
+{
+    //float divisor = pow(old_tech + 6, ship_component_elements::tech_upgrade_effectiveness);
+    //float multiplier = pow(new_tech + 6, ship_component_elements::tech_upgrade_effectiveness);
+
+    //float nratio = multiplier / divisor;
+
+    //float nratio = pow((new_tech + 1) / (old_tech + 1), ship_component_elements::tech_upgrade_effectiveness);
+
+    new_tech += 1;
+    old_tech += 1;
+
+    float nratio = pow(ship_component_elements::tech_upgrade_effectiveness, new_tech) / pow(ship_component_elements::tech_upgrade_effectiveness, old_tech);
+    float nratio_cooldown = pow(ship_component_elements::tech_cooldown_upgrade_effectiveness, new_tech) / pow(ship_component_elements::tech_cooldown_upgrade_effectiveness, old_tech);
+
+    ///at infinity, nratio = nratio cooldown
+    ///what we really wanna do is calculate backwards from infinity
+    ///so at tech level 1, we take small steps
+    ///and at tech level 10, all drain is at like, 0
+    ///hmm. Keep this for the moment
+
+    in.produced_per_s *= nratio;
+    in.produced_per_use *= nratio;
+
+    in.drained_per_s /= nratio_cooldown;
+    in.drained_per_use /= nratio_cooldown;
+
+
+    in.time_between_uses_s /= nratio_cooldown;
+    in.max_amount *= nratio;
+}
+
 float component_attribute::add_amount(float amount)
 {
     cur_amount += amount;
@@ -296,24 +336,37 @@ void component_attribute::calculate_efficiency(float step_s)
     cur_efficiency = currently_drained / (drained_per_s * step_s);
 }
 
+void component_attribute::upgrade_tech_level(int type, float from, float to)
+{
+    ship_component_elements::upgrade_component(*this, type, from, to);
+}
+
 void component_attribute::set_tech_level_from_empire(int type, empire* e)
 {
     int appropriate_tech = ship_component_elements::component_element_to_research_type[type];
 
-    tech_level = e->research_tech_level.categories[appropriate_tech].amount;
+    int new_tech_level = e->research_tech_level.categories[appropriate_tech].amount;
+
+    upgrade_tech_level(type, tech_level, new_tech_level);
+
+    tech_level = new_tech_level;
 }
 
 void component_attribute::set_tech_level_from_research(int type, research& r)
 {
     int appropriate_tech = ship_component_elements::component_element_to_research_type[type];
 
-    tech_level = r.categories[appropriate_tech].amount;
+    int new_tech_level = r.categories[appropriate_tech].amount;
+
+    upgrade_tech_level(type, tech_level, new_tech_level);
+
+    tech_level = new_tech_level;
 }
 
-void component_attribute::set_tech_level(float ctech_level)
+/*void component_attribute::set_tech_level(float ctech_level)
 {
     tech_level = ctech_level;
-}
+}*/
 
 float component_attribute::get_tech_level()
 {
@@ -726,13 +779,13 @@ void component::set_tag(component_tag::tag tag, float val)
     tag_list[tag] = val;
 }
 
-void component::set_tech_level(float tech_level)
+/*void component::set_tech_level(float tech_level)
 {
     for(auto& i : components)
     {
         i.second.set_tech_level(tech_level);
     }
-}
+}*/
 
 void component::set_tech_level_from_empire(empire* e)
 {
@@ -750,13 +803,13 @@ void component::set_tech_level_from_research(research& r)
     }
 }
 
-void component::set_tech_level_of_element(ship_component_elements::types type, float tech_level)
+/*void component::set_tech_level_of_element(ship_component_elements::types type, float tech_level)
 {
     if(!has_element(type))
         return;
 
     components[type].set_tech_level(tech_level);
-}
+}*/
 
 float component::get_tech_level_of_element(ship_component_elements::types type)
 {
