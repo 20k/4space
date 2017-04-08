@@ -35,6 +35,123 @@ std::map<resource::types, float> ship_component_elements::component_storage_to_r
     return ret;
 }
 
+std::map<resource::types, float> ship_component_elements::component_base_construction_ratio(const types& type)
+{
+    std::map<resource::types, float> ret;
+
+    if(type == COOLING_POTENTIAL)
+    {
+        ret[resource::IRON] = 1;
+    }
+
+    if(type == ENERGY)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 0.5f;
+        ret[resource::COPPER] = 0.2f;
+    }
+
+    if(type == OXYGEN)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::COPPER] = 0.5f;
+    }
+
+    if(type == AMMO)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+    }
+
+    if(type == FUEL)
+    {
+        ret[resource::IRON] = 1;
+    }
+
+    if(type == CARGO)
+    {
+        ret[resource::IRON] = 1;
+    }
+
+    if(type == SHIELD_POWER)
+    {
+        ret[resource::IRON] = 0.5f;
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
+    }
+
+    if(type == ARMOUR)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+    }
+
+    if(type == HP)
+    {
+        ret[resource::IRON] = 1;
+    }
+
+    if(type == ENGINE_POWER)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
+    }
+
+    if(type == WARP_POWER)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
+    }
+
+    if(type == SCANNING_POWER)
+    {
+        ret[resource::IRON] = 0.3f;
+        ret[resource::COPPER] = 1;
+    }
+
+    if(type == COMMAND)
+    {
+        ret[resource::IRON] = 1;
+    }
+
+    if(type == STEALTH)
+    {
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
+        ret[resource::URANIUM] = 0.2f;
+    }
+
+    if(type == RAILGUN)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 0.55f;
+        ret[resource::COPPER] = 0.15f;
+    }
+
+    if(type == TORPEDO)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 0.25f;
+        ret[resource::COPPER] = 0.5f;
+    }
+
+    if(type == PLASMAGUN)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 0.8f;
+        ret[resource::COPPER] = 1;
+    }
+
+    if(type == COILGUN)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 0.25f;
+        ret[resource::COPPER] = 0.2f;
+    }
+}
+
 float component_attribute::add_amount(float amount)
 {
     cur_amount += amount;

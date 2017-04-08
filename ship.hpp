@@ -154,6 +154,9 @@ namespace ship_component_elements
     };
 
     std::map<resource::types, float> component_storage_to_resources(const types& type);
+
+    ///not cost, but if we multiply by cost we get the end cost
+    std::map<resource::types, float> component_base_construction_ratio(const types& type);
 }
 
 namespace combat_variables
