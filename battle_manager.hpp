@@ -51,6 +51,9 @@ struct battle_manager
     ///team -> ship
     std::map<int, std::vector<ship*>> ships;
 
+    std::vector<std::pair<empire*, int>> slots_filled;
+    int num_slots = 0;
+
     void tick(float step_s);
 
     void draw(sf::RenderWindow& win);

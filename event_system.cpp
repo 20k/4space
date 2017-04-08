@@ -163,139 +163,167 @@ void destroy_spawn_derelict_and_terminate(game_event& event)
     event.parent->finished = true;
 }*/
 
-dialogue_node observation_powerup
+namespace lone_derelict_dialogue
 {
-    "Ongoing",
-    "The derelict's power systems appear to be fluctuating",
+    dialogue_node observation_powerup
     {
-        "Take no chances, blow it up",
-        "Keep observing",
-        "Assess it for salvage value",
-    },
+        "Ongoing",
+        "The derelict's power systems appear to be fluctuating",
+        {
+            "Take no chances, blow it up",
+            "Keep observing",
+            "Assess it for salvage value",
+        },
+        {
+            dlge(resolution_destroyed), wait(30.f, both(dlge(observation_resolution_hostile), spawn_hostile)), both(dlge(salvage_resolution_hostile), spawn_hostile)
+        }
+    };
+
+    dialogue_node observation_powerdown
     {
-        dlge(resolution_destroyed), wait(30.f, both(dlge(observation_resolution_hostile), spawn_hostile)), both(dlge(salvage_resolution_hostile), spawn_hostile)
+        "Ongoing",
+        "The derelict's power systems are completely flatlined",
+        {
+            "Assess it for salvage value",
+        },
+        {
+            both(dlge(salvage_resolution), spawn_derelict)
+        }
+    };
+
+    void observation_wait(game_event& event)
+    {
+        bool hostile = randf_s(0.f, 1.f) < 0.5f;
+
+        waiting_event ev;
+
+        if(hostile)
+            ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 30.f, dlge(observation_powerup));
+        else
+            ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 30.f, dlge(observation_powerdown));
+
+        event.waiting_events.push_back(ev);
     }
-};
 
-dialogue_node observation_powerdown
-{
-    "Ongoing",
-    "The derelict's power systems are completely flatlined",
+    dialogue_node observation
     {
-        "Assess it for salvage value",
-    },
+        "Ongoing",
+        "You begin to watch carefully from afar",
+        {
+
+        },
+        {
+            observation_wait
+        }
+    };
+
+    dialogue_node resolution_destroyed =
     {
-        both(dlge(salvage_resolution), spawn_derelict)
+        "Resolution",
+        "The ship was blown out of the sky, you scrap the remains for materials",
+        {
+
+        },
+        {
+            destroy_spawn_derelict_and_terminate
+        }
+    };
+
+    dialogue_node salvage_resolution =
+    {
+        "Resolution",
+        "The ship appears badly damaged but could be made spaceworth again",
+        {
+
+        },
+        {
+            terminate_quest
+        }
+    };
+
+    dialogue_node salvage_resolution_hostile =
+    {
+        "Alert!",
+        "As the salvage drones approach the ship, it begins to power up and becomes hostile!",
+        {
+
+        },
+        {
+            terminate_quest
+        }
+    };
+
+    dialogue_node observation_resolution_hostile
+    {
+        "Alert!",
+        "The power fluctuations rapidly stabilise, the ship is active and hostile!",
+        {
+
+        },
+        {
+            terminate_quest
+        }
+    };
+
+    static void decide_derelict_or_hostile(game_event& event)
+    {
+        if(randf_s(0.f, 1.f) < 0.9f)
+        {
+            event.dialogue = salvage_resolution;
+
+            spawn_derelict(event);
+        }
+        else
+        {
+            event.dialogue = salvage_resolution_hostile;
+
+            spawn_hostile(event);
+        }
+    };
+
+    ///we need to data drive the event system from here somehow
+    ///maybe have ptrs to bools that get set if we click one (or store internally)
+    ///that way the next event can see what the previous event picked
+    ///or like, trigger events somehow from here
+    dialogue_node dia_first =
+    {
+        "Derelict Ship",
+        "A derelict ship was detected drifting lazily in orbit",
+        {
+            "Take no chances, blow it up",
+            "Observe it from a distance",
+            "Assess it for salvage value",
+        },
+        {
+            dlge(resolution_destroyed), dlge(observation), decide_derelict_or_hostile,
+        },
+    };
+
+    dialogue_node get()
+    {
+        return dia_first;
     }
-};
-
-void observation_wait(game_event& event)
-{
-    bool hostile = randf_s(0.f, 1.f) < 0.5f;
-
-    waiting_event ev;
-
-    if(hostile)
-        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 30.f, dlge(observation_powerup));
-    else
-        ev.is_finished = std::bind(transition_ev, std::placeholders::_1, 30.f, dlge(observation_powerdown));
-
-    event.waiting_events.push_back(ev);
 }
 
-dialogue_node observation =
+///we need factions to do this one
+///might spawn a new faction due to us helping them
+namespace alien_precursor_technology
 {
-    "Ongoing",
-    "You begin to watch carefully from afar",
+    /*dialogue_node first
     {
+        "Information",
+        "We have detected traces of an ancient alien civilisation on this planet",
+        {
+            "Observe it from space",
+            "Send in a ground team",
+        }
+    }*/
 
-    },
+    /*dialogue_node get()
     {
-        observation_wait
-    }
-};
-
-dialogue_node resolution_destroyed =
-{
-    "Resolution",
-    "The ship was blown out of the sky, you collect materials from the remnants",
-    {
-
-    },
-    {
-        destroy_spawn_derelict_and_terminate
-    }
-};
-
-dialogue_node salvage_resolution =
-{
-    "Resolution",
-    "The ship appears badly damaged but could be made spaceworth again",
-    {
-
-    },
-    {
-        terminate_quest
-    }
-};
-
-dialogue_node salvage_resolution_hostile =
-{
-    "Alert!",
-    "As the salvage drones approach the ship, it begins to power up and becomes hostile!",
-    {
-
-    },
-    {
-        terminate_quest
-    }
-};
-
-dialogue_node observation_resolution_hostile
-{
-    "Alert!",
-    "The power fluctuations rapidly stabilise, the ship is active and hostile!",
-    {
-
-    },
-    {
-        terminate_quest
-    }
-};
-
-void decide_derelict_or_hostile(game_event& event)
-{
-    if(randf_s(0.f, 1.f) < 0.9f)
-    {
-        event.dialogue = salvage_resolution;
-
-        spawn_derelict(event);
-    }
-    else
-    {
-        event.dialogue = salvage_resolution_hostile;
-
-        spawn_hostile(event);
-    }
+        return first;
+    }*/
 }
-
-///we need to data drive the event system from here somehow
-///maybe have ptrs to bools that get set if we click one (or store internally)
-///that way the next event can see what the previous event picked
-///or like, trigger events somehow from here
-dialogue_node dia_first =
-{
-    "Derelict Ship",
-    "A derelict ship was detected drifting lazily in orbit of the planet",
-    {
-        "Take no chances, blow it up",
-        "Observe it from a distance",
-        "Assess it for salvage value",
-    },
-    {
-        dlge(resolution_destroyed), dlge(observation), decide_derelict_or_hostile,
-    },
-};
 
 int present_dialogue(const std::vector<std::string>& options)
 {
@@ -350,8 +378,6 @@ void game_event::draw_ui()
     {
         if(waiting_events[i].is_finished(*this))
         {
-            //dialogue = waiting_events[i].node;
-
             waiting_events.erase(waiting_events.begin() + i);
             i--;
             continue;
@@ -367,8 +393,9 @@ void game_event::draw_ui()
     if(!dialogue.is_open)
         return;
 
+    std::string header_str = dialogue.header + " (" + alert_location->name + ")";
 
-    ImGui::Begin((dialogue.header + "###DLOGUE").c_str(), &dialogue.is_open, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin((header_str + "###DLOGUE").c_str(), &dialogue.is_open, ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> dialogue_options = {dialogue.text};
 
@@ -415,13 +442,6 @@ void game_event::tick(float step_s)
 
     alert_location->has_quest_alert = true;
 
-    /*if(alert_location->clicked)
-    {
-        alert_location->clicked = false;
-
-        set_dialogue_open_state(!dialogue.is_open);
-    }*/
-
     time_alive_s += step_s;
 
     set_dialogue_open_state(alert_location->dialogue_open);
@@ -452,7 +472,7 @@ game_event_manager::game_event_manager(orbital* o, fleet_manager& pfleet_manage)
     first.arc_type = arc_type;
     first.parent = this;
     first.event_num = 0;
-    first.dialogue = dia_first; ///set from map the starting dialogues?
+    first.dialogue = lone_derelict_dialogue::get(); ///set from map the starting dialogues?
 
     event_history.push_back(first);
 

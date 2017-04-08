@@ -364,11 +364,77 @@ void battle_manager::add_ship(ship* s)
 
     ships[s->team].push_back(s);
 
-    vec2f team_positions[2] = {{500, 40}, {500, 400}};
+    /*vec2f team_positions[2] = {{500, 40}, {500, 400}};
 
-    s->local_pos = team_positions[s->team];
+    vec2f pos;
 
-    s->local_pos.x() += prev_num * 50;
+    if(s->team >= 2)
+    {
+        pos =
+    }
+    else
+    {
+        pos = team_positions[s->team];
+    }*/
+
+    int slot_num = 0;
+    int num_in_slot = 0;
+    bool found = false;
+
+    for(auto& i : slots_filled)
+    {
+        if(s->owned_by->parent_empire->is_allied(i.first) || s->owned_by->parent_empire == i.first)
+        {
+            num_in_slot = ++i.second;
+
+            found = true;
+
+            break;
+        }
+
+        slot_num++;
+    }
+
+    if(!found)
+    {
+        slots_filled.push_back({s->owned_by->parent_empire, 0});
+
+        slot_num = slots_filled.size() - 1;
+    }
+
+    int num_teams_accommodated = 4;
+
+    vec2f pos;
+
+    if(slot_num == 0)
+    {
+        pos = {500 + num_in_slot * 50, 40};
+    }
+    if(slot_num == 1)
+    {
+        pos = {500 + num_in_slot * 50, 400};
+    }
+
+    if(slot_num == 2)
+    {
+        pos = {800 + num_in_slot * 50, 40};
+    }
+
+    if(slot_num == 3)
+    {
+        pos = {800 + num_in_slot * 50, 400};
+    }
+
+    if(slot_num >= 4)
+    {
+        pos = {500 + num_in_slot * 50 + 300 * (int)(slot_num/2), (slot_num % 2) * 400 + 40};
+    }
+
+    printf("fpos %f %f\n", pos.x(), pos.y());
+
+    s->local_pos = pos;
+
+    //s->local_pos.x() += prev_num * 50;
 
     s->dim = {100, 40};
 
@@ -390,6 +456,12 @@ ship* battle_manager::get_nearest_hostile(ship* s)
                 continue;
 
             if(os->fully_disabled())
+                continue;
+
+            if(s->owned_by->parent_empire == os->owned_by->parent_empire)
+                continue;
+
+            if(s->owned_by->parent_empire->is_allied(os->owned_by->parent_empire))
                 continue;
 
             vec2f my_pos = s->local_pos;
@@ -460,6 +532,9 @@ bool battle_manager::can_disengage(empire* disengaging_empire)
             if(s->team != disengaging_empire->team_id)
                 continue;
 
+            if(s->owned_by->parent_empire->is_allied(disengaging_empire))
+                continue;
+
             if(!s->can_disengage())
                 return false;
         }
@@ -480,7 +555,7 @@ void battle_manager::do_disengage(empire* disengaging_empire)
             if(disengaging_empire == nullptr)
                 continue;
 
-            if(s->team != disengaging_empire->team_id)
+            if(s->owned_by->parent_empire != disengaging_empire)
                 continue;
 
             s->apply_disengage_penalty();
@@ -513,7 +588,10 @@ bool battle_manager::can_end_battle_peacefully(empire* leaving_empire)
     {
         for(ship* s : i.second)
         {
-            if(s->team == leaving_empire->team_id)
+            if(s->owned_by->parent_empire == leaving_empire)
+                continue;
+
+            if(s->owned_by->parent_empire->is_allied(leaving_empire))
                 continue;
 
             if(!s->fully_disabled())

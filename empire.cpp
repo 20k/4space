@@ -302,6 +302,23 @@ float empire::available_scanning_power_on(ship* s, system_manager& system_manage
     return max_scanning_power;
 }
 
+void empire::ally(empire* e)
+{
+    relations_map[e].allied = true;
+    e->relations_map[this].allied = true;
+}
+
+void empire::unally(empire* e)
+{
+    relations_map[e].allied = false;
+    e->relations_map[this].allied = false;
+}
+
+bool empire::is_allied(empire* e)
+{
+    return relations_map[e].allied;
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;

@@ -61,13 +61,15 @@ struct waiting_event
     std::function<bool(game_event&)> is_finished;
 };
 
-extern dialogue_node resolution_destroyed;
-extern dialogue_node salvage_resolution;
-extern dialogue_node salvage_resolution_hostile;
-extern dialogue_node observation_resolution_hostile;
-extern dialogue_node observation_powerup;
-extern dialogue_node observation;
-extern dialogue_node dia_first;
+namespace lone_derelict_dialogue
+{
+    extern dialogue_node resolution_destroyed;
+    extern dialogue_node salvage_resolution;
+    extern dialogue_node salvage_resolution_hostile;
+    extern dialogue_node observation_resolution_hostile;
+    extern dialogue_node observation_powerup;
+    extern dialogue_node observation;
+}
 
 ///Ok. This is basically a branching sequence of events, each event may trigger a new event depending on the circumstances
 ///so we need an event history, and the current event, which can just be the last event in the history

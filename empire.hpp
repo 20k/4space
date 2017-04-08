@@ -12,6 +12,12 @@ struct ship_manager;
 struct ship;
 struct system_manager;
 
+struct faction_relations
+{
+    bool allied = false;
+    float friendliness = 0.5f; ///0 = v bad, 1 = best
+};
+
 struct empire
 {
     ///a two dimensional vector that we can use to determine our similarity to other empires
@@ -31,6 +37,8 @@ struct empire
 
     std::vector<orbital*> owned;
     std::vector<ship_manager*> owned_fleets;
+
+    std::map<empire*, faction_relations> relations_map;
 
     empire();
 
@@ -70,6 +78,17 @@ struct empire
 
     float available_scanning_power_on(orbital* o);
     float available_scanning_power_on(ship* s, system_manager& system_manage);
+
+    ///does allying, not 'try' ally etc
+    ///two way street
+    ///when we implement proposing alliances, culture shift will be a thing
+    ///if we're allied with another faction, culture shift
+    void ally(empire* e);
+    void unally(empire* e);
+    bool is_allied(empire* e);
+
+    ///make sure all relations have valid values
+    void clamp_relations();
 };
 
 struct empire_manager
