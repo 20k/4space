@@ -501,3 +501,12 @@ void game_event_manager::tick(float step_s)
 
     event_history.back().tick(step_s);
 }
+
+game_event_manager* all_events_manager::make_new()
+{
+    //game_event_manager* gem = new game_event_manager;
+
+    //events.push_back(gem);
+
+    //return gem;
+}

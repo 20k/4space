@@ -1467,7 +1467,7 @@ int main()
 
     sf::RenderWindow window;
 
-    window.create(sf::VideoMode(1024, 768),"Wowee", sf::Style::Default, settings);
+    window.create(sf::VideoMode(1200, 900),"Wowee", sf::Style::Default, settings);
 
     ImGui::SFML::Init(window);
 

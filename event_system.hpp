@@ -136,4 +136,14 @@ struct game_event_manager
     bool finished = false;
 };
 
+struct all_events_manager
+{
+    std::vector<game_event_manager*> events;
+
+    game_event_manager* make_new();
+
+    bool can_interact(empire* e);
+    void set_interacting(empire* e);
+};
+
 #endif // EVENT_SYSTEM_HPP_INCLUDED
