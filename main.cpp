@@ -924,7 +924,16 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(orb->is_resource_object)
                 {
-                    ImGui::SetTooltip((orb->name + "\n" + orb->produced_resources_ps.get_formatted_str()).c_str());
+                    std::string res_first = orb->name;
+
+                    if(orb->parent_empire != nullptr)
+                    {
+                        res_first = res_first + "\n" + "Empire: " + orb->parent_empire->name;
+                    }
+
+                    res_first += "\n" + orb->produced_resources_ps.get_formatted_str();
+
+                    ImGui::SetTooltip(res_first.c_str());
                 }
             }
 
@@ -1023,6 +1032,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(elem->header == "")
                     elem->header = orbital_info::names[kk->type];
+
+                if(kk->parent_empire != nullptr)
+                {
+                    elem->header = elem->header + "\n" + "Empire: " + kk->parent_empire->name;
+                }
 
                 elem->data = kk->get_info_str();
 
