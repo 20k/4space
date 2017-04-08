@@ -11,6 +11,8 @@ void text_manager::load()
         return;
 
     font.loadFromFile("VeraMono.ttf");
+
+    loaded = true;
 }
 
 void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool rounding)

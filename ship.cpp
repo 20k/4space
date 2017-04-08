@@ -776,7 +776,7 @@ float component::get_base_component_cost()
     if(primary_attribute == ship_component_elements::NONE)
         return 0.f;
 
-    return ship_component_elements::base_cost_of_component_with_this_primary_attribute[primary_attribute];
+    return ship_component_elements::base_cost_of_component_with_this_primary_attribute[primary_attribute] * cost_mult;
 }
 
 float component::get_component_cost()
@@ -1762,7 +1762,7 @@ bool ship::can_move_in_system()
     {
         if(c.has_element(ship_component_elements::ENGINE_POWER))
         {
-            component_attribute elem = c.get_element(ship_component_elements::ENGINE_POWER);
+            const component_attribute& elem = c.components[ship_component_element::ENGINE_POWER];//c.get_element(ship_component_elements::ENGINE_POWER);
 
             if(elem.cur_efficiency >= threshold_working_efficiency)
                 return true;
@@ -2438,6 +2438,8 @@ void ship_manager::resupply(empire* from)
 
 void ship_manager::tick_all(float step_s)
 {
+    //sf::Clock clk;
+
     for(ship* s : ships)
     {
         s->tick_all_components(step_s);
@@ -2458,6 +2460,8 @@ void ship_manager::tick_all(float step_s)
             }
         }
     }
+
+    //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f);
 }
 
 bool ship_manager::can_move_in_system()
@@ -2486,11 +2490,25 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
 
     vec3f alert_colour;
     bool any_alert = false;
+    bool any_fully_disabled = false;
+    bool any_immobile = false;
 
     for(ship* s : ships)
     {
         float stored = s->get_stored_resources()[ship_component_element::FUEL];
         float max_store = s->get_max_resources()[ship_component_element::FUEL];
+
+        ///for some reason, if this evaluates to true we go slooow
+        if(!s->can_move_in_system())
+        {
+            any_immobile = true;
+        }
+
+        if(s->fully_disabled())
+        {
+            any_fully_disabled = true;
+        }
+
 
         if(max_store < 0.001f)
         {
@@ -2517,10 +2535,10 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     if(any_alert)
         alert_symbol += "!";
 
-    bool any_immobile = false;
+    //bool any_immobile = false;
 
     ///implement mixed colours later
-    for(ship* s : ships)
+    /*for(ship* s : ships)
     {
         if(!s->can_move_in_system())
         {
@@ -2528,21 +2546,25 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
 
             alert_colour = rcol;
         }
-    }
+    }*/
 
     if(any_immobile)
+    {
+        alert_colour = rcol;
+
         alert_symbol = "!";
+    }
 
 
-    bool any_fully_disabled = false;
+    //bool any_fully_disabled = false;
 
-    for(ship* s : ships)
+    /*for(ship* s : ships)
     {
         if(s->fully_disabled())
         {
             any_fully_disabled = true;
         }
-    }
+    }*/
 
     if(any_fully_disabled)
     {

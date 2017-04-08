@@ -1715,6 +1715,7 @@ int main()
             state = 2;
         }
 
+
         /*if(once<sf::Keyboard::F2>())
         {
             test_ship->resupply(*player_empire);
@@ -1800,10 +1801,15 @@ int main()
         system_manage.cull_empty_orbital_fleets(empire_manage);
         fleet_manage.cull_dead(empire_manage);
 
+        sf::Clock tclk;
+
         if(state != 1)
             system_manage.draw_alerts(window, player_empire);
 
+        printf("%f\n", tclk.getElapsedTime().asMicroseconds()/1000.f);
+
         fleet_manage.tick_all(diff_s);
+
 
         //printf("predrawres\n");
 
@@ -1833,6 +1839,7 @@ int main()
         //playing_music.debug(window);
         window.display();
         window.clear();
+
 
         diff_s = clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f - last_time_s;
         last_time_s = clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f;

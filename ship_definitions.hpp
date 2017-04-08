@@ -82,14 +82,14 @@ inline component make_default_ammo_store()
     return ammo_store;
 }
 
-inline component make_default_shields()
+inline component make_default_shields(float effectiveness = 1.f)
 {
     component_attribute shield;
-    shield.produced_per_s = 1.f;
-    shield.max_amount = 50.f;
+    shield.produced_per_s = 1.f * effectiveness;
+    shield.max_amount = 50.f * effectiveness;
 
     component_attribute power;
-    power.drained_per_s = 20.f;
+    power.drained_per_s = 20.f * effectiveness;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;
@@ -103,19 +103,21 @@ inline component make_default_shields()
     shields.name = "Shield Generator";
     shields.primary_attribute = ship_component_elements::SHIELD_POWER;
 
+    shields.cost_mult = effectiveness;
+
     return shields;
 }
 
-inline component make_default_power_core()
+inline component make_default_power_core(float effectiveness = 1.f)
 {
     component_attribute power;
-    power.produced_per_s = 80.f;
-    power.max_amount = 80.f;
+    power.produced_per_s = 80.f * effectiveness;
+    power.max_amount = 80.f * effectiveness;
 
     component_attribute fuel;
     fuel.max_amount = 1.f;
     fuel.cur_amount = 1.f;
-    fuel.drained_per_s = fuel.max_amount / 1000;
+    fuel.drained_per_s = effectiveness * fuel.max_amount / 1000;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;
@@ -129,6 +131,7 @@ inline component make_default_power_core()
     core.name = "Power Core";
     core.primary_attribute = ship_component_elements::ENERGY;
     core.repair_this_when_recrewing = true;
+    core.cost_mult = effectiveness;
 
     return core;
 }
@@ -189,7 +192,7 @@ inline component make_default_heatsink()
     return heatsink;
 }
 
-inline component make_default_warp_drive()
+inline component make_default_warp_drive(float charge_rate = 1.f)
 {
     component_attribute cooling;
     cooling.drained_per_s = 0.1f;
@@ -197,6 +200,7 @@ inline component make_default_warp_drive()
 
     component_attribute power;
     power.drained_per_use = 80;
+    power.drained_per_s = 15.f * charge_rate;
 
     component_attribute command;
     command.drained_per_s = 0.5f;
@@ -206,7 +210,7 @@ inline component make_default_warp_drive()
     hp.cur_amount = hp.max_amount;
 
     component_attribute warp_power;
-    warp_power.produced_per_s = 10.25f;
+    warp_power.produced_per_s = 0.5f * charge_rate;
     warp_power.drained_per_use = 10.f;
     warp_power.max_amount = 10.f;
     warp_power.cur_amount = warp_power.max_amount * 0.25f;
@@ -229,17 +233,18 @@ inline component make_default_warp_drive()
 
     warp_drive.name = "Warp Drive";
     warp_drive.primary_attribute = ship_component_elements::WARP_POWER;
+    warp_drive.cost_mult = charge_rate;
 
     return warp_drive;
 }
 
-inline component make_default_stealth()
+inline component make_default_stealth(float effectiveness = 1.f)
 {
     component_attribute cooling;
-    cooling.drained_per_s = 0.2f;
+    cooling.drained_per_s = 0.2f * effectiveness;
 
     component_attribute power;
-    power.drained_per_s = 10.f;
+    power.drained_per_s = 10.f * effectiveness;
 
     component_attribute command;
     command.drained_per_s = 0.5f;
@@ -249,7 +254,7 @@ inline component make_default_stealth()
     hp.cur_amount = hp.max_amount;
 
     component_attribute stealth;
-    stealth.produced_per_s = 30.f;
+    stealth.produced_per_s = 30.f * effectiveness;
 
     component stealth_drive;
     stealth_drive.add(ship_component_element::COOLING_POTENTIAL, cooling);
@@ -262,17 +267,18 @@ inline component make_default_stealth()
 
     stealth_drive.name = "Stealth Systems";
     stealth_drive.primary_attribute = ship_component_element::STEALTH;
+    stealth_drive.cost_mult = effectiveness;
 
     return stealth_drive;
 }
 
-inline component make_default_scanner()
+inline component make_default_scanner(float effectiveness = 1.f)
 {
     component_attribute cooling;
-    cooling.drained_per_s = 0.1f;
+    cooling.drained_per_s = 0.1f * effectiveness;
 
     component_attribute power;
-    power.drained_per_s = 5;
+    power.drained_per_s = 5 * effectiveness;
 
     component_attribute command;
     command.drained_per_s = 0.5f;
@@ -282,7 +288,7 @@ inline component make_default_scanner()
     hp.cur_amount = hp.max_amount;
 
     component_attribute scanner_power;
-    scanner_power.produced_per_s = 20;
+    scanner_power.produced_per_s = 20 * effectiveness;
 
     component scanner;
 
@@ -294,6 +300,7 @@ inline component make_default_scanner()
 
     scanner.name = "Scanner";
     scanner.primary_attribute = ship_component_element::SCANNING_POWER;
+    scanner.cost_mult = effectiveness;
 
     return scanner;
 }
@@ -418,7 +425,7 @@ inline ship make_default()
     test_ship.add(make_default_crew());
     test_ship.add(make_default_life_support());
     test_ship.add(make_default_ammo_store());
-    test_ship.add(make_default_shields());
+    test_ship.add(make_default_shields(10.f));
     test_ship.add(make_default_power_core());
     test_ship.add(make_default_engines());
     test_ship.add(make_default_warp_drive());

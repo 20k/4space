@@ -329,6 +329,8 @@ struct component
 
     ///does in * hp_cur / hp_max safely
     float safe_hp_frac_modify(float in);
+
+    float cost_mult = 1.f;
 };
 
 struct projectile;
