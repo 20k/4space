@@ -486,12 +486,15 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }
     ///have a recovery cost display?
 
-    ImGui::Text("(Upgrade to latest Tech)");
-
-    ///setting tech level currently does not have a cost associated with it
-    if(ImGui::IsItemClicked())
+    if(s.owned_by->parent_empire == player_empire)
     {
-        s.set_tech_level_from_empire(owner);
+        ImGui::Text("(Upgrade to latest Tech)");
+
+        ///setting tech level currently does not have a cost associated with it
+        if(ImGui::IsItemClicked())
+        {
+            s.set_tech_level_from_empire(owner);
+        }
     }
 
     if(s.fully_disabled() && claiming_empire != nullptr && s.can_recrew(claiming_empire) && !s.owned_by->any_in_combat())
