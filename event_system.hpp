@@ -99,6 +99,8 @@ struct game_event
     std::deque<waiting_event> waiting_events;
 };
 
+struct ship_manager;
+
 ///lets get a very basic interaction system going. "A thing has happened click between two options"
 ///then implement followon
 ///this manages one particularly game event, which is composed of sub game events
@@ -126,6 +128,7 @@ struct game_event_manager
     void set_faction(empire* e);
     void set_interacting_faction(empire* e);
     bool can_interact(empire* e);
+    ship_manager* get_nearby_fleet(empire* e);
 
     void draw_ui();
     void tick(float step_s);

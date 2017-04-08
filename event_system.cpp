@@ -492,6 +492,11 @@ void game_event_manager::set_interacting_faction(empire* e)
 
 bool game_event_manager::can_interact(empire* e)
 {
+    return get_nearby_fleet(e) != nullptr;
+}
+
+ship_manager* game_event_manager::get_nearby_fleet(empire* e)
+{
     for(orbital* o : e->owned)
     {
         if(o->type != orbital_info::FLEET)
@@ -517,11 +522,11 @@ bool game_event_manager::can_interact(empire* e)
 
         if((o->absolute_pos - event_history.back().alert_location->absolute_pos).length() < interact_distance)
         {
-            return true;
+            return sm;
         }
     }
 
-    return false;
+    return nullptr;
 }
 
 void game_event_manager::draw_ui()
