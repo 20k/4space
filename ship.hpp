@@ -480,7 +480,6 @@ struct ship : positional
     float get_drive_signature();
     float get_scanning_ps();
 
-private:
     sf::RenderTexture* intermediate_texture = nullptr;
 
     ///?

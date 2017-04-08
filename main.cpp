@@ -493,7 +493,10 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         ship c_cpy = s;
 
-        c_cpy.set_tech_level_from_empire(owner);
+        if(s.owned_by->parent_empire != nullptr)
+            c_cpy.set_tech_level_from_empire(s.owned_by->parent_empire);
+
+        c_cpy.intermediate_texture = nullptr;
 
         auto res_cost = c_cpy.resources_cost();
 
