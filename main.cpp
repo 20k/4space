@@ -1186,7 +1186,13 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
             game_event_manager* event = all_events.orbital_to_game_event(o);
 
-            if(event != nullptr && !event->can_interact(player_empire))
+            //ship_manager* nearest_fleet = event->get_nearest_fleet(player_empire);
+
+            if(event != nullptr && event->interacting_faction != nullptr && event->interacting_faction != player_empire)
+            {
+                ImGui::Text("(Another empire has already claimed this event)");
+            }
+            else if(event != nullptr && !event->can_interact(player_empire))
             {
                 ImGui::Text("(Requires nearby fleet to view alert)");
 
@@ -1201,6 +1207,12 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
                 if(ImGui::IsItemClicked())
                 {
+                    if(o->dialogue_open && event->interacting_faction == nullptr)
+                    {
+                        event->set_interacting_faction(player_empire);
+                        ///set interacting fleet
+                    }
+
                     o->dialogue_open = !o->dialogue_open;
                 }
             }
@@ -1777,7 +1789,7 @@ int main()
 
         test_event->tick(diff_s);
         test_event->draw_ui();
-        test_event->set_interacting_faction(player_empire);
+        //test_event->set_interacting_faction(player_empire);
 
         ///um ok. This is correct if slightly stupid
         ///we cull empty orbital fleets, then we cull the dead fleet itself

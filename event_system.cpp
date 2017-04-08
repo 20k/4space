@@ -518,6 +518,9 @@ ship_manager* game_event_manager::get_nearby_fleet(empire* e)
         if(!any_valid)
             continue;
 
+        if(o->parent_system != event_history.back().alert_location->parent_system)
+            continue;
+
         float interact_distance = 120.f;
 
         if((o->absolute_pos - event_history.back().alert_location->absolute_pos).length() < interact_distance)
@@ -527,6 +530,49 @@ ship_manager* game_event_manager::get_nearby_fleet(empire* e)
     }
 
     return nullptr;
+}
+
+ship_manager* game_event_manager::get_nearest_fleet(empire* e)
+{
+    float min_dist = 9999999;
+    ship_manager* min_sm = nullptr;
+
+    for(orbital* o : e->owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        bool any_valid = false;
+
+        for(ship* s : sm->ships)
+        {
+            if(!s->fully_disabled())
+            {
+                any_valid = true;
+                break;
+            }
+        }
+
+        if(!any_valid)
+            continue;
+
+        if(o->parent_system != event_history.back().alert_location->parent_system)
+            continue;
+
+        float interact_distance = 120.f;
+
+        float len = (o->absolute_pos - event_history.back().alert_location->absolute_pos).length();
+
+        if(len < interact_distance && len < min_dist)
+        {
+            min_dist = len;
+            min_sm = sm;
+        }
+    }
+
+    return min_sm;
 }
 
 void game_event_manager::draw_ui()

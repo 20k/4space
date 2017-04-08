@@ -129,6 +129,7 @@ struct game_event_manager
     void set_interacting_faction(empire* e);
     bool can_interact(empire* e);
     ship_manager* get_nearby_fleet(empire* e);
+    ship_manager* get_nearest_fleet(empire* e);
 
     void draw_ui();
     void tick(float step_s);
