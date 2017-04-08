@@ -70,6 +70,7 @@ namespace popup_element_type
         RESUPPLY,
         ENGAGE,
         ENGAGE_COOLDOWN,
+        COLONISE,
         COUNT
     };
 }
@@ -816,7 +817,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     ImGui::End();
 }
 
-void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles)
+void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage)
 {
     sf::Mouse mouse;
 
@@ -902,6 +903,20 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     term = true;
                 }
 
+                /*if(lclick && orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && nearest_colony_ship_of_empire(orb, player_empire) != nullptr)
+                {
+                    popup.going = true;
+
+                    popup_element elem;
+                    elem.element = orb;
+
+
+
+                    popup.elements.push_back(elem);
+
+                    term = true;
+                }*/
+
                 if(orb->type == orbital_info::STAR)
                 {
                     ImGui::SetTooltip((orb->name + "\n" + orb->description).c_str());
@@ -944,6 +959,15 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 if(orb->type == orbital_info::FLEET && sm->any_in_combat())
                 {
                     elem.buttons_map.erase(popup_element_type::RESUPPLY);
+                }
+
+                if(orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr)
+                {
+                    elem.buttons_map[popup_element_type::COLONISE].name = "Colonise";
+                }
+                else
+                {
+                    elem.buttons_map.erase(popup_element_type::COLONISE);
                 }
 
                 selected.push_back(orb);
@@ -1009,7 +1033,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 {
                     kk->highlight = true;
 
-                    if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire)
+                    ship_manager* sm = (ship_manager*)kk->data;
+
+                    if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire && kk->parent_system == system_manage.currently_viewed && !sm->any_colonising())
                     {
                         kk->request_transfer({transformed.x, transformed.y});
                     }
@@ -1051,6 +1077,21 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 hostile_fleets.push_back(o);
 
                 all_battles.make_new_battle(hostile_fleets);
+            }
+
+            if(map_element.first == popup_element_type::COLONISE && map_element.second.pressed)
+            {
+                orbital* o = (orbital*)elem.element;
+
+                assert(o);
+
+                ship* nearest = fleet_manage.nearest_free_colony_ship_of_empire(o, player_empire);
+
+                if(!nearest)
+                    continue;
+
+                nearest->colonising = true;
+                nearest->colonise_target = o;
             }
         }
     }
@@ -1761,7 +1802,7 @@ int main()
 
         if(state == 0 || state == 2)
         {
-            debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles);
+            debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage);
 
             system_manage.draw_viewed_system(window, player_empire);
             system_manage.draw_universe_map(window, player_empire);
@@ -1815,6 +1856,9 @@ int main()
 
         //printf("precull\n");
 
+        empire_manage.tick_cleanup_colonising();
+        system_manage.cull_empty_orbital_fleets(empire_manage);
+        fleet_manage.cull_dead(empire_manage);
         system_manage.cull_empty_orbital_fleets(empire_manage);
         fleet_manage.cull_dead(empire_manage);
 

@@ -1463,6 +1463,17 @@ void ship::use(component& c)
     add_negative_resources(negative);
 }
 
+component* ship::get_component_with_primary(ship_component_elements::types type)
+{
+    for(component& c : entity_list)
+    {
+        if(c.primary_attribute == type)
+            return &c;
+    }
+
+    return nullptr;
+}
+
 std::vector<component> ship::fire()
 {
     std::vector<component> ret;
@@ -2759,6 +2770,17 @@ void ship_manager::cull_invalid()
     }
 }
 
+bool ship_manager::any_colonising()
+{
+    for(ship* s : ships)
+    {
+        if(s->colonising)
+            return true;
+    }
+
+    return false;
+}
+
 std::string ship_manager::get_engage_str()
 {
     if(can_engage())
@@ -2841,4 +2863,59 @@ void fleet_manager::tick_all(float step_s)
     {
         i->tick_all(step_s);
     }
+}
+
+ship* fleet_manager::nearest_free_colony_ship_of_empire(orbital* o, empire* e)
+{
+    orbital_system* os = o->parent_system;
+
+    float min_dist = 999999.f;
+    ship* min_ship = nullptr;
+
+    for(orbital* test_orbital : os->orbitals)
+    {
+        if(test_orbital->parent_empire != e)
+            continue;
+
+        if(test_orbital->type != orbital_info::FLEET)
+            continue;
+
+        if(test_orbital->parent_system != os)
+            continue;
+
+        ship_manager* sm = (ship_manager*)test_orbital->data;
+
+        vec2f pos = test_orbital->absolute_pos;
+        vec2f base_pos = o->absolute_pos;
+
+        float dist = (pos - base_pos).length();
+
+        if(dist < min_dist)
+        {
+            ship* s = nullptr;
+
+            for(ship* found : sm->ships)
+            {
+                if(found->colonising)
+                    continue;
+
+                component* fc = found->get_component_with_primary(ship_component_elements::COLONISER);
+
+                if(fc != nullptr)
+                {
+                    s = found;
+
+                    break;
+                }
+            }
+
+            if(s != nullptr)
+            {
+                min_ship = s;
+                min_dist = dist;
+            }
+        }
+    }
+
+    return min_ship;
 }

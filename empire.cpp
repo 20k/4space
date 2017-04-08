@@ -349,6 +349,61 @@ void empire::positive_interaction(empire* e)
     relations_map[e].positivity += 1.f;
 }
 
+bool empire::can_colonise(orbital* o)
+{
+    if(owns(o))
+        return false;
+
+    ///? Is parent empire an acceptable proxy for colonising
+    ///but then, the whole point of colonising is ownership claiming. Can expand later?
+    if(o->parent_empire != nullptr)
+        return false;
+
+    return true;
+}
+
+void empire::tick_cleanup_colonising()
+{
+    for(orbital* o : owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        vec2f pos = o->absolute_pos;
+
+        for(ship* s : sm->ships)
+        {
+            if(s->colonising)
+            {
+                if(s->colonise_target->parent_empire != nullptr)
+                {
+                    s->colonising = false;
+                    continue;
+                }
+
+                vec2f target = s->colonise_target->absolute_pos;
+
+                float len = (target - pos).length();
+
+                float max_dist = 20.f;
+
+                if(len < max_dist)
+                {
+                    s->cleanup = true;
+
+                    take_ownership(s->colonise_target);
+                }
+                else
+                {
+                    o->transfer(s->colonise_target->absolute_pos);
+                }
+            }
+        }
+    }
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;
@@ -379,5 +434,13 @@ void empire_manager::tick_all(float step_s)
     for(empire* emp : empires)
     {
         emp->tick(step_s);
+    }
+}
+
+void empire_manager::tick_cleanup_colonising()
+{
+    for(empire* e : empires)
+    {
+        e->tick_cleanup_colonising();
     }
 }

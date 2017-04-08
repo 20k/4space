@@ -393,6 +393,8 @@ struct ship : positional
     bool can_use(component& c);
     void use(component& c);
 
+    component* get_component_with_primary(ship_component_elements::types type);
+
     std::vector<component> fire();
     bool can_use_warp_drives();
     void use_warp_drives();
@@ -487,6 +489,11 @@ struct ship : positional
 
     sf::RenderTexture* intermediate_texture = nullptr;
 
+    ///starting to apply hacks to get around the lack of a command queue
+    ///sign that we may need the command queue
+    bool colonising = false;
+    orbital* colonise_target = nullptr;
+
     ///?
     //void fire();
 };
@@ -537,6 +544,10 @@ struct ship_manager
     void cull_invalid();
 
     std::string get_engage_str();
+
+    bool any_colonising();
+
+    void cleanup_colonising();
 };
 
 struct empire_manager;
@@ -553,6 +564,10 @@ struct fleet_manager
     void cull_dead(empire_manager& empire_manage);
 
     void tick_all(float step_s);
+
+    ship* nearest_free_colony_ship_of_empire(orbital* o, empire* e);
+
+    void tick_cleanup_colonising();
 };
 
 #endif // SHIP_HPP_INCLUDED

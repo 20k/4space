@@ -535,7 +535,7 @@ inline ship make_colony_ship()
     test_ship.add(make_default_engines());
     test_ship.add(make_default_warp_drive(0.75f));
     test_ship.add(make_default_scanner(0.5));
-    test_ship.add(make_default_heatsink());
+    test_ship.add(make_default_heatsink(1.8f));
     test_ship.add(make_default_coloniser());
 
     test_ship.name = "Colony Default";

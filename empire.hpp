@@ -95,6 +95,10 @@ struct empire
 
     void negative_interaction(empire* e);
     void positive_interaction(empire* e);
+
+    ///theoretically, not practically
+    bool can_colonise(orbital* o);
+    void tick_cleanup_colonising(); ///and claim
 };
 
 struct empire_manager
@@ -107,6 +111,8 @@ struct empire_manager
     void notify_removal(ship_manager* s);
 
     void tick_all(float step_s);
+
+    void tick_cleanup_colonising();
 };
 
 #endif // EMPIRE_HPP_INCLUDED
