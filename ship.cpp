@@ -2266,6 +2266,12 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 
     end_val += disabled_mod + culture_distance_mod;
 
+    float drive_signature = get_drive_signature();
+
+    ///drive signature / 100
+
+    end_val += clamp((get_scanning_ps() - drive_signature) / 100.f, 0.1f, 3.f);
+
     end_val = clamp(end_val, 0.f, 1.f);
 
     return end_val;
@@ -2296,6 +2302,25 @@ float ship::get_scanning_power_on(orbital* o, int difficulty_modifier)
 
         return max_emissions;
     }
+}
+
+float ship::get_drive_signature()
+{
+    auto store = get_produced_resources(1.f);
+
+    float power = store[ship_component_elements::ENERGY];
+    float stealth = store[ship_component_element::STEALTH];
+
+    return power - stealth;
+}
+
+float ship::get_scanning_ps()
+{
+    auto store = get_produced_resources(1.f);
+
+    float scan_ps = store[ship_component_elements::SCANNING_POWER];
+
+    return scan_ps;
 }
 
 ship* ship_manager::make_new(int team)

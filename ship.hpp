@@ -465,6 +465,9 @@ struct ship : positional
     float get_scanning_power_on(orbital* o, int difficulty_modifier = 0);
     float get_scanning_power_on_ship(ship* s, int difficulty_modifier = 0);
 
+    float get_drive_signature();
+    float get_scanning_ps();
+
 private:
     sf::RenderTexture* intermediate_texture = nullptr;
 

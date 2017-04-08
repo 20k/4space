@@ -14,6 +14,7 @@
 #include "empire.hpp"
 #include "research.hpp"
 #include "event_system.hpp"
+//#include "music.hpp"
 
 template<sf::Keyboard::Key k>
 bool once()
@@ -1430,6 +1431,8 @@ int main()
     randf_s();
     randf_s();
 
+    //music playing_music;
+
     empire_manager empire_manage;
 
     empire* player_empire = empire_manage.make_new();
@@ -1459,6 +1462,7 @@ int main()
     ship_manager* fleet2 = fleet_manage.make_new();
     ship_manager* fleet3 = fleet_manage.make_new();
     ship_manager* fleet4 = fleet_manage.make_new();
+    ship_manager* fleet5 = fleet_manage.make_new();
 
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
@@ -1472,12 +1476,16 @@ int main()
 
     ship* derelict_ship = fleet4->make_new_from(hostile_empire->team_id, make_default());
 
+    ship* scout_ship = fleet5->make_new_from(player_empire->team_id, make_scout());
+
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
     test_ship3->name = "SS Duplicate";
     test_ship4->name = "SS Secondary";
 
     derelict_ship->name = "SS Dereliction";
+
+    scout_ship->name = "SS Scout";
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
@@ -1542,9 +1550,18 @@ int main()
     base->generate_asteroids_old(500, 3, 5);
     //base->generate_planet_resources(2.f);
 
+
+    orbital* oscout = base->make_new(orbital_info::FLEET, 5.f);
+    oscout->orbital_angle = 0.f;
+    oscout->orbital_length = 270;
+    oscout->parent = sun;
+    oscout->data = fleet5;
+
+
     player_empire->take_ownership_of_all(base);
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
+    player_empire->take_ownership(fleet5);
 
     orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
@@ -1594,6 +1611,13 @@ int main()
 
     while(window.isOpen())
     {
+        /*playing_music.tick(diff_s);
+
+        if(once<sf::Keyboard::Add>())
+        {
+            playing_music.tg.make_cell_random();
+        }*/
+
         sf::Event event;
 
         bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
@@ -1643,6 +1667,9 @@ int main()
 
         if(key.isKeyPressed(sf::Keyboard::D))
             cdir.x() -= 1;
+
+        if(!focused)
+            cdir = 0.f;
 
         system_manage.pan_camera(cdir * diff_s * 300);
 
@@ -1803,6 +1830,7 @@ int main()
         //printf("Prerender\n");
 
         ImGui::Render();
+        //playing_music.debug(window);
         window.display();
         window.clear();
 
