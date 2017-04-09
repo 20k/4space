@@ -174,11 +174,11 @@ struct orbital_system
     orbital* get_base();
 
     std::vector<orbital*> orbitals;
-    std::vector<orbital*> total_orbitals; ///including useless ones
+    std::vector<orbital*> asteroids; ///including useless ones
 
     orbital* make_new(orbital_info::type type, float rad, int num_verts = 5);
 
-    void tick(float step_s);
+    void tick(float step_s, orbital_system* viewed_system);
 
     void destroy(orbital*);
     ///non destructively reparent
@@ -208,6 +208,8 @@ struct orbital_system
     bool can_engage(orbital* me, orbital* them);
 
     void make_asteroid_orbital(orbital* o);
+
+    float accumulated_nonviewed_time = 0.f;
 };
 
 struct system_manager

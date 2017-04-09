@@ -612,23 +612,36 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
 
     if(n->type == orbital_info::ASTEROID)
     {
-        total_orbitals.push_back(n);
+        asteroids.push_back(n);
     }
     else
     {
-        total_orbitals.push_back(n);
         orbitals.push_back(n);
     }
 
     return n;
 }
 
-void orbital_system::tick(float step_s)
+void orbital_system::tick(float step_s, orbital_system* viewed)
 {
-    for(auto& i : total_orbitals)
+    for(auto& i : orbitals)
     {
         i->tick(step_s);
     }
+
+    accumulated_nonviewed_time += step_s;
+
+    if(this != viewed)
+    {
+        return;
+    }
+
+    for(auto& i : asteroids)
+    {
+        i->tick(accumulated_nonviewed_time);
+    }
+
+    accumulated_nonviewed_time = 0.f;
 }
 
 void orbital_system::destroy(orbital* o)
@@ -644,11 +657,11 @@ void orbital_system::destroy(orbital* o)
         }
     }
 
-    for(int i=0; i<(int)total_orbitals.size(); i++)
+    for(int i=0; i<(int)asteroids.size(); i++)
     {
-        if(total_orbitals[i] == o)
+        if(asteroids[i] == o)
         {
-            total_orbitals.erase(total_orbitals.begin() + i);
+            asteroids.erase(asteroids.begin() + i);
             delete o;
             i--;
             break;
@@ -667,17 +680,17 @@ void orbital_system::steal(orbital* o, orbital_system* s)
         }
     }
 
-    for(int i=0; i<s->total_orbitals.size(); i++)
+    /*for(int i=0; i<s->total_orbitals.size(); i++)
     {
         if(s->total_orbitals[i] == o)
         {
-            s->orbitals.erase(s->total_orbitals.begin() + i);
+            s->total_orbitals.erase(s->total_orbitals.begin() + i);
             break;
         }
-    }
+    }*/
 
     orbitals.push_back(o);
-    total_orbitals.push_back(o);
+    //total_orbitals.push_back(o);
 
     o->parent = get_base();
     o->parent_system = this;
@@ -686,14 +699,14 @@ void orbital_system::steal(orbital* o, orbital_system* s)
 ///need to figure out higher positioning, but whatever
 void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
 {
-    /*for(auto& i : orbitals)
+    for(auto& i : asteroids)
     {
-        i->draw(win);
-    }*/
+        i->draw(win, viewer_empire);
+    }
 
-    for(int kk=total_orbitals.size()-1; kk >= 0; kk--)
+    for(int kk=orbitals.size()-1; kk >= 0; kk--)
     {
-        total_orbitals[kk]->draw(win, viewer_empire);
+        orbitals[kk]->draw(win, viewer_empire);
     }
 }
 
@@ -1107,7 +1120,7 @@ void orbital_system::make_asteroid_orbital(orbital* o)
 {
     orbitals.push_back(o);
 
-    /*for(int i=0; i<asteroids.size(); i++)
+    for(int i=0; i<asteroids.size(); i++)
     {
         if(asteroids[i] == o)
         {
@@ -1115,7 +1128,7 @@ void orbital_system::make_asteroid_orbital(orbital* o)
             i--;
             continue;
         }
-    }*/
+    }
 }
 
 orbital_system* system_manager::make_new()
@@ -1159,7 +1172,7 @@ void system_manager::tick(float step_s)
 {
     for(auto& i : systems)
     {
-        i->tick(step_s);
+        i->tick(step_s, currently_viewed);
     }
 
     repulse_fleets();
@@ -1442,7 +1455,11 @@ void system_manager::generate_universe(int num)
         orbital_system* sys = make_new();
         sys->generate_full_random_system();
 
-        vec2f random_position = randv<2, float>(-200.f, 200.f);
+        float random_angle = randf_s(0.f, 2*M_PI);
+
+        float random_radius = randf_s(0.f, 1.f) * 200;
+
+        vec2f random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
 
         int c = 0;
 
@@ -1463,7 +1480,12 @@ void system_manager::generate_universe(int num)
             if(all_good)
                 break;
 
-            random_position = randv<2, float>(-200.f, 200.f);
+            //random_position = randv<2, float>(-200.f, 200.f);
+
+            random_angle = randf_s(0.f, 2*M_PI);
+            random_radius = randf_s(0.f, 1.f) * 200;
+
+            random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
 
             c++;
         }
