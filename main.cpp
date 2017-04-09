@@ -1526,6 +1526,7 @@ int main()
     ship* derelict_ship = fleet4->make_new_from(hostile_empire->team_id, make_default());
 
     ship* scout_ship = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
+    ship* scout_ship2 = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
 
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
@@ -1535,6 +1536,7 @@ int main()
     derelict_ship->name = "SS Dereliction";
 
     scout_ship->name = "SS Scout";
+    scout_ship2->name = "SS Scout2";
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);

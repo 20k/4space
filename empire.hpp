@@ -72,6 +72,7 @@ struct empire
     ///type is the amount of resources we are requesting
     std::map<resource::types, float> dispense_resources_proportionally(const std::map<resource::types, float>& type, float take_fraction, float& frac_out);
 
+    void tick_system_claim();
     void tick(float step_s);
     void draw_ui();
 

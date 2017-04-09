@@ -1,6 +1,8 @@
 #include "empire.hpp"
 #include "system_manager.hpp"
 #include "ship.hpp"
+#include <set>
+#include <unordered_set>
 
 empire::empire()
 {
@@ -24,8 +26,11 @@ void empire::take_ownership(orbital* o)
 
 void empire::take_ownership_of_all(orbital_system* o)
 {
-    for(auto& i : o->orbitals)
+    for(orbital* i : o->orbitals)
     {
+        if(i->type == orbital_info::ASTEROID && !i->is_resource_object)
+            continue;
+
         take_ownership(i);
     }
 }
@@ -225,6 +230,48 @@ std::map<resource::types, float> empire::dispense_resources_proportionally(const
     frac_out = min_frac;
 
     return ret;
+}
+
+void empire::tick_system_claim()
+{
+    std::unordered_set<orbital_system*> systems;
+
+    for(orbital* o : owned)
+    {
+        orbital_system* os = o->parent_system;
+
+        systems.insert(os);
+    }
+
+
+    for(auto& i : systems)
+    {
+        bool own_all_planets = true;
+
+        for(orbital* o : i->orbitals)
+        {
+            if(o->type == orbital_info::PLANET && o->parent_empire != this)
+            {
+                own_all_planets = false;
+            }
+        }
+
+        if(!own_all_planets)
+            continue;
+
+        for(orbital* o : i->orbitals)
+        {
+            if(o->type == orbital_info::ASTEROID && o->is_resource_object)
+            {
+                take_ownership(o);
+            }
+
+            if(o->type == orbital_info::STAR)
+            {
+                take_ownership(o);
+            }
+        }
+    }
 }
 
 void empire::tick(float step_s)
@@ -434,6 +481,7 @@ void empire_manager::tick_all(float step_s)
     for(empire* emp : empires)
     {
         emp->tick(step_s);
+        emp->tick_system_claim();
     }
 }
 
