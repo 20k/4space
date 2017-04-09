@@ -430,7 +430,7 @@ void battle_manager::add_ship(ship* s)
         pos = {500 + num_in_slot * 50 + 300 * (int)(slot_num/2), (slot_num % 2) * 400 + 40};
     }
 
-    printf("fpos %f %f\n", pos.x(), pos.y());
+    //printf("fpos %f %f\n", pos.x(), pos.y());
 
     s->local_pos = pos;
 

@@ -152,7 +152,7 @@ inline component make_default_engines()
 
     component_attribute fuel;
     fuel.max_amount = 10.f;
-    fuel.cur_amount = 2.f;
+    fuel.cur_amount = 4.f;
     fuel.drained_per_s = fuel.max_amount/max_bad_engine_lifetime_s;
 
     component_attribute power;

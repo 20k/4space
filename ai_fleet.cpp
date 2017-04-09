@@ -41,9 +41,11 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     if(bm != nullptr)
     {
+        //printf("in battle\n");
+
         if(bm->can_end_battle_peacefully(ship_manage->parent_empire))
         {
-            bm->end_battle_peacefully();
+            all_battles.end_battle_peacefully(bm);
         }
     }
 
@@ -73,6 +75,9 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
             continue;
 
         if(other_ships->parent_empire == my_empire)
+            continue;
+
+        if(!other_ships->can_engage())
             continue;
 
         targets.push_back({other, other_ships});
