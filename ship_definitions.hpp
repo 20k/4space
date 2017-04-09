@@ -20,7 +20,7 @@ inline component make_default_crew()
 
     component_attribute oxygen;
     oxygen.drained_per_s = 0.5f;
-    oxygen.max_amount = 5.f;
+    oxygen.max_amount = 10.f;
 
     //component_attribute repair;
     //repair.produced_per_s = 0.2f;
