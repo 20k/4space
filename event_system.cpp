@@ -64,7 +64,7 @@ void terminate_quest(game_event& event)
     event.alert_location->has_quest_alert = false;
 }
 
-void give_random_research(game_event& event)
+void give_random_research_from_ancient(game_event& event)
 {
     empire* derelict = event.parent->ancient_faction;
     empire* interactor = event.parent->interacting_faction;
@@ -83,6 +83,24 @@ void give_random_research(game_event& event)
     interactor->add_resource(resource::RESEARCH, total_available_currency);
 }
 
+void give_random_research_currency(game_event& event)
+{
+    int amount = 100 + randf_s(-40.f, 40.f);
+
+    int type = resource::RESEARCH;
+
+    event.parent->interacting_faction->add_resource((resource::types)type, amount);
+}
+
+void give_random_resource(game_event& event)
+{
+    int amount = 100 + randf_s(-40.f, 40.f);
+
+    int type = randf_s(0.f, resource::COUNT);
+
+    event.parent->interacting_faction->add_resource((resource::types)type, amount);
+}
+
 void give_research_currency_proportion_lo(game_event& event)
 {
     float research_frac = 0.05f;
@@ -98,6 +116,7 @@ void give_research_currency_proportion_lo(game_event& event)
 
     interactor->add_resource(resource::RESEARCH, total_currency);
 }
+
 void give_research_currency_proportion_hi(game_event& event)
 {
     float research_frac = 0.07f;
@@ -136,6 +155,19 @@ void positive_interaction(game_event& event)
     empire* interactor = event.parent->interacting_faction;
 
     derelict->positive_interaction(interactor);
+}
+
+void resupply_nearby_fleets(game_event& event)
+{
+    empire* interactor = event.parent->interacting_faction;
+
+    ///do this but without empire affiliation?
+    auto sms = event.parent->get_nearby_fleets(interactor);
+
+    for(ship_manager* sm : sms)
+    {
+        sm->resupply_from_nobody();
+    }
 }
 
 void damage_nearby_fleets(game_event& event)
@@ -481,7 +513,7 @@ namespace alien_precursor_technology
 
         },
         {
-            both(terminate_quest, both(give_random_research, positive_interaction)) ///shift culture, bump interaction count
+            both(terminate_quest, both(give_random_research_from_ancient, positive_interaction)) ///shift culture, bump interaction count
         }
     };
 
@@ -629,6 +661,119 @@ namespace alien_precursor_technology
         return first;
     }
 }
+
+namespace bountiful_resources
+{
+    dialogue_node first
+    {
+        "Information",
+        "You have discovered a planet with bountiful natural resources, we have claimed a small portion for ourselves",
+        {
+
+        },
+        {
+            both(terminate_quest, give_random_resource)
+        }
+    };
+
+    dialogue_node get()
+    {
+        return first;
+    }
+}
+
+namespace volcanism
+{
+    dialogue_node first
+    {
+        "Information",
+        "This planet is highly volcanically active, the sensor readings will produce invaluable research",
+        {
+
+        },
+        {
+            both(terminate_quest, give_random_research_currency)
+        }
+    };
+
+    dialogue_node get()
+    {
+        return first;
+    }
+}
+
+namespace abandoned_spacestation
+{
+    dialogue_node first
+    {
+        "Information",
+        "A recently abandoned spacestation, of modern design, lies in orbit",
+        {
+            "Take any leftover supplies",
+            "Scrap it for resources",
+        },
+        {
+            both(terminate_quest, resupply_nearby_fleets), both(terminate_quest, give_random_resource)
+        }
+    };
+
+    dialogue_node get()
+    {
+        return first;
+    }
+}
+
+///need to be able to set up observation posts to give gradual tech
+///ie creating an orbital
+namespace neutron_star
+{
+    dialogue_node first
+    {
+        "Information",
+        "The star of this system is a neutron star - this is rather uncommon",
+        {
+            "Log the sensor data",
+        },
+        {
+            both(terminate_quest, give_random_research_currency)
+        }
+    };
+
+    dialogue_node get()
+    {
+        return first;
+    }
+}
+
+namespace shattered_planet
+{
+    dialogue_node first
+    {
+        "Information",
+        "This planet was shattered by a massive impact, and is slowly reforming under its own gravitational pull",
+        {
+            "Log the sensor data",
+            "Salvage some natural resources",
+        },
+        {
+            both(terminate_quest, give_random_research_currency), both(terminate_quest, give_random_research_currency)
+        }
+    };
+
+    dialogue_node get()
+    {
+        return first;
+    }
+}
+
+/*namespace cusp_of_spaceflight
+{
+    dialogue_node first
+    {
+        "Information",
+        ""
+    }
+}*/
 
 int present_dialogue(const std::vector<std::string>& options)
 {

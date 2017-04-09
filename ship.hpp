@@ -420,7 +420,8 @@ struct ship : positional
 
     bool display_ui = false;
 
-    void resupply(empire& emp, int num = 1);
+    ///fallback on nullptr emp is to force resupply
+    void resupply(empire* emp, int num = 1);
 
     bool can_move_in_system();
     float get_move_system_speed();
@@ -521,6 +522,7 @@ struct ship_manager
     empire* parent_empire = nullptr;
 
     void resupply(empire* from);
+    void resupply_from_nobody();
 
     void tick_all(float step_s);
 

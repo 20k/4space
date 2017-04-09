@@ -1782,7 +1782,7 @@ ship::~ship()
 }
 
 ///resupply probably needs to distribute fairly from global, or use different resources
-void ship::resupply(empire& emp, int num)
+void ship::resupply(empire* emp, int num)
 {
     std::vector<ship_component_elements::types> types =
     {
@@ -1814,12 +1814,20 @@ void ship::resupply(empire& emp, int num)
             requested_resource_amounts = hp_repair_costs;
         }
 
-        float efficiency_frac;
-
-        std::map<resource::types, float> gotten = emp.dispense_resources_proportionally(requested_resource_amounts, 1.f/num, efficiency_frac);
-
         std::map<ship_component_elements::types, float> to_add;
-        to_add[type] = efficiency_frac * current_capacity;
+
+        if(emp != nullptr)
+        {
+            float efficiency_frac;
+
+            std::map<resource::types, float> gotten = emp->dispense_resources_proportionally(requested_resource_amounts, 1.f/num, efficiency_frac);
+
+            to_add[type] = efficiency_frac * current_capacity;
+        }
+        else
+        {
+            to_add[type] = current_capacity;
+        }
 
         distribute_resources(to_add);
     }
@@ -2504,7 +2512,19 @@ void ship_manager::resupply(empire* from)
 
     for(ship* s : ships)
     {
-        s->resupply(*from, num);
+        s->resupply(from, num);
+
+        num--;
+    }
+}
+
+void ship_manager::resupply_from_nobody()
+{
+    int num = ships.size();
+
+    for(ship* s : ships)
+    {
+        s->resupply(nullptr, num);
 
         num--;
     }
