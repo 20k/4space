@@ -448,6 +448,9 @@ void orbital::request_transfer(vec2f pos)
 
     ship_manager* sm = (ship_manager*)data;
 
+    if(sm->any_in_combat())
+        return;
+
     if(sm->can_move_in_system())
         transfer(pos);
 }
@@ -1162,6 +1165,20 @@ orbital_system* system_manager::get_by_element(void* ptr)
         {
             if(m->data == ptr)
                 return i;
+        }
+    }
+
+    return nullptr;
+}
+
+orbital* system_manager::get_by_element_orbital(void* ptr)
+{
+    for(auto& i : systems)
+    {
+        for(auto& m : i->orbitals)
+        {
+            if(m->data == ptr)
+                return m;
         }
     }
 

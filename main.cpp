@@ -693,7 +693,7 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }*/
 
-void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick)
+void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, system_manager& system_manage)
 {
     if(battle == nullptr)
         return;
@@ -721,7 +721,7 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick)
 
     if(ImGui::Button("Step Battle 1s"))
     {
-        battle->tick(1.f);
+        battle->tick(1.f, system_manage);
     }
 
     ImGui::End();
@@ -812,7 +812,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         }
     }
 
-    debug_battle(all_battles.currently_viewing, win, lclick);
+    debug_battle(all_battles.currently_viewing, win, lclick, system_manage);
 
     ImGui::End();
 }
@@ -1499,7 +1499,7 @@ int main()
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
 
-    player_empire->ally(hostile_empire);
+    //player_empire->ally(hostile_empire);
 
     empire* derelict_empire = empire_manage.make_new();
     derelict_empire->name = "Test Ancient Faction";
@@ -1745,7 +1745,7 @@ int main()
 
         }*/
 
-        all_battles.tick(diff_s);
+        all_battles.tick(diff_s, system_manage);
 
         handle_camera(window, system_manage);
 

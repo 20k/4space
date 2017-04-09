@@ -48,13 +48,15 @@ struct battle_manager
 {
     projectile_manager projectile_manage;
 
+    void keep_fleets_together(system_manager& system_manage);
+
     ///team -> ship
     std::map<int, std::vector<ship*>> ships;
 
     std::vector<std::pair<empire*, int>> slots_filled;
     int num_slots = 0;
 
-    void tick(float step_s);
+    void tick(float step_s, system_manager& system_manage);
 
     void draw(sf::RenderWindow& win);
 
@@ -93,7 +95,7 @@ struct all_battles_manager
 
     void destroy(battle_manager* bm);
 
-    void tick(float step_s);
+    void tick(float step_s, system_manager& system_manage);
 
     void draw_viewing(sf::RenderWindow& win);
     void set_viewing(battle_manager* bm, system_manager& system_manage, bool jump = false);

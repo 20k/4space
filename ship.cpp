@@ -2688,15 +2688,7 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
 
 void ship_manager::try_warp(orbital_system* fin, orbital_system* cur, orbital* o)
 {
-    bool all_use = true;
-
-    for(ship* s : ships)
-    {
-        if(!s->can_use_warp_drives())
-            all_use = false;
-    }
-
-    if(!all_use)
+    if(!can_warp(fin, cur, o))
         return;
 
     for(ship* s : ships)
@@ -2726,6 +2718,9 @@ bool ship_manager::can_warp(orbital_system* fin, orbital_system* cur, orbital* o
         if(!s->can_use_warp_drives())
             all_use = false;
     }
+
+    if(any_in_combat())
+        return false;
 
     return all_use;
 }

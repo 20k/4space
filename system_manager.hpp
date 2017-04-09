@@ -223,6 +223,7 @@ struct system_manager
     ///perf issue?
     orbital_system* get_parent(orbital* o);
     orbital_system* get_by_element(void* ptr);
+    orbital* get_by_element_orbital(void* ptr);
 
     void tick(float step_s);
 

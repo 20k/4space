@@ -3,6 +3,7 @@
 #include "system_manager.hpp"
 #include "empire.hpp"
 #include "util.hpp"
+#include <set>
 
 void projectile::load(int type)
 {
@@ -223,7 +224,55 @@ void tick_ai(battle_manager& battle_manage, float step_s)
     }
 }
 
-void battle_manager::tick(float step_s)
+void battle_manager::keep_fleets_together(system_manager& system_manage)
+{
+    std::set<ship_manager*> fleets;
+
+    for(auto& i : ships)
+    {
+        for(ship* s : i.second)
+        {
+            fleets.insert(s->owned_by);
+        }
+    }
+
+    std::vector<orbital*> orbitals;
+
+    for(ship_manager* sm : fleets)
+    {
+        orbitals.push_back(system_manage.get_by_element_orbital((void*)sm));
+    }
+
+    vec2f avg = {0,0};
+    int avg_num = 0;
+
+    int sm1 = 0;
+
+    for(orbital* o : orbitals)
+    {
+        avg += o->absolute_pos;
+        avg_num ++;
+    }
+
+    if(avg_num == 0)
+        return;
+
+    avg = avg / avg_num;
+
+    for(orbital* o : orbitals)
+    {
+        vec2f m_pos = o->absolute_pos;
+
+        float dist = (o->absolute_pos - avg).length();
+
+        if(dist < 40.f)
+            continue;
+
+        o->transfer(avg);
+    }
+}
+
+void battle_manager::tick(float step_s, system_manager& system_manage)
 {
     tick_ai(*this, step_s);
 
@@ -266,6 +315,8 @@ void battle_manager::tick(float step_s)
         //s.tick_all_components(step_s);
 
     }
+
+    keep_fleets_together(system_manage);
 
     projectile_manage.tick(*this, step_s);
 }
@@ -671,11 +722,11 @@ void all_battles_manager::destroy(battle_manager* bm)
     }
 }
 
-void all_battles_manager::tick(float step_s)
+void all_battles_manager::tick(float step_s, system_manager& system_manage)
 {
     for(auto& i : battles)
     {
-        i->tick(step_s);
+        i->tick(step_s, system_manage);
     }
 
     if(currently_viewing == nullptr && battles.size() > 0)
