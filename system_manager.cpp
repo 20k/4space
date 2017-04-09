@@ -193,7 +193,7 @@ float impl_sin(float x)
         return 1.27323954f * x - 0.405284735f * x * x;
 }*/
 
-inline
+/*inline
 float sin_fast(float x)
 {
     float sin;
@@ -229,7 +229,7 @@ float cos_fast(float x)
         x -= 6.28318531f;
 
     return sin_fast(x);
-}
+}*/
 
 inline float impl_sin(float x)
 {
