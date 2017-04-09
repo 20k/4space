@@ -289,6 +289,22 @@ void empire::tick(float step_s)
     }
 }
 
+void empire::tick_ai(all_battles_manager& all_battles)
+{
+    if(!has_ai)
+        return;
+
+    for(orbital* o : owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        sm->ai_controller.tick_fleet(sm, o, all_battles);
+    }
+}
+
 void empire::draw_ui()
 {
     research_tech_level.draw_ui(this);
@@ -476,12 +492,13 @@ void empire_manager::notify_removal(ship_manager* s)
     }
 }
 
-void empire_manager::tick_all(float step_s)
+void empire_manager::tick_all(float step_s, all_battles_manager& all_battles)
 {
     for(empire* emp : empires)
     {
         emp->tick(step_s);
         emp->tick_system_claim();
+        emp->tick_ai(all_battles);
     }
 }
 

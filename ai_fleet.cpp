@@ -86,13 +86,14 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     ///but the ai currently has no friendly systems (or resources) so can't run away *to* anywhere
     ///will have to check for nearby systems etc
 
-
     auto nearest = get_nearest(targets, o);
 
     assert(nearest.first != nullptr);
 
     o->transfer(nearest.first->absolute_pos);
 
+    ///can_engage deliberately does not check any_in_combat (so we can chain battles), so be careful that we don't do this
+    ///currently fine as check is above
     if(os->can_engage(o, nearest.first))
     {
         battle_manager* bm = all_battles.make_new_battle({o, nearest.first});

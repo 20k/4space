@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include "resource_manager.hpp"
 #include "research.hpp"
+#include "ai_fleet.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -505,6 +506,8 @@ struct orbital;
 ///can be used as a fleet
 struct ship_manager
 {
+    ai_fleet ai_controller;
+
     std::vector<ship*> ships;
 
     ship* make_new(int team);

@@ -11,6 +11,7 @@ struct orbital_system;
 struct ship_manager;
 struct ship;
 struct system_manager;
+struct all_battles_manager;
 
 struct faction_relations
 {
@@ -22,6 +23,8 @@ struct faction_relations
 
 struct empire
 {
+    bool has_ai = false;
+
     ///a two dimensional vector that we can use to determine our similarity to other empires
     ///used for determining tech and ship operating capability
     ///we need some way for getting less tech once we learn a lot from the culture
@@ -74,6 +77,7 @@ struct empire
 
     void tick_system_claim();
     void tick(float step_s);
+    void tick_ai(all_battles_manager& all_battles);
     void draw_ui();
 
     float empire_culture_distance(empire* e);
@@ -111,7 +115,7 @@ struct empire_manager
     void notify_removal(orbital* o);
     void notify_removal(ship_manager* s);
 
-    void tick_all(float step_s);
+    void tick_all(float step_s, all_battles_manager& all_battles);
 
     void tick_cleanup_colonising();
 };

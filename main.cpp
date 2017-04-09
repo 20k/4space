@@ -1497,6 +1497,7 @@ int main()
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
+    hostile_empire->has_ai = true;
 
     //player_empire->ally(hostile_empire);
 
@@ -1879,7 +1880,7 @@ int main()
         player_empire->generate_resource_from_owned(diff_s);
 
         player_empire->draw_ui();
-        empire_manage.tick_all(diff_s);
+        empire_manage.tick_all(diff_s, all_battles);
 
         //test_event->tick(diff_s);
         //test_event->draw_ui();
