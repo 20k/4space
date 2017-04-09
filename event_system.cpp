@@ -144,6 +144,7 @@ void damage_nearby_fleets(game_event& event)
 
     auto sms = event.parent->get_nearby_fleets(interactor, 60.f);
 
+    ///this is really unsatisfying as a way to do ship damage
     for(auto& sm : sms)
         sm->random_damage_ships(0.6f);
 }

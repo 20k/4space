@@ -25,6 +25,20 @@ namespace game_event_info
         LOCAL_NATIVES, ///natives on planet doing something. Needs space -> planet, very little else (this is more lore)
         ANCIENT_PRECURSOR, ///found something. Includes alien tech, traces of civilisation.
         LONE_DERELICT, ///individual derelict, needs salvage mechanics and combat to work, research would help. Could be ancient
+
+        ///0 click events (you are just given something)
+        BOUNTIFUL_RESOUCES,  ///give a random resource. Should affect planet gen
+        VOLCANISMM, ///give random tech resource. Should affect planet gen
+        ABANDONED_SPACESTATION, ///give resources, refill ship supplies. Is a modern age space station, recently derelict
+        NEUTRON_STAR, ///give resources
+        SHATTERED_PLANET, ///give tech
+
+        ///1 click events (make a decision, get a reward), 3 of these
+        CUSP_OF_SPACEFLIGHT, ///encounter a civilisation on the brink of spaceflight, can help, destroy, or set up observation
+        BRINK_OF_COLLAPSE, ///enounter a collapsing planet. Allow it to collapse destroying its natural resources but gaining science, or save it so you can colonise it later. 3rd option?
+        //UNSTABLE_STAR, ///The star is critically unstable, try and provoke. Can't do this easily yet because it involves removing orbitals
+        ARTIFICIAL_STAR, ///star was clearly created by some ancient race with a cache of resources orbiting (interaction provokes defences). Make close observation, siphon off resources (fuel/ammo)
+
         ///implement these for the moment
         ///Not yet:
         ///Ringworld
