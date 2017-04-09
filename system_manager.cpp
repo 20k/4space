@@ -978,6 +978,26 @@ std::vector<orbital*> orbital_system::get_fleets_within_engagement_range(orbital
     return ret;
 }
 
+bool orbital_system::can_engage(orbital* me, orbital* them)
+{
+    float dist = (me->absolute_pos - them->absolute_pos).length();
+
+    float engagement_rad = 40.f;
+
+    if(me->type != orbital_info::FLEET || them->type != orbital_info::FLEET)
+        return false;
+
+    ship_manager* sm_me = (ship_manager*)me->data;
+    ship_manager* sm_them = (ship_manager*)them->data;
+
+    if(dist < engagement_rad && sm_me->can_engage() && sm_them->can_engage())
+    {
+        return true;
+    }
+
+    return false;
+}
+
 orbital_system* system_manager::make_new()
 {
     orbital_system* sys = new orbital_system;

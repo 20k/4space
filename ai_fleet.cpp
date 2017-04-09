@@ -3,6 +3,31 @@
 #include "empire.hpp"
 #include "ship.hpp"
 #include "battle_manager.hpp"
+#include <assert.h>
+
+std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbital*, ship_manager*>>& targets, orbital* me)
+{
+    float min_dist = 999999.f;
+    std::pair<orbital*, ship_manager*> ret = {nullptr, nullptr};
+
+    for(auto& i : targets)
+    {
+        orbital* o = i.first;
+
+        vec2f my_pos = me->absolute_pos;
+        vec2f their_pos = o->absolute_pos;
+
+        float dist = (their_pos - my_pos).length();
+
+        if(dist < min_dist)
+        {
+            ret = i;
+            min_dist = dist;
+        }
+    }
+
+    return ret;
+}
 
 void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles)
 {
@@ -25,11 +50,15 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     if(ship_manage->any_in_combat())
         return;
 
+    ///fly around?
+    if(!ship_manage->can_engage())
+        return;
+
     orbital_system* os = o->parent_system;
 
     empire* my_empire = ship_manage->parent_empire;
 
-    std::vector<ship_manager*> targets;
+    std::vector<std::pair<orbital*, ship_manager*>> targets;
 
     for(orbital* other : os->orbitals)
     {
@@ -46,7 +75,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
         if(other_ships->parent_empire == my_empire)
             continue;
 
-        targets.push_back(other_ships);
+        targets.push_back({other, other_ships});
     }
 
     if(targets.size() == 0)
@@ -58,4 +87,14 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     ///will have to check for nearby systems etc
 
 
+    auto nearest = get_nearest(targets, o);
+
+    assert(nearest.first != nullptr);
+
+    o->transfer(nearest.first->absolute_pos);
+
+    if(os->can_engage(o, nearest.first))
+    {
+        battle_manager* bm = all_battles.make_new_battle({o, nearest.first});
+    }
 }

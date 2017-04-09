@@ -203,6 +203,8 @@ struct orbital_system
 
     ///hostile fleets
     std::vector<orbital*> get_fleets_within_engagement_range(orbital* me);
+
+    bool can_engage(orbital* me, orbital* them);
 };
 
 struct system_manager

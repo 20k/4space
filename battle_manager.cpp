@@ -757,6 +757,8 @@ battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
         }
     }
 
+    return bm;
+
     //printf("made new battle with %i %i\n", t1.size(), nships);
 }
 
