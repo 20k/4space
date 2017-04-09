@@ -49,9 +49,9 @@ void text_manager::render_without_zoom(sf::RenderWindow& win, const std::string&
     text.setColor(sf::Color(col.x(), col.y(), col.z()));
 
 
-    sf::View view = win.getView();
+    /*sf::View view = win.getView();
     sf::View def_view = win.getDefaultView();
-    def_view.setSize(view.getSize());
+    def_view.setSize(view.getSize());*/
 
 
     //float iv_scale = 1.f;
@@ -68,8 +68,13 @@ void text_manager::render_without_zoom(sf::RenderWindow& win, const std::string&
 
     text.setPosition(pos.x(), pos.y());*/
 
-    sf::View backup_view = win.getView();
+
+    /*sf::View backup_view = win.getView();
     sf::View new_view = win.getDefaultView();
+
+    auto spos = win.mapCoordsToPixel({pos.x(), pos.y()});
+
+    vec2f screen_pos = {spos.x, spos.y};
 
     new_view.setCenter(backup_view.getTransform().transformPoint(backup_view.getCenter()));
 
@@ -80,23 +85,30 @@ void text_manager::render_without_zoom(sf::RenderWindow& win, const std::string&
         float w = text.getGlobalBounds().width;
 
         pos.x() = pos.x() - w/2;
+    }*/
+
+    if(str == "")
+        return;
+
+    sf::View current_view = win.getView();
+    sf::View default_view = win.getDefaultView();
+
+    auto projected = win.mapCoordsToPixel({pos.x(), pos.y()});
+
+    vec2f spos = {projected.x, projected.y};
+
+    text.setScale(scale, scale);
+
+    if(centered)
+    {
+        spos = spos - (vec2f){text.getGlobalBounds().width/2, text.getGlobalBounds().height/2};
     }
 
-    //text.setPosition(pos.x(), pos.y());
+    text.setPosition({spos.x(), spos.y()});
 
-    //pos.x() = new_view.getTransform().transformPoint(pos.x(), pos.y()).x;
-    //pos.y() = new_view.getTransform().transformPoint(pos.x(), pos.y()).y;
-
-    //pos.x() = backup_view.getInverseTransform().transformPoint(pos.x(), pos.y()).x;
-    //pos.y() = backup_view.getInverseTransform().transformPoint(pos.x(), pos.y()).y;
-
-    text.setPosition(pos.x(), pos.y());
-
-    win.setView(new_view);
+    win.setView(default_view);
 
     win.draw(text);
 
-    win.setView(backup_view);
-
-    //printf("pos %f %f\n", pos.x(), pos.y());
+    win.setView(current_view);
 }

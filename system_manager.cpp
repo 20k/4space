@@ -1338,9 +1338,14 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         os->highlight = false;
 
-        std::string owner_str = os->get_base()->get_empire_str(false);
+        std::string owner_str = "";
 
-        text_manager::render_without_zoom(win, owner_str, pos, {1.f, 1.f, 1.f}, true, 0.5f);
+        if(os->get_base()->parent_empire != nullptr)
+        {
+            owner_str = os->get_base()->parent_empire->name;
+        }
+
+        //text_manager::render_without_zoom(win, owner_str, pos - (vec2f){0, 1000}, {1.f, 1.f, 1.f}, true, 0.45);
     }
 }
 
