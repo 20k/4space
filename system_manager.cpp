@@ -233,12 +233,12 @@ float cos_fast(float x)
 
 inline float impl_sin(float x)
 {
-    return sin_fast(x);
+    return sinf(x);
 }
 
 inline float impl_cos(float x)
 {
-    return cos_fast(x);
+    return cosf(x);
 }
 
 void orbital::tick(float step_s)
@@ -271,8 +271,8 @@ void orbital::tick(float step_s)
 
     orbital_angle += calculated_angular_velocity_ps * step_s;
 
-    if(orbital_angle >= M_PIf)
-        orbital_angle -= 2*M_PIf;
+    //if(orbital_angle >= M_PIf)
+    //    orbital_angle -= 2*M_PIf;
 
     absolute_pos = orbital_length * (vec2f){impl_cos(orbital_angle), impl_sin(orbital_angle)} + parent->absolute_pos;
 }
