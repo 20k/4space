@@ -142,6 +142,8 @@ struct game_event_manager
     void set_faction(empire* e);
     void set_interacting_faction(empire* e);
     bool can_interact(empire* e);
+
+    ///this should really be under empire
     ship_manager* get_nearby_fleet(empire* e);
     std::vector<ship_manager*> get_nearby_fleets(empire* e, float dist = 120.f);
     ship_manager* get_nearest_fleet(empire* e);

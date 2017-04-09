@@ -779,3 +779,16 @@ void all_battles_manager::end_battle_peacefully(battle_manager* bm)
 {
     disengage(bm, nullptr);
 }
+
+battle_manager* all_battles_manager::get_battle_involving(ship_manager* ship_manage)
+{
+    for(battle_manager* bm : battles)
+    {
+        if(bm->any_in_fleet_involved(ship_manage))
+        {
+            return bm;
+        }
+    }
+
+    return nullptr;
+}

@@ -103,6 +103,8 @@ struct all_battles_manager
     ///disengaging empire can be nullptr
     void disengage(battle_manager* bm, empire* disengaging_empire);
     void end_battle_peacefully(battle_manager* bm);
+
+    battle_manager* get_battle_involving(ship_manager* ship_manage);
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

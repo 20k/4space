@@ -2801,6 +2801,17 @@ bool ship_manager::any_colonising()
     return false;
 }
 
+bool ship_manager::any_derelict()
+{
+    for(ship* s : ships)
+    {
+        if(s->fully_disabled())
+            return true;
+    }
+
+    return false;
+}
+
 std::string ship_manager::get_engage_str()
 {
     if(can_engage())
