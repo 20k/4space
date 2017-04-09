@@ -536,14 +536,22 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
         n->sprite.load(orbital_info::load_strs[type]);
     }
 
-    orbitals.push_back(n);
+    if(n->type == orbital_info::ASTEROID)
+    {
+        total_orbitals.push_back(n);
+    }
+    else
+    {
+        total_orbitals.push_back(n);
+        orbitals.push_back(n);
+    }
 
     return n;
 }
 
 void orbital_system::tick(float step_s)
 {
-    for(auto& i : orbitals)
+    for(auto& i : total_orbitals)
     {
         i->tick(step_s);
     }
@@ -558,7 +566,18 @@ void orbital_system::destroy(orbital* o)
             orbitals.erase(orbitals.begin() + i);
             delete o;
             i--;
-            return;
+            break;
+        }
+    }
+
+    for(int i=0; i<(int)total_orbitals.size(); i++)
+    {
+        if(total_orbitals[i] == o)
+        {
+            total_orbitals.erase(total_orbitals.begin() + i);
+            delete o;
+            i--;
+            break;
         }
     }
 }
@@ -574,7 +593,17 @@ void orbital_system::steal(orbital* o, orbital_system* s)
         }
     }
 
+    for(int i=0; i<s->total_orbitals.size(); i++)
+    {
+        if(s->total_orbitals[i] == o)
+        {
+            s->orbitals.erase(s->total_orbitals.begin() + i);
+            break;
+        }
+    }
+
     orbitals.push_back(o);
+    total_orbitals.push_back(o);
 
     o->parent = get_base();
     o->parent_system = this;
@@ -588,9 +617,9 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
         i->draw(win);
     }*/
 
-    for(int kk=orbitals.size()-1; kk >= 0; kk--)
+    for(int kk=total_orbitals.size()-1; kk >= 0; kk--)
     {
-        orbitals[kk]->draw(win, viewer_empire);
+        total_orbitals[kk]->draw(win, viewer_empire);
     }
 }
 
@@ -710,6 +739,7 @@ void orbital_system::generate_asteroids_new(int n, int num_belts, int num_resour
         }
 
         cur_orbitals[n]->make_random_resource_asteroid(1.f);
+        make_asteroid_orbital(cur_orbitals[n]);
     }
 }
 
@@ -800,6 +830,7 @@ void orbital_system::generate_asteroids_old(int n, int num_belts, int num_resour
         }
 
         cur_orbitals[n]->make_random_resource_asteroid(1.f);
+        make_asteroid_orbital(cur_orbitals[n]);
     }
 }
 
@@ -996,6 +1027,21 @@ bool orbital_system::can_engage(orbital* me, orbital* them)
     }
 
     return false;
+}
+
+void orbital_system::make_asteroid_orbital(orbital* o)
+{
+    orbitals.push_back(o);
+
+    /*for(int i=0; i<asteroids.size(); i++)
+    {
+        if(asteroids[i] == o)
+        {
+            asteroids.erase(asteroids.begin() + i);
+            i--;
+            continue;
+        }
+    }*/
 }
 
 orbital_system* system_manager::make_new()
@@ -1311,4 +1357,44 @@ orbital_system* system_manager::get_nearest_to_camera()
     }
 
     return f;
+}
+
+void system_manager::generate_universe(int num)
+{
+    float exclusion_rad = 20.f;
+
+    for(int i=0; i<num; i++)
+    {
+        orbital_system* sys = make_new();
+        sys->generate_full_random_system();
+
+        vec2f random_position = randv<2, float>(-200.f, 200.f);
+
+        int c = 0;
+
+        do
+        {
+            bool all_good = true;
+
+            for(orbital_system* other : systems)
+            {
+                if((other->universe_pos - random_position).length() < exclusion_rad)
+                {
+                    all_good = false;
+
+                    break;
+                }
+            }
+
+            if(all_good)
+                break;
+
+            random_position = randv<2, float>(-200.f, 200.f);
+
+            c++;
+        }
+        while(c < 100);
+
+        sys->universe_pos = random_position;
+    }
 }

@@ -174,6 +174,7 @@ struct orbital_system
     orbital* get_base();
 
     std::vector<orbital*> orbitals;
+    std::vector<orbital*> total_orbitals; ///including useless ones
 
     orbital* make_new(orbital_info::type type, float rad, int num_verts = 5);
 
@@ -205,6 +206,8 @@ struct orbital_system
     std::vector<orbital*> get_fleets_within_engagement_range(orbital* me);
 
     bool can_engage(orbital* me, orbital* them);
+
+    void make_asteroid_orbital(orbital* o);
 };
 
 struct system_manager
@@ -251,6 +254,9 @@ struct system_manager
     vec2f camera;
     float universe_scale = 100.f;
     float sun_universe_rad = 200;
+
+    ///also generate empires in universe, in a separate function
+    void generate_universe(int num);
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED
