@@ -330,6 +330,19 @@ std::vector<std::string> orbital::get_info_str()
     }
 }
 
+std::string orbital::get_empire_str(bool newline)
+{
+    if(parent_empire == nullptr)
+        return "";
+
+    std::string str = "Empire: " + parent_empire->name;
+
+    if(newline)
+        str += "\n";
+
+    return str;
+}
+
 void orbital::transfer(float pnew_rad, float pnew_angle)
 {
     old_rad = orbital_length;

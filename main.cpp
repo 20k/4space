@@ -905,19 +905,21 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(orb->type == orbital_info::STAR)
                 {
-                    ImGui::SetTooltip((orb->name + "\n" + orb->description).c_str());
+                    ImGui::SetTooltip((orb->name + "\n" + orb->get_empire_str() + orb->description).c_str());
                 }
 
                 if(orb->is_resource_object)
                 {
                     std::string res_first = orb->name;
 
-                    if(orb->parent_empire != nullptr)
+                    /*if(orb->parent_empire != nullptr)
                     {
-                        res_first = res_first + "\n" + "Empire: " + orb->parent_empire->name;
-                    }
+                        res_first = res_first + "\n" + orb->get_empire_str();
+                    }*/
 
-                    res_first += "\n" + orb->produced_resources_ps.get_formatted_str();
+                    res_first += "\n" + orb->get_empire_str();
+
+                    res_first += orb->produced_resources_ps.get_formatted_str();
 
                     ImGui::SetTooltip(res_first.c_str());
                 }
@@ -1021,7 +1023,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(kk->parent_empire != nullptr)
                 {
-                    elem->header = elem->header + "\n" + "Empire: " + kk->parent_empire->name;
+                    elem->header = elem->header + "\n" + kk->get_empire_str(false);
                 }
 
                 elem->data = kk->get_info_str();

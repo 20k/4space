@@ -133,6 +133,7 @@ struct orbital
     bool point_within(vec2f pos);
 
     std::vector<std::string> get_info_str();
+    std::string get_empire_str(bool newline = true);
 
     void transfer(float new_rad, float new_angle);
     void transfer(vec2f pos);
