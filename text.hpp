@@ -16,7 +16,9 @@ struct text_manager
 
     static void load();
 
-    static void render(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool rounding = false);
+    static void render(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool rounding = false, float char_size = 16, float scale = 1.f);
+
+    static void render_without_zoom(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool centered = true, float scale = 1.f);
 };
 
 #endif // TEXT_HPP_INCLUDED

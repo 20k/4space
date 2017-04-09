@@ -1337,6 +1337,10 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         win.draw(circle);
 
         os->highlight = false;
+
+        std::string owner_str = os->get_base()->get_empire_str(false);
+
+        text_manager::render_without_zoom(win, owner_str, pos, {1.f, 1.f, 1.f}, true, 0.5f);
     }
 }
 
