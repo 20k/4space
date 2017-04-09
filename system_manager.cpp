@@ -271,8 +271,8 @@ void orbital::tick(float step_s)
 
     orbital_angle += calculated_angular_velocity_ps * step_s;
 
-    if(orbital_angle >= M_PI)
-        orbital_angle -= 2*M_PI;
+    if(orbital_angle >= M_PIf)
+        orbital_angle -= 2*M_PIf;
 
     absolute_pos = orbital_length * (vec2f){impl_cos(orbital_angle), impl_sin(orbital_angle)} + parent->absolute_pos;
 }
@@ -755,7 +755,7 @@ void orbital_system::generate_asteroids_new(int n, int num_belts, int num_resour
 
     float max_random_radius = 25.f;
 
-    int asteroids_per_belt = n / num_belts;
+    int asteroids_per_belt = n / (exclusion_radiuses.size() + 1);
 
     std::vector<orbital*> cur_orbitals;
 
@@ -1018,7 +1018,7 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
         }
     }
 
-    generate_asteroids_new(num_asteroids, num_belts, num_resource_asteroids);
+    generate_asteroids_old(num_asteroids, num_belts, num_resource_asteroids);
     //generate_planet_resources(2.f);
 }
 
@@ -1027,8 +1027,8 @@ void orbital_system::generate_full_random_system()
     int min_planets = 0;
     int max_planets = 5;
 
-    int min_asteroids = 300;
-    int max_asteroids = 500;
+    int min_asteroids = 100;
+    int max_asteroids = 200;
 
     int min_belts = 1;
     int max_belts = 6;
