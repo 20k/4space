@@ -170,6 +170,77 @@ void do_transfer(orbital* o)
     }
 }
 
+/*inline
+float impl_cos(float x)
+{
+    x += 1.57079632f;
+
+    if (x >  3.14159265f)
+        x -= 6.28318531f;
+
+    if (x < 0)
+        return 1.27323954f * x + 0.405284735f * x * x;
+    else
+        return 1.27323954f * x - 0.405284735f * x * x;
+}
+
+inline
+float impl_sin(float x)
+{
+    if (x < 0)
+        return 1.27323954f * x + .405284735f * x * x;
+    else
+        return 1.27323954f * x - 0.405284735f * x * x;
+}*/
+
+inline
+float sin_fast(float x)
+{
+    float sin;
+
+    if (x < 0)
+    {
+        sin = 1.27323954f * x + .405284735f * x * x;
+
+        if (sin < 0)
+            sin = .225 * (sin *-sin - sin) + sin;
+        else
+            sin = .225 * (sin * sin - sin) + sin;
+    }
+    else
+    {
+        sin = 1.27323954f * x - 0.405284735f * x * x;
+
+        if (sin < 0)
+            sin = .225 * (sin *-sin - sin) + sin;
+        else
+            sin = .225 * (sin * sin - sin) + sin;
+    }
+
+    return sin;
+}
+
+inline
+float cos_fast(float x)
+{
+    x += 1.57079632f;
+
+    if (x >  3.14159265f)
+        x -= 6.28318531f;
+
+    return sin_fast(x);
+}
+
+inline float impl_sin(float x)
+{
+    return sin_fast(x);
+}
+
+inline float impl_cos(float x)
+{
+    return cos_fast(x);
+}
+
 void orbital::tick(float step_s)
 {
     internal_time_s += step_s;
@@ -194,13 +265,16 @@ void orbital::tick(float step_s)
 
     double scaled_real_dist = (orbital_length / default_scale) * distance_from_earth_to_sun;
 
-    double vspeed = sqrt(mu / scaled_real_dist);
+    double vspeed_sq = mu / scaled_real_dist;
 
-    float calculated_angular_velocity_ps = sqrt(vspeed * vspeed / (scaled_real_dist * scaled_real_dist));
+    float calculated_angular_velocity_ps = sqrtf(vspeed_sq / (scaled_real_dist * scaled_real_dist));
 
     orbital_angle += calculated_angular_velocity_ps * step_s;
 
-    absolute_pos = orbital_length * (vec2f){cosf(orbital_angle), sinf(orbital_angle)} + parent->absolute_pos;
+    if(orbital_angle >= M_PI)
+        orbital_angle -= 2*M_PI;
+
+    absolute_pos = orbital_length * (vec2f){impl_cos(orbital_angle), impl_sin(orbital_angle)} + parent->absolute_pos;
 }
 
 void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
