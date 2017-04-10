@@ -1660,7 +1660,7 @@ void system_manager::generate_universe(int num)
 
         float random_angle = randf_s(0.f, 2*M_PI);
 
-        float random_radius = randf_s(0.f, 1.f) * 200;
+        float random_radius = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * 500;
 
         vec2f random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
 
@@ -1686,7 +1686,7 @@ void system_manager::generate_universe(int num)
             //random_position = randv<2, float>(-200.f, 200.f);
 
             random_angle = randf_s(0.f, 2*M_PI);
-            random_radius = randf_s(0.f, 1.f) * 200;
+            random_radius = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * 500;
 
             random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
 
