@@ -1645,7 +1645,7 @@ int main()
     sys_2->generate_full_random_system();
     sys_2->universe_pos = {10, 10};
 
-    empire* e2 = empire_manage.birth_empire(fleet_manage, sys_2, 1);
+    empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
 
     system_manage.generate_universe(100);
 

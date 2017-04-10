@@ -70,6 +70,7 @@ void sprite_renderable::load(const std::string& str)
     tex.loadFromImage(img);
     //tex.setSmooth(true);
     ///smooth rendering causes issues, we'll have to go high res or constructive
+    ///also looks hideous
 }
 
 void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)

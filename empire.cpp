@@ -549,3 +549,36 @@ empire* empire_manager::birth_empire(fleet_manager& fleet_manage, orbital_system
     e->take_ownership(ofleet);
     e->take_ownership(fleet1);
 }
+
+empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fleet_manage, orbital_system* os, int fleets, int ships_per_fleet)
+{
+    if(os->is_owned())
+        return nullptr;
+
+    empire* e = make_new();
+
+    e->name = "Pirates";
+    e->has_ai = true;
+
+    for(int i=0; i<fleets; i++)
+    {
+        ship_manager* fleet1 = fleet_manage.make_new();
+
+        for(int kk=0; kk < ships_per_fleet; kk++)
+        {
+            ship* test_ship = fleet1->make_new_from(e->team_id, make_default());
+            test_ship->name = "SS Still Todo " + std::to_string(i) + std::to_string(kk);
+        }
+
+        orbital* ofleet = os->make_new(orbital_info::FLEET, 5.f);
+
+        ofleet->orbital_angle = i * M_PI/13.f;
+        ofleet->orbital_length = 200.f;
+        ofleet->parent = os->get_base();
+        ofleet->data = fleet1;
+
+        e->take_ownership(ofleet);
+        e->take_ownership(fleet1);
+    }
+
+}
