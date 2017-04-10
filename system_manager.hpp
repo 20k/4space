@@ -52,7 +52,7 @@ namespace orbital_info
         ""
     };
 
-    float decolonise_time_s = 60.f;
+    static float decolonise_time_s = 60.f;
 }
 
 namespace sf

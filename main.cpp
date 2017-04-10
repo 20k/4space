@@ -1507,7 +1507,7 @@ int main()
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
 
-    player_empire->ally(hostile_empire);
+    //player_empire->ally(hostile_empire);
     //player_empire->become_hostile(hostile_empire);
 
     empire* derelict_empire = empire_manage.make_new();

@@ -499,7 +499,7 @@ ship* battle_manager::get_nearest_hostile(ship* s)
             if(s->owned_by->parent_empire == os->owned_by->parent_empire)
                 continue;
 
-            if(s->owned_by->parent_empire->is_allied(os->owned_by->parent_empire))
+            if(!s->owned_by->parent_empire->is_hostile(os->owned_by->parent_empire))
                 continue;
 
             vec2f my_pos = s->local_pos;
@@ -570,7 +570,7 @@ bool battle_manager::can_disengage(empire* disengaging_empire)
             if(s->team != disengaging_empire->team_id)
                 continue;
 
-            if(s->owned_by->parent_empire->is_allied(disengaging_empire))
+            if(!s->owned_by->parent_empire->is_hostile(disengaging_empire))
                 continue;
 
             if(!s->can_disengage())
@@ -629,7 +629,7 @@ bool battle_manager::can_end_battle_peacefully(empire* leaving_empire)
             if(s->owned_by->parent_empire == leaving_empire)
                 continue;
 
-            if(s->owned_by->parent_empire->is_allied(leaving_empire))
+            if(!s->owned_by->parent_empire->is_hostile(leaving_empire))
                 continue;
 
             if(!s->fully_disabled())

@@ -71,7 +71,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
         ship_manager* other_ships = (ship_manager*)other->data;
 
-        if(my_empire->is_allied(other_ships->parent_empire))
+        if(!my_empire->is_hostile(other_ships->parent_empire))
             continue;
 
         if(other_ships->parent_empire == my_empire)

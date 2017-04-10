@@ -361,10 +361,17 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     vec3f friendly_empire_mult = {0.5, 1, 0.5};
 
+    vec3f neutral_empire_mult = {1.f, 0.5, 0.f};
+
     if(parent_empire != viewer_empire)
     {
         current_sprite_col = base_sprite_col * hostile_empire_mult;
         //current_simple_col = current_simple_col * hostile_empire_mult;
+    }
+
+    if(parent_empire != nullptr && !parent_empire->is_hostile(viewer_empire) && parent_empire != viewer_empire)
+    {
+        current_sprite_col = base_sprite_col * neutral_empire_mult;
     }
 
     ///if the orbital has no parent!
