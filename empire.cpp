@@ -594,16 +594,8 @@ void empire_manager::tick_decolonisation()
     }
 }
 
-empire* empire_manager::birth_empire(fleet_manager& fleet_manage, orbital_system* os, int system_size)
+void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
-    if(os->is_owned())
-        return nullptr;
-
-    empire* e = make_new();
-
-    e->name = "Rando";
-    e->has_ai = true;
-
     ship_manager* fleet1 = fleet_manage.make_new();
 
     ship* test_ship = fleet1->make_new_from(e->team_id, make_default());
@@ -629,6 +621,49 @@ empire* empire_manager::birth_empire(fleet_manager& fleet_manage, orbital_system
 
     e->take_ownership(ofleet);
     e->take_ownership(fleet1);
+
+}
+
+empire* empire_manager::birth_empire(system_manager& system_manage, fleet_manager& fleet_manage, orbital_system* os, int system_size)
+{
+    if(os->is_owned())
+        return nullptr;
+
+    empire* e = make_new();
+
+    e->name = "Rando";
+    e->has_ai = true;
+
+    claim_system(e, os, fleet_manage);
+
+    std::vector<orbital_system*> systems = system_manage.systems;
+
+    ///thanks c++. This time not even 100% sarcastically
+    ///don't need to multiply by universe scale because space is relative dude
+    std::sort(systems.begin(), systems.end(),
+
+    [&](const orbital_system* a, const orbital_system* b) -> bool
+    {
+        return (a->universe_pos - os->universe_pos).length() < (b->universe_pos - os->universe_pos).length();
+    });
+
+    int num = 1;
+
+    for(orbital_system* sys : systems)
+    {
+        if(sys == os)
+            continue;
+
+        if(sys->is_owned())
+            continue;
+
+        if(num >= system_size)
+            break;
+
+        claim_system(e, sys, fleet_manage);
+
+        num++;
+    }
 
     return e;
 }
@@ -665,4 +700,20 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
     }
 
     return e;
+}
+
+void empire_manager::birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage)
+{
+    for(int i=0; i<system_manage.systems.size(); i++)
+    {
+        orbital_system* os = system_manage.systems[i];
+
+        if(os->is_owned())
+            continue;
+
+        if(randf_s(0.f, 1.f) < 0.9f)
+            continue;
+
+        birth_empire(system_manage, fleet_manage, os, randf_s(1.f, 10.f));
+    }
 }

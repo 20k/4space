@@ -1387,7 +1387,7 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
 
     vec2f o2dir = (p1 - avg).norm();
 
-    o2dir = o2dir.rot(M_PI/2) * olen/2;
+    o2dir = o2dir.rot(M_PI/2) * olen/2.f;
 
     return {avg - o2dir * 1.02f, avg + o2dir * 1.02f};
 }
@@ -1427,7 +1427,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
     }*/
 
-    float frad = sun_universe_rad * 5.5f;
+    float frad = sun_universe_rad * 6.5f;
 
     for(orbital_system* os : systems)
     {

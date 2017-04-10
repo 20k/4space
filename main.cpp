@@ -1712,13 +1712,15 @@ int main()
     sys_2->generate_full_random_system();
     sys_2->universe_pos = {10, 10};
 
-    empire* e2 = empire_manage.birth_empire(fleet_manage, sys_2);
+    empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
     //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
 
     //player_empire->become_hostile(e2);
     player_empire->ally(e2);
 
     system_manage.generate_universe(100);
+
+    empire_manage.birth_empires_random(fleet_manage, system_manage);
 
     system_manage.set_viewed_system(base);
 
