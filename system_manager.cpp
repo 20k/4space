@@ -22,6 +22,11 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 {
     col = col * 255.f;
 
+    auto real_coord = win.mapCoordsToPixel({absolute_pos.x(), absolute_pos.y()});
+
+    if(real_coord.x < 0 || real_coord.x > win.getSize().x || real_coord.y < 0 || real_coord.y >= win.getSize().y)
+        return;
+
     sf::RectangleShape shape;
     shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
 
