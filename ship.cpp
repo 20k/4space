@@ -2537,6 +2537,37 @@ void ship_manager::resupply_from_nobody()
     }
 }
 
+bool ship_manager::should_resupply()
+{
+    std::vector<ship_component_elements::types> types =
+    {
+        ship_component_elements::HP,
+        ship_component_elements::FUEL,
+        ship_component_elements::AMMO,
+        ship_component_elements::ARMOUR,
+    };
+
+    for(ship* s : ships)
+    {
+        auto cur_res = s->get_stored_resources();
+
+        auto max_stored = s->get_max_resources();
+
+        for(auto& i : types)
+        {
+            if(max_stored[i] < 0.0001f)
+                continue;
+
+            if((cur_res[i] / max_stored[i]) < 0.4f)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 void ship_manager::tick_all(float step_s)
 {
     //sf::Clock clk;

@@ -264,7 +264,7 @@ void empire::tick_system_claim()
 
         for(orbital* o : i->orbitals)
         {
-            if(o->type == orbital_info::ASTEROID && o->is_resource_object || o->type == orbital_info::MOON)
+            if((o->type == orbital_info::ASTEROID && o->is_resource_object) || o->type == orbital_info::MOON)
             {
                 take_ownership(o);
             }

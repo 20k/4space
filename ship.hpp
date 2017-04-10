@@ -526,6 +526,8 @@ struct ship_manager
 
     void resupply(empire* from);
     void resupply_from_nobody();
+    ///for the ai to use
+    bool should_resupply();
 
     void tick_all(float step_s);
 
