@@ -24,6 +24,7 @@ struct faction_relations
 struct empire
 {
     bool has_ai = false;
+    vec3f colour = {1,1,1};
 
     ///a two dimensional vector that we can use to determine our similarity to other empires
     ///used for determining tech and ship operating capability

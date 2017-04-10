@@ -1315,13 +1315,39 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     if(in_system_view())
         return;
 
-    sf::CircleShape circle;
+    for(orbital_system* os : systems)
+    {
+        vec2f pos = os->universe_pos * universe_scale;
+
+        if(os->get_base()->parent_empire != nullptr)
+        {
+            vec3f col = os->get_base()->parent_empire->colour * 255.f;
+
+            sf::CircleShape ncircle;
+
+            ncircle.setFillColor({10, 10, 10});
+            ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
+
+            ncircle.setRadius(sun_universe_rad * 5.5f);
+
+            ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
+
+            ncircle.setOutlineThickness(sun_universe_rad / 15.f);
+            ncircle.setPosition({pos.x(), pos.y()});
+
+            ncircle.setPointCount(100.f);
+
+            win.draw(ncircle);
+        }
+    }
 
     for(int i=0; i<systems.size(); i++)
     {
         orbital_system* os = systems[i];
 
         vec2f pos = os->universe_pos * universe_scale;
+
+        sf::CircleShape circle;
 
         circle.setPosition({pos.x(), pos.y()});
         circle.setFillColor(sf::Color(255, 200, 50));
@@ -1338,14 +1364,14 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         os->highlight = false;
 
-        std::string owner_str = "";
+        /*std::string owner_str = "";
 
         if(os->get_base()->parent_empire != nullptr)
         {
             owner_str = os->get_base()->parent_empire->name;
         }
 
-        //text_manager::render_without_zoom(win, owner_str, pos - (vec2f){0, 1000}, {1.f, 1.f, 1.f}, true, 0.45);
+        text_manager::render_without_zoom(win, owner_str, pos - (vec2f){0, 1000}, {1.f, 1.f, 1.f}, true, 0.45);*/
     }
 }
 
@@ -1377,8 +1403,19 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
 
             hovered_system = s;
 
+            std::string str;
+
             if(s->get_base() != nullptr)
-                ImGui::SetTooltip(s->get_base()->name.c_str());
+            {
+                str = s->get_base()->name;
+
+                if(s->get_base()->parent_empire != nullptr)
+                {
+                    str += "\n" + s->get_base()->parent_empire->name;
+                }
+
+                ImGui::SetTooltip(str.c_str());
+            }
 
             if(lclick)
             {
