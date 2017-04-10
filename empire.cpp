@@ -9,7 +9,7 @@ empire::empire()
 {
     culture_similarity = {randf_s(0.f, 1.f), randf_s(0.f, 1.f)};
 
-    colour = randv<3, float>(0.5f, 1.f);
+    colour = randv<3, float>(0.3f, 1.f);
 }
 
 int empire::team_gid = 0;
