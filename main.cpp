@@ -1890,6 +1890,7 @@ int main()
 
             ///this is slow
             system_manage.draw_viewed_system(window, player_empire);
+            ///dis kinda slow too
             system_manage.draw_universe_map(window, player_empire);
             system_manage.process_universe_map(window, lclick);
         }
