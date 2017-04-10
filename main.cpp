@@ -71,7 +71,8 @@ namespace popup_element_type
         ENGAGE,
         ENGAGE_COOLDOWN,
         COLONISE,
-        DECOLONISE,
+        DECLARE_WAR,
+        DECLARE_WAR_SURE,
         COUNT
     };
 }
@@ -947,6 +948,15 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     elem.buttons_map.erase(popup_element_type::ENGAGE);
                 }
 
+                if(orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire)
+                {
+                    elem.buttons_map[popup_element_type::DECLARE_WAR].name = "Declare War";
+                }
+                else
+                {
+                    elem.buttons_map.erase(popup_element_type::DECLARE_WAR);
+                }
+
                 if(orb->type == orbital_info::FLEET && !sm->can_engage() && sm->parent_empire == player_empire)
                 {
                     elem.buttons_map[popup_element_type::ENGAGE_COOLDOWN].name = sm->get_engage_str();
@@ -1051,8 +1061,12 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     for(popup_element& elem : popup.elements)
     {
-        for(auto& map_element : elem.buttons_map)
+        //for(auto& map_element : elem.buttons_map)
+
+        for(auto iter = elem.buttons_map.begin(); iter != elem.buttons_map.end(); iter++)
         {
+            auto map_element = *iter;
+
             ///this seems the least hitler method we have so far to handle this
             if(map_element.first == popup_element_type::RESUPPLY && map_element.second.pressed)
             {
@@ -1097,6 +1111,37 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 nearest->colonising = true;
                 nearest->colonise_target = o;
+            }
+
+
+            if(map_element.first == popup_element_type::DECLARE_WAR && map_element.second.pressed)
+            {
+                elem.buttons_map[popup_element_type::DECLARE_WAR_SURE].name = "Are you sure?";
+            }
+
+            bool declaring = false;
+
+            if(map_element.first == popup_element_type::DECLARE_WAR_SURE && map_element.second.pressed)
+            {
+                declaring = true;
+
+                orbital* o = (orbital*)elem.element;
+
+                assert(o);
+
+                empire* parent = o->parent_empire;
+
+                if(!parent->is_hostile(player_empire))
+                {
+                    parent->become_hostile(player_empire);
+                }
+            }
+
+            if(declaring)
+            {
+                elem.buttons_map.erase(popup_element_type::DECLARE_WAR_SURE);
+
+                iter--;
             }
         }
     }
@@ -1824,6 +1869,8 @@ int main()
             //battle->draw(window);
         }
 
+        system_manage.tick(diff_s);
+
 
         if(state == 0 || state == 2)
         {
@@ -1873,7 +1920,6 @@ int main()
 
         //printf("premanage\n");
 
-        system_manage.tick(diff_s);
 
         //printf("prepp\n");
 
