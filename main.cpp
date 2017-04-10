@@ -1556,6 +1556,15 @@ int main()
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
 
+
+    hostile_empire->resources.resources[resource::IRON].amount = 5000.f;
+    hostile_empire->resources.resources[resource::COPPER].amount = 5000.f;
+    hostile_empire->resources.resources[resource::TITANIUM].amount = 5000.f;
+    hostile_empire->resources.resources[resource::URANIUM].amount = 5000.f;
+    hostile_empire->resources.resources[resource::RESEARCH].amount = 8000.f;
+    hostile_empire->resources.resources[resource::HYDROGEN].amount = 8000.f;
+    hostile_empire->resources.resources[resource::OXYGEN].amount = 8000.f;
+
     //player_empire->ally(hostile_empire);
     //player_empire->become_hostile(hostile_empire);
 
@@ -1706,7 +1715,8 @@ int main()
     empire* e2 = empire_manage.birth_empire(fleet_manage, sys_2);
     //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
 
-    player_empire->become_hostile(e2);
+    //player_empire->become_hostile(e2);
+    player_empire->ally(e2);
 
     system_manage.generate_universe(100);
 
@@ -1945,7 +1955,7 @@ int main()
 
         player_empire->resources.draw_ui(window);
         //printf("Pregen\n");
-        player_empire->generate_resource_from_owned(diff_s);
+        empire_manage.generate_resources_from_owned(diff_s);
 
         player_empire->draw_ui();
         empire_manage.tick_all(diff_s, all_battles);

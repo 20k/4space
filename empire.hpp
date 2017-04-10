@@ -120,6 +120,8 @@ struct empire_manager
 
     empire* make_new();
 
+    void generate_resources_from_owned(float diff_s);
+
     void notify_removal(orbital* o);
     void notify_removal(ship_manager* s);
 

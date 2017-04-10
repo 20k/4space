@@ -544,6 +544,14 @@ empire* empire_manager::make_new()
     return e;
 }
 
+void empire_manager::generate_resources_from_owned(float diff_s)
+{
+    for(empire* e : empires)
+    {
+        e->generate_resource_from_owned(diff_s);
+    }
+}
+
 void empire_manager::notify_removal(orbital* o)
 {
     for(auto& i : empires)

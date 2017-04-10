@@ -52,6 +52,15 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     if(ship_manage->any_in_combat())
         return;
 
+    ///we're not in combat here
+
+    if(ship_manage->should_resupply())
+    {
+        ship_manage->resupply(ship_manage->parent_empire);
+
+        //printf("ai resupply\n");
+    }
+
     ///fly around?
     if(!ship_manage->can_engage())
         return;
