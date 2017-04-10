@@ -1315,6 +1315,66 @@ void system_manager::set_viewed_system(orbital_system* s, bool reset_zoom)
     }
 }
 
+bool intersect(vec2f p1, vec2f p2, float r)
+{
+    return (p1 - p2).length() < r * 2;
+}
+
+std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
+{
+    vec2f avg = (p1 + p2) / 2;
+
+    float r1_len = (avg - p1).length();
+
+    /*if(r1_len > r)
+    {
+        return {{0.f, 0.f}, {0.f, 0.f}};
+    }
+
+    float angle = acos(r1_len / r);
+
+    vec2f p1 = */
+
+    float olen = sqrt(std::max(r*r - r1_len*r1_len, 0.f));
+
+    //vec2f o1dir = (p1 - avg).rot(0).norm() * olen/2;
+    //vec2f o2dir = (p1 - avg).rot(0).norm() * olen/2;
+
+    /*vec2f o1dir = p1 - avg;
+    vec2f o2dir = p1 - avg;
+
+    o1dir = o1dir.norm().rot(0) * olen/2;
+    o2dir = o2dir.norm().rot(0) * olen/2;
+
+    return {o1dir + avg, o2dir + avg};*/
+
+    vec2f o2dir = (p1 - avg).norm();
+
+    //float angle = atan2(o2dir.y(), o2dir.x());
+
+    o2dir = o2dir.rot(M_PI/2) * olen/2;
+
+
+    /*ImGui::Begin("TESRSDF");
+
+    float offset = 0.f;
+
+    ImGui::InputFloat("fdadfsfd", &offset);
+
+    ImGui::End();
+
+    angle += offset;
+
+    o2dir.v[0] = cosf(angle) * olen/2;
+    o2dir.v[1] = sinf(angle) * olen/2;*/
+
+    //printf("%f %f\n", o2dir.x(), o2dir.y());
+
+    //printf("%f %f\n", o2dir.x(), o2dir.y());
+
+    return {avg - o2dir, avg + o2dir};
+}
+
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire)
 {
     //printf("zoom %f\n", zoom_level);
@@ -1322,18 +1382,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     if(in_system_view())
         return;
 
-    /*if(temp.getSize() != win.getSize())
-    {
-        temp.create(win.getSize().x, win.getSize().y);
-        temp.setSmooth(true);
-    }*/
-
-    //temp.clear();
-
-    //temp.setView(win.getView());
-
-    //sf::BlendMode blend(sf::BlendMode);
-    //sf::BlendMode blend(sf::BlendMode::DstAlpha, sf::BlendMode::DstAlpha, sf::BlendMode::Subtract);
     sf::BlendMode blend(sf::BlendMode::DstAlpha, sf::BlendMode::DstAlpha, sf::BlendMode::Subtract);
 
     /*for(orbital_system* os : systems)
@@ -1362,6 +1410,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
     }*/
 
+    float frad = sun_universe_rad * 5.5f;
+
     for(orbital_system* os : systems)
     {
         vec2f pos = os->universe_pos * universe_scale;
@@ -1376,7 +1426,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             ncircle.setFillColor({0,0,0,255});
             ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
 
-            ncircle.setRadius(sun_universe_rad * 5.4f);
+            ncircle.setRadius(frad);
 
             ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
 
@@ -1388,6 +1438,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             win.draw(ncircle, blend);
         }
     }
+
+    //sf::BlendMode b2(sf::BlendMode::SrcColor, sf::BlendMode::DstColor, sf::BlendMode::Add);
 
     for(orbital_system* os : systems)
     {
@@ -1402,7 +1454,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             ncircle.setFillColor({20, 20, 20, 255});
             ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
 
-            ncircle.setRadius(sun_universe_rad * 5.5f);
+            ncircle.setRadius(frad);
 
             ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
 
@@ -1411,22 +1463,47 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             ncircle.setPointCount(100.f);
 
-            win.draw(ncircle, sf::BlendAdd);
+            ///change to add if we want to see overlap
+            win.draw(ncircle);
         }
     }
 
-    //temp.display();
+    for(orbital_system* o1 : systems)
+    {
+        for(orbital_system* o2 : systems)
+        {
+            if(o1 == o2)
+                continue;
 
-    /*sf::Sprite spr;
-    spr.setTexture(temp.getTexture());
+            if(!intersect(o1->universe_pos * universe_scale, o2->universe_pos * universe_scale, frad))
+                continue;
 
-    auto old_view = win.getView();
+            if(o1->get_base()->parent_empire == nullptr || o2->get_base()->parent_empire == nullptr)
+                continue;
 
-    win.setView(win.getDefaultView());
+            auto intersection = get_intersection(o1->universe_pos * universe_scale, o2->universe_pos * universe_scale, frad);
 
-    win.draw(spr);
+            vec2f p1 = intersection.first;
+            vec2f p2 = intersection.second;
 
-    win.setView(old_view);*/
+            sf::RectangleShape shape;
+
+            //shape.setSize({400.f, 400.f});
+            shape.setSize({(p2 - p1).length(), sun_universe_rad/15.f});
+            shape.setRotation(r2d((p2 - p1).angle()));
+
+            shape.setOrigin(shape.getLocalBounds().width/2, shape.getLocalBounds().height/2);
+
+            shape.setPosition(p1.x(), p1.y());
+
+            win.draw(shape);
+
+            /*shape.setPosition(p2.x(), p2.y());
+
+            win.draw(shape);*/
+        }
+    }
+
 
     for(int i=0; i<systems.size(); i++)
     {
