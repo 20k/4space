@@ -132,6 +132,7 @@ inline component make_default_power_core(float effectiveness = 1.f)
     component_attribute hp;
     hp.max_amount = default_room_hp;
     hp.cur_amount = hp.max_amount;
+    //hp.cur_amount = 0;
 
     component core;
     core.add(ship_component_element::ENERGY, power);

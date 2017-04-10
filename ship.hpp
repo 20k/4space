@@ -294,6 +294,8 @@ struct component
 
     ///how much *more* we can take
     std::map<ship_component_element, float> get_available_capacities();
+    std::vector<std::pair<ship_component_element, float>> get_available_capacities_vec();
+
     //std::map<ship_component_element, float> get_needed_resources(float time_s);
     std::map<ship_component_element, float> get_stored_and_produced_resources(float time_s);
 
@@ -366,7 +368,7 @@ struct ship : positional
     std::vector<component> entity_list;
 
     ///returns extra resources for us to handle
-    std::map<ship_component_element, float> tick_all_components(float step_s);
+    void tick_all_components(float step_s);
     void tick_other_systems(float step_s);
     research tick_drain_research_from_crew(float step_s);
 
@@ -379,7 +381,10 @@ struct ship : positional
 
     //std::map<ship_component_element, float> last_left_over;
 
+    std::vector<component_attribute> get_fully_merged(float step_s);
+
     std::map<ship_component_element, float> get_available_capacities();
+    std::vector<std::pair<ship_component_element, float>> get_available_capacities_vec();
     /*std::map<ship_component_element, float> get_needed_resources();*/
     std::map<ship_component_element, float> get_produced_resources(float time_s);
 
