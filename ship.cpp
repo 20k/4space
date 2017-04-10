@@ -1024,6 +1024,11 @@ void ship::tick_all_components(float step_s)
 
     int type = 0;
 
+    ///so next up, we want drained to only actually drain a % of its usage based on cur production but maintain 100%
+    ///I guess we could do the similar opposite of currently drained (with current production drained, or we calc efficiency as)
+    ///available / production. We could just cheat and make max available every time, and update drain efficiency
+    ///based on how much is used. Straightforward, minimal hackiness
+    ///Ignore my brain when it says drain, is unncessary faff
     for(auto& i : fully_merge)
     {
         if(i.produced_per_s <= FLOAT_BOUND || i.drained_per_s <= FLOAT_BOUND)
