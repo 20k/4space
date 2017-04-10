@@ -1322,57 +1322,17 @@ bool intersect(vec2f p1, vec2f p2, float r)
 
 std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
 {
-    vec2f avg = (p1 + p2) / 2;
+    vec2f avg = (p1 + p2) / 2.f;
 
     float r1_len = (avg - p1).length();
 
-    /*if(r1_len > r)
-    {
-        return {{0.f, 0.f}, {0.f, 0.f}};
-    }
-
-    float angle = acos(r1_len / r);
-
-    vec2f p1 = */
-
     float olen = sqrt(std::max(r*r - r1_len*r1_len, 0.f));
-
-    //vec2f o1dir = (p1 - avg).rot(0).norm() * olen/2;
-    //vec2f o2dir = (p1 - avg).rot(0).norm() * olen/2;
-
-    /*vec2f o1dir = p1 - avg;
-    vec2f o2dir = p1 - avg;
-
-    o1dir = o1dir.norm().rot(0) * olen/2;
-    o2dir = o2dir.norm().rot(0) * olen/2;
-
-    return {o1dir + avg, o2dir + avg};*/
 
     vec2f o2dir = (p1 - avg).norm();
 
-    //float angle = atan2(o2dir.y(), o2dir.x());
-
     o2dir = o2dir.rot(M_PI/2) * olen/2;
 
-
-    /*ImGui::Begin("TESRSDF");
-
-    float offset = 0.f;
-
-    ImGui::InputFloat("fdadfsfd", &offset);
-
-    ImGui::End();
-
-    angle += offset;
-
-    o2dir.v[0] = cosf(angle) * olen/2;
-    o2dir.v[1] = sinf(angle) * olen/2;*/
-
-    //printf("%f %f\n", o2dir.x(), o2dir.y());
-
-    //printf("%f %f\n", o2dir.x(), o2dir.y());
-
-    return {avg - o2dir, avg + o2dir};
+    return {avg - o2dir * 1.02f, avg + o2dir * 1.02f};
 }
 
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire)
@@ -1496,6 +1456,12 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             shape.setPosition(p1.x(), p1.y());
 
+            vec3f colour = (o1->get_base()->parent_empire->colour + o2->get_base()->parent_empire->colour)/2.f;
+
+            colour = colour * 255.f;
+
+            shape.setFillColor({colour.x(), colour.y(), colour.z()});
+
             win.draw(shape);
 
             /*shape.setPosition(p2.x(), p2.y());
@@ -1575,7 +1541,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
 
                 if(s->get_base()->parent_empire != nullptr)
                 {
-                    str += "\n" + s->get_base()->parent_empire->name;
+                    str += "\n" + s->get_base()->get_empire_str(false);
                 }
 
                 ImGui::SetTooltip(str.c_str());
