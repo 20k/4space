@@ -1028,6 +1028,7 @@ void ship::tick_all_components(float step_s)
     ///I guess we could do the similar opposite of currently drained (with current production drained, or we calc efficiency as)
     ///available / production. We could just cheat and make max available every time, and update drain efficiency
     ///based on how much is used. Straightforward, minimal hackiness
+    ///we'll need to play it into storage somehow as well
     ///Ignore my brain when it says drain, is unncessary faff
     for(auto& i : fully_merge)
     {
@@ -1058,6 +1059,9 @@ void ship::tick_all_components(float step_s)
     //printf("%f %f stap\n", stored_and_produced[ship_component_elements::OXYGEN], to_apply_prop[ship_component_elements::OXYGEN]);
 
     ///change to take first from production, then from storage instead of weird proportional
+    ///optimise this bit. Take out the n^2 if we can!
+    ///if we reduce each list down to linear first, then the n^2 might be much smaller, then apply the linear result to all the components
+    ///would also have the added side effect that all production would be eated proportionally
     for(auto& i : entity_list)
     {
         for(auto& c : i.components)
