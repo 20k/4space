@@ -15,6 +15,7 @@ struct all_battles_manager;
 
 struct faction_relations
 {
+    bool hostile = false;
     bool allied = false;
     float friendliness = 0.5f; ///0 = v bad, 1 = best
     float hostility = 0; ///For precursors, but also a generally 'pissed off' meter
@@ -92,9 +93,12 @@ struct empire
     ///two way street
     ///when we implement proposing alliances, culture shift will be a thing
     ///if we're allied with another faction, culture shift
+    void become_hostile(empire* e);
+    void become_unhostile(empire* e);
     void ally(empire* e);
     void unally(empire* e);
     bool is_allied(empire* e);
+    bool is_hostile(empire* e);
 
     ///make sure all relations have valid values
     void clamp_relations();
@@ -105,6 +109,7 @@ struct empire
     ///theoretically, not practically
     bool can_colonise(orbital* o);
     void tick_cleanup_colonising(); ///and claim
+    void tick_decolonisation();
 };
 
 struct fleet_manager;
@@ -121,10 +126,12 @@ struct empire_manager
     void tick_all(float step_s, all_battles_manager& all_battles);
 
     void tick_cleanup_colonising();
+    void tick_decolonisation();
 
     ///if system_size > 1, explores nearby uncolonised systems
     empire* birth_empire(fleet_manager& fleet_manage, orbital_system* os, int system_size = 1);
     empire* birth_empire_without_system_ownership(fleet_manager& fleet_manage, orbital_system* os, int fleets = 2, int ships_per_fleet = 2);
+
 };
 
 #endif // EMPIRE_HPP_INCLUDED

@@ -257,7 +257,7 @@ void battle_manager::keep_fleets_together(system_manager& system_manage)
     if(avg_num == 0)
         return;
 
-    avg = avg / avg_num;
+    avg = avg / (float)avg_num;
 
     for(orbital* o : orbitals)
     {
@@ -414,19 +414,6 @@ void battle_manager::add_ship(ship* s)
     int prev_num = ships[s->team].size();
 
     ships[s->team].push_back(s);
-
-    /*vec2f team_positions[2] = {{500, 40}, {500, 400}};
-
-    vec2f pos;
-
-    if(s->team >= 2)
-    {
-        pos =
-    }
-    else
-    {
-        pos = team_positions[s->team];
-    }*/
 
     int slot_num = 0;
     int num_in_slot = 0;

@@ -254,6 +254,30 @@ void orbital::tick(float step_s)
     if(parent == nullptr)
         return;
 
+    float colo_rate = 1.f * step_s;
+
+    if(being_decolonised && parent_empire != nullptr)
+    {
+        decolonise_timer_s += colo_rate;
+
+        if(decolonise_timer_s >= 30.f)
+        {
+            parent_empire = nullptr;
+
+            decolonise_timer_s = 0;
+        }
+
+        being_decolonised = false;
+    }
+    else
+    {
+        decolonise_timer_s -= colo_rate;
+
+        decolonise_timer_s = std::max(decolonise_timer_s, 0.f);
+
+        being_decolonised = false;
+    }
+
     double mass_of_sun = 2 * pow(10., 30.);
     double distance_from_earth_to_sun = 149000000000;
     double g_const = 6.674 * pow(10., -11.);
@@ -556,6 +580,16 @@ void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_
     ship_manager* sm = (ship_manager*)data;
 
     sm->draw_alerts(win, absolute_pos);
+}
+
+bool orbital::is_colonised()
+{
+    return type == orbital_info::PLANET && parent_empire != nullptr;
+}
+
+bool orbital::can_colonise()
+{
+    return type == orbital_info::PLANET && parent_empire == nullptr;
 }
 
 orbital* orbital_system::get_base()

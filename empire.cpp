@@ -386,10 +386,26 @@ float empire::available_scanning_power_on(ship* s, system_manager& system_manage
     return max_scanning_power;
 }
 
+void empire::become_hostile(empire* e)
+{
+    relations_map[e].hostile = true;
+    e->relations_map[this].hostile = true;
+
+    unally(e);
+}
+
+void empire::become_unhostile(empire* e)
+{
+    relations_map[e].hostile = false;
+    e->relations_map[this].hostile = false;
+}
+
 void empire::ally(empire* e)
 {
     relations_map[e].allied = true;
     e->relations_map[this].allied = true;
+
+    become_unhostile(e);
 }
 
 void empire::unally(empire* e)
@@ -401,6 +417,11 @@ void empire::unally(empire* e)
 bool empire::is_allied(empire* e)
 {
     return relations_map[e].allied;
+}
+
+bool empire::is_hostile(empire* e)
+{
+    return relations_map[e].hostile;
 }
 
 void empire::negative_interaction(empire* e)
@@ -470,6 +491,39 @@ void empire::tick_cleanup_colonising()
     }
 }
 
+void empire::tick_decolonisation()
+{
+    for(orbital* o : owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        vec2f my_pos = o->absolute_pos;
+
+        orbital_system* parent = o->parent_system;
+
+        ///acceptable to be n^2 now as this is only important objects
+        for(orbital* other : parent->orbitals)
+        {
+            if(other->parent_empire == nullptr || other->parent_empire == this)
+                continue;
+
+            if(!is_hostile(other->parent_empire))
+                continue;
+
+            vec2f their_pos = other->absolute_pos;
+
+            float dist = (their_pos - my_pos).length();
+
+            if(dist < 40)
+            {
+                ///reset in o->tick, no ordering dependencies
+                o->being_decolonised = true;
+            }
+        }
+    }
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;
@@ -513,6 +567,14 @@ void empire_manager::tick_cleanup_colonising()
     }
 }
 
+void empire_manager::tick_decolonisation()
+{
+    for(empire* e : empires)
+    {
+        e->tick_decolonisation();
+    }
+}
+
 empire* empire_manager::birth_empire(fleet_manager& fleet_manage, orbital_system* os, int system_size)
 {
     if(os->is_owned())
@@ -548,6 +610,8 @@ empire* empire_manager::birth_empire(fleet_manager& fleet_manage, orbital_system
 
     e->take_ownership(ofleet);
     e->take_ownership(fleet1);
+
+    return e;
 }
 
 empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fleet_manage, orbital_system* os, int fleets, int ships_per_fleet)
@@ -581,4 +645,5 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
         e->take_ownership(fleet1);
     }
 
+    return e;
 }

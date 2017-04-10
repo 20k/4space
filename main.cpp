@@ -71,6 +71,7 @@ namespace popup_element_type
         ENGAGE,
         ENGAGE_COOLDOWN,
         COLONISE,
+        DECOLONISE,
         COUNT
     };
 }
@@ -1280,6 +1281,13 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             }
         }
 
+        if(o->type == orbital_info::PLANET && o->being_decolonised)
+        {
+            std::string decolo_time = "Time Being Decolonised " + to_string_with_enforced_variable_dp(o->decolonise_timer_s);
+
+            ImGui::Text(decolo_time.c_str());
+        }
+
         g_elem_id++;
     }
 
@@ -1499,7 +1507,8 @@ int main()
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
 
-    player_empire->ally(hostile_empire);
+    //player_empire->ally(hostile_empire);
+    player_empire->become_hostile(hostile_empire);
 
     empire* derelict_empire = empire_manage.make_new();
     derelict_empire->name = "Test Ancient Faction";
@@ -1514,7 +1523,7 @@ int main()
     ship_manager* fleet2 = fleet_manage.make_new();
     ship_manager* fleet3 = fleet_manage.make_new();
     ship_manager* fleet4 = fleet_manage.make_new();
-    ship_manager* fleet5 = fleet_manage.make_new();
+    //ship_manager* fleet5 = fleet_manage.make_new();
 
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
@@ -1528,7 +1537,7 @@ int main()
 
     ship* derelict_ship = fleet4->make_new_from(hostile_empire->team_id, make_default());
 
-    ship* scout_ship = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
+    //ship* scout_ship = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
     //ship* scout_ship2 = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
 
     test_ship->name = "SS Icarus";
@@ -1538,7 +1547,7 @@ int main()
 
     derelict_ship->name = "SS Dereliction";
 
-    scout_ship->name = "SS Scout";
+    //scout_ship->name = "SS Scout";
     //scout_ship2->name = "SS Scout2";
 
     /*test_ship.tick_all_components(1.f);
@@ -1605,17 +1614,17 @@ int main()
     //base->generate_planet_resources(2.f);
 
 
-    orbital* oscout = base->make_new(orbital_info::FLEET, 5.f);
+    /*orbital* oscout = base->make_new(orbital_info::FLEET, 5.f);
     oscout->orbital_angle = 0.f;
     oscout->orbital_length = 270;
     oscout->parent = sun;
-    oscout->data = fleet5;
+    oscout->data = fleet5;*/
 
 
     player_empire->take_ownership_of_all(base);
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
-    player_empire->take_ownership(fleet5);
+    //player_empire->take_ownership(fleet5);
 
     orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
@@ -1645,7 +1654,10 @@ int main()
     sys_2->generate_full_random_system();
     sys_2->universe_pos = {10, 10};
 
-    empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
+    empire* e2 = empire_manage.birth_empire(fleet_manage, sys_2);
+    //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
+
+    player_empire->become_hostile(e2);
 
     system_manage.generate_universe(100);
 
@@ -1887,6 +1899,7 @@ int main()
 
         player_empire->draw_ui();
         empire_manage.tick_all(diff_s, all_battles);
+        empire_manage.tick_decolonisation();
 
         //test_event->tick(diff_s);
         //test_event->draw_ui();
