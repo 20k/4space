@@ -1498,6 +1498,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             if(o1->get_base()->parent_empire == nullptr || o2->get_base()->parent_empire == nullptr)
                 continue;
 
+            if(o1->get_base()->parent_empire == viewer_empire && o2->get_base()->parent_empire == viewer_empire)
+                continue;
+
             auto intersection = get_intersection(o1->universe_pos * universe_scale, o2->universe_pos * universe_scale, frad);
 
             vec2f p1 = intersection.first;
