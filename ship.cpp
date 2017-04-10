@@ -3038,10 +3038,34 @@ void fleet_manager::cull_dead(empire_manager& empire_manage)
 
 void fleet_manager::tick_all(float step_s)
 {
-    for(ship_manager* i : fleets)
+    int bound = 4;
+
+    for(ship_manager* sm : fleets)
     {
-        i->tick_all(step_s);
+        sm->accumulated_dt += step_s;
     }
+
+    int tcount = 0;
+
+    for(ship_manager* sm : fleets)
+    {
+        tcount %= bound;
+
+        if(tcount != internal_counter && !sm->any_in_combat())
+        {
+            tcount++;
+            continue;
+        }
+
+        sm->tick_all(sm->accumulated_dt);
+
+        sm->accumulated_dt = 0;
+
+        tcount++;
+    }
+
+    internal_counter += 1;
+    internal_counter %= bound;
 }
 
 ship* fleet_manager::nearest_free_colony_ship_of_empire(orbital* o, empire* e)

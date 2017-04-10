@@ -561,6 +561,8 @@ struct ship_manager
 
     bool any_derelict();
     bool all_derelict();
+
+    float accumulated_dt = 0;
 };
 
 struct empire_manager;
@@ -581,6 +583,8 @@ struct fleet_manager
     ship* nearest_free_colony_ship_of_empire(orbital* o, empire* e);
 
     void tick_cleanup_colonising();
+
+    int internal_counter = 0;
 };
 
 #endif // SHIP_HPP_INCLUDED
