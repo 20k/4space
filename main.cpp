@@ -1837,7 +1837,7 @@ int main()
         if(once<sf::Keyboard::F3>())
         {
             system_manage.set_viewed_system(sys_2);
-            state = 2;
+            state = 0;
         }
 
         /*if(once<sf::Keyboard::F2>())
@@ -1872,7 +1872,7 @@ int main()
         system_manage.tick(diff_s);
 
 
-        if(state == 0 || state == 2)
+        if(state == 0)
         {
             debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage);
 
