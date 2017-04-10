@@ -210,6 +210,8 @@ struct orbital_system
     void make_asteroid_orbital(orbital* o);
 
     float accumulated_nonviewed_time = 0.f;
+
+    bool is_owned();
 };
 
 struct system_manager
@@ -260,6 +262,8 @@ struct system_manager
 
     ///also generate empires in universe, in a separate function
     void generate_universe(int num);
+
+    sf::RenderTexture temp;
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

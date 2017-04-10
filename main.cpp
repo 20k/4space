@@ -1499,7 +1499,7 @@ int main()
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
 
-    //player_empire->ally(hostile_empire);
+    player_empire->ally(hostile_empire);
 
     empire* derelict_empire = empire_manage.make_new();
     derelict_empire->name = "Test Ancient Faction";
@@ -1644,6 +1644,8 @@ int main()
     orbital_system* sys_2 = system_manage.make_new();
     sys_2->generate_full_random_system();
     sys_2->universe_pos = {10, 10};
+
+    empire* e2 = empire_manage.birth_empire(fleet_manage, sys_2, 1);
 
     system_manage.generate_universe(100);
 

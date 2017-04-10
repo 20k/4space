@@ -107,6 +107,8 @@ struct empire
     void tick_cleanup_colonising(); ///and claim
 };
 
+struct fleet_manager;
+
 struct empire_manager
 {
     std::vector<empire*> empires;
@@ -119,6 +121,9 @@ struct empire_manager
     void tick_all(float step_s, all_battles_manager& all_battles);
 
     void tick_cleanup_colonising();
+
+    ///if system_size > 1, explores nearby uncolonised systems
+    empire* birth_empire(fleet_manager& fleet_manage, orbital_system* os, int system_size = 1);
 };
 
 #endif // EMPIRE_HPP_INCLUDED

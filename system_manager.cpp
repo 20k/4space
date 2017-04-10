@@ -1134,6 +1134,13 @@ void orbital_system::make_asteroid_orbital(orbital* o)
     }
 }
 
+bool orbital_system::is_owned()
+{
+    assert(get_base() != nullptr);
+
+    return get_base()->parent_empire != nullptr;
+}
+
 orbital_system* system_manager::make_new()
 {
     orbital_system* sys = new orbital_system;
@@ -1315,6 +1322,46 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     if(in_system_view())
         return;
 
+    /*if(temp.getSize() != win.getSize())
+    {
+        temp.create(win.getSize().x, win.getSize().y);
+        temp.setSmooth(true);
+    }*/
+
+    //temp.clear();
+
+    //temp.setView(win.getView());
+
+    //sf::BlendMode blend(sf::BlendMode);
+    //sf::BlendMode blend(sf::BlendMode::DstAlpha, sf::BlendMode::DstAlpha, sf::BlendMode::Subtract);
+    sf::BlendMode blend(sf::BlendMode::DstAlpha, sf::BlendMode::DstAlpha, sf::BlendMode::Subtract);
+
+    /*for(orbital_system* os : systems)
+    {
+        vec2f pos = os->universe_pos * universe_scale;
+
+        if(os->get_base()->parent_empire != nullptr)
+        {
+            vec3f col = os->get_base()->parent_empire->colour * 255.f;
+
+            sf::CircleShape ncircle;
+
+            ncircle.setFillColor({20, 20, 20, 255});
+            ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
+
+            ncircle.setRadius(sun_universe_rad * 5.5f);
+
+            ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
+
+            //ncircle.setOutlineThickness(sun_universe_rad / 15.f);
+            ncircle.setPosition({pos.x(), pos.y()});
+
+            ncircle.setPointCount(100.f);
+
+            win.draw(ncircle);
+        }
+    }*/
+
     for(orbital_system* os : systems)
     {
         vec2f pos = os->universe_pos * universe_scale;
@@ -1325,10 +1372,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             sf::CircleShape ncircle;
 
-            ncircle.setFillColor({10, 10, 10});
+            //ncircle.setFillColor({20, 20, 20, 255});
+            ncircle.setFillColor({0,0,0,255});
             ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
 
-            ncircle.setRadius(sun_universe_rad * 5.5f);
+            ncircle.setRadius(sun_universe_rad * 5.4f);
 
             ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
 
@@ -1337,9 +1385,48 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             ncircle.setPointCount(100.f);
 
-            win.draw(ncircle);
+            win.draw(ncircle, blend);
         }
     }
+
+    for(orbital_system* os : systems)
+    {
+        vec2f pos = os->universe_pos * universe_scale;
+
+        if(os->get_base()->parent_empire != nullptr)
+        {
+            vec3f col = os->get_base()->parent_empire->colour * 255.f;
+
+            sf::CircleShape ncircle;
+
+            ncircle.setFillColor({20, 20, 20, 255});
+            ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
+
+            ncircle.setRadius(sun_universe_rad * 5.5f);
+
+            ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
+
+            //ncircle.setOutlineThickness(sun_universe_rad / 15.f);
+            ncircle.setPosition({pos.x(), pos.y()});
+
+            ncircle.setPointCount(100.f);
+
+            win.draw(ncircle, sf::BlendAdd);
+        }
+    }
+
+    //temp.display();
+
+    /*sf::Sprite spr;
+    spr.setTexture(temp.getTexture());
+
+    auto old_view = win.getView();
+
+    win.setView(win.getDefaultView());
+
+    win.draw(spr);
+
+    win.setView(old_view);*/
 
     for(int i=0; i<systems.size(); i++)
     {

@@ -3,6 +3,7 @@
 #include "ship.hpp"
 #include <set>
 #include <unordered_set>
+#include "ship_definitions.hpp"
 
 empire::empire()
 {
@@ -510,4 +511,41 @@ void empire_manager::tick_cleanup_colonising()
     {
         e->tick_cleanup_colonising();
     }
+}
+
+empire* empire_manager::birth_empire(fleet_manager& fleet_manage, orbital_system* os, int system_size)
+{
+    if(os->is_owned())
+        return nullptr;
+
+    empire* e = make_new();
+
+    e->name = "Rando";
+    e->has_ai = true;
+
+    ship_manager* fleet1 = fleet_manage.make_new();
+
+    ship* test_ship = fleet1->make_new_from(e->team_id, make_default());
+    test_ship->name = "SS Still Todo";
+
+    orbital* ofleet = os->make_new(orbital_info::FLEET, 5.f);
+
+    ofleet->orbital_angle = M_PI/13.f;
+    ofleet->orbital_length = 200.f;
+    ofleet->parent = os->get_base();
+    ofleet->data = fleet1;
+
+    for(orbital* o : os->orbitals)
+    {
+        if(o->type == orbital_info::FLEET)
+            continue;
+
+        if(o->parent_empire != nullptr)
+            continue;
+
+        e->take_ownership(o);
+    }
+
+    e->take_ownership(ofleet);
+    e->take_ownership(fleet1);
 }
