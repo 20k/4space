@@ -258,6 +258,12 @@ void orbital::tick(float step_s)
 
     if(being_decolonised && parent_empire != nullptr)
     {
+        if(type == orbital_info::FLEET)
+        {
+            printf("MASSIVE ERROR IN TICK, WRONG TYPE FOR DELOCO\n");
+            return;
+        }
+
         decolonise_timer_s += colo_rate;
 
         if(decolonise_timer_s >= 30.f)

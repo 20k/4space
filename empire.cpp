@@ -511,6 +511,9 @@ void empire::tick_decolonisation()
             if(!is_hostile(other->parent_empire))
                 continue;
 
+            if(other->type == orbital_info::FLEET)
+                continue;
+
             vec2f their_pos = other->absolute_pos;
 
             float dist = (their_pos - my_pos).length();
