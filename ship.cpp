@@ -1794,9 +1794,11 @@ void ship::resupply(empire* emp, int num)
 
     std::map<resource::types, float> hp_repair_costs = resources_needed_to_repair_total();
 
+    auto capacities = get_available_capacities();
+
     for(ship_component_elements::types& type : types)
     {
-        float current_capacity = get_available_capacities()[type];
+        float current_capacity = capacities[type];
 
         std::map<resource::types, float> requested_resource_amounts = ship_component_elements::component_storage_to_resources(type);
 

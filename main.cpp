@@ -1784,8 +1784,6 @@ int main()
             }
         }
 
-
-
         if(focused && key.isKeyPressed(sf::Keyboard::F10))
         {
             window.close();
@@ -1890,12 +1888,11 @@ int main()
         {
             debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage);
 
+            ///this is slow
             system_manage.draw_viewed_system(window, player_empire);
             system_manage.draw_universe_map(window, player_empire);
             system_manage.process_universe_map(window, lclick);
         }
-
-
 
         //printf("ui\n");
 
@@ -1909,6 +1906,7 @@ int main()
                 }
             }
         }
+
 
         for(orbital_system* os : system_manage.systems)
         {
@@ -1926,6 +1924,7 @@ int main()
         fleet_manage.cull_dead(empire_manage);
         system_manage.cull_empty_orbital_fleets(empire_manage);
         fleet_manage.cull_dead(empire_manage);
+
 
         if(key.isKeyPressed(sf::Keyboard::N))
         {
@@ -1951,15 +1950,20 @@ int main()
         if(state != 1)
             system_manage.draw_alerts(window, player_empire);
 
+        ///this is slow
         fleet_manage.tick_all(diff_s);
 
         //printf("predrawres\n");
 
         player_empire->resources.draw_ui(window);
         //printf("Pregen\n");
+
+
         empire_manage.generate_resources_from_owned(diff_s);
 
+
         player_empire->draw_ui();
+        ///this is slow
         empire_manage.tick_all(diff_s, all_battles);
         empire_manage.tick_decolonisation();
 

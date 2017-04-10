@@ -750,6 +750,8 @@ void orbital_system::steal(orbital* o, orbital_system* s)
 ///need to figure out higher positioning, but whatever
 void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
 {
+    //sf::Clock clk;
+
     for(auto& i : asteroids)
     {
         i->draw(win, viewer_empire);
@@ -759,6 +761,8 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
     {
         orbitals[kk]->draw(win, viewer_empire);
     }
+
+    //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);
 }
 
 void orbital_system::cull_empty_orbital_fleets(empire_manager& empire_manage)
