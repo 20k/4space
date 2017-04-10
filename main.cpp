@@ -1000,7 +1000,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     ImGui::SetTooltip("Right click to Warp");
                 }
 
-                if(rclick)
+                if(rclick && sm->parent_empire == player_empire)
                 {
                     sm->try_warp(system_manage.hovered_system, parent, o);
                 }
