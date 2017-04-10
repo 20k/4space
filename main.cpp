@@ -1601,7 +1601,7 @@ int main()
     tplanet->orbital_length = 50.f;
     tplanet->parent = sun;
 
-    base->generate_asteroids_old(500, 3, 5);
+    base->generate_asteroids_old(500, 5, 5);
     //base->generate_planet_resources(2.f);
 
 

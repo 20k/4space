@@ -100,6 +100,8 @@ struct orbital
 
     void* data = nullptr;
 
+    int num_moons = 0;
+
     vec2f absolute_pos;
 
     //float angular_velocity_ps = 0.f;

@@ -835,13 +835,20 @@ void orbital_system::generate_asteroids_new(int n, int num_belts, int num_resour
 
 void orbital_system::generate_asteroids_old(int n, int num_belts, int num_resource_asteroids)
 {
-    std::vector<float> exclusion_radiuses;
+    std::vector<std::pair<float, float>> exclusion_radiuses;
 
     for(auto& i : orbitals)
     {
         if(i->type == orbital_info::PLANET)
         {
-            exclusion_radiuses.push_back(i->orbital_length);
+            float excl_rad = 20;
+
+            if(i->num_moons >= 1)
+            {
+                excl_rad = 50;
+            }
+
+            exclusion_radiuses.push_back({i->orbital_length, excl_rad});
         }
     }
 
@@ -865,7 +872,7 @@ void orbital_system::generate_asteroids_old(int n, int num_belts, int num_resour
 
         bool bad = false;
 
-        int max_tries = 10;
+        int max_tries = 40;
         int cur_tries = 0;
 
         do
@@ -876,7 +883,7 @@ void orbital_system::generate_asteroids_old(int n, int num_belts, int num_resour
 
             for(auto& i : exclusion_radiuses)
             {
-                if(fabs(rad - i) < exclusion_radius)
+                if(fabs(rad - i.first) < i.second)
                 {
                     bad = true;
                     break;
@@ -887,7 +894,7 @@ void orbital_system::generate_asteroids_old(int n, int num_belts, int num_resour
         }
         while(bad && cur_tries < max_tries);
 
-        exclusion_radiuses.push_back(rad);
+        exclusion_radiuses.push_back({rad, 10});
 
         for(int kk=0; kk<asteroids_per_belt; kk++)
         {
@@ -1029,6 +1036,8 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
             moon->rotation_velocity_ps = randf_s(0.f, 2*M_PI/10.f);
 
             moon->parent = planet;
+
+            planet->num_moons++;
 
             moon->name = planet->name + " (" + scifi_name(moon_num) + ")";
         }
