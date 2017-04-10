@@ -266,7 +266,7 @@ void orbital::tick(float step_s)
 
         decolonise_timer_s += colo_rate;
 
-        if(decolonise_timer_s >= 30.f)
+        if(decolonise_timer_s >= orbital_info::decolonise_time_s)
         {
             parent_empire = nullptr;
 

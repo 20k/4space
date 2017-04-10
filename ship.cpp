@@ -2814,6 +2814,17 @@ bool ship_manager::any_derelict()
     return false;
 }
 
+bool ship_manager::all_derelict()
+{
+    for(ship* s : ships)
+    {
+        if(!s->fully_disabled())
+            return false;
+    }
+
+    return true;
+}
+
 std::string ship_manager::get_engage_str()
 {
     if(can_engage())

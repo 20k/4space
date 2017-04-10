@@ -264,7 +264,7 @@ void empire::tick_system_claim()
 
         for(orbital* o : i->orbitals)
         {
-            if(o->type == orbital_info::ASTEROID && o->is_resource_object)
+            if(o->type == orbital_info::ASTEROID && o->is_resource_object || o->type == orbital_info::MOON)
             {
                 take_ownership(o);
             }
@@ -498,6 +498,14 @@ void empire::tick_decolonisation()
         if(o->type != orbital_info::FLEET)
             continue;
 
+        ship_manager* sm = (ship_manager*)o->data;
+
+        if(sm->any_in_combat())
+            continue;
+
+        if(sm->all_derelict())
+            continue;
+
         vec2f my_pos = o->absolute_pos;
 
         orbital_system* parent = o->parent_system;
@@ -511,7 +519,7 @@ void empire::tick_decolonisation()
             if(!is_hostile(other->parent_empire))
                 continue;
 
-            if(other->type == orbital_info::FLEET)
+            if(other->type != orbital_info::PLANET)
                 continue;
 
             vec2f their_pos = other->absolute_pos;
@@ -521,7 +529,7 @@ void empire::tick_decolonisation()
             if(dist < 40)
             {
                 ///reset in o->tick, no ordering dependencies
-                o->being_decolonised = true;
+                other->being_decolonised = true;
             }
         }
     }

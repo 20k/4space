@@ -553,6 +553,7 @@ struct ship_manager
     bool any_colonising();
 
     bool any_derelict();
+    bool all_derelict();
 };
 
 struct empire_manager;

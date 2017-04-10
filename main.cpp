@@ -1281,9 +1281,9 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
             }
         }
 
-        if(o->type == orbital_info::PLANET && o->being_decolonised)
+        if(o->type == orbital_info::PLANET && o->decolonise_timer_s > 0.0001f)
         {
-            std::string decolo_time = "Time Being Decolonised " + to_string_with_enforced_variable_dp(o->decolonise_timer_s);
+            std::string decolo_time = "Time until decolonised " + to_string_with_enforced_variable_dp(orbital_info::decolonise_time_s - o->decolonise_timer_s);
 
             ImGui::Text(decolo_time.c_str());
         }
@@ -1507,8 +1507,8 @@ int main()
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
 
-    //player_empire->ally(hostile_empire);
-    player_empire->become_hostile(hostile_empire);
+    player_empire->ally(hostile_empire);
+    //player_empire->become_hostile(hostile_empire);
 
     empire* derelict_empire = empire_manage.make_new();
     derelict_empire->name = "Test Ancient Faction";
@@ -1537,7 +1537,7 @@ int main()
 
     ship* derelict_ship = fleet4->make_new_from(hostile_empire->team_id, make_default());
 
-    //ship* scout_ship = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
+    ship* scout_ship = fleet3->make_new_from(player_empire->team_id, make_colony_ship());
     //ship* scout_ship2 = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
 
     test_ship->name = "SS Icarus";
@@ -1547,7 +1547,7 @@ int main()
 
     derelict_ship->name = "SS Dereliction";
 
-    //scout_ship->name = "SS Scout";
+    scout_ship->name = "SS Scout";
     //scout_ship2->name = "SS Scout2";
 
     /*test_ship.tick_all_components(1.f);
