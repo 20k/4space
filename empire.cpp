@@ -406,6 +406,16 @@ void empire::ally(empire* e)
     e->relations_map[this].allied = true;
 
     become_unhostile(e);
+
+    for(orbital* o : e->owned)
+    {
+        o->ever_viewed = true;
+    }
+
+    for(orbital* o : owned)
+    {
+        o->ever_viewed = true;
+    }
 }
 
 void empire::unally(empire* e)
