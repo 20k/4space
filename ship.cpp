@@ -850,7 +850,7 @@ float component::get_base_component_cost()
     if(primary_attribute == ship_component_elements::NONE)
         return 0.f;
 
-    return ship_component_elements::base_cost_of_component_with_this_primary_attribute[primary_attribute] * cost_mult;
+    return ship_component_elements::base_cost_of_component_with_this_primary_attribute[primary_attribute] * cost_mult * ship_component_elements::construction_cost_mult;
 }
 
 float component::get_component_cost()
@@ -858,7 +858,14 @@ float component::get_component_cost()
     float tech_level = get_tech_level_of_primary();
     float base_cost = get_base_component_cost();
 
-    return research_info::get_cost_scaling(tech_level, base_cost);
+    float cost = research_info::get_cost_scaling(tech_level, base_cost);
+
+    /*if(tech_level > 0)
+    {
+        printf("%f %f %f cost\n", cost, tech_level, base_cost);
+    }*/
+
+    return cost;
 }
 
 ///fractional based on hp

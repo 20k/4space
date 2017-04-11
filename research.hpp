@@ -47,7 +47,7 @@ namespace research_info
     #ifdef TESTING
     float get_research_level_cost(int level, float cost = 50.f, bool testing = true);
     #else
-    float get_research_level_cost(int level, float cost = 50.f, bool testing = false);
+    float get_research_level_cost(int level, float cost = 50.f, bool testing = false, float scaling = 4.f);
     #endif // TESTING
 
     float get_cost_scaling(float level, float cost);

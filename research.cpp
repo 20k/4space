@@ -4,7 +4,7 @@
 
 #include "../../render_projects/imgui/imgui.h"
 
-float research_info::get_research_level_cost(int level, float cost, bool testing)
+float research_info::get_research_level_cost(int level, float cost, bool testing, float scaling)
 {
     if(testing)
         return 2;
@@ -12,14 +12,16 @@ float research_info::get_research_level_cost(int level, float cost, bool testing
     if(level == 0)
         return cost;
 
-    float fv = get_research_level_cost(level - 1) * 4.f;
+    float fv = get_research_level_cost(level - 1, cost, testing, scaling) * scaling;
 
     return fv;
 }
 
 float research_info::get_cost_scaling(float level, float base_cost)
 {
-    return get_research_level_cost(level, base_cost, false);
+    float val = get_research_level_cost(level, base_cost, false, 3.f);
+
+    return val;
 }
 
 float research_info::tech_unit_to_research_currency(float tech_unit, bool has_minimum_value)
