@@ -870,8 +870,11 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
         {
             emp->ally(e);
         }
+        else
+        {
+            emp->become_hostile(e);
+        }
 
-        emp->become_hostile(e);
     }
 
     return e;
