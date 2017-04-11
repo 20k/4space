@@ -1723,6 +1723,22 @@ void ship::hit(projectile* p)
     return hit_raw_damage(p->base.get_tag(component_tag::DAMAGE));
 }
 
+void distribute_damage(float hp_damage, int num, ship* s)
+{
+    for(int i=0; i<num; i++)
+    {
+        int tcp = randf_s(0.f, s->entity_list.size());
+
+        std::map<ship_component_element, float> nhp_diff;
+        nhp_diff[ship_component_element::HP] = -hp_damage / num;
+
+        s->entity_list[tcp].apply_diff(nhp_diff);
+
+        //printf("rejig %i\n", i);
+    }
+}
+
+///should we spread damage over multiple components?
 void ship::hit_raw_damage(float damage)
 {
     float shields = get_stored_resources()[ship_component_element::SHIELD_POWER];
@@ -1749,12 +1765,27 @@ void ship::hit_raw_damage(float damage)
 
     int random_component = (int)randf_s(0.f, entity_list.size());
 
-    component& h = entity_list[random_component];
+    component* h = &entity_list[random_component];
+
+    ///make it less likely that crew will die
+    if(h->primary_attribute == ship_component_elements::COMMAND)
+    {
+        distribute_damage(hp_damage, 3, this);
+
+        return;
+    }
+
+    if(h->get_available_capacities_vec()[(int)ship_component_elements::HP].second < 0.0001f)
+    {
+        distribute_damage(hp_damage, 2, this);
+
+        return;
+    }
 
     std::map<ship_component_element, float> hp_diff;
     hp_diff[ship_component_element::HP] = -hp_damage;
 
-    h.apply_diff(hp_diff);
+    h->apply_diff(hp_diff);
 }
 
 void set_center_sfml(sf::RectangleShape& shape)
