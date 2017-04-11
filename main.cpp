@@ -1040,9 +1040,22 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 if(elem->header == "")
                     elem->header = orbital_info::names[kk->type];
 
-                if(kk->parent_empire != nullptr)
+                if(do_obfuscate)
+                {
+                    elem->header = "Unknown";
+                }
+
+                if(!do_obfuscate && kk->parent_empire != nullptr)
                 {
                     elem->header = elem->header + "\n" + kk->get_empire_str(false);
+                }
+
+                if(do_obfuscate && kk->parent_empire != nullptr)
+                {
+                    if(kk->parent_empire != nullptr)
+                    {
+                        elem->header = elem->header + "\nEmpire: Unknown";
+                    }
                 }
 
                 elem->data = kk->get_info_str();
@@ -1052,7 +1065,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(do_obfuscate)
                 {
-                    elem->header = obfuscate(elem->header, true);
+                    //elem->header = obfuscate(elem->header, true);
 
                     for(auto& i : elem->data)
                     {
