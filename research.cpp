@@ -4,6 +4,8 @@
 
 #include "../../render_projects/imgui/imgui.h"
 
+///good for science, makes the progression feel a little non linear
+///bad for ship cost scaling, harder to balance and gets exponentially more expensive. Although may be quite flat atm
 float research_info::get_research_level_cost(int level, float cost, bool testing, float scaling)
 {
     if(testing)
@@ -21,7 +23,7 @@ float research_info::get_cost_scaling(float level, float base_cost)
 {
     //float val = get_research_level_cost(level, base_cost, false, 3.f);
 
-    float val = level * base_cost * 3.f;
+    float val = base_cost + level * base_cost * 3.f;
 
     return val;
 }
