@@ -90,7 +90,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
             continue;
 
         ///STEALTH PROBABLY BORKED
-        if(my_empire->available_scanning_power_on(other_ships, system_manage) <= 0)
+        if(my_empire->available_scanning_power_on(other_ships, system_manage) <= 0 && !other_ships->any_in_combat())
             continue;
 
         targets.push_back({other, other_ships});
