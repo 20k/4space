@@ -914,14 +914,10 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 {
                     std::string res_first = orb->name;
 
-                    /*if(orb->parent_empire != nullptr)
-                    {
-                        res_first = res_first + "\n" + orb->get_empire_str();
-                    }*/
-
                     res_first += "\n" + orb->get_empire_str();
 
-                    res_first += orb->produced_resources_ps.get_formatted_str();
+                    if(orb->ever_viewed)
+                        res_first += orb->produced_resources_ps.get_formatted_str();
 
                     ImGui::SetTooltip(res_first.c_str());
                 }
@@ -1041,7 +1037,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 elem->data = kk->get_info_str();
 
-                if(kk->description != "")
+                if(kk->description != "" && kk->ever_viewed)
                     elem->data.push_back(kk->description);
 
                 if(popup.going)

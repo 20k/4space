@@ -355,17 +355,21 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
             }
         }
     }*/
+    bool currently_has_vision = viewer_empire->has_vision(parent_system);
 
     bool not_currently_viewed_fleet = false;
 
-    if(viewer_empire->has_vision(parent_system) || type != orbital_info::FLEET)
+    if(currently_has_vision || type != orbital_info::FLEET)
     {
         last_viewed_position = absolute_pos;
+    }
 
+    if(currently_has_vision)
+    {
         ever_viewed = true;
     }
 
-    if(!viewer_empire->has_vision(parent_system) && type == orbital_info::FLEET)
+    if(!currently_has_vision && type == orbital_info::FLEET)
     {
         not_currently_viewed_fleet = true;
     }
@@ -451,7 +455,7 @@ std::vector<std::string> orbital::get_info_str()
 
         std::string rstr = "";
 
-        if(is_resource_object)
+        if(is_resource_object && ever_viewed)
         {
             rstr = "\n\n" + produced_resources_ps.get_formatted_str();
         }
