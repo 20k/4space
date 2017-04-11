@@ -522,6 +522,8 @@ void empire::tick_decolonisation()
 
         ship_manager* sm = (ship_manager*)o->data;
 
+        sm->decolonising = false;
+
         if(sm->any_in_combat())
             continue;
 
@@ -552,6 +554,8 @@ void empire::tick_decolonisation()
             {
                 ///reset in o->tick, no ordering dependencies
                 other->being_decolonised = true;
+
+                sm->decolonising = true;
             }
         }
     }

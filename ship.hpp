@@ -568,6 +568,9 @@ struct ship_manager
     bool all_derelict();
 
     float accumulated_dt = 0;
+
+    ///for stealth
+    bool decolonising = false;
 };
 
 struct empire_manager;
