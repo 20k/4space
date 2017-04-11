@@ -356,6 +356,24 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         }
     }*/
 
+    bool not_currently_viewed_fleet = false;
+
+    if(viewer_empire->has_vision(parent_system) || type != orbital_info::FLEET)
+    {
+        last_viewed_position = absolute_pos;
+
+        ever_viewed = true;
+    }
+
+    if(!viewer_empire->has_vision(parent_system) && type == orbital_info::FLEET)
+    {
+        not_currently_viewed_fleet = true;
+    }
+
+    if(!ever_viewed && type == orbital_info::FLEET)
+        return;
+
+
     vec3f base_sprite_col = {1,1,1};
     vec3f current_simple_col = col;
 
@@ -385,10 +403,15 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         current_sprite_col = base_sprite_col * friendly_empire_mult;
     }
 
+    if(not_currently_viewed_fleet)
+    {
+        current_sprite_col = current_sprite_col/2.f;
+    }
+
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, absolute_pos, current_simple_col);
+        simple_renderable.draw(win, rotation, last_viewed_position, current_simple_col);
     else if(render_type == 1)
-        sprite.draw(win, rotation, absolute_pos, current_sprite_col, highlight);
+        sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
     highlight = false;
 }
@@ -756,6 +779,9 @@ void orbital_system::steal(orbital* o, orbital_system* s)
 void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
 {
     //sf::Clock clk;
+
+    //if(!viewer_empire->has_vision(this))
+    //    return;
 
     for(auto& i : asteroids)
     {

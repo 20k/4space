@@ -176,6 +176,9 @@ struct orbital
     ///if > than amount, remove parent empire
     float decolonise_timer_s = 0.f;
     bool being_decolonised = false;
+
+    vec2f last_viewed_position;
+    bool ever_viewed = false;
 };
 
 struct orbital_system

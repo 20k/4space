@@ -535,6 +535,28 @@ void empire::tick_decolonisation()
     }
 }
 
+bool empire::has_vision(orbital_system* os)
+{
+    empire* them = os->get_base()->parent_empire;
+
+    if(is_allied(them))
+        return true;
+
+    if(them == this)
+        return true;
+
+    for(orbital* o : owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        if(o->parent_system == os)
+            return true;
+    }
+
+    return false;
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;

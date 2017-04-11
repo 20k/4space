@@ -113,6 +113,8 @@ struct empire
     void tick_cleanup_colonising(); ///and claim
     void tick_decolonisation();
 
+    bool has_vision(orbital_system* os);
+
     empire_manager* parent = nullptr;
 };
 
