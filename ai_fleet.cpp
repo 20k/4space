@@ -29,7 +29,7 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
     return ret;
 }
 
-void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles)
+void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
 {
     ///split fleets up after we finish basic ai
     if(ship_manage->any_derelict())
@@ -87,6 +87,10 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
             continue;
 
         if(!other_ships->can_engage())
+            continue;
+
+        ///STEALTH PROBABLY BORKED
+        if(my_empire->available_scanning_power_on(other_ships, system_manage) <= 0)
             continue;
 
         targets.push_back({other, other_ships});

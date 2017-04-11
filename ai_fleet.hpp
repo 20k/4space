@@ -5,6 +5,7 @@ struct ship_manager;
 struct orbital;
 struct battle_manager;
 struct all_battles_manager;
+struct system_manager;
 
 ///fleet manager owns the ai_fleet?
 ///would simplify dependency management as it all already works fine
@@ -18,7 +19,7 @@ struct all_battles_manager;
 ///may contain state
 struct ai_fleet
 {
-    void tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles);
+    void tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage);
 };
 
 #endif // AI_FLEET_HPP_INCLUDED

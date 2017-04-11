@@ -1025,6 +1025,16 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 if(elem == nullptr)
                     continue;
 
+                bool do_obfuscate = false;
+
+                if(kk->type == orbital_info::FLEET)
+                {
+                    if(player_empire->available_scanning_power_on((ship_manager*)kk->data, system_manage) <= 0 && !player_empire->is_allied(kk->parent_empire))
+                    {
+                        do_obfuscate = true;
+                    }
+                }
+
                 elem->header = kk->name;
 
                 if(elem->header == "")
@@ -1039,6 +1049,16 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(kk->description != "" && kk->ever_viewed)
                     elem->data.push_back(kk->description);
+
+                if(do_obfuscate)
+                {
+                    elem->header = obfuscate(elem->header, true);
+
+                    for(auto& i : elem->data)
+                    {
+                        i = obfuscate(i, true);
+                    }
+                }
 
                 if(popup.going)
                 {
@@ -1552,6 +1572,8 @@ int main()
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
 
+    hostile_empire->research_tech_level.categories[research_info::MATERIALS].amount = 3.f;
+
 
     hostile_empire->resources.resources[resource::IRON].amount = 5000.f;
     hostile_empire->resources.resources[resource::COPPER].amount = 5000.f;
@@ -1586,6 +1608,8 @@ int main()
     ship* test_ship3 = fleet1->make_new_from(player_empire->team_id, make_default());
 
     ship* test_ship2 = fleet2->make_new_from(hostile_empire->team_id, make_default());
+
+    test_ship2->set_tech_level_from_empire(hostile_empire);
 
     ship* test_ship4 = fleet3->make_new_from(player_empire->team_id, make_default());
 

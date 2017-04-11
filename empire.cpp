@@ -292,7 +292,7 @@ void empire::tick(float step_s)
     }
 }
 
-void empire::tick_ai(all_battles_manager& all_battles)
+void empire::tick_ai(all_battles_manager& all_battles, system_manager& system_manage)
 {
     if(!has_ai)
         return;
@@ -304,7 +304,7 @@ void empire::tick_ai(all_battles_manager& all_battles)
 
         ship_manager* sm = (ship_manager*)o->data;
 
-        sm->ai_controller.tick_fleet(sm, o, all_battles);
+        sm->ai_controller.tick_fleet(sm, o, all_battles, system_manage);
     }
 }
 
@@ -384,6 +384,18 @@ float empire::available_scanning_power_on(ship* s, system_manager& system_manage
     }
 
     return max_scanning_power;
+}
+
+float empire::available_scanning_power_on(ship_manager* sm, system_manager& system_manage)
+{
+    float max_v = 0.f;
+
+    for(ship* s : sm->ships)
+    {
+        max_v = std::max(max_v, available_scanning_power_on(s, system_manage));
+    }
+
+    return max_v;
 }
 
 void empire::become_hostile(empire* e)
@@ -729,7 +741,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
     {
         emp->tick(step_s);
         emp->tick_system_claim();
-        emp->tick_ai(all_battles);
+        emp->tick_ai(all_battles, system_manage);
     }
 
     for(empire* emp : pirate_empires)

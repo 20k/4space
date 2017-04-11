@@ -82,7 +82,7 @@ struct empire
 
     void tick_system_claim();
     void tick(float step_s);
-    void tick_ai(all_battles_manager& all_battles);
+    void tick_ai(all_battles_manager& all_battles, system_manager& system_manage);
     void draw_ui();
 
     float empire_culture_distance(empire* e);
@@ -91,6 +91,7 @@ struct empire
 
     float available_scanning_power_on(orbital* o);
     float available_scanning_power_on(ship* s, system_manager& system_manage);
+    float available_scanning_power_on(ship_manager* sm, system_manager& system_manage);
 
     ///does allying, not 'try' ally etc
     ///two way street
