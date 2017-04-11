@@ -168,8 +168,8 @@ namespace ship_component_elements
     ///not cost, but if we multiply by cost we get the end cost
     std::map<resource::types, float> component_base_construction_ratio(const types& type);
 
-    static float tech_upgrade_effectiveness = 1.3f;
-    static float tech_cooldown_upgrade_effectiveness = 1.2f;
+    static float tech_upgrade_effectiveness = 1.2f;
+    static float tech_cooldown_upgrade_effectiveness = 1.1f;
 
     void upgrade_component(component_attribute& in, int type, float old_tech, float new_tech);
 }
