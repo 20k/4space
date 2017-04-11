@@ -668,6 +668,7 @@ empire* empire_manager::birth_empire(system_manager& system_manage, fleet_manage
     return e;
 }
 
+///give em random tech?
 empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fleet_manage, orbital_system* os, int fleets, int ships_per_fleet)
 {
     if(os->is_owned())
@@ -677,6 +678,14 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
 
     e->name = "Pirates";
     e->has_ai = true;
+
+    e->resources.resources[resource::IRON].amount = 5000.f;
+    e->resources.resources[resource::COPPER].amount = 5000.f;
+    e->resources.resources[resource::TITANIUM].amount = 5000.f;
+    e->resources.resources[resource::URANIUM].amount = 5000.f;
+    e->resources.resources[resource::RESEARCH].amount = 8000.f;
+    e->resources.resources[resource::HYDROGEN].amount = 8000.f;
+    e->resources.resources[resource::OXYGEN].amount = 8000.f;
 
     for(int i=0; i<fleets; i++)
     {
@@ -715,5 +724,19 @@ void empire_manager::birth_empires_random(fleet_manager& fleet_manage, system_ma
             continue;
 
         birth_empire(system_manage, fleet_manage, os, randf_s(1.f, 10.f));
+    }
+}
+
+void empire_manager::birth_empires_without_ownership(fleet_manager& fleet_manage, system_manager& system_manage)
+{
+    for(orbital_system* sys : system_manage.systems)
+    {
+        if(sys->is_owned())
+            continue;
+
+        if(randf_s(0.f, 1.f) < 0.8f)
+            continue;
+
+        birth_empire_without_system_ownership(fleet_manage, sys, randf_s(1.f, 4.f), randf_s(1.f, 3.f));
     }
 }

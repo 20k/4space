@@ -135,6 +135,7 @@ struct empire_manager
     empire* birth_empire_without_system_ownership(fleet_manager& fleet_manage, orbital_system* os, int fleets = 2, int ships_per_fleet = 2);
 
     void birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage);
+    void birth_empires_without_ownership(fleet_manager& fleet_manage, system_manager& system_manage);
 };
 
 #endif // EMPIRE_HPP_INCLUDED
