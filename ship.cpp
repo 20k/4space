@@ -2458,8 +2458,8 @@ float default_scanning_power_curve(float scanner_modified_power)
     if(scanner_modified_power >= 1.5f)
         return 1.f;*/
 
-    if(scanner_modified_power < 0)
-        return 0.f;
+    //if(scanner_modified_power < 0)
+    //    return 0.f;
 
     //if(scanner_modified_power > 1.f)
     //    return 1.f;
@@ -2480,13 +2480,34 @@ float get_default_scanning_power(ship* s)
         if(c.components[c.primary_attribute].cur_efficiency < 0.25f)
             continue;
 
-        float tech_level = c.get_tech_level_of_primary();
+        float tech_level = c.get_tech_level_of_primary() + 0.5f;
 
         tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
         scanner_modified_power = std::max(scanner_modified_power, tech_level);
     }
 
     return scanner_modified_power;
+}
+
+float get_stealth_power(ship* s)
+{
+    float max_tech_stealth_system_modified = 0.f;
+
+    for(int i=0; i<s->entity_list.size(); i++)
+    {
+        component& c = s->entity_list[i];
+
+        if(c.primary_attribute != ship_component_elements::STEALTH)
+            continue;
+
+        float tech_level = c.get_tech_level_of_primary() + 0.5f;
+
+        tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
+
+        max_tech_stealth_system_modified = std::max(max_tech_stealth_system_modified, tech_level);
+    }
+
+    return max_tech_stealth_system_modified;
 }
 
 float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
@@ -2503,30 +2524,13 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
     if(empire_culture_distance >= 0.5f)
         culture_distance_mod = (empire_culture_distance - 0.5f) * 0.10f;
 
-    bool has_stealth = false;
-    float max_tech_stealth_system_modified = 0.f;
-
-    for(int i=0; i<s->entity_list.size(); i++)
-    {
-        component& c = s->entity_list[i];
-
-        if(c.primary_attribute != ship_component_elements::STEALTH)
-            continue;
-
-        float tech_level = c.get_tech_level_of_primary() + 0.5f;
-
-        tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
-
-        max_tech_stealth_system_modified = std::max(max_tech_stealth_system_modified, tech_level);
-
-        has_stealth = true;
-    }
+    float max_tech_stealth_system_modified = get_stealth_power(s);
 
     float modified_scanning_power = get_default_scanning_power(this) - difficulty_modifier;
 
     float disabled_mod = s->fully_disabled() ? 0.25f : 0.f;
 
-    float end_val = default_scanning_power_curve(modified_scanning_power - max_tech_stealth_system_modified);
+    float end_val = modified_scanning_power - max_tech_stealth_system_modified;
 
     end_val += disabled_mod + culture_distance_mod;
 
