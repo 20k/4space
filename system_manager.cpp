@@ -1309,6 +1309,35 @@ orbital* system_manager::get_by_element_orbital(void* ptr)
     return nullptr;
 }
 
+std::vector<orbital_system*> system_manager::get_nearest_n(orbital_system* os, int n)
+{
+    std::vector<orbital_system*> syst = systems;
+
+    ///thanks c++. This time not even 100% sarcastically
+    ///don't need to multiply by universe scale because space is relative dude
+    std::sort(syst.begin(), syst.end(),
+
+    [&](const orbital_system* a, const orbital_system* b) -> bool
+    {
+        return (a->universe_pos - os->universe_pos).length() < (b->universe_pos - os->universe_pos).length();
+    });
+
+    std::vector<orbital_system*> ret;
+
+    for(orbital_system* sys : syst)
+    {
+        if(sys == os)
+            continue;
+
+        ret.push_back(sys);
+
+        if(ret.size() >= n)
+            break;
+    }
+
+    return ret;
+}
+
 void system_manager::tick(float step_s)
 {
     for(auto& i : systems)

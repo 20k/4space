@@ -243,6 +243,8 @@ struct system_manager
     orbital_system* get_by_element(void* ptr);
     orbital* get_by_element_orbital(void* ptr);
 
+    std::vector<orbital_system*> get_nearest_n(orbital_system* os, int n);
+
     void tick(float step_s);
 
     void destroy(orbital_system* s);

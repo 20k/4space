@@ -23,6 +23,7 @@ struct faction_relations
 };
 
 struct empire_manager;
+struct fleet_manager;
 
 struct empire
 {
@@ -116,6 +117,14 @@ struct empire
     bool has_vision(orbital_system* os);
 
     empire_manager* parent = nullptr;
+
+    std::vector<orbital_system*> get_unowned_system_with_my_fleets_in();
+    float pirate_invasion_timer_s = 0.f; ///if this empire is pirates, time since we invaded
+    float max_pirate_invasion_elapsed_time_s = 1 * 60.f;
+
+    void tick_invasion_timer(float diff_s, system_manager& system_manage, fleet_manager& fleet_manage);
+
+    bool is_pirate = false;
 };
 
 struct fleet_manager;
@@ -123,6 +132,8 @@ struct fleet_manager;
 struct empire_manager
 {
     std::vector<empire*> empires;
+    std::vector<empire*> pirate_empires;
+    ///ok so. if a pirate empire has a fleet alive in not an owned system, they can keep launching attacks
 
     empire* make_new();
 
@@ -131,7 +142,7 @@ struct empire_manager
     void notify_removal(orbital* o);
     void notify_removal(ship_manager* s);
 
-    void tick_all(float step_s, all_battles_manager& all_battles);
+    void tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage);
 
     void tick_cleanup_colonising();
     void tick_decolonisation();

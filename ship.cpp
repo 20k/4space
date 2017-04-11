@@ -1776,6 +1776,9 @@ void ship::generate_image(vec2i dim)
 
     tex.setSmooth(true);
 
+    ///this is whats slow on adding ships in combat
+    ///also crashes for some reason. Too many contexts?
+    ///should do this all manually
     intermediate_texture = new sf::RenderTexture;
     intermediate_texture->create(dim.x(), dim.y());
     intermediate_texture->setSmooth(true);
@@ -1882,6 +1885,9 @@ void ship::generate_image(vec2i dim)
     intermediate_texture->display();
 
     tex = intermediate_texture->getTexture();
+
+    delete intermediate_texture;
+    intermediate_texture = nullptr;
 }
 
 ship::~ship()
@@ -2839,6 +2845,28 @@ void ship_manager::try_warp(orbital_system* fin, orbital_system* cur, orbital* o
     if(!can_warp(fin, cur, o))
         return;
 
+    /*for(ship* s : ships)
+    {
+        s->use_warp_drives();
+    }
+
+    vec2f my_pos = cur->universe_pos;
+    vec2f their_pos = fin->universe_pos;
+
+    vec2f arrive_dir = (my_pos - their_pos).norm() * 500;
+
+    fin->steal(o, cur);
+
+    o->transferring = false;
+
+    o->absolute_pos = arrive_dir;
+    o->set_orbit(arrive_dir);*/
+
+    force_warp(fin, cur, o);
+}
+
+void ship_manager::force_warp(orbital_system* fin, orbital_system* cur, orbital* o)
+{
     for(ship* s : ships)
     {
         s->use_warp_drives();

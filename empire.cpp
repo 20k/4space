@@ -557,6 +557,127 @@ bool empire::has_vision(orbital_system* os)
     return false;
 }
 
+std::vector<orbital_system*> empire::get_unowned_system_with_my_fleets_in()
+{
+    std::set<orbital_system*> systems;
+
+    for(orbital* o : owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        if(sm->all_derelict())
+            continue;
+
+        if(o->parent_system->is_owned())
+            continue;
+
+        systems.insert(o->parent_system);
+    }
+
+    std::vector<orbital_system*> ret;
+
+    for(auto& i : systems)
+    {
+        ret.push_back(i);
+    }
+
+    return ret;
+}
+
+void empire::tick_invasion_timer(float diff_s, system_manager& system_manage, fleet_manager& fleet_manage)
+{
+    pirate_invasion_timer_s += diff_s;
+
+    if(pirate_invasion_timer_s < max_pirate_invasion_elapsed_time_s)
+        return;
+
+    pirate_invasion_timer_s = 0;
+
+    std::vector<orbital_system*> effectively_owned = get_unowned_system_with_my_fleets_in();
+
+    if(effectively_owned.size() == 0)
+        return;
+
+    std::set<orbital_system*> nearby;
+
+    for(orbital_system* os : effectively_owned)
+    {
+        auto near = system_manage.get_nearest_n(os, 10);
+
+        int cnt = 0;
+
+        for(orbital_system* i : near)
+        {
+            if(!i->is_owned())
+                continue;
+
+            nearby.insert(i);
+
+            cnt++;
+
+            if(cnt > 2)
+            {
+                break;
+            }
+        }
+    }
+
+    std::vector<orbital_system*> lin_near;
+
+    for(auto& i : nearby)
+    {
+        lin_near.push_back(i);
+    }
+
+    std::vector<std::pair<orbital*, ship_manager*>> fleet_nums;
+
+    int fleets = nearby.size();
+
+    for(int i=0; i<fleets; i++)
+    {
+        ship_manager* fleet1 = fleet_manage.make_new();
+
+        for(int j = 0; j < 2; j++)
+        {
+            ship* test_ship = fleet1->make_new_from(team_id, make_default());
+            test_ship->name = "SS " + std::to_string(i) + std::to_string(j);
+
+            std::map<ship_component_element, float> res;
+
+            res[ship_component_element::WARP_POWER] = 100000.f;
+
+            test_ship->distribute_resources(res);
+        }
+
+        orbital* ofleet = effectively_owned[0]->make_new(orbital_info::FLEET, 5.f);
+
+        ofleet->orbital_angle = i*M_PI/13.f;
+        ofleet->orbital_length = 200.f;
+        ofleet->parent = effectively_owned[0]->get_base();
+        ofleet->data = fleet1;
+
+        take_ownership(ofleet);
+        take_ownership(fleet1);
+
+        fleet_nums.push_back({ofleet, fleet1});
+    }
+
+    for(int i=0; i<fleets; i++)
+    {
+        auto fl = fleet_nums[i];
+
+        orbital* o = fl.first;
+        ship_manager* sm = fl.second;
+
+        sm->force_warp(lin_near[i], o->parent_system, o);
+    }
+
+    printf("INVADE\n");
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;
@@ -592,13 +713,18 @@ void empire_manager::notify_removal(ship_manager* s)
     }
 }
 
-void empire_manager::tick_all(float step_s, all_battles_manager& all_battles)
+void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage)
 {
     for(empire* emp : empires)
     {
         emp->tick(step_s);
         emp->tick_system_claim();
         emp->tick_ai(all_battles);
+    }
+
+    for(empire* emp : pirate_empires)
+    {
+        emp->tick_invasion_timer(step_s, system_manage, fleet_manage);
     }
 }
 
@@ -700,8 +826,11 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
 
     empire* e = make_new();
 
+    pirate_empires.push_back(e);
+
     e->name = "Pirates";
     e->has_ai = true;
+    e->is_pirate = true;
 
     e->resources.resources[resource::IRON].amount = 5000.f;
     e->resources.resources[resource::COPPER].amount = 5000.f;
@@ -736,6 +865,11 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
     {
         if(emp == e)
             continue;
+
+        if(emp->is_pirate)
+        {
+            emp->ally(e);
+        }
 
         emp->become_hostile(e);
     }
