@@ -2609,7 +2609,7 @@ void ship_manager::steal(ship* const s)
     ships.push_back(s);
 }
 
-void ship_manager::resupply(empire* from)
+void ship_manager::resupply(empire* from, bool can_resupply_derelicts)
 {
     if(parent_empire == nullptr)
         return;
@@ -2623,6 +2623,12 @@ void ship_manager::resupply(empire* from)
 
     for(ship* s : ships)
     {
+        if(!can_resupply_derelicts && s->fully_disabled())
+        {
+            num--;
+            continue;
+        }
+
         s->resupply(from, num);
 
         num--;

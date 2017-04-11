@@ -529,7 +529,7 @@ struct ship_manager
 
     empire* parent_empire = nullptr;
 
-    void resupply(empire* from);
+    void resupply(empire* from, bool can_resupply_derelicts = true);
     void resupply_from_nobody();
     ///for the ai to use
     bool should_resupply();

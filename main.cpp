@@ -966,7 +966,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     elem.buttons_map.erase(popup_element_type::ENGAGE_COOLDOWN);
                 }
 
-                if(orb->type == orbital_info::FLEET && sm->any_in_combat())
+                if(orb->type == orbital_info::FLEET && (sm->any_in_combat() || sm->all_derelict()))
                 {
                     elem.buttons_map.erase(popup_element_type::RESUPPLY);
                 }
@@ -1074,7 +1074,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 ship_manager* sm = (ship_manager*)o->data;
 
-                sm->resupply(player_empire);
+                sm->resupply(player_empire, false);
             }
 
             if(map_element.first == popup_element_type::ENGAGE && map_element.second.pressed)
