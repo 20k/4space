@@ -96,7 +96,7 @@ inline component make_default_shields(float effectiveness = 1.f)
 {
     component_attribute shield;
     shield.produced_per_s = 1.f * effectiveness;
-    shield.max_amount = 50.f * effectiveness;
+    shield.max_amount = 30.f * effectiveness;
 
     component_attribute power;
     power.drained_per_s = 20.f * effectiveness;
@@ -386,7 +386,7 @@ inline component make_default_railgun()
     gun.add(ship_component_element::COMMAND, command);
     gun.add(ship_component_element::HP, hp);
 
-    gun.set_tag(component_tag::DAMAGE, 30.f);
+    gun.set_tag(component_tag::DAMAGE, 20.f);
     gun.set_tag(component_tag::SPEED, 80.f);
     gun.set_tag(component_tag::SCALE, 0.5f);
 
@@ -425,7 +425,7 @@ inline component make_default_torpedo()
     torp.add(ship_component_element::COMMAND, command);
     torp.add(ship_component_element::HP, hp);
 
-    torp.set_tag(component_tag::DAMAGE, 35);
+    torp.set_tag(component_tag::DAMAGE, 25);
     torp.set_tag(component_tag::SPEED, 40);
     torp.set_tag(component_tag::SCALE, 0.5f);
 
