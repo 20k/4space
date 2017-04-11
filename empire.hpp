@@ -22,6 +22,8 @@ struct faction_relations
     float positivity = 0; ///For precursors, but also a generally short term happiness meter
 };
 
+struct empire_manager;
+
 struct empire
 {
     bool has_ai = false;
@@ -110,6 +112,8 @@ struct empire
     bool can_colonise(orbital* o);
     void tick_cleanup_colonising(); ///and claim
     void tick_decolonisation();
+
+    empire_manager* parent = nullptr;
 };
 
 struct fleet_manager;

@@ -257,6 +257,11 @@ void destroy_spawn_derelict_and_terminate(game_event& event)
     event.parent->finished = true;
 }
 
+/*void spawn_fledgling_empire(game_event& event)
+{
+
+}*/
+
 /*void spawn_hostile_and_terminate(game_event& event)
 {
     spawn_hostile(event);

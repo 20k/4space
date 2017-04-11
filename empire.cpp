@@ -539,6 +539,8 @@ empire* empire_manager::make_new()
 {
     empire* e = new empire;
 
+    e->parent = this;
+
     empires.push_back(e);
 
     return e;
