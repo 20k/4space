@@ -1364,20 +1364,25 @@ void system_manager::destroy(orbital_system* s)
 
 void repulse(orbital* o1, orbital* o2)
 {
-    if(o1->absolute_pos == o2->absolute_pos)
+    /*if(o1->absolute_pos == o2->absolute_pos)
     {
         o1->orbital_length -= 1;
 
         return;
-    }
+    }*/
 
     if(o1->transferring || o2->transferring)
         return;
 
-    vec2f o1_to_o2 = (o2->absolute_pos - o1->absolute_pos).norm();
+    vec2f o1_to_o2 = (o2->absolute_pos - o1->absolute_pos);
 
-    vec2f new_o1_pos = -o1_to_o2 + o1->absolute_pos;
-    vec2f new_o2_pos = o1_to_o2 + o2->absolute_pos;
+    if(approx_equal(o1_to_o2, (vec2f){0.f, 0}, 0.001f))
+    {
+        o1_to_o2 = {1, 0};
+    }
+
+    vec2f new_o1_pos = -o1_to_o2.norm() + o1->absolute_pos;
+    vec2f new_o2_pos = o1_to_o2.norm() + o2->absolute_pos;
 
     o1->transfer(new_o1_pos);
     o2->transfer(new_o2_pos);

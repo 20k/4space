@@ -1770,17 +1770,22 @@ void ship::hit_raw_damage(float damage)
     ///make it less likely that crew will die
     if(h->primary_attribute == ship_component_elements::COMMAND)
     {
-        distribute_damage(hp_damage, 3, this);
+        std::map<ship_component_element, float> hp_diff;
+        hp_diff[ship_component_element::HP] = -hp_damage/2;
+
+        h->apply_diff(hp_diff);
+
+        distribute_damage(hp_damage/2, 1, this);
 
         return;
     }
 
-    if(h->get_available_capacities_vec()[(int)ship_component_elements::HP].second < 0.0001f)
+    /*if(h->get_available_capacities()[ship_component_elements::HP] < 0.0001f)
     {
         distribute_damage(hp_damage, 2, this);
 
         return;
-    }
+    }*/
 
     std::map<ship_component_element, float> hp_diff;
     hp_diff[ship_component_element::HP] = -hp_damage;
