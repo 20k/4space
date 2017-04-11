@@ -1233,6 +1233,27 @@ bool orbital_system::is_owned()
     return get_base()->parent_empire != nullptr;
 }
 
+std::string orbital_system::get_resource_str(bool include_vision)
+{
+    resource_manager resources;
+
+    for(orbital* o : orbitals)
+    {
+        if(!o->is_resource_object)
+            continue;
+
+        if(!o->ever_viewed && include_vision)
+            continue;
+
+        for(int res = 0; res < o->produced_resources_ps.resources.size(); res++)
+        {
+            resources.resources[res].amount += o->produced_resources_ps.resources[res].amount;
+        }
+    }
+
+    return resources.get_processed_str(true);
+}
+
 orbital_system* system_manager::make_new()
 {
     orbital_system* sys = new orbital_system;
@@ -1638,6 +1659,8 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
                 {
                     str += "\n" + s->get_base()->get_empire_str(false);
                 }
+
+                str += "\n" + s->get_resource_str(true);
 
                 ImGui::SetTooltip(str.c_str());
             }

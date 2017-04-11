@@ -226,6 +226,8 @@ struct orbital_system
     float accumulated_nonviewed_time = 0.f;
 
     bool is_owned();
+
+    std::string get_resource_str(bool include_vision);
 };
 
 struct system_manager
