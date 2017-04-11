@@ -708,6 +708,14 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
         e->take_ownership(fleet1);
     }
 
+    for(empire* emp : empires)
+    {
+        if(emp == e)
+            continue;
+
+        emp->become_hostile(e);
+    }
+
     return e;
 }
 

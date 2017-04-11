@@ -2087,7 +2087,7 @@ void ship::test_set_disabled()
 
     float available_command = get_produced_resources(1.f)[ship_component_elements::COMMAND];
 
-    if(available_command <= 0.0001f)
+    if(available_command <= 0.001f)
     {
         full_disabled = true;
     }
