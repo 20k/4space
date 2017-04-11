@@ -12,14 +12,16 @@ float research_info::get_research_level_cost(int level, float cost, bool testing
     if(level == 0)
         return cost;
 
-    float fv = get_research_level_cost(level - 1, cost, testing, scaling) * scaling;
+    float fv = get_research_level_cost(level - 1, cost, testing, scaling) * scaling + cost;
 
     return fv;
 }
 
 float research_info::get_cost_scaling(float level, float base_cost)
 {
-    float val = get_research_level_cost(level, base_cost, false, 3.f);
+    //float val = get_research_level_cost(level, base_cost, false, 3.f);
+
+    float val = level * base_cost * 3.f;
 
     return val;
 }
