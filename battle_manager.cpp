@@ -282,6 +282,9 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
         {
             s->tick_combat(step_s);
 
+            if(get_nearest_hostile(s) == nullptr)
+                continue;
+
             std::vector<component> fired = s->fire();
 
             for(component& kk : fired)
