@@ -1770,6 +1770,8 @@ void ship::check_load(vec2i dim)
     generate_image(dim);
 }
 
+sf::RenderTexture* ship::intermediate = nullptr;
+
 void ship::generate_image(vec2i dim)
 {
     float min_bound = std::min(dim.x(), dim.y());
@@ -1779,9 +1781,24 @@ void ship::generate_image(vec2i dim)
     ///this is whats slow on adding ships in combat
     ///also crashes for some reason. Too many contexts?
     ///should do this all manually
-    intermediate_texture = new sf::RenderTexture;
+    /*intermediate_texture = new sf::RenderTexture;
     intermediate_texture->create(dim.x(), dim.y());
-    intermediate_texture->setSmooth(true);
+    intermediate_texture->setSmooth(true);*/
+
+    if(intermediate == nullptr)
+    {
+        intermediate = new sf::RenderTexture;
+
+        if(intermediate->getSize().x < dim.x() || intermediate->getSize().y < dim.y())
+        {
+            intermediate->create(dim.x(), dim.y());
+
+            intermediate->setSmooth(true);
+        }
+    }
+
+    intermediate->clear(sf::Color(0,0,0,0));
+
 
     sf::BlendMode blend(sf::BlendMode::Factor::One, sf::BlendMode::Factor::Zero);
 
@@ -1791,7 +1808,10 @@ void ship::generate_image(vec2i dim)
     r1.setSize({dim.x(), dim.y()});
     r1.setPosition(0, 0);
 
-    intermediate_texture->draw(r1);
+    //intermediate_texture->draw(r1);
+
+    intermediate->draw(r1);
+
 
     int granularity = min_bound/4;
 
@@ -1823,7 +1843,7 @@ void ship::generate_image(vec2i dim)
         corner.setPosition(c.x(), c.y());
         corner.setRotation(r2d(rot));
 
-        intermediate_texture->draw(corner, blend);
+        intermediate->draw(corner, blend);
     }
 
     sf::RectangleShape chunk = corner;
@@ -1877,23 +1897,25 @@ void ship::generate_image(vec2i dim)
             chunk.setRotation(0.f);
         }
 
-        intermediate_texture->draw(chunk, blend);
+        intermediate->draw(chunk, blend);
 
         exclusion.push_back(pos);
     }
 
-    intermediate_texture->display();
+    intermediate->display();
 
-    tex = intermediate_texture->getTexture();
+    tex = intermediate->getTexture();
 
-    delete intermediate_texture;
-    intermediate_texture = nullptr;
+    is_loaded = true;
+
+    //delete intermediate_texture;
+    //intermediate_texture = nullptr;
 }
 
 ship::~ship()
 {
-    if(intermediate_texture)
-        delete intermediate_texture;
+    //if(intermediate_texture)
+    //    delete intermediate_texture;
 }
 
 ///resupply probably needs to distribute fairly from global, or use different resources

@@ -496,7 +496,9 @@ struct ship : positional
     float get_drive_signature();
     float get_scanning_ps();
 
-    sf::RenderTexture* intermediate_texture = nullptr;
+    static sf::RenderTexture* intermediate;
+
+    //sf::RenderTexture* intermediate_texture = nullptr;
 
     ///starting to apply hacks to get around the lack of a command queue
     ///sign that we may need the command queue
