@@ -139,6 +139,17 @@ bool empire::can_fully_dispense(const std::map<resource::types, float>& res)
     return true;
 }
 
+bool empire::can_fully_dispense(const resource_manager& res)
+{
+    for(int i=0; i<res.resources.size(); i++)
+    {
+        if(resources.resources[i].amount < res.resources[i].amount)
+            return false;
+    }
+
+    return true;
+}
+
 void empire::dispense_resources(const std::map<resource::types, float>& res)
 {
     for(auto& i : res)
@@ -147,9 +158,52 @@ void empire::dispense_resources(const std::map<resource::types, float>& res)
     }
 }
 
+void empire::add_resource(const resource_manager& res)
+{
+    for(int i=0; i<res.resources.size(); i++)
+    {
+        resources.resources[i].amount += res.resources[i].amount;
+    }
+}
+
 void empire::add_resource(resource::types type, float amount)
 {
     resources.resources[(int)type].amount += amount;
+}
+
+float empire::get_relations_shift_of_adding_resources(const resource_manager& res)
+{
+    float max_total_shift = 1.f;
+
+    float max_individual_shift = 0.3f;
+
+    float accum = 0.f;
+
+    for(int i=0; i<res.resources.size(); i++)
+    {
+        if(res.resources[i].amount <= 0.001f)
+            continue;
+
+        ///need to use empire worth calculation here instead of raw resources
+        if(resources.resources[i].amount < 100.f)
+        {
+            accum += max_individual_shift * res.resources[i].amount / 100.f;
+        }
+        else
+        {
+            float v = 0.25f * max_individual_shift * res.resources[i].amount / resources.resources[i].amount;
+
+            if(v >= max_individual_shift)
+                v = max_individual_shift;
+
+            accum += v;
+        }
+    }
+
+    if(accum > max_total_shift)
+        accum = max_total_shift;
+
+    return accum;
 }
 
 void empire::add_research(const research& r)
@@ -170,6 +224,23 @@ void empire::culture_shift(float culture_units, empire* destination)
     culture_similarity = culture_similarity + to_destination;
 
     //printf("%f %f culture\n", culture_similarity.x(), culture_similarity.y());
+}
+
+void empire::positive_relations(empire* e, float amount)
+{
+    relations_map[e].friendliness += amount;
+    relations_map[e].positivity += amount;
+
+    e->relations_map[this].friendliness += amount;
+    e->relations_map[this].positivity += amount;
+}
+
+void empire::dispense_resource(const resource_manager& res)
+{
+    for(int i=0; i<res.resources.size(); i++)
+    {
+        resources.resources[i].amount -= res.resources[i].amount;
+    }
 }
 
 float empire::dispense_resource(resource::types type, float requested)
@@ -1030,6 +1101,20 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
         ImGui::Indent();
 
+        std::string rpad = "-";
+
+        if(offer_resources_ui)
+            rpad = "+";
+
+        ImGui::Text((rpad + "Offer Resources" + rpad).c_str());
+
+        if(ImGui::IsItemClicked())
+        {
+            offer_resources_ui = !offer_resources_ui;
+
+            offering_resources = e;
+        }
+
         //ImGui::Text(rel_str.c_str());
 
         for(int i=0; i<e->owned.size(); i++)
@@ -1050,6 +1135,60 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
         }
 
         ImGui::Unindent();
+    }
+
+    ImGui::End();
+}
+
+void empire_manager::draw_resource_donation_ui(empire* viewer_empire)
+{
+    if(!offer_resources_ui)
+        return;
+
+    if(offering_resources == nullptr)
+        return;
+
+    ImGui::Begin("Offer Resources", &offer_resources_ui, IMGUI_WINDOW_FLAGS);
+
+    if(ImGui::IsWindowHovered())
+    {
+        ImGui::SetTooltip("Click and drag, shift for faster, alt for slower");
+    }
+
+    for(int i=0; i<(int)resource::COUNT; i++)
+    {
+        ImGui::DragFloat(resource::short_names[i].c_str(), &offering.resources[i].amount, 1.f, 0.f, viewer_empire->resources.resources[i].amount);
+    }
+
+    ImGui::Text("(Offer Resource)");
+
+    if(ImGui::IsItemClicked())
+    {
+        giving_are_you_sure = true;
+    }
+
+    if(giving_are_you_sure)
+    {
+        ImGui::Text("(Are you sure?)");
+
+        if(ImGui::IsItemClicked())
+        {
+            giving_are_you_sure = false;
+
+            if(viewer_empire->can_fully_dispense(offering))
+            {
+                viewer_empire->dispense_resource(offering);
+
+                float relations_mod = offering_resources->get_relations_shift_of_adding_resources(offering);
+
+                printf("%f REL\n", relations_mod);
+
+                offering_resources->positive_relations(viewer_empire, relations_mod);
+
+                ///get relations difference based on res
+                offering_resources->add_resource(offering);
+            }
+        }
     }
 
     ImGui::End();

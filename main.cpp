@@ -2005,6 +2005,7 @@ int main()
 
         empire_manage.generate_resources_from_owned(diff_s);
         empire_manage.draw_diplomacy_ui(player_empire, system_manage);
+        empire_manage.draw_resource_donation_ui(player_empire);
 
 
         player_empire->draw_ui();

@@ -66,16 +66,22 @@ struct empire
 
     void generate_resource_from_owned(float step_s);
 
+    bool can_fully_dispense(const resource_manager& res);
     bool can_fully_dispense(const std::map<resource::types, float>& res);
     void dispense_resources(const std::map<resource::types, float>& res);
 
+    void add_resource(const resource_manager& res);
     void add_resource(resource::types type, float amount);
+
+    float get_relations_shift_of_adding_resources(const resource_manager& res);
 
     void add_research(const research& r);
 
     void culture_shift(float culture_units, empire* destination);
+    void positive_relations(empire* e, float amount);
 
     ///returns real amount
+    void dispense_resource(const resource_manager& res);
     float dispense_resource(resource::types type, float requested);
     ///take fraction is fraction to actually take, frac_out is the proportion of initial resources we were able to take
     ///type is the amount of resources we are requesting
@@ -159,6 +165,13 @@ struct empire_manager
     void birth_empires_without_ownership(fleet_manager& fleet_manage, system_manager& system_manage);
 
     void draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage);
+    void draw_resource_donation_ui(empire* viewer_empire);
+
+    empire* offering_resources = nullptr;
+    bool offer_resources_ui = false;
+    bool giving_resources_ui_clicked = false;
+    resource_manager offering;
+    bool giving_are_you_sure = false;
 };
 
 #endif // EMPIRE_HPP_INCLUDED
