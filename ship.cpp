@@ -2256,7 +2256,7 @@ void ship::test_set_disabled()
     }
 
     float disabled_frac = 0.15f;
-    float eff_disabled_frac = 0.15f;
+    float eff_disabled_frac = 0.10f;
 
     if((cur_hp / max_hp) < disabled_frac)
     {
