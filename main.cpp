@@ -539,6 +539,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
             //o->data = new_sm;
 
+            parent_fleet->toggle_fleet_ui = false;
+
             popup.going = false;
             popup.elements.clear();
         }
@@ -789,6 +791,18 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     if(lclick && !lshift && system_manage.in_system_view())
     {
+        for(popup_element& pe : popup.elements)
+        {
+            orbital* o = (orbital*)pe.element;
+
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            ship_manager* sm = (ship_manager*)o->data;
+
+            sm->toggle_fleet_ui = false;
+        }
+
         popup.going = false;
 
         popup.elements.clear();
@@ -840,6 +854,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     elem.element = orb;
 
                     popup.elements.push_back(elem);
+
+                    if(orb->type == orbital_info::FLEET)
+                        sm->toggle_fleet_ui = true;
 
                     term = true;
                 }
@@ -1377,6 +1394,8 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                         fleet_angle = real->orbital_angle;
                         fleet_length = real->orbital_length;
                     }
+
+                    i->owned_by->toggle_fleet_ui = false;
 
                     ns->steal(i);
                 }
