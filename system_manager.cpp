@@ -162,7 +162,8 @@ float get_length_circle(vec2f p1, vec2f p2)
 
 void do_transfer(orbital* o)
 {
-    float speed_s = 30;
+    ///doesn't do speed, ignore me as a concept
+    float speed_s_old = 30;
 
     vec2f end_pos = o->new_rad * (vec2f){cos(o->new_angle), sin(o->new_angle)};
     vec2f start_pos = o->old_rad * (vec2f){cos(o->old_angle), sin(o->old_angle)};
@@ -174,7 +175,7 @@ void do_transfer(orbital* o)
 
     float dist = sqrt(linear_extra * linear_extra + radius_extra*radius_extra);
 
-    float traverse_time = dist / speed_s;
+    float traverse_time = dist / speed_s_old;
 
     ///nope. Ok need to work out angular distance on a circle between two points
 
@@ -199,8 +200,10 @@ void do_transfer(orbital* o)
     vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
     vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};
 
+    float speed = 6.f;
+
     ///this is the real speed here
-    vec2f calc_dir = (calculated_next - calculated_cur).norm() / 4.f;
+    vec2f calc_dir = (calculated_next - calculated_cur).norm() / speed;
 
     vec2f calc_real_next = calculated_cur + calc_dir;
 
