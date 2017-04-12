@@ -1100,7 +1100,6 @@ void ship::tick_all_components(float step_s)
         ref_vec = &ship_component_elements::repair_out_combat_map;
     }
 
-
     to_repair_sorted.resize(ref_vec->size());
 
     for(component& c : entity_list)

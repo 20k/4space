@@ -570,9 +570,14 @@ bool battle_manager::can_disengage(empire* disengaging_empire)
     {
         for(ship* s : i.second)
         {
-            if(s->team != disengaging_empire->team_id)
+            //if(s->team != disengaging_empire->team_id)
+            //    continue;
+
+            ///above check is WRONG
+            if(s->owned_by->parent_empire == disengaging_empire)
                 continue;
 
+            ///below check is true for parent empire, but checking anyway for robustness in the future
             if(!s->owned_by->parent_empire->is_hostile(disengaging_empire))
                 continue;
 

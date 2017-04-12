@@ -199,6 +199,7 @@ void do_transfer(orbital* o)
     vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
     vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};
 
+    ///this is the real speed here
     vec2f calc_dir = (calculated_next - calculated_cur).norm() / 4.f;
 
     vec2f calc_real_next = calculated_cur + calc_dir;
@@ -344,7 +345,8 @@ void orbital::tick(float step_s)
 
     float calculated_angular_velocity_ps = sqrtf(vspeed_sq / (scaled_real_dist * scaled_real_dist));
 
-    orbital_angle += calculated_angular_velocity_ps * step_s;
+    if(!transferring)
+        orbital_angle += calculated_angular_velocity_ps * step_s;
 
     //if(orbital_angle >= M_PIf)
     //    orbital_angle -= 2*M_PIf;
