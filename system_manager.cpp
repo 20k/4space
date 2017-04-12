@@ -141,16 +141,42 @@ void orbital::set_orbit(vec2f pos)
     set_orbit(rel.angle(), rel.length());
 }
 
+float get_length_circle(vec2f p1, vec2f p2)
+{
+    float max_rad = std::max(p1.length(), p2.length());
+
+    p1 = p1.norm() * max_rad;
+    p2 = p2.norm() * max_rad;
+
+    //float a = (p1 - p2).length();
+
+    float A = acos(clamp(dot(p1.norm(), p2.norm()), -1.f, 1.f));
+
+    //float r = sqrt(a*a / (2 * (1 - cos(A))));
+    ///fuck we know r its just p1.length()
+
+    float r = p1.length();
+
+    return fabs(r * A);
+}
+
 void do_transfer(orbital* o)
 {
-    float speed_s = 10;
+    float speed_s = 30;
 
     vec2f end_pos = o->new_rad * (vec2f){cos(o->new_angle), sin(o->new_angle)};
     vec2f start_pos = o->old_rad * (vec2f){cos(o->old_angle), sin(o->old_angle)};
 
-    float distance = (end_pos - start_pos).length();
+    float distance_lin = (end_pos - start_pos).length();
 
-    float traverse_time = distance / speed_s;
+    float linear_extra = fabs(end_pos.length() - start_pos.length());
+    float radius_extra = get_length_circle(start_pos, end_pos);
+
+    float dist = sqrt(linear_extra * linear_extra + radius_extra*radius_extra);
+
+    float traverse_time = dist / speed_s;
+
+    ///nope. Ok need to work out angular distance on a circle between two points
 
     float frac = (o->internal_time_s - o->start_time_s) / traverse_time;
 
@@ -170,10 +196,20 @@ void do_transfer(orbital* o)
     float iangle = o->old_angle + frac * (a2 - a1);
     float irad = o->new_rad * frac + o->old_rad * (1.f - frac);
 
+    vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
+    vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};
+
+    vec2f calc_dir = (calculated_next - calculated_cur).norm() / 4.f;
+
+    vec2f calc_real_next = calculated_cur + calc_dir;
+
+    iangle = calc_real_next.angle();
+    irad = calc_real_next.length();
+
     o->orbital_angle = iangle;
     o->orbital_length = irad;
 
-    if(distance < 2 || frac > 1)
+    if(distance_lin < 2 || frac > 1)
     {
         o->transferring = false;
     }
