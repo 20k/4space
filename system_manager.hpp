@@ -246,6 +246,8 @@ struct system_manager
 
     std::vector<orbital_system*> get_nearest_n(orbital_system* os, int n);
 
+    std::vector<orbital*> next_frame_warp_radiuses;
+
     void tick(float step_s);
 
     void destroy(orbital_system* s);
@@ -254,7 +256,9 @@ struct system_manager
 
     void cull_empty_orbital_fleets(empire_manager& empire_manage);
 
+    void add_selected_orbital(orbital* o);
 
+    void draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_empire);
     void draw_alerts(sf::RenderWindow& win, empire* viewing_empire);
 
     void draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire);

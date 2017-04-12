@@ -407,6 +407,7 @@ struct ship : positional
     std::vector<component> fire();
     bool can_use_warp_drives();
     void use_warp_drives();
+    float get_warp_distance(); ///ignores practicalities, purely base distance
 
     void add(const component& c);
 
@@ -549,6 +550,7 @@ struct ship_manager
     void force_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     void try_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     bool can_warp(orbital_system* fin, orbital_system* cur, orbital* o);
+    float get_min_warp_distance(); ///ignores practicalities, purely base distance
 
     void leave_combat();
     void enter_combat();

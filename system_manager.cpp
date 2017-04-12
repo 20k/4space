@@ -7,6 +7,7 @@
 #include "procedural_text_generator.hpp"
 #include "../../render_projects/imgui/imgui.h"
 #include "text.hpp"
+#include "tooltip_handler.hpp"
 
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
@@ -1425,6 +1426,53 @@ void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage)
     }
 }
 
+void system_manager::add_selected_orbital(orbital* o)
+{
+    if(o->type != orbital_info::FLEET)
+        return;
+
+    next_frame_warp_radiuses.push_back(o);
+}
+
+void system_manager::draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_empire)
+{
+    if(in_system_view())
+    {
+        next_frame_warp_radiuses.clear();
+        return;
+    }
+
+    for(orbital* o : next_frame_warp_radiuses)
+    {
+        if(!viewing_empire->is_allied(o->parent_empire) && viewing_empire != o->parent_empire)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        float rad = sm->get_min_warp_distance() * 20;
+
+        sf::CircleShape circle;
+
+        circle.setPointCount(200);
+        circle.setRadius(rad);
+
+        circle.setFillColor(sf::Color(20, 60, 20, 50));
+
+        circle.setOutlineColor(sf::Color(200, 200, 200));
+        circle.setOutlineThickness(10.f);
+
+        circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
+
+        vec2f pos = o->parent_system->universe_pos * universe_scale;
+
+        circle.setPosition({pos.x(), pos.y()});
+
+        win.draw(circle);
+    }
+
+    next_frame_warp_radiuses.clear();
+}
+
 void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 {
     ///change this so that later we see alerts from the overall map
@@ -1703,7 +1751,8 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 
                 str += "\n" + s->get_resource_str(true, viewer_empire);
 
-                ImGui::SetTooltip(str.c_str());
+                //ImGui::SetTooltip(str.c_str());
+                tooltip::add(str.c_str());
             }
 
             if(lclick)

@@ -1634,6 +1634,23 @@ void ship::use_warp_drives()
     }
 }
 
+float ship::get_warp_distance()
+{
+    float rad = 0.f;
+
+    for(component& c : entity_list)
+    {
+        if(!c.has_tag(component_tag::WARP_DISTANCE))
+            continue;
+
+        float val = c.get_tag(component_tag::WARP_DISTANCE);
+
+        rad = std::max(rad, val);
+    }
+
+    return rad;
+}
+
 ///this is slow
 void ship::distribute_resources(std::map<ship_component_element, float> res)
 {
@@ -2961,6 +2978,26 @@ bool ship_manager::can_warp(orbital_system* fin, orbital_system* cur, orbital* o
         return false;
 
     return all_use;
+}
+
+float ship_manager::get_min_warp_distance()
+{
+    float min_dist = 0.f;
+    bool init = false;
+
+    for(ship* s : ships)
+    {
+        if(!init)
+        {
+            min_dist = s->get_warp_distance();
+            init = true;
+            continue;
+        }
+
+        min_dist = std::min(min_dist, s->get_warp_distance());
+    }
+
+    return min_dist;
 }
 
 void ship_manager::enter_combat()

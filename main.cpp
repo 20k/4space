@@ -15,6 +15,7 @@
 #include "research.hpp"
 #include "event_system.hpp"
 //#include "music.hpp"
+#include "tooltip_handler.hpp"
 
 template<sf::Keyboard::Key k>
 bool once()
@@ -976,6 +977,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     elem.buttons_map.erase(popup_element_type::COLONISE);
                 }
 
+                ///for drawing warp radiuses, but will take anything and might be extended later
+                system_manage.add_selected_orbital(orb);
+
                 selected.push_back(orb);
             }
 
@@ -1002,11 +1006,13 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(!sm->can_warp(system_manage.hovered_system, parent, o))
                 {
-                    ImGui::SetTooltip("Cannot Warp");
+                    //ImGui::SetTooltip("Cannot Warp");
+                    tooltip::add("Cannot Warp");
                 }
                 else
                 {
-                    ImGui::SetTooltip("Right click to Warp");
+                    //ImGui::SetTooltip("Right click to Warp");
+                    tooltip::add("Right click to Warp");
                 }
 
                 if(rclick && sm->parent_empire == player_empire)
@@ -1927,6 +1933,7 @@ int main()
             ///dis kinda slow too
             system_manage.draw_universe_map(window, player_empire);
             system_manage.process_universe_map(window, lclick, player_empire);
+            system_manage.draw_warp_radiuses(window, player_empire);
         }
 
         //printf("ui\n");
@@ -1983,7 +1990,9 @@ int main()
 
 
         if(state != 1)
+        {
             system_manage.draw_alerts(window, player_empire);
+        }
 
         ///this is slow
         fleet_manage.tick_all(diff_s);
@@ -2022,6 +2031,8 @@ int main()
         fleet_manage.cull_dead(empire_manage);
 
         //printf("Prerender\n");
+
+        tooltip::set_clear_tooltip();
 
         ImGui::Render();
         //playing_music.debug(window);
