@@ -231,6 +231,8 @@ struct orbital_system
     std::string get_resource_str(bool include_vision, empire* viewer_empire);
 };
 
+struct popup_info;
+
 struct system_manager
 {
     std::vector<orbital_system*> systems;
@@ -286,7 +288,7 @@ struct system_manager
     ///also generate empires in universe, in a separate function
     void generate_universe(int num);
 
-    void draw_ship_ui(empire* viewing_empire);
+    void draw_ship_ui(empire* viewing_empire, popup_info& popup);
 
     sf::RenderTexture temp;
 };

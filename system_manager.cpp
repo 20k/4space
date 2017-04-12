@@ -9,6 +9,9 @@
 #include "text.hpp"
 #include "tooltip_handler.hpp"
 #include "top_bar.hpp"
+#include <deque>
+#include "popup.hpp"
+
 
 float system_manager::universe_scale = 100.f;
 
@@ -1940,7 +1943,7 @@ void system_manager::generate_universe(int num)
     }
 }
 
-void system_manager::draw_ship_ui(empire* viewing_empire)
+void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 {
     /*if(!top_bar::get_active(top_bar_info::FLEETS))
         return;*/

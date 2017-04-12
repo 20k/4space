@@ -65,73 +65,8 @@ bool once()
 
 #include "ship_definitions.hpp"
 
-namespace popup_element_type
-{
-    enum types
-    {
-        RESUPPLY,
-        ENGAGE,
-        ENGAGE_COOLDOWN,
-        COLONISE,
-        DECLARE_WAR,
-        DECLARE_WAR_SURE,
-        COUNT
-    };
-}
+#include "popup.hpp"
 
-struct button_element
-{
-    std::string name;
-    bool pressed = false;
-};
-
-struct popup_element
-{
-    static int gid;
-    int id = gid++;
-
-    std::string header;
-    std::vector<std::string> data;
-    std::deque<bool> checked;
-    bool mergeable = false;
-    bool toggle_clickable = false;
-
-    std::map<popup_element_type::types, button_element> buttons_map;
-
-    void* element = nullptr;
-};
-
-int popup_element::gid;
-
-struct popup_info
-{
-    std::vector<popup_element> elements;
-
-    popup_element* fetch(void* element)
-    {
-        for(auto& i : elements)
-        {
-            if(i.element == element)
-                return &i;
-        }
-
-        return nullptr;
-    }
-
-    void rem(void* element)
-    {
-        for(int i=0; i<elements.size(); i++)
-        {
-            if(elements[i].element == element)
-            {
-                elements.erase(elements.begin() + i);
-                return;
-            }
-        }
-    }
-
-    bool going = false;
-};
 
 ///so display this (ish) on mouseover for a component
 std::string get_component_display_string(component& c)
@@ -1961,7 +1896,7 @@ int main()
             system_manage.draw_warp_radiuses(window, player_empire);
         }
 
-        system_manage.draw_ship_ui(player_empire);
+        system_manage.draw_ship_ui(player_empire, popup);
 
         //printf("ui\n");
 
