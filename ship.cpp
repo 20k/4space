@@ -2977,6 +2977,14 @@ bool ship_manager::can_warp(orbital_system* fin, orbital_system* cur, orbital* o
     if(any_in_combat())
         return false;
 
+    vec2f base_dist = fin->universe_pos * system_manager::universe_scale;
+    vec2f end_dist = cur->universe_pos * system_manager::universe_scale;
+
+    if((base_dist - end_dist).length() > get_min_warp_distance() * system_manager::universe_scale)
+    {
+        return false;
+    }
+
     return all_use;
 }
 

@@ -9,6 +9,8 @@
 #include "text.hpp"
 #include "tooltip_handler.hpp"
 
+float system_manager::universe_scale = 100.f;
+
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
     vert_dist.clear();
@@ -1449,7 +1451,7 @@ void system_manager::draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_e
 
         ship_manager* sm = (ship_manager*)o->data;
 
-        float rad = sm->get_min_warp_distance() * 20;
+        float rad = sm->get_min_warp_distance() * universe_scale;
 
         sf::CircleShape circle;
 

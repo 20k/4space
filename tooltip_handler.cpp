@@ -16,6 +16,9 @@ void tooltip::set_clear_tooltip()
         tool.pop_back();
     }
 
+    if(tool.size() == 0)
+        return;
+
     ImGui::SetTooltip(tool.c_str());
 
     tool.clear();

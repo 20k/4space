@@ -246,7 +246,7 @@ inline component make_default_warp_drive(float charge_rate = 1.f)
     warp_drive.name = "Warp Drive";
     warp_drive.primary_attribute = ship_component_elements::WARP_POWER;
     warp_drive.cost_mult = get_cost_mod(charge_rate);
-    warp_drive.set_tag(component_tag::WARP_DISTANCE, 120.f);
+    warp_drive.set_tag(component_tag::WARP_DISTANCE, 40.f);
 
     return warp_drive;
 }

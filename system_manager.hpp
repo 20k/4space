@@ -280,7 +280,7 @@ struct system_manager
 
     float zoom_level = 1.f;
     vec2f camera;
-    float universe_scale = 100.f;
+    static float universe_scale;
     float sun_universe_rad = 200;
 
     ///also generate empires in universe, in a separate function
