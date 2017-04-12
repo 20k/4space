@@ -1948,11 +1948,21 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
     /*if(!top_bar::get_active(top_bar_info::FLEETS))
         return;*/
 
+    sf::Keyboard key;
+
+    bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
+    bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
+
     ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], IMGUI_WINDOW_FLAGS);
 
+    int sys_c = 0;
+
     ///or... maybe draw for all fleets we know of?
-    for(orbital_system* sys : systems)
+    //for(orbital_system* sys : systems)
+    for(int sys_c = 0; sys_c < systems.size(); sys_c++)
     {
+        orbital_system* sys = systems[sys_c];
+
         std::string sys_name = sys->get_base()->name;
 
         std::map<empire*, std::vector<orbital*>> ship_map;
@@ -1984,6 +1994,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
         if(ship_map.size() == 0)
             continue;
+
+        if(sys_c != 0)
+            ImGui::Text("-");
 
         ImGui::Text(sys_name.c_str());
 
@@ -2048,6 +2061,46 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                 if(ImGui::IsItemClicked())
                 {
                     sm->toggle_fleet_ui = !sm->toggle_fleet_ui;
+
+                    if(sm->toggle_fleet_ui && !lctrl)
+                    {
+                        if(!lshift)
+                        {
+                            popup.elements.clear();
+                        }
+
+                        bool already_in = false;
+
+                        for(auto& i : popup.elements)
+                        {
+                            if(i.element == o)
+                            {
+                                already_in = true;
+                                break;
+                            }
+                        }
+
+
+                        popup.going = true;
+
+                        popup_element nelem;
+                        nelem.element = o;
+
+                        if(!already_in)
+                            popup.elements.push_back(nelem);
+                    }
+                    else
+                    {
+                        for(int i=0; i<popup.elements.size() && !lctrl; i++)
+                        {
+                            if(popup.elements[i].element == o)
+                            {
+                                popup.elements.erase(popup.elements.begin() + i);
+                                i--;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 if(sm->toggle_fleet_ui)
@@ -2073,9 +2126,6 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             }
         }
-
-        ImGui::Text("-");
-
     }
 
     ImGui::End();

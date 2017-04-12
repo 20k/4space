@@ -273,7 +273,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }
 
 
-    ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -962,6 +962,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 if(parent == system_manage.hovered_system || parent == nullptr)
                     continue;
 
+                if(o->parent_empire != player_empire)
+                    continue;
+
                 ship_manager* sm = (ship_manager*)o->data;
 
                 if(!sm->can_warp(system_manage.hovered_system, parent, o))
@@ -1150,7 +1153,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
     if(!popup.going)
         return;
 
-    ImGui::Begin(("Selected:###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin(("Selected###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     std::set<ship*> potential_new_fleet;
 
@@ -1896,7 +1899,6 @@ int main()
             system_manage.draw_warp_radiuses(window, player_empire);
         }
 
-        system_manage.draw_ship_ui(player_empire, popup);
 
         //printf("ui\n");
 
@@ -1941,6 +1943,10 @@ int main()
         //printf("prepp\n");
 
         do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events);
+
+        ///being post do_popup seems to fix some flickering
+        ///i guess its an imgui ordering thing
+        system_manage.draw_ship_ui(player_empire, popup);
 
         //printf("precull\n");
 
