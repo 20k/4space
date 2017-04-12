@@ -1761,6 +1761,16 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 {
     hovered_system = currently_viewed;
 
+    if(top_bar::active[top_bar_info::UNIVERSE])
+    {
+        if(in_system_view())
+            enter_universe_view();
+        else
+            set_viewed_system(get_nearest_to_camera(), true);
+
+        top_bar::active[top_bar_info::UNIVERSE] = false;
+    }
+
     if(in_system_view())
         return;
 
@@ -1872,7 +1882,8 @@ bool system_manager::in_system_view()
 
 void system_manager::enter_universe_view()
 {
-    zoom_level = 10;
+    //zoom_level = 10;
+    set_zoom(10.f, true);
 }
 
 orbital_system* system_manager::get_nearest_to_camera()

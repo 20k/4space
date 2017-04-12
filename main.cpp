@@ -1561,6 +1561,11 @@ int main()
     randf_s();
     randf_s();
 
+    top_bar::active[top_bar_info::ECONOMY] = true;
+    top_bar::active[top_bar_info::RESEARCH] = true;
+    top_bar::active[top_bar_info::BATTLES] = true;
+    top_bar::active[top_bar_info::FLEETS] = true;
+
     //music playing_music;
 
     empire_manager empire_manage;
