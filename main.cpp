@@ -841,6 +841,13 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 if(lclick && popup.fetch(orb))
                 {
+                    if(orb->type == orbital_info::FLEET)
+                    {
+                        ship_manager* sm = (ship_manager*)orb->data;
+
+                        sm->toggle_fleet_ui = false;
+                    }
+
                     popup.rem(orb);
                     break;
                 }
