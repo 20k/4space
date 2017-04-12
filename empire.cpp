@@ -4,6 +4,9 @@
 #include <set>
 #include <unordered_set>
 #include "ship_definitions.hpp"
+#include "../../render_projects/imgui/imgui.h"
+#include "top_bar.hpp"
+#include "util.hpp"
 
 empire::empire()
 {
@@ -16,6 +19,9 @@ int empire::team_gid = 0;
 
 void empire::take_ownership(orbital* o)
 {
+    if(o->type == orbital_info::ASTEROID && !o->is_resource_object)
+        return;
+
     for(auto& i : owned)
     {
         if(i == o)
@@ -401,7 +407,11 @@ float empire::available_scanning_power_on(ship_manager* sm, system_manager& syst
 void empire::become_hostile(empire* e)
 {
     relations_map[e].hostile = true;
+    relations_map[e].friendliness -= 0.5f;
+
     e->relations_map[this].hostile = true;
+    e->relations_map[this].friendliness -= 0.5f;
+
 
     unally(e);
 }
@@ -409,13 +419,19 @@ void empire::become_hostile(empire* e)
 void empire::become_unhostile(empire* e)
 {
     relations_map[e].hostile = false;
+    relations_map[e].friendliness += 0.5f;
+
     e->relations_map[this].hostile = false;
+    e->relations_map[this].friendliness += 0.5f;
 }
 
 void empire::ally(empire* e)
 {
     relations_map[e].allied = true;
+    relations_map[e].friendliness += 0.5f;
+
     e->relations_map[this].allied = true;
+    e->relations_map[this].friendliness += 0.5f;
 
     become_unhostile(e);
 
@@ -438,6 +454,9 @@ void empire::unally(empire* e)
 {
     relations_map[e].allied = false;
     e->relations_map[this].allied = false;
+
+    relations_map[e].friendliness -= 0.25f;
+    e->relations_map[this].friendliness -= 0.25f;
 }
 
 bool empire::is_allied(empire* e)
@@ -938,4 +957,100 @@ void empire_manager::birth_empires_without_ownership(fleet_manager& fleet_manage
 
         birth_empire_without_system_ownership(fleet_manage, sys, randf_s(1.f, 4.f), randf_s(1.f, 3.f));
     }
+}
+
+void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage)
+{
+    ImGui::Begin("Diplomacy", &top_bar::active[top_bar_info::DIPLOMACY], IMGUI_WINDOW_FLAGS);
+
+    ///if we've seen a system or one of their ships
+    //for(auto& i : viewer_empire->relations_map)
+
+    for(empire* e : empires)
+    {
+        faction_relations& relations = viewer_empire->relations_map[e];
+
+        if(e->is_pirate)
+            continue;
+
+        if(e == viewer_empire)
+            continue;
+
+        if(e->is_derelict)
+            continue;
+
+        float culture_dist = viewer_empire->empire_culture_distance(e);
+
+        float current_friendliness = (culture_dist - 0.5f) + relations.friendliness;
+
+        std::string rel_str = to_string_with_enforced_variable_dp(current_friendliness);
+
+        std::string empire_name = e->name;
+
+        std::string pad = "-";
+
+        if(e->toggle_ui)
+        {
+            pad = "+";
+        }
+
+        ImGui::Text((pad + empire_name + pad).c_str());
+
+        if(ImGui::IsItemClicked())
+        {
+            e->toggle_ui = !e->toggle_ui;
+        }
+
+        ImGui::SameLine();
+
+        ImGui::Text(("" + rel_str).c_str());
+
+        if(viewer_empire->is_allied(e))
+        {
+            ImGui::SameLine();
+
+            ImGui::Text("(Allied)");
+        }
+
+        else if(!viewer_empire->is_hostile(e))
+        {
+            ImGui::SameLine();
+
+            ImGui::Text("(Neutral)");
+        }
+        else
+        {
+            ImGui::SameLine();
+
+            ImGui::Text("(Hostile)");
+        }
+
+        if(!e->toggle_ui)
+            continue;
+
+        ImGui::Indent();
+
+        ImGui::Text(rel_str.c_str());
+
+        for(int i=0; i<e->owned.size(); i++)
+        {
+            orbital* o = e->owned[i];
+
+            if(o->type == orbital_info::PLANET)
+            {
+                ImGui::Text(("System: " + o->name).c_str());
+
+                if(ImGui::IsItemClicked())
+                {
+                    system_manage.set_viewed_system(o->parent_system);
+                }
+
+                break;
+            }
+        }
+
+        ImGui::Unindent();
+    }
+
+    ImGui::End();
 }

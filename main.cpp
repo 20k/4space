@@ -1601,6 +1601,7 @@ int main()
 
     empire* derelict_empire = empire_manage.make_new();
     derelict_empire->name = "Test Ancient Faction";
+    derelict_empire->is_derelict = true;
 
     ///manages FLEETS, not SHIPS
     ///this is fine. This is a global thing, the highest level of storage for FLEETS of ships
@@ -2003,6 +2004,7 @@ int main()
 
 
         empire_manage.generate_resources_from_owned(diff_s);
+        empire_manage.draw_diplomacy_ui(player_empire, system_manage);
 
 
         player_empire->draw_ui();

@@ -18,6 +18,7 @@ struct faction_relations
     bool hostile = false;
     bool allied = false;
     float friendliness = 0.5f; ///0 = v bad, 1 = best
+
     float hostility = 0; ///For precursors, but also a generally 'pissed off' meter
     float positivity = 0; ///For precursors, but also a generally short term happiness meter
 };
@@ -126,6 +127,8 @@ struct empire
     void tick_invasion_timer(float diff_s, system_manager& system_manage, fleet_manager& fleet_manage);
 
     bool is_pirate = false;
+    bool toggle_ui = false;
+    bool is_derelict = false;
 };
 
 struct fleet_manager;
@@ -154,6 +157,8 @@ struct empire_manager
 
     void birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage);
     void birth_empires_without_ownership(fleet_manager& fleet_manage, system_manager& system_manage);
+
+    void draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage);
 };
 
 #endif // EMPIRE_HPP_INCLUDED
