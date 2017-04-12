@@ -16,6 +16,7 @@
 #include "event_system.hpp"
 //#include "music.hpp"
 #include "tooltip_handler.hpp"
+#include "top_bar.hpp"
 
 template<sf::Keyboard::Key k>
 bool once()
@@ -2044,6 +2045,7 @@ int main()
 
         //printf("Prerender\n");
 
+        top_bar::display();
         tooltip::set_clear_tooltip();
 
         ImGui::Render();
