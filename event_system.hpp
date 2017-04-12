@@ -56,6 +56,7 @@ struct game_event_manager;
 struct game_event;
 struct empire;
 struct fleet_manager;
+struct system_manager;
 
 struct dialogue_node
 {
@@ -129,6 +130,7 @@ struct game_event_manager
     empire* ancient_faction = nullptr;
     empire* interacting_faction = nullptr;
     fleet_manager* fleet_manage;
+    system_manager* system_manage;
 
     int arc_type;
     ///basically determines the difficulty of this arc
@@ -137,7 +139,7 @@ struct game_event_manager
 
     game_event make_next_event();
 
-    game_event_manager(game_event_info::types type, orbital* o, fleet_manager& fm);
+    game_event_manager(game_event_info::types type, orbital* o, fleet_manager& fm, system_manager& sm);
 
     void set_faction(empire* e);
     void set_interacting_faction(empire* e);
@@ -163,7 +165,7 @@ struct all_events_manager
 {
     std::vector<game_event_manager*> events;
 
-    game_event_manager* make_new(game_event_info::types type, orbital* o, fleet_manager& fm);
+    game_event_manager* make_new(game_event_info::types type, orbital* o, fleet_manager& fm, system_manager& sm);
 
     game_event_manager* orbital_to_game_event(orbital* o);
 

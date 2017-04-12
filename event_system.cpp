@@ -257,10 +257,16 @@ void destroy_spawn_derelict_and_terminate(game_event& event)
     event.parent->finished = true;
 }
 
-/*void spawn_fledgling_empire(game_event& event)
+void spawn_fledgling_empire(game_event& event)
 {
+    empire* e = event.parent->interacting_faction;
 
-}*/
+    empire_manager* em = e->parent;
+
+    empire* new_empire = em->birth_empire(*event.parent->system_manage, *event.parent->fleet_manage, event.alert_location->parent_system, 1);
+
+    new_empire->ally(e);
+}
 
 /*void spawn_hostile_and_terminate(game_event& event)
 {
@@ -773,11 +779,81 @@ namespace shattered_planet
 
 /*namespace cusp_of_spaceflight
 {
+    extern dialogue_node make_contact;
+
+    dialogue_node success
+    {
+        "Resolution",
+        "The fledgling empire gladly accepts your offers. A new empire has been born",
+        {
+
+        },
+        {
+            both(terminate_quest, spawn_fledgling_empire),
+        }
+    };
+
+    dialogue_node not_enough
+    {
+        "Information",
+        "Not enough resoruces",
+        {
+
+        },
+        {
+            dlge(make_contact),
+        }
+    };
+
+    void do_resource_check(game_event& event)
+    {
+        empire* e = event.parent->interacting_faction;
+
+        std::map<resource::types, float> res;
+
+        for(int i=0; i<(int)resource::COUNT; i++)
+        {
+            res[(resource::types)i] = 100.f;
+        }
+
+        if(e->can_fully_dispense(res))
+        {
+            e->dispense_resources(res);
+
+            event.dialogue = success;
+        }
+        else
+        {
+            event.dialogue = not_enough;
+        }
+    }
+
+    dialogue_node make_contact
+    {
+        "Information",
+        "After deciphering their language, you successfully establish communication with the fledgling empire who respond astonishedly",
+        {
+            "Uplift them to a spacefaring empire by donating resources (-100 of each)",
+            "Harvest their culture for technology",
+            "Harvest their world for its natural resources",
+        },
+        {
+
+        }
+    };
+
     dialogue_node first
     {
         "Information",
-        ""
-    }
+        "Your scanners detect a civilisation on the cusp of spaceflight",
+        {
+            "Make contact",
+            "Leave them alone for the moment",
+        },
+        {
+            wait(5, dlge(make_contact)), dlge(first),
+        }
+    };
 }*/
 
 int present_dialogue(const std::vector<std::string>& options)
@@ -918,7 +994,7 @@ game_event game_event_manager::make_next_event()
     return ret;
 }
 
-game_event_manager::game_event_manager(game_event_info::types type, orbital* o, fleet_manager& pfleet_manage)
+game_event_manager::game_event_manager(game_event_info::types type, orbital* o, fleet_manager& pfleet_manage, system_manager& psystem_manage)
 {
     arc_type = randf_s(0.f, game_event_info::COUNT);
 
@@ -939,6 +1015,7 @@ game_event_manager::game_event_manager(game_event_info::types type, orbital* o, 
 
     ///fleet manager never expires, so this is fine
     fleet_manage = &pfleet_manage;
+    system_manage = &psystem_manage;
 }
 
 void game_event_manager::set_faction(empire* e)
@@ -1097,9 +1174,9 @@ void game_event_manager::tick(float step_s)
     event_history.back().tick(step_s);
 }
 
-game_event_manager* all_events_manager::make_new(game_event_info::types type, orbital* o, fleet_manager& fm)
+game_event_manager* all_events_manager::make_new(game_event_info::types type, orbital* o, fleet_manager& fm, system_manager& sm)
 {
-    game_event_manager* gem = new game_event_manager(type, o, fm);
+    game_event_manager* gem = new game_event_manager(type, o, fm, sm);
 
     events.push_back(gem);
 

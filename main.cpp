@@ -1764,11 +1764,11 @@ int main()
 
     all_events_manager all_events;
 
-    game_event_manager* test_event = all_events.make_new(game_event_info::ANCIENT_PRECURSOR, tplanet, fleet_manage);
+    game_event_manager* test_event = all_events.make_new(game_event_info::ANCIENT_PRECURSOR, tplanet, fleet_manage, system_manage);
 
     test_event->set_faction(derelict_empire);
 
-    game_event_manager* test_event2 = all_events.make_new(game_event_info::LONE_DERELICT, sun, fleet_manage);
+    game_event_manager* test_event2 = all_events.make_new(game_event_info::LONE_DERELICT, sun, fleet_manage, system_manage);
 
     test_event2->set_faction(derelict_empire);
 
