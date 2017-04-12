@@ -572,24 +572,36 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
             ship_manager* parent_fleet = s.owned_by;
 
-            owner->release_ownership(parent_fleet);
-
             orbital_system* os = system_manage.get_by_element(parent_fleet);
 
             orbital* o = os->get_by_element(parent_fleet);
 
             assert(o);
 
-            owner->release_ownership(o);
-            claiming_empire->take_ownership(o);
+            ///?
+            /*if(parent_fleet->ships.size() == 1)
+            {
+                owner->release_ownership(parent_fleet);
+                owner->release_ownership(o);
+            }*/
+
+            //claiming_empire->take_ownership(o);
 
             ship_manager* new_sm = fleet_manage.make_new();
+
+            orbital* new_orbital = os->make_new(orbital_info::FLEET, 5.f);
+            new_orbital->orbital_angle = o->orbital_angle;
+            new_orbital->orbital_length = o->orbital_length;
+            new_orbital->parent = o->parent;
+            new_orbital->data = new_sm;
+
+            claiming_empire->take_ownership(new_orbital);
 
             new_sm->steal(&s);
 
             claiming_empire->take_ownership(new_sm);
 
-            o->data = new_sm;
+            //o->data = new_sm;
 
             popup.going = false;
             popup.elements.clear();

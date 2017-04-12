@@ -1056,6 +1056,7 @@ void ship::tick_all_components(float step_s)
     std::map<ship_component_element, float> stored = get_stored_resources();*/
 
     std::vector<component_attribute> fully_merge = get_fully_merged(step_s);
+    std::vector<component_attribute> fully_merge_no_eff = get_fully_merged_no_efficiency(step_s);
 
 
     ///HACK ALERT
@@ -1122,7 +1123,9 @@ void ship::tick_all_components(float step_s)
             if(c.primary_attribute == ship_component_elements::NONE)
                 continue;
 
-            float producing_ps = fully_merge[c.primary_attribute].produced_per_s;
+            ///skipping efficiency on producing_ps as it means something else is the bottleneck
+            ///and we'd probably gain more by repairing that as that's the limiting factor
+            float producing_ps = fully_merge_no_eff[c.primary_attribute].produced_per_s;
             float using_ps = fully_merge[c.primary_attribute].drained_per_s;
 
             if(producing_ps > using_ps && ship_component_elements::allowed_skip_repair[c.primary_attribute] != -1)
@@ -1491,6 +1494,31 @@ std::vector<component_attribute> ship::get_fully_merged(float step_s)
             which.max_amount += other.max_amount;
 
             which.produced_per_s += other.produced_per_s * step_s * other.cur_efficiency;
+            which.drained_per_s += other.drained_per_s * step_s;
+        }
+    }
+
+    return ret;
+}
+
+std::vector<component_attribute> ship::get_fully_merged_no_efficiency(float step_s)
+{
+    std::vector<component_attribute> ret;
+
+    ret.resize((int)ship_component_elements::NONE);
+
+    for(auto& i : entity_list)
+    {
+        for(auto& attr : i.components)
+        {
+            component_attribute& which = ret[attr.first];
+
+            component_attribute& other = attr.second;
+
+            which.cur_amount += other.cur_amount;
+            which.max_amount += other.max_amount;
+
+            which.produced_per_s += other.produced_per_s * step_s;
             which.drained_per_s += other.drained_per_s * step_s;
         }
     }

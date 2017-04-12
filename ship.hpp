@@ -446,6 +446,7 @@ struct ship : positional
     //std::map<ship_component_element, float> last_left_over;
 
     std::vector<component_attribute> get_fully_merged(float step_s);
+    std::vector<component_attribute> get_fully_merged_no_efficiency(float step_s);
 
     std::map<ship_component_element, float> get_available_capacities();
     std::vector<std::pair<ship_component_element, float>> get_available_capacities_vec();
