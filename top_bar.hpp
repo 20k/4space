@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 
+#define IMGUI_WINDOW_FLAGS ImGuiWindowFlags_NoFocusOnAppearing
+
 namespace top_bar_info
 {
     enum types
@@ -37,7 +39,7 @@ struct top_bar
     static std::map<top_bar_info::types, bool> active;
 
     //void set_str(top_bar_info::types type, std::string str);
-    static bool get_pressed(top_bar_info::types type);
+    static bool get_active(top_bar_info::types type);
 
     static void display();
 };

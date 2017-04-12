@@ -78,6 +78,7 @@ struct battle_manager
 
 
     bool any_in_fleet_involved(ship_manager* sm);
+    bool any_in_empire_involved(empire* e);
 
     void destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles);
 

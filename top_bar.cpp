@@ -4,7 +4,7 @@
 std::vector<std::string> top_bar::headers = top_bar_info::names;
 std::map<top_bar_info::types, bool> top_bar::active;
 
-bool top_bar::get_pressed(top_bar_info::types type)
+bool top_bar::get_active(top_bar_info::types type)
 {
     return active[type];
 }
@@ -17,7 +17,14 @@ void top_bar::display()
 
     for(auto& i : headers)
     {
-        ImGui::Text(i.c_str());
+        std::string pad = "-";
+
+        if(active[(top_bar_info::types)num])
+        {
+            pad = "+";
+        }
+
+        ImGui::Text((pad + i + pad).c_str());
 
         if(ImGui::IsItemClicked())
         {

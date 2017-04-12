@@ -286,6 +286,8 @@ struct system_manager
     ///also generate empires in universe, in a separate function
     void generate_universe(int num);
 
+    void draw_ship_ui(empire* viewing_empire);
+
     sf::RenderTexture temp;
 };
 

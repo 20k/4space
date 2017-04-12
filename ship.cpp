@@ -4,6 +4,7 @@
 #include "text.hpp"
 #include "system_manager.hpp"
 #include "util.hpp"
+#include "top_bar.hpp"
 
 int ship::gid;
 
@@ -3428,3 +3429,5 @@ ship* fleet_manager::nearest_free_colony_ship_of_empire(orbital* o, empire* e)
 
     return min_ship;
 }
+
+

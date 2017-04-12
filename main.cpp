@@ -745,13 +745,19 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
 
 void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire)
 {
-    ImGui::Begin("Ongoing Battles");
+    if(!top_bar::get_active(top_bar_info::BATTLES))
+        return;
+
+    ImGui::Begin("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS);
 
     for(int i=0; i<all_battles.battles.size(); i++)
     {
         std::string id_str = std::to_string(i);
 
         battle_manager* bm = all_battles.battles[i];
+
+        if(!bm->any_in_empire_involved(player_empire))
+            continue;
 
         for(auto& i : bm->ships)
         {
@@ -898,22 +904,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     popup_element elem;
                     elem.element = orb;
 
-                    ///disabling merging here and resupply invalides all fleet actions except moving atm
-                    ///unexpected fix to fleet merging problem
-                    ///disable resupply if in combat
-                    if(orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)))
-                    {
-                        if(orb->parent_empire == player_empire)
-                            elem.mergeable = true;
-
-                        elem.buttons_map[popup_element_type::RESUPPLY] = {"Resupply", false};
-                    }
-
-                    if(orb->type == orbital_info::FLEET)
-                    {
-                        elem.toggle_clickable = true;
-                    }
-
                     popup.elements.push_back(elem);
 
                     term = true;
@@ -989,6 +979,28 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 {
                     elem.buttons_map.erase(popup_element_type::COLONISE);
                 }
+
+
+                ///disabling merging here and resupply invalides all fleet actions except moving atm
+                ///unexpected fix to fleet merging problem
+                ///disable resupply if in combat
+                if(orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)))
+                {
+                    if(orb->parent_empire == player_empire)
+                        elem.mergeable = true;
+
+                    elem.buttons_map[popup_element_type::RESUPPLY] = {"Resupply", false};
+                }
+                else
+                {
+                    elem.buttons_map.erase(popup_element_type::RESUPPLY);
+                }
+
+                if(orb->type == orbital_info::FLEET)
+                {
+                    elem.toggle_clickable = true;
+                }
+
 
                 ///for drawing warp radiuses, but will take anything and might be extended later
                 system_manage.add_selected_orbital(orb);
@@ -1948,6 +1960,8 @@ int main()
             system_manage.process_universe_map(window, lclick, player_empire);
             system_manage.draw_warp_radiuses(window, player_empire);
         }
+
+        system_manage.draw_ship_ui(player_empire);
 
         //printf("ui\n");
 

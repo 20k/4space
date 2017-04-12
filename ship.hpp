@@ -636,6 +636,7 @@ struct ship_manager
 
     ///for stealth
     bool decolonising = false;
+    bool toggle_fleet_ui = false;
 };
 
 struct empire_manager;
@@ -655,7 +656,11 @@ struct fleet_manager
 
     ship* nearest_free_colony_ship_of_empire(orbital* o, empire* e);
 
-    void tick_cleanup_colonising();
+    //void tick_cleanup_colonising();
+
+    ///if this becomes a perf issue, move into empire
+    ///shouldn't though
+    //void draw_ui(empire* viewing_empire, system_manager& system_manage);
 
     int internal_counter = 0;
 };

@@ -3,6 +3,7 @@
 #include "empire.hpp"
 
 #include "../../render_projects/imgui/imgui.h"
+#include "top_bar.hpp"
 
 ///good for science, makes the progression feel a little non linear
 ///bad for ship cost scaling, harder to balance and gets exponentially more expensive. Although may be quite flat atm
@@ -50,6 +51,9 @@ research::research()
 
 void research::draw_ui(empire* emp)
 {
+    if(!top_bar::get_active(top_bar_info::RESEARCH))
+        return;
+
     std::vector<std::string> fnames = research_info::names;
     std::vector<std::string> amounts;
 
@@ -58,7 +62,7 @@ void research::draw_ui(empire* emp)
         amounts.push_back(to_string_with_variable_prec(i.amount));
     }
 
-    ImGui::Begin("Research");
+    ImGui::Begin("Research", &top_bar::active[top_bar_info::RESEARCH], IMGUI_WINDOW_FLAGS);
 
     for(int i=0; i<fnames.size(); i++)
     {

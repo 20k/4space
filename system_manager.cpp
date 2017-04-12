@@ -8,6 +8,7 @@
 #include "../../render_projects/imgui/imgui.h"
 #include "text.hpp"
 #include "tooltip_handler.hpp"
+#include "top_bar.hpp"
 
 float system_manager::universe_scale = 100.f;
 
@@ -1937,4 +1938,142 @@ void system_manager::generate_universe(int num)
 
         sys->universe_pos = random_position;
     }
+}
+
+void system_manager::draw_ship_ui(empire* viewing_empire)
+{
+    /*if(!top_bar::get_active(top_bar_info::FLEETS))
+        return;*/
+
+    ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], IMGUI_WINDOW_FLAGS);
+
+    ///or... maybe draw for all fleets we know of?
+    for(orbital_system* sys : systems)
+    {
+        std::string sys_name = sys->get_base()->name;
+
+        std::map<empire*, std::vector<orbital*>> ship_map;
+
+        bool any_orbitals = false;
+
+        for(orbital* o : sys->orbitals)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            if(!o->viewed_by[viewing_empire])
+                continue;
+
+            ship_manager* sm = (ship_manager*)o->data;
+
+            bool do_obfuscate = false;
+
+            if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= 0 && !viewing_empire->is_allied(sm->parent_empire))
+            {
+                do_obfuscate = true;
+            }
+
+            if(!do_obfuscate)
+                ship_map[o->parent_empire].push_back(o);
+            else
+                ship_map[nullptr].push_back(o); ///feels pretty icky doing this
+        }
+
+        if(ship_map.size() == 0)
+            continue;
+
+        ImGui::Text(sys_name.c_str());
+
+        for(auto& kk : ship_map)
+        {
+            empire* e = kk.first;
+
+            std::string empire_name;
+
+            if(e != nullptr)
+            {
+                empire_name = "Empire: " + e->name;
+            }
+            else
+            {
+                empire_name = "Empire: Unknown";
+            }
+
+            ImGui::Text(empire_name.c_str());
+
+            for(orbital* o : kk.second)
+            {
+                ship_manager* sm = (ship_manager*)o->data;
+
+                bool do_obfuscate = false;
+
+                if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= 0 && !viewing_empire->is_allied(sm->parent_empire))
+                {
+                    do_obfuscate = true;
+                }
+
+                std::string fleet_name = o->name;
+
+                if(fleet_name == "")
+                    fleet_name = orbital_info::names[o->type];
+
+                std::vector<std::string> display_txt = sm->get_info_strs();
+
+                if(do_obfuscate)
+                    display_txt = {"Unknown Ship"};
+
+                if(do_obfuscate)
+                    fleet_name = "Unknown Fleet";
+
+                std::string combat_pad = "";
+
+                if(sm->any_in_combat())
+                    combat_pad = "!";
+
+                ///need system location... ruh roh
+                ///shunt this into orbital manager?
+
+                std::string pad = "-";
+
+                if(sm->toggle_fleet_ui)
+                    pad = "+";
+
+                ///when clicking on fleet, also select it
+                ///could solve a few of our ui problems!
+                ImGui::Text((pad + combat_pad + fleet_name + combat_pad + pad).c_str());
+
+                if(ImGui::IsItemClicked())
+                {
+                    sm->toggle_fleet_ui = !sm->toggle_fleet_ui;
+                }
+
+                if(sm->toggle_fleet_ui)
+                {
+                    ImGui::Indent();
+
+                    int num = 0;
+
+                    for(auto& i : display_txt)
+                    {
+                        ImGui::Text((combat_pad + i + combat_pad).c_str());
+
+                        if(ImGui::IsItemClicked())
+                        {
+                            sm->ships[num]->display_ui = !sm->ships[num]->display_ui;
+                        }
+
+                        num++;
+                    }
+
+                    ImGui::Unindent();
+                }
+
+            }
+        }
+
+        ImGui::Text("-");
+
+    }
+
+    ImGui::End();
 }

@@ -672,6 +672,20 @@ bool battle_manager::any_in_fleet_involved(ship_manager* sm)
     return false;
 }
 
+bool battle_manager::any_in_empire_involved(empire* e)
+{
+    for(auto& i : ships)
+    {
+        for(ship* s : i.second)
+        {
+            if(s->owned_by->parent_empire == e)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles)
 {
     for(auto& i : bm->projectile_manage.projectiles)
