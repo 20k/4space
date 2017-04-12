@@ -58,6 +58,30 @@ namespace ship_component_elements
         NONE,
     };
 
+    static std::vector<types> repair_priorities_in_combat
+    {
+        COMMAND,
+        OXYGEN,
+        ENERGY,
+        SHIELD_POWER,
+        COILGUN,
+        TORPEDO,
+        RAILGUN,
+        PLASMAGUN,
+        WARP_POWER,
+        STEALTH,
+    };
+
+    static std::vector<types> repair_priorities_out_combat
+    {
+        COMMAND,
+        OXYGEN,
+        ENERGY,
+        WARP_POWER,
+        SHIELD_POWER,
+        STEALTH,
+    };
+
     ///we could just take the inverse of cooling_potential when displaying
     ///might be more friendly for the player
     static std::vector<std::string> display_strings
