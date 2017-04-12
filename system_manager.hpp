@@ -136,7 +136,7 @@ struct orbital
 
     bool point_within(vec2f pos);
 
-    std::vector<std::string> get_info_str();
+    std::vector<std::string> get_info_str(empire* viewer_empire);
     std::string get_empire_str(bool newline = true);
 
     void transfer(float new_rad, float new_angle);
@@ -178,7 +178,8 @@ struct orbital
     bool being_decolonised = false;
 
     vec2f last_viewed_position;
-    bool ever_viewed = false;
+    //bool ever_viewed = false;
+    std::map<empire*, bool> viewed_by;
 };
 
 struct orbital_system
@@ -227,7 +228,7 @@ struct orbital_system
 
     bool is_owned();
 
-    std::string get_resource_str(bool include_vision);
+    std::string get_resource_str(bool include_vision, empire* viewer_empire);
 };
 
 struct system_manager
@@ -261,7 +262,7 @@ struct system_manager
     void set_viewed_system(orbital_system* s, bool reset_zoom = true);
 
     void draw_universe_map(sf::RenderWindow& win, empire* viewer_empire);
-    void process_universe_map(sf::RenderWindow& win, bool lclick);
+    void process_universe_map(sf::RenderWindow& win, bool lclick, empire* viewer_empire);
 
     ///camera. Set here because zoom will be useful
     ///Camera panning should also probably go here

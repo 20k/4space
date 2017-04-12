@@ -916,7 +916,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                     res_first += "\n" + orb->get_empire_str();
 
-                    if(orb->ever_viewed)
+                    if(orb->viewed_by[player_empire])
                         res_first += orb->produced_resources_ps.get_formatted_str();
 
                     ImGui::SetTooltip(res_first.c_str());
@@ -1058,9 +1058,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     }
                 }
 
-                elem->data = kk->get_info_str();
+                elem->data = kk->get_info_str(player_empire);
 
-                if(kk->description != "" && kk->ever_viewed)
+                if(kk->description != "" && kk->viewed_by[player_empire])
                     elem->data.push_back(kk->description);
 
                 if(do_obfuscate)
@@ -1926,7 +1926,7 @@ int main()
             system_manage.draw_viewed_system(window, player_empire);
             ///dis kinda slow too
             system_manage.draw_universe_map(window, player_empire);
-            system_manage.process_universe_map(window, lclick);
+            system_manage.process_universe_map(window, lclick, player_empire);
         }
 
         //printf("ui\n");

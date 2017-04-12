@@ -366,7 +366,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     if(currently_has_vision)
     {
-        ever_viewed = true;
+        viewed_by[viewer_empire] = true;
     }
 
     if(!currently_has_vision && type == orbital_info::FLEET)
@@ -374,7 +374,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         not_currently_viewed_fleet = true;
     }
 
-    if(!ever_viewed && type == orbital_info::FLEET)
+    if(!viewed_by[viewer_empire] && type == orbital_info::FLEET)
         return;
 
 
@@ -428,7 +428,7 @@ void orbital::center_camera(system_manager& system_manage)
 bool orbital::point_within(vec2f pos)
 {
     vec2f dim = rad * 1.5f;
-    vec2f apos = absolute_pos;
+    vec2f apos = last_viewed_position;
 
     if(pos.x() < apos.x() + dim.x() && pos.x() >= apos.x() - dim.x() && pos.y() < apos.y() + dim.y() && pos.y() >= apos.y() - dim.y())
     {
@@ -438,7 +438,7 @@ bool orbital::point_within(vec2f pos)
     return false;
 }
 
-std::vector<std::string> orbital::get_info_str()
+std::vector<std::string> orbital::get_info_str(empire* viewer_empire)
 {
     if(type != orbital_info::FLEET || data == nullptr)
     {
@@ -455,7 +455,7 @@ std::vector<std::string> orbital::get_info_str()
 
         std::string rstr = "";
 
-        if(is_resource_object && ever_viewed)
+        if(is_resource_object && viewed_by[viewer_empire])
         {
             rstr = "\n\n" + produced_resources_ps.get_formatted_str();
         }
@@ -1237,7 +1237,7 @@ bool orbital_system::is_owned()
     return get_base()->parent_empire != nullptr;
 }
 
-std::string orbital_system::get_resource_str(bool include_vision)
+std::string orbital_system::get_resource_str(bool include_vision, empire* viewer_empire)
 {
     resource_manager resources;
 
@@ -1246,7 +1246,7 @@ std::string orbital_system::get_resource_str(bool include_vision)
         if(!o->is_resource_object)
             continue;
 
-        if(!o->ever_viewed && include_vision)
+        if(!o->viewed_by[viewer_empire] && include_vision)
             continue;
 
         for(int res = 0; res < o->produced_resources_ps.resources.size(); res++)
@@ -1662,7 +1662,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     }
 }
 
-void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
+void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, empire* viewer_empire)
 {
     hovered_system = currently_viewed;
 
@@ -1701,7 +1701,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick)
                     str += "\n" + s->get_base()->get_empire_str(false);
                 }
 
-                str += "\n" + s->get_resource_str(true);
+                str += "\n" + s->get_resource_str(true, viewer_empire);
 
                 ImGui::SetTooltip(str.c_str());
             }

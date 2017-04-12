@@ -421,12 +421,16 @@ void empire::ally(empire* e)
 
     for(orbital* o : e->owned)
     {
-        o->ever_viewed = true;
+        //o->ever_viewed = true;
+
+        o->viewed_by[this] = true;
     }
 
     for(orbital* o : owned)
     {
-        o->ever_viewed = true;
+       // o->ever_viewed = true;
+
+       o->viewed_by[e] = true;
     }
 }
 
