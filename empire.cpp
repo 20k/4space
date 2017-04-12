@@ -1030,7 +1030,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
         ImGui::Indent();
 
-        ImGui::Text(rel_str.c_str());
+        //ImGui::Text(rel_str.c_str());
 
         for(int i=0; i<e->owned.size(); i++)
         {
