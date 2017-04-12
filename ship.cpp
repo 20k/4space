@@ -1063,6 +1063,91 @@ void ship::tick_all_components(float step_s)
     {
         fully_merge[ship_component_elements::HP].produced_per_s = 0;
     }
+
+    /*
+
+    for(component& c : entity_list)
+    {
+        //to_repair_sorted.push_back(c.primary_attribute);
+    }
+
+    if(in_combat())
+    {
+        to_repair_sorted.resize(ship_component_elements::repair_priorities_in_combat.size());
+
+        for(component& c : entity_list)
+        {
+            if(c.primary_attribute == ship_component_elements::NONE)
+                continue;
+        }
+    }
+    else
+    {
+
+    }*/
+
+    std::vector<std::vector<component*>> to_repair_sorted;
+
+    std::vector<int>* ref_vec;
+
+    if(in_combat())
+    {
+        ref_vec = &ship_component_elements::repair_in_combat_map;
+
+    }
+    else
+    {
+        ref_vec = &ship_component_elements::repair_out_combat_map;
+    }
+
+
+    to_repair_sorted.resize(ref_vec->size());
+
+    for(component& c : entity_list)
+    {
+        int val = (*ref_vec)[c.primary_attribute];
+
+        if(val != -1)
+        {
+            to_repair_sorted[val].push_back(&c);
+        }
+    }
+
+    for(auto& i : to_repair_sorted)
+    {
+        for(auto& kk : i)
+        {
+            component& c = *kk;
+
+            ///due to skip check
+            if(c.primary_attribute == ship_component_elements::NONE)
+                continue;
+
+            float producing_ps = fully_merge[c.primary_attribute].produced_per_s;
+            float using_ps = fully_merge[c.primary_attribute].drained_per_s;
+
+            if(producing_ps > using_ps && ship_component_elements::allowed_skip_repair[c.primary_attribute] != -1)
+                continue;
+
+            float available = fully_merge[ship_component_elements::HP].produced_per_s;
+
+
+            component_attribute& hp_attr = c.components[ship_component_elements::HP];
+
+            float damage = hp_attr.get_available_capacity();
+
+            float to_consume = std::min(damage, available);
+
+            hp_attr.add_amount(to_consume);
+
+            available -= to_consume;
+
+            fully_merge[ship_component_elements::HP].produced_per_s = available;
+        }
+    }
+
+
+
     ///DIRTY HACK ALERT
 
     std::map<ship_component_element, float> to_apply_prop;
@@ -1780,11 +1865,17 @@ void ship::hit(projectile* p)
     return hit_raw_damage(p->base.get_tag(component_tag::DAMAGE));
 }
 
-void distribute_damage(float hp_damage, int num, ship* s)
+void distribute_damage(float hp_damage, int num, ship* s, bool hit_crew = false)
 {
     for(int i=0; i<num; i++)
     {
-        int tcp = randf_s(0.f, s->entity_list.size());
+        int tcp = 0;
+
+        do
+        {
+            tcp = randf_s(0.f, s->entity_list.size());
+        }
+        while(s->entity_list[tcp].primary_attribute == ship_component_elements::COMMAND && !hit_crew);
 
         std::map<ship_component_element, float> nhp_diff;
         nhp_diff[ship_component_element::HP] = -hp_damage / num;

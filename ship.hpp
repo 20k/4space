@@ -58,12 +58,13 @@ namespace ship_component_elements
         NONE,
     };
 
-    static std::vector<types> repair_priorities_in_combat
+    static std::vector<types> repair_priorities_in_combat_def
     {
         COMMAND,
         OXYGEN,
         ENERGY,
         SHIELD_POWER,
+        COOLING_POTENTIAL,
         COILGUN,
         TORPEDO,
         RAILGUN,
@@ -72,7 +73,7 @@ namespace ship_component_elements
         STEALTH,
     };
 
-    static std::vector<types> repair_priorities_out_combat
+    static std::vector<types> repair_priorities_out_combat_def
     {
         COMMAND,
         OXYGEN,
@@ -81,6 +82,40 @@ namespace ship_component_elements
         SHIELD_POWER,
         STEALTH,
     };
+
+    static std::vector<types> allowed_skip_repair_def
+    {
+        OXYGEN,
+    };
+
+    inline
+    std::vector<int> generate_repair_priorities(const std::vector<types>& vec)
+    {
+        std::vector<int> ret;
+
+        ///delibarately includes none
+        for(int i=0; i<=(int)NONE; i++)
+        {
+            int found_val = -1;
+
+            for(int kk=0; kk<vec.size(); kk++)
+            {
+                if(vec[kk] == i)
+                {
+                    found_val = kk;
+                    break;
+                }
+            }
+
+            ret.push_back(found_val);
+        }
+
+        return ret;
+    }
+
+    static std::vector<int> repair_in_combat_map = generate_repair_priorities(repair_priorities_in_combat_def);
+    static std::vector<int> repair_out_combat_map = generate_repair_priorities(repair_priorities_out_combat_def);
+    static std::vector<int> allowed_skip_repair = generate_repair_priorities(allowed_skip_repair_def);
 
     ///we could just take the inverse of cooling_potential when displaying
     ///might be more friendly for the player
