@@ -172,6 +172,8 @@ namespace ship_component_elements
     static float tech_cooldown_upgrade_effectiveness = 1.1f;
 
     void upgrade_component(component_attribute& in, int type, float old_tech, float new_tech);
+
+    float upgrade_value(float value, float old_tech, float new_tech);
 }
 
 namespace combat_variables

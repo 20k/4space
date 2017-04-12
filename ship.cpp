@@ -172,6 +172,18 @@ float get_tech_level_value(float level)
     return get_tech_level_value(level-1) + ship_component_elements::tech_upgrade_effectiveness;
 }
 
+float ship_component_elements::upgrade_value(float value, float old_tech, float new_tech)
+{
+    new_tech += 1;
+    old_tech += 1;
+
+    float nratio = pow(ship_component_elements::tech_upgrade_effectiveness, new_tech) / pow(ship_component_elements::tech_upgrade_effectiveness, old_tech);
+    float nratio_cooldown = pow(ship_component_elements::tech_cooldown_upgrade_effectiveness, new_tech) / pow(ship_component_elements::tech_cooldown_upgrade_effectiveness, old_tech);
+
+
+    return value * nratio;
+}
+
 void ship_component_elements::upgrade_component(component_attribute& in, int type, float old_tech, float new_tech)
 {
     //float divisor = pow(old_tech + 6, ship_component_elements::tech_upgrade_effectiveness);
@@ -810,6 +822,20 @@ void component::set_tag(component_tag::tag tag, float val)
 
 void component::set_tech_level_from_empire(empire* e)
 {
+    if(primary_attribute == ship_component_elements::WARP_POWER)
+    {
+        float tl = get_tech_level_of_primary();
+
+        int appropriate_tech = ship_component_elements::component_element_to_research_type[primary_attribute];
+        float new_tech_level = e->research_tech_level.categories[appropriate_tech].amount;
+
+        float old_value = get_tag(component_tag::WARP_DISTANCE);
+
+        float new_value = ship_component_elements::upgrade_value(old_value, tl, new_tech_level);
+
+        set_tag(component_tag::WARP_DISTANCE, new_value);
+    }
+
     for(auto& i : components)
     {
         i.second.set_tech_level_from_empire(i.first, e);
@@ -818,6 +844,20 @@ void component::set_tech_level_from_empire(empire* e)
 
 void component::set_tech_level_from_research(research& r)
 {
+    if(primary_attribute == ship_component_elements::WARP_POWER)
+    {
+        float tl = get_tech_level_of_primary();
+
+        int appropriate_tech = ship_component_elements::component_element_to_research_type[primary_attribute];
+        float new_tech_level = r.categories[appropriate_tech].amount;
+
+        float old_value = get_tag(component_tag::WARP_DISTANCE);
+
+        float new_value = ship_component_elements::upgrade_value(old_value, tl, new_tech_level);
+
+        set_tag(component_tag::WARP_DISTANCE, new_value);
+    }
+
     for(auto& i : components)
     {
         i.second.set_tech_level_from_research(i.first, r);
