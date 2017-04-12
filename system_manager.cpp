@@ -1945,15 +1945,15 @@ void system_manager::generate_universe(int num)
 
 void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 {
-    /*if(!top_bar::get_active(top_bar_info::FLEETS))
-        return;*/
+    if(!top_bar::get_active(top_bar_info::FLEETS))
+        return;
 
     sf::Keyboard key;
 
     bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
     bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
 
-    ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], IMGUI_WINDOW_FLAGS);
+    ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     int sys_c = 0;
 
@@ -1996,9 +1996,31 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
             continue;
 
         if(sys_c != 0)
-            ImGui::Text("-");
+            ImGui::Text("\n");
 
         ImGui::Text(sys_name.c_str());
+
+        ImGui::SameLine();
+
+        ImGui::Text("(goto)");
+
+        if(ImGui::IsItemClicked())
+        {
+            set_viewed_system(sys);
+        }
+
+        ImGui::SameLine();
+
+        int str_len = sys_name.length();
+
+        std::string str;
+
+        for(int i=0; i<40 - str_len; i++)
+        {
+            str = str + "-";
+        }
+
+        ImGui::Text(str.c_str());
 
         for(auto& kk : ship_map)
         {
