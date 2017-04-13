@@ -235,6 +235,15 @@ void empire::positive_relations(empire* e, float amount)
     e->relations_map[this].positivity += amount;
 }
 
+void empire::negative_relations(empire* e, float amount)
+{
+    relations_map[e].friendliness -= amount;
+    relations_map[e].hostility += amount;
+
+    e->relations_map[this].friendliness -= amount;
+    e->relations_map[this].hostility += amount;
+}
+
 void empire::dispense_resource(const resource_manager& res)
 {
     for(int i=0; i<res.resources.size(); i++)
@@ -702,6 +711,45 @@ void empire::tick_decolonisation()
     }
 }
 
+void empire::tick_relation_ship_occupancy_loss(float step_s, system_manager& system_manage)
+{
+    for(orbital* o : owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        orbital_system* sys = o->parent_system;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        int ship_num = sm->ships.size();
+
+        empire* system_owner = sys->get_base()->parent_empire;
+
+        if(system_owner == nullptr)
+            continue;
+
+        if(can_traverse_space(system_owner))
+            continue;
+
+        int relation_loss_ships = 0;
+
+        for(ship* s : sm->ships)
+        {
+            if(system_owner->available_scanning_power_on(s, system_manage) > 0)
+            {
+                relation_loss_ships++;
+            }
+        }
+
+        float relation_loss_ps_per_ship = 0.005f;
+
+        float relation_loss = relation_loss_ps_per_ship * step_s * relation_loss_ships;
+
+        system_owner->negative_relations(this, relation_loss);
+    }
+}
+
 bool empire::has_vision(orbital_system* os)
 {
     empire* them = os->get_base()->parent_empire;
@@ -754,9 +802,9 @@ std::vector<orbital_system*> empire::get_unowned_system_with_my_fleets_in()
     return ret;
 }
 
-void empire::tick_invasion_timer(float diff_s, system_manager& system_manage, fleet_manager& fleet_manage)
+void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fleet_manager& fleet_manage)
 {
-    pirate_invasion_timer_s += diff_s;
+    pirate_invasion_timer_s += step_s;
 
     if(pirate_invasion_timer_s < max_pirate_invasion_elapsed_time_s)
         return;
@@ -887,6 +935,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick(step_s);
         emp->tick_system_claim();
         emp->tick_ai(all_battles, system_manage);
+        emp->tick_relation_ship_occupancy_loss(step_s, system_manage);
     }
 
     for(empire* emp : pirate_empires)
@@ -1205,7 +1254,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
             {
                 if(ImGui::IsItemHovered())
                 {
-                    ImGui::SetTooltip("Need at least 1.2 relationship to trade space passage");
+                    ImGui::SetTooltip("Need at least 1.2 relationship to trade territory access");
                 }
             }
             else if(ImGui::IsItemClicked())

@@ -1586,6 +1586,7 @@ int main()
     hostile_empire->has_ai = true;
 
     hostile_empire->research_tech_level.categories[research_info::MATERIALS].amount = 3.f;
+    hostile_empire->trade_space_access(player_empire, true);
 
 
     hostile_empire->resources.resources[resource::IRON].amount = 5000.f;

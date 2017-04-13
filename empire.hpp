@@ -80,6 +80,7 @@ struct empire
 
     void culture_shift(float culture_units, empire* destination);
     void positive_relations(empire* e, float amount);
+    void negative_relations(empire* e, float amount);
 
     ///returns real amount
     void dispense_resource(const resource_manager& res);
@@ -127,6 +128,7 @@ struct empire
     bool can_colonise(orbital* o);
     void tick_cleanup_colonising(); ///and claim
     void tick_decolonisation();
+    void tick_relation_ship_occupancy_loss(float diff_s, system_manager& system_manage);
 
     bool has_vision(orbital_system* os);
 
@@ -136,7 +138,7 @@ struct empire
     float pirate_invasion_timer_s = 0.f; ///if this empire is pirates, time since we invaded
     float max_pirate_invasion_elapsed_time_s = 5 * 60.f;
 
-    void tick_invasion_timer(float diff_s, system_manager& system_manage, fleet_manager& fleet_manage);
+    void tick_invasion_timer(float step_s, system_manager& system_manage, fleet_manager& fleet_manage);
 
     bool is_pirate = false;
     bool toggle_ui = false;
