@@ -1123,7 +1123,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
             if(o->type == orbital_info::PLANET)
             {
-                ImGui::Text(("System: " + o->name).c_str());
+                ImGui::Text(("System: " + o->parent_system->get_base()->name).c_str());
 
                 if(ImGui::IsItemClicked())
                 {
@@ -1180,8 +1180,6 @@ void empire_manager::draw_resource_donation_ui(empire* viewer_empire)
                 viewer_empire->dispense_resource(offering);
 
                 float relations_mod = offering_resources->get_relations_shift_of_adding_resources(offering);
-
-                printf("%f REL\n", relations_mod);
 
                 offering_resources->positive_relations(viewer_empire, relations_mod);
 
