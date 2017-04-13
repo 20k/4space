@@ -16,7 +16,7 @@ namespace top_bar_info
         DIPLOMACY,
         FLEETS,
         BATTLES,
-        SYSTEMS,
+        //SYSTEMS,
         UNIVERSE,
         NONE
     };
@@ -28,7 +28,7 @@ namespace top_bar_info
         "Diplomacy",
         "Fleets",
         "Battles",
-        "Systems",
+        //"Systems",
         "Universe",
     };
 }
