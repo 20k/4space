@@ -811,7 +811,7 @@ void empire::tick_invasion_timer(float diff_s, system_manager& system_manage, fl
         sm->force_warp(lin_near[i], o->parent_system, o);
     }
 
-    printf("INVADE\n");
+    //printf("INVADE\n");
 }
 
 empire* empire_manager::make_new()
