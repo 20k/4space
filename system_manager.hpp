@@ -229,6 +229,9 @@ struct orbital_system
     bool is_owned();
 
     std::string get_resource_str(bool include_vision, empire* viewer_empire);
+
+    ///for overall fleet window
+    bool toggle_fleet_ui = true;
 };
 
 struct popup_info;

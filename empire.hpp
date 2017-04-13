@@ -136,6 +136,8 @@ struct empire
     bool is_pirate = false;
     bool toggle_ui = false;
     bool is_derelict = false;
+
+    bool toggle_systems_ui = true;
 };
 
 struct fleet_manager;

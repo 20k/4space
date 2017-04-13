@@ -1954,6 +1954,7 @@ void system_manager::generate_universe(int num)
     }
 }
 
+///group systems by empire owner
 void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 {
     if(!top_bar::get_active(top_bar_info::FLEETS))
@@ -1966,92 +1967,48 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
     ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
-    int sys_c = 0;
+    std::map<empire*, std::vector<orbital_system*>> empire_to_systems;
 
-    ///or... maybe draw for all fleets we know of?
-    //for(orbital_system* sys : systems)
-    for(int sys_c = 0; sys_c < systems.size(); sys_c++)
+    for(orbital_system* os : systems)
     {
-        orbital_system* sys = systems[sys_c];
+        empire_to_systems[os->get_base()->parent_empire].push_back(os);
+    }
 
-        std::string sys_name = sys->get_base()->name;
+    int snum = 0;
 
-        std::map<empire*, std::vector<orbital*>> ship_map;
+    ///really want to force the first empire to be player, somehow
+    ///bundle all up below into do_empire_system_stuff?
+    for(auto& sys_emp : empire_to_systems)
+    {
+        int sys_c = 0;
 
-        bool any_orbitals = false;
+        bool first_of_empire = true;
 
-        for(orbital* o : sys->orbitals)
+        std::string empire_name_str;
+
+        if(sys_emp.first != nullptr)
+            empire_name_str = "Systems owned by: " + sys_emp.first->name + " (" + std::to_string(sys_emp.second.size()) + ")";
+
+        ///or... maybe draw for all fleets we know of?
+        ///sort these all into a std::map -> vector of empires
+        for(int sys_c = 0; sys_c < sys_emp.second.size(); sys_c++)
         {
-            if(o->type != orbital_info::FLEET)
-                continue;
+            orbital_system* sys = sys_emp.second[sys_c];
 
-            if(!o->viewed_by[viewing_empire])
-                continue;
+            std::string sys_name = sys->get_base()->name;
 
-            ship_manager* sm = (ship_manager*)o->data;
+            std::map<empire*, std::vector<orbital*>> ship_map;
 
-            bool do_obfuscate = false;
+            bool any_orbitals = false;
 
-            if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= 0 && !viewing_empire->is_allied(sm->parent_empire))
+            for(orbital* o : sys->orbitals)
             {
-                do_obfuscate = true;
-            }
+                if(o->type != orbital_info::FLEET)
+                    continue;
 
-            if(!do_obfuscate)
-                ship_map[o->parent_empire].push_back(o);
-            else
-                ship_map[nullptr].push_back(o); ///feels pretty icky doing this
-        }
+                if(!o->viewed_by[viewing_empire])
+                    continue;
 
-        if(ship_map.size() == 0)
-            continue;
-
-        if(sys_c != 0)
-            ImGui::Text("\n");
-
-        ImGui::Text(sys_name.c_str());
-
-        ImGui::SameLine();
-
-        ImGui::Text("(goto)");
-
-        if(ImGui::IsItemClicked())
-        {
-            set_viewed_system(sys);
-        }
-
-        ImGui::SameLine();
-
-        int str_len = sys_name.length();
-
-        std::string str;
-
-        for(int i=0; i<40 - str_len; i++)
-        {
-            str = str + "-";
-        }
-
-        ImGui::Text(str.c_str());
-
-        for(auto& kk : ship_map)
-        {
-            empire* e = kk.first;
-
-            std::string empire_name;
-
-            if(e != nullptr)
-            {
-                empire_name = "Empire: " + e->name;
-            }
-            else
-            {
-                empire_name = "Empire: Unknown";
-            }
-
-            ImGui::Text(empire_name.c_str());
-
-            for(orbital* o : kk.second)
-            {
                 ship_manager* sm = (ship_manager*)o->data;
 
                 bool do_obfuscate = false;
@@ -2061,103 +2018,215 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     do_obfuscate = true;
                 }
 
-                std::string fleet_name = o->name;
+                if(!do_obfuscate)
+                    ship_map[o->parent_empire].push_back(o);
+                else
+                    ship_map[nullptr].push_back(o); ///feels pretty icky doing this
+            }
 
-                if(fleet_name == "")
-                    fleet_name = orbital_info::names[o->type];
+            if(ship_map.size() == 0)
+                continue;
 
-                std::vector<std::string> display_txt = sm->get_info_strs();
+            if(snum != 0 && first_of_empire)
+                ImGui::Text("\n");
 
-                if(do_obfuscate)
-                    display_txt = {"Unknown Ship"};
+            snum = 1;
 
-                if(do_obfuscate)
-                    fleet_name = "Unknown Fleet";
-
-                std::string combat_pad = "";
-
-                if(sm->any_in_combat())
-                    combat_pad = "!";
-
-                ///need system location... ruh roh
-                ///shunt this into orbital manager?
-
-                std::string pad = "-";
-
-                if(sm->toggle_fleet_ui)
-                    pad = "+";
-
-                ///when clicking on fleet, also select it
-                ///could solve a few of our ui problems!
-                ImGui::Text((pad + combat_pad + fleet_name + combat_pad + pad).c_str());
+            if(first_of_empire)
+            {
+                ImGui::Text(empire_name_str.c_str());
 
                 if(ImGui::IsItemClicked())
                 {
-                    sm->toggle_fleet_ui = !sm->toggle_fleet_ui;
-
-                    if(sm->toggle_fleet_ui && !lctrl)
-                    {
-                        if(!lshift)
-                        {
-                            popup.elements.clear();
-                        }
-
-                        bool already_in = false;
-
-                        for(auto& i : popup.elements)
-                        {
-                            if(i.element == o)
-                            {
-                                already_in = true;
-                                break;
-                            }
-                        }
-
-
-                        popup.going = true;
-
-                        popup_element nelem;
-                        nelem.element = o;
-
-                        if(!already_in)
-                            popup.elements.push_back(nelem);
-                    }
-                    else
-                    {
-                        for(int i=0; i<popup.elements.size() && !lctrl; i++)
-                        {
-                            if(popup.elements[i].element == o)
-                            {
-                                popup.elements.erase(popup.elements.begin() + i);
-                                i--;
-                                break;
-                            }
-                        }
-                    }
+                    sys_emp.first->toggle_systems_ui = !sys_emp.first->toggle_systems_ui;
                 }
 
-                if(sm->toggle_fleet_ui)
-                {
-                    ImGui::Indent();
-
-                    int num = 0;
-
-                    for(auto& i : display_txt)
-                    {
-                        ImGui::Text((combat_pad + i + combat_pad).c_str());
-
-                        if(ImGui::IsItemClicked())
-                        {
-                            sm->ships[num]->display_ui = !sm->ships[num]->display_ui;
-                        }
-
-                        num++;
-                    }
-
-                    ImGui::Unindent();
-                }
-
+                first_of_empire = false;
             }
+
+            if(sys_emp.first->toggle_systems_ui == false)
+                continue;
+
+            ImGui::Indent();
+
+            ///spacing between systems
+            if(sys_c != 0)
+                ImGui::Text("\n");
+
+            ImGui::Text(sys_name.c_str());
+
+            if(ImGui::IsItemClicked())
+            {
+                sys->toggle_fleet_ui = !sys->toggle_fleet_ui;
+            }
+
+            ImGui::SameLine();
+
+            ImGui::Text("(goto)");
+
+            if(ImGui::IsItemClicked())
+            {
+                set_viewed_system(sys);
+            }
+
+            #define DASH_LINES
+            #ifdef DASH_LINES
+            ImGui::SameLine();
+
+            int str_len = sys_name.length();
+
+            std::string str;
+
+            for(int i=0; i<40 - str_len; i++)
+            {
+                str = str + "-";
+            }
+
+            ImGui::Text(str.c_str());
+
+            if(ImGui::IsItemClicked())
+            {
+                sys->toggle_fleet_ui = !sys->toggle_fleet_ui;
+            }
+            #endif
+
+            if(!sys->toggle_fleet_ui)
+            {
+                ImGui::Unindent();
+                continue;
+            }
+
+            ImGui::Indent();
+
+            for(auto& kk : ship_map)
+            {
+                empire* e = kk.first;
+
+                std::string empire_name;
+
+                if(e != nullptr)
+                {
+                    empire_name = "Empire: " + e->name;
+                }
+                else
+                {
+                    empire_name = "Empire: Unknown";
+                }
+
+                ImGui::Text(empire_name.c_str());
+
+                for(orbital* o : kk.second)
+                {
+                    ship_manager* sm = (ship_manager*)o->data;
+
+                    bool do_obfuscate = false;
+
+                    if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= 0 && !viewing_empire->is_allied(sm->parent_empire))
+                    {
+                        do_obfuscate = true;
+                    }
+
+                    std::string fleet_name = o->name;
+
+                    if(fleet_name == "")
+                        fleet_name = orbital_info::names[o->type];
+
+                    std::vector<std::string> display_txt = sm->get_info_strs();
+
+                    if(do_obfuscate)
+                        display_txt = {"Unknown Ship"};
+
+                    if(do_obfuscate)
+                        fleet_name = "Unknown Fleet";
+
+                    std::string combat_pad = "";
+
+                    if(sm->any_in_combat())
+                        combat_pad = "!";
+
+                    ///need system location... ruh roh
+                    ///shunt this into orbital manager?
+
+                    std::string pad = "-";
+
+                    if(sm->toggle_fleet_ui)
+                        pad = "+";
+
+                    ///when clicking on fleet, also select it
+                    ///could solve a few of our ui problems!
+                    ImGui::Text((pad + combat_pad + fleet_name + combat_pad + pad).c_str());
+
+                    if(ImGui::IsItemClicked())
+                    {
+                        sm->toggle_fleet_ui = !sm->toggle_fleet_ui;
+
+                        if(sm->toggle_fleet_ui && !lctrl)
+                        {
+                            if(!lshift)
+                            {
+                                popup.elements.clear();
+                            }
+
+                            bool already_in = false;
+
+                            for(auto& i : popup.elements)
+                            {
+                                if(i.element == o)
+                                {
+                                    already_in = true;
+                                    break;
+                                }
+                            }
+
+
+                            popup.going = true;
+
+                            popup_element nelem;
+                            nelem.element = o;
+
+                            if(!already_in)
+                                popup.elements.push_back(nelem);
+                        }
+                        else
+                        {
+                            for(int i=0; i<popup.elements.size() && !lctrl; i++)
+                            {
+                                if(popup.elements[i].element == o)
+                                {
+                                    popup.elements.erase(popup.elements.begin() + i);
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if(sm->toggle_fleet_ui)
+                    {
+                        ImGui::Indent();
+
+                        int num = 0;
+
+                        for(auto& i : display_txt)
+                        {
+                            ImGui::Text((combat_pad + i + combat_pad).c_str());
+
+                            if(ImGui::IsItemClicked())
+                            {
+                                sm->ships[num]->display_ui = !sm->ships[num]->display_ui;
+                            }
+
+                            num++;
+                        }
+
+                        ImGui::Unindent();
+                    }
+
+                }
+            }
+
+            ImGui::Unindent();
+            ImGui::Unindent();
         }
     }
 

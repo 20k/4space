@@ -534,16 +534,25 @@ void empire::unally(empire* e)
 
 bool empire::is_allied(empire* e)
 {
+    if(e == nullptr)
+        return false;
+
     return relations_map[e].allied;
 }
 
 bool empire::is_hostile(empire* e)
 {
+    if(e == nullptr)
+        return false;
+
     return relations_map[e].hostile;
 }
 
 bool empire::can_make_peace(empire* e)
 {
+    if(e == nullptr)
+        return false;
+
     return relations_map[e].friendliness >= 0.5f;
 }
 
