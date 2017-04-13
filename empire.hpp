@@ -107,12 +107,14 @@ struct empire
     ///if we're allied with another faction, culture shift
     void become_hostile(empire* e);
     void become_unhostile(empire* e);
+    void trade_space_access(empire* e, bool status);
     void trade_vision(empire* e);
     void ally(empire* e);
     void unally(empire* e);
     bool is_allied(empire* e);
     bool is_hostile(empire* e);
     bool can_make_peace(empire* e);
+    bool can_traverse_space(empire* e); ///without diplomatic penalty
 
 
     ///make sure all relations have valid values

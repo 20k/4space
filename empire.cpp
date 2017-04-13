@@ -483,6 +483,7 @@ void empire::become_hostile(empire* e)
     e->relations_map[this].hostile = true;
     e->relations_map[this].friendliness -= 0.5f;
 
+    trade_space_access(e, false);
 
     unally(e);
 }
@@ -494,6 +495,12 @@ void empire::become_unhostile(empire* e)
 
     e->relations_map[this].hostile = false;
     e->relations_map[this].friendliness += 0.5f;
+}
+
+void empire::trade_space_access(empire* e, bool status)
+{
+    relations_map[e].have_passage_rights = status;
+    e->relations_map[this].have_passage_rights = status;
 }
 
 void empire::trade_vision(empire* e)
@@ -547,6 +554,8 @@ void empire::unally(empire* e)
 
     relations_map[e].friendliness -= 0.5f;
     e->relations_map[this].friendliness -= 0.5f;
+
+    trade_space_access(e, false);
 }
 
 bool empire::is_allied(empire* e)
@@ -571,6 +580,11 @@ bool empire::can_make_peace(empire* e)
         return false;
 
     return relations_map[e].friendliness >= 0.5f;
+}
+
+bool empire::can_traverse_space(empire* e)
+{
+    return e->relations_map[this].have_passage_rights;
 }
 
 void empire::negative_interaction(empire* e)
@@ -1181,6 +1195,27 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
         else if(ImGui::IsItemClicked())
         {
             e->trade_vision(viewer_empire);
+        }
+
+        if(!viewer_empire->can_traverse_space(e))
+        {
+            ImGui::Text("Trade Territory Access");
+
+            if(current_friendliness < 1.2f)
+            {
+                if(ImGui::IsItemHovered())
+                {
+                    ImGui::SetTooltip("Need at least 1.2 relationship to trade space passage");
+                }
+            }
+            else if(ImGui::IsItemClicked())
+            {
+                viewer_empire->trade_space_access(e, true);
+            }
+        }
+        else
+        {
+            ImGui::Text("Have Territory Access");
         }
 
         if(!viewer_empire->is_allied(e))
