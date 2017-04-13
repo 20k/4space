@@ -84,6 +84,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />
+		<Unit filename="popup.cpp" />
+		<Unit filename="popup.hpp" />
 		<Unit filename="procedural_text_generator.cpp" />
 		<Unit filename="procedural_text_generator.hpp" />
 		<Unit filename="research.cpp" />

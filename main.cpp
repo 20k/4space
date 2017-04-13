@@ -948,7 +948,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     if(orb->parent_empire == player_empire)
                         elem.mergeable = true;
 
-                    elem.buttons_map[popup_element_type::RESUPPLY] = {"Resupply", false};
+                    elem.buttons_map[popup_element_type::RESUPPLY].name = "Resupply";
                 }
                 else
                 {
@@ -1751,6 +1751,7 @@ int main()
 
     //player_empire->become_hostile(e2);
     player_empire->ally(e2);
+    player_empire->positive_relations(e2, 0.5f);
 
     system_manage.generate_universe(100);
 

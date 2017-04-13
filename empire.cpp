@@ -1092,9 +1092,30 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
         else if(!viewer_empire->is_hostile(e))
         {
+            float friendliness = current_friendliness;
+
             ImGui::SameLine();
 
-            ImGui::Text("(Neutral)");
+            if(friendliness >= 0.9f)
+            {
+                ImGui::Text("(Very Friendly)");
+            }
+            else if(friendliness >= 0.7)
+            {
+                ImGui::Text("(Friendly)");
+            }
+            else if(friendliness < 0.3f)
+            {
+                ImGui::Text("(Unfriendly)");
+            }
+            else if(friendliness < 0.1f)
+            {
+                ImGui::Text("(Extreme dislike)");
+            }
+            else
+            {
+                ImGui::Text("(Neutral)");
+            }
         }
         else
         {
@@ -1127,7 +1148,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
         {
             ImGui::Text("(Ally)");
 
-            if(viewer_empire->relations_map[e].friendliness < 1)
+            if(current_friendliness < 1)
             {
                 if(ImGui::IsItemHovered())
                 {
@@ -1165,7 +1186,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
         {
             ImGui::Text("(Make Peace)");
 
-            if(!viewer_empire->can_make_peace(e))
+            if(current_friendliness < 0.5f)
             {
                 if(ImGui::IsItemHovered())
                     ImGui::SetTooltip("Need relation > 0.5");
