@@ -110,6 +110,7 @@ struct empire
     void unally(empire* e);
     bool is_allied(empire* e);
     bool is_hostile(empire* e);
+    bool can_make_peace(empire* e);
 
     ///make sure all relations have valid values
     void clamp_relations();

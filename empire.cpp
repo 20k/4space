@@ -498,13 +498,15 @@ void empire::become_unhostile(empire* e)
 
 void empire::ally(empire* e)
 {
+    if(is_hostile(e))
+        become_unhostile(e);
+
     relations_map[e].allied = true;
     relations_map[e].friendliness += 0.5f;
 
     e->relations_map[this].allied = true;
     e->relations_map[this].friendliness += 0.5f;
 
-    become_unhostile(e);
 
     for(orbital* o : e->owned)
     {
@@ -526,8 +528,8 @@ void empire::unally(empire* e)
     relations_map[e].allied = false;
     e->relations_map[this].allied = false;
 
-    relations_map[e].friendliness -= 0.25f;
-    e->relations_map[this].friendliness -= 0.25f;
+    relations_map[e].friendliness -= 0.5f;
+    e->relations_map[this].friendliness -= 0.5f;
 }
 
 bool empire::is_allied(empire* e)
@@ -538,6 +540,11 @@ bool empire::is_allied(empire* e)
 bool empire::is_hostile(empire* e)
 {
     return relations_map[e].hostile;
+}
+
+bool empire::can_make_peace(empire* e)
+{
+    return relations_map[e].friendliness >= 0.5f;
 }
 
 void empire::negative_interaction(empire* e)
@@ -1114,6 +1121,63 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
             offering_resources = e;
         }
+
+
+        if(!viewer_empire->is_allied(e))
+        {
+            ImGui::Text("(Ally)");
+
+            if(viewer_empire->relations_map[e].friendliness < 1)
+            {
+                if(ImGui::IsItemHovered())
+                {
+                    ImGui::SetTooltip("Need relation > 1");
+                }
+            }
+            else if(ImGui::IsItemClicked())
+            {
+                viewer_empire->ally(e);
+            }
+        }
+        else
+        {
+            ImGui::Text("(Break Alliance)");
+
+            if(ImGui::IsItemClicked())
+            {
+                viewer_empire->unally(e);
+            }
+        }
+
+
+        if(viewer_empire->is_hostile(e))
+        {
+            ImGui::Text("(Make Peace)");
+
+            if(!viewer_empire->can_make_peace(e))
+            {
+                ImGui::SetTooltip("Need relation > 0.5");
+            }
+            else if(ImGui::IsItemClicked())
+            {
+                viewer_empire->become_unhostile(e);
+            }
+        }
+        else
+        {
+            ImGui::Text("(Declare War)");
+
+            if(ImGui::IsItemClicked())
+            {
+                if(viewer_empire->is_allied(e))
+                {
+                    viewer_empire->unally(e);
+                }
+
+                viewer_empire->become_hostile(e);
+            }
+        }
+
 
         //ImGui::Text(rel_str.c_str());
 
