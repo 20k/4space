@@ -18,6 +18,7 @@ struct faction_relations
     bool hostile = false;
     bool allied = false;
     float friendliness = 0.5f; ///0 = v bad, 1 = best
+    bool have_passage_rights = false;
 
     float hostility = 0; ///For precursors, but also a generally 'pissed off' meter
     float positivity = 0; ///For precursors, but also a generally short term happiness meter
@@ -106,11 +107,13 @@ struct empire
     ///if we're allied with another faction, culture shift
     void become_hostile(empire* e);
     void become_unhostile(empire* e);
+    void trade_vision(empire* e);
     void ally(empire* e);
     void unally(empire* e);
     bool is_allied(empire* e);
     bool is_hostile(empire* e);
     bool can_make_peace(empire* e);
+
 
     ///make sure all relations have valid values
     void clamp_relations();

@@ -496,6 +496,23 @@ void empire::become_unhostile(empire* e)
     e->relations_map[this].friendliness += 0.5f;
 }
 
+void empire::trade_vision(empire* e)
+{
+    for(orbital* o : e->owned)
+    {
+        //o->ever_viewed = true;
+
+        o->viewed_by[this] = true;
+    }
+
+    for(orbital* o : owned)
+    {
+       // o->ever_viewed = true;
+
+       o->viewed_by[e] = true;
+    }
+}
+
 void empire::ally(empire* e)
 {
     if(is_hostile(e))
@@ -1152,6 +1169,19 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
             offering_resources = e;
         }
 
+        ImGui::Text("Trade Starcharts");
+
+        if(current_friendliness < 0.9f)
+        {
+            if(ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Need at least 0.9 relationship to trade starcharts");
+            }
+        }
+        else if(ImGui::IsItemClicked())
+        {
+            e->trade_vision(viewer_empire);
+        }
 
         if(!viewer_empire->is_allied(e))
         {
