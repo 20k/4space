@@ -168,6 +168,9 @@ struct empire_manager
     void draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage);
     void draw_resource_donation_ui(empire* viewer_empire);
 
+    bool confirm_break_alliance = false;
+    bool confirm_declare_war = false;
+
     empire* offering_resources = nullptr;
     bool offer_resources_ui = false;
     bool giving_resources_ui_clicked = false;

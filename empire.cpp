@@ -1145,10 +1145,21 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
             if(ImGui::IsItemClicked())
             {
-                viewer_empire->unally(e);
+                confirm_break_alliance = true;
+            }
+
+            if(confirm_break_alliance)
+            {
+                ImGui::Text("(Are you sure?)");
+
+                if(ImGui::IsItemClicked())
+                {
+                    viewer_empire->unally(e);
+
+                    confirm_break_alliance = false;
+                }
             }
         }
-
 
         if(viewer_empire->is_hostile(e))
         {
@@ -1156,7 +1167,8 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
             if(!viewer_empire->can_make_peace(e))
             {
-                ImGui::SetTooltip("Need relation > 0.5");
+                if(ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Need relation > 0.5");
             }
             else if(ImGui::IsItemClicked())
             {
@@ -1169,12 +1181,24 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
             if(ImGui::IsItemClicked())
             {
-                if(viewer_empire->is_allied(e))
-                {
-                    viewer_empire->unally(e);
-                }
+                confirm_declare_war = true;
+            }
 
-                viewer_empire->become_hostile(e);
+            if(confirm_declare_war)
+            {
+                ImGui::Text("(Are you sure?)");
+
+                if(ImGui::IsItemClicked())
+                {
+                    if(viewer_empire->is_allied(e))
+                    {
+                        viewer_empire->unally(e);
+                    }
+
+                    viewer_empire->become_hostile(e);
+
+                    confirm_declare_war = false;
+                }
             }
         }
 
