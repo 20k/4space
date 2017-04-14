@@ -278,6 +278,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
     std::vector<std::string> cons_list;
+    std::vector<std::string> net_list;
     std::vector<std::string> store_max_list;
 
     for(const ship_component_element& id : elements)
@@ -301,6 +302,13 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         std::string header_str = ship_component_elements::display_strings[id];
 
+        std::string net_str = to_string_with_enforced_variable_dp(prod - cons, 1);
+
+        if(prod - cons >= 0)
+        {
+            net_str = "+" + net_str;
+        }
+
         //std::string res = header + ": " + display_str + "\n";
 
         //bool knows = s.is_known_with_scanning_power(id, known_information);
@@ -315,15 +323,17 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         header_str = obfuscate(header_str, obfuscd);
         prod_str = obfuscate(prod_str, obfuscd);
         cons_str = obfuscate(cons_str, obfuscd);
+        net_str = obfuscate(net_str, obfuscd);
         store_max_str = obfuscate(store_max_str, obfuscd);
 
         if(ship_component_elements::skippable_in_display[id] != -1)
             continue;
 
 
-        headers.push_back(header_str + " ");
+        headers.push_back(header_str);
         prod_list.push_back(prod_str);
         cons_list.push_back(cons_str);
+        net_list.push_back(net_str);
         store_max_list.push_back(store_max_str);
 
         //ImGui::Text(res.c_str());
@@ -334,11 +344,29 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         std::string header_formatted = format(headers[i], headers);
         std::string prod_formatted = format(prod_list[i], prod_list);
         std::string cons_formatted = format(cons_list[i], cons_list);
+        std::string net_formatted = format(net_list[i], net_list);
         std::string store_max_formatted = format(store_max_list[i], store_max_list);
 
-        std::string display = header_formatted + ": " + prod_formatted + " | " + cons_formatted + " | " + store_max_formatted;
+        //std::string display = header_formatted + ": " + prod_formatted + " | " + cons_formatted + " | " + store_max_formatted;
 
-        ImGui::Text(display.c_str());
+        //std::string display = header_formatted + " : " + net_formatted + " | " + store_max_formatted;
+
+        //ImGui::Text(display.c_str());
+
+        ImGui::Text((header_formatted + " : ").c_str());
+
+        ImGui::SameLine(0.f, 0.f);
+
+        ImGui::Text((net_formatted).c_str());
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip((prod_list[i] + " | " + cons_list[i]).c_str());
+        }
+
+        ImGui::SameLine(0.f, 0.f);
+
+        ImGui::Text((" | " + store_max_formatted).c_str());
     }
 
     //static std::map<int, std::map<int, bool>> ui_click_state;
