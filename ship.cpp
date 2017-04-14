@@ -1057,7 +1057,7 @@ void ship::tick_all_components(float step_s)
     std::map<ship_component_element, float> stored = get_stored_resources();*/
 
     std::vector<component_attribute> fully_merge = get_fully_merged(step_s);
-    std::vector<component_attribute> fully_merge_no_eff = get_fully_merged_no_efficiency(step_s);
+    std::vector<component_attribute> fully_merge_no_eff_with_hpfrac = get_fully_merged_no_efficiency_with_hpfrac(step_s);
 
 
     ///HACK ALERT
@@ -1126,7 +1126,8 @@ void ship::tick_all_components(float step_s)
 
             ///skipping efficiency on producing_ps as it means something else is the bottleneck
             ///and we'd probably gain more by repairing that as that's the limiting factor
-            float producing_ps = fully_merge_no_eff[c.primary_attribute].produced_per_s;
+            ///want to factor hp efficiency in
+            float producing_ps = fully_merge_no_eff_with_hpfrac[c.primary_attribute].produced_per_s;
             float using_ps = fully_merge[c.primary_attribute].drained_per_s;
 
             if(producing_ps > using_ps && ship_component_elements::allowed_skip_repair[c.primary_attribute] != -1)
@@ -1502,7 +1503,7 @@ std::vector<component_attribute> ship::get_fully_merged(float step_s)
     return ret;
 }
 
-std::vector<component_attribute> ship::get_fully_merged_no_efficiency(float step_s)
+std::vector<component_attribute> ship::get_fully_merged_no_efficiency_with_hpfrac(float step_s)
 {
     std::vector<component_attribute> ret;
 
@@ -1510,6 +1511,15 @@ std::vector<component_attribute> ship::get_fully_merged_no_efficiency(float step
 
     for(auto& i : entity_list)
     {
+        float hp_eff = 1.f;
+
+        if(i.has_element(ship_component_element::HP))
+        {
+            component_attribute elem = i.get_element(ship_component_element::HP);
+
+            hp_eff = elem.cur_amount / elem.max_amount;
+        }
+
         for(auto& attr : i.components)
         {
             component_attribute& which = ret[attr.first];
@@ -1519,7 +1529,7 @@ std::vector<component_attribute> ship::get_fully_merged_no_efficiency(float step
             which.cur_amount += other.cur_amount;
             which.max_amount += other.max_amount;
 
-            which.produced_per_s += other.produced_per_s * step_s;
+            which.produced_per_s += other.produced_per_s * step_s * hp_eff;
             which.drained_per_s += other.drained_per_s * step_s;
         }
     }
