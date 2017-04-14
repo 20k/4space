@@ -2069,7 +2069,12 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             if(first_of_empire)
             {
-                ImGui::Text(empire_name_str.c_str());
+                std::string pad = "-";
+
+                if(sys_emp.first->toggle_systems_ui)
+                    pad = "+";
+
+                ImGui::Text((pad + empire_name_str).c_str());
 
                 if(ImGui::IsItemClicked())
                 {
@@ -2088,7 +2093,12 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
             if(sys_c != 0)
                 ImGui::Text("\n");
 
-            ImGui::Text(sys_name.c_str());
+            std::string sys_pad = "-";
+
+            if(sys->toggle_fleet_ui)
+                sys_pad = "+";
+
+            ImGui::Text((sys_pad + sys_name).c_str());
 
             if(ImGui::IsItemClicked())
             {
