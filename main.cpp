@@ -809,6 +809,16 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         popup.elements.clear();
     }
 
+    for(ship_manager* sm : fleet_manage.fleets)
+    {
+        if(sm->to_close_ui)
+        {
+            sm->toggle_fleet_ui = false;
+        }
+
+        sm->to_close_ui = false;
+    }
+
     std::vector<orbital*> selected;
 
     bool first = true;

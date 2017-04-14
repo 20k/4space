@@ -2199,6 +2199,21 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                         {
                             if(!lshift)
                             {
+                                for(popup_element& pe : popup.elements)
+                                {
+                                    orbital* o2 = (orbital*)pe.element;
+
+                                    if(o2->type != orbital_info::FLEET)
+                                        continue;
+
+                                    if(o2 == o)
+                                        continue;
+
+                                    ship_manager* sm = (ship_manager*)o2->data;
+
+                                    sm->to_close_ui = true;
+                                }
+
                                 popup.elements.clear();
                             }
 
@@ -2234,6 +2249,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                                 }
                             }
                         }
+
+                        if(sm->toggle_fleet_ui)
+                            continue;
                     }
 
                     if(sm->toggle_fleet_ui)

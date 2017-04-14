@@ -640,6 +640,7 @@ struct ship_manager
     ///for stealth
     bool decolonising = false;
     bool toggle_fleet_ui = false;
+    bool to_close_ui = false;
 };
 
 struct empire_manager;
