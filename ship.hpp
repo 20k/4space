@@ -58,6 +58,15 @@ namespace ship_component_elements
         NONE,
     };
 
+    static std::vector<types> skippable_in_display_def
+    {
+        COLONISER,
+        RAILGUN,
+        TORPEDO,
+        PLASMAGUN,
+        COILGUN,
+    };
+
     static std::vector<types> repair_priorities_in_combat_def
     {
         COMMAND,
@@ -116,32 +125,31 @@ namespace ship_component_elements
     static std::vector<int> repair_in_combat_map = generate_repair_priorities(repair_priorities_in_combat_def);
     static std::vector<int> repair_out_combat_map = generate_repair_priorities(repair_priorities_out_combat_def);
     static std::vector<int> allowed_skip_repair = generate_repair_priorities(allowed_skip_repair_def);
+    static std::vector<int> skippable_in_display = generate_repair_priorities(skippable_in_display_def);
 
     ///we could just take the inverse of cooling_potential when displaying
     ///might be more friendly for the player
     static std::vector<std::string> display_strings
     {
-        "COOLING_POTENTIAL",
-        "ENERGY",
-        "OXYGEN",
-        "AMMO",
-        "FUEL",
-        "CARGO",
-        "SHIELD_POWER",
-        "ARMOUR",
+        "Cooling",
+        "Energy",
+        "Oxygen",
+        "Ammo",
+        "Fuel",
+        "Cargo",
+        "Shields",
+        "Armour",
         "HP",
-        "ENGINE_POWER",
-        "WARP_POWER",
-        "SCANNING_POWER",
-        //"PROJECTILE",
-        "COMMAND",
-        "STEALTH",
-        "COLONISER",
-        //"REPAIR",
-        "RAILGUN",
-        "TORPEDO",
-        "PLASMAGUN",
-        "COILGUN",
+        "Engines",
+        "Warp",
+        "Scanning",
+        "Command",
+        "Stealth",
+        "Coloniser",
+        "Railgun",
+        "Torpedo",
+        "Plasmagun",
+        "Coilgun",
     };
 
     static std::vector<std::string> short_name

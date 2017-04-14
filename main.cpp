@@ -317,8 +317,11 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         cons_str = obfuscate(cons_str, obfuscd);
         store_max_str = obfuscate(store_max_str, obfuscd);
 
+        if(ship_component_elements::skippable_in_display[id] != -1)
+            continue;
 
-        headers.push_back(header_str);
+
+        headers.push_back(header_str + " ");
         prod_list.push_back(prod_str);
         cons_list.push_back(cons_str);
         store_max_list.push_back(store_max_str);
