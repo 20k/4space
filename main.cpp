@@ -2013,7 +2013,7 @@ int main()
         player_empire->draw_ui();
         ///this is slow
         //sf::Clock tclk;
-        empire_manage.tick_all(diff_s, all_battles, system_manage, fleet_manage);
+        empire_manage.tick_all(diff_s, all_battles, system_manage, fleet_manage, player_empire);
         //printf("%f dfdfdf\n", tclk.getElapsedTime().asMicroseconds() / 1000.f);
 
         empire_manage.tick_decolonisation();

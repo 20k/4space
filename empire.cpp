@@ -486,6 +486,9 @@ float empire::available_scanning_power_on(ship_manager* sm, system_manager& syst
 
 void empire::become_hostile(empire* e)
 {
+    if(is_hostile(e))
+        return;
+
     relations_map[e].hostile = true;
     relations_map[e].friendliness -= 0.5f;
 
@@ -499,6 +502,9 @@ void empire::become_hostile(empire* e)
 
 void empire::become_unhostile(empire* e)
 {
+    if(!is_hostile(e))
+        return;
+
     relations_map[e].hostile = false;
     relations_map[e].friendliness += 0.5f;
 
@@ -531,6 +537,9 @@ void empire::trade_vision(empire* e)
 
 void empire::ally(empire* e)
 {
+    if(is_allied(e))
+        return;
+
     if(is_hostile(e))
         become_unhostile(e);
 
@@ -558,6 +567,9 @@ void empire::ally(empire* e)
 
 void empire::unally(empire* e)
 {
+    if(!is_allied(e))
+        return;
+
     relations_map[e].allied = false;
     e->relations_map[this].allied = false;
 
@@ -594,6 +606,15 @@ bool empire::can_make_peace(empire* e)
 bool empire::can_traverse_space(empire* e)
 {
     return e->relations_map[this].have_passage_rights;
+}
+
+float empire::get_culture_modified_friendliness(empire* e)
+{
+    float culture_dist = empire_culture_distance(e);
+
+    float current_friendliness = (culture_dist - 0.5f) + relations_map[e].friendliness;
+
+    return current_friendliness;
 }
 
 void empire::negative_interaction(empire* e)
@@ -769,6 +790,41 @@ void empire::tick_relation_ship_occupancy_loss(float step_s, system_manager& sys
         float relation_loss = relation_loss_ps_per_ship * step_s * relation_loss_ships;
 
         system_owner->negative_relations(this, relation_loss);
+    }
+}
+
+///will need popup alerts for this
+void empire::tick_relation_alliance_changes(empire* player_empire)
+{
+    for(auto& i : relations_map)
+    {
+        empire* e = i.first;
+        faction_relations& rel = i.second;
+
+        float current_friendliness = get_culture_modified_friendliness(e);
+
+        if(e->is_allied(this) && current_friendliness < 0.7f)
+        {
+            e->unally(this);
+        }
+
+        if(!e->is_hostile(this) && current_friendliness < 0)
+        {
+            e->become_hostile(this);
+        }
+
+        if(e == player_empire)
+            continue;
+
+        if(!is_allied(e) && current_friendliness >= 1.f)
+        {
+            ally(e);
+        }
+
+        if(is_hostile(e) && current_friendliness > 0.1f)
+        {
+            become_unhostile(e);
+        }
     }
 }
 
@@ -950,7 +1006,7 @@ void empire_manager::notify_removal(ship_manager* s)
     }
 }
 
-void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage)
+void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage, empire* player_empire)
 {
     for(empire* emp : empires)
     {
@@ -958,6 +1014,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick_system_claim();
         emp->tick_ai(all_battles, system_manage);
         emp->tick_relation_ship_occupancy_loss(step_s, system_manage);
+        emp->tick_relation_alliance_changes(player_empire);
     }
 
     for(empire* emp : pirate_empires)

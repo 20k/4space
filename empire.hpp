@@ -117,6 +117,8 @@ struct empire
     bool can_make_peace(empire* e);
     bool can_traverse_space(empire* e); ///without diplomatic penalty
 
+    float get_culture_modified_friendliness(empire* e);
+
 
     ///make sure all relations have valid values
     void clamp_relations();
@@ -132,6 +134,7 @@ struct empire
     void tick_cleanup_colonising(); ///and claim
     void tick_decolonisation();
     void tick_relation_ship_occupancy_loss(float diff_s, system_manager& system_manage);
+    void tick_relation_alliance_changes(empire* player_empire);
 
     bool has_vision(orbital_system* os);
 
@@ -166,7 +169,7 @@ struct empire_manager
     void notify_removal(orbital* o);
     void notify_removal(ship_manager* s);
 
-    void tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage);
+    void tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage, empire* player_empire);
 
     void tick_cleanup_colonising();
     void tick_decolonisation();
