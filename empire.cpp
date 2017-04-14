@@ -1150,6 +1150,9 @@ void empire_manager::birth_empires_without_ownership(fleet_manager& fleet_manage
 
 void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage)
 {
+    if(!top_bar::active[top_bar_info::DIPLOMACY])
+        return;
+
     ImGui::Begin("Diplomacy", &top_bar::active[top_bar_info::DIPLOMACY], IMGUI_WINDOW_FLAGS);
 
     ///if we've seen a system or one of their ships
