@@ -1953,6 +1953,18 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
 
         distribute_damage(hp_damage/2, 1, this);
 
+        if(hit_by == nullptr || ship_hit_by == nullptr || system_manage == nullptr)
+            return;
+
+        empire* being_hit_empire = owned_by->parent_empire;
+
+        float information = being_hit_empire->available_scanning_power_on(ship_hit_by, *system_manage);
+
+        if(information <= 0)
+            return;
+
+        hit_by->propagage_relationship_modification_from_damaging_ship(being_hit_empire);
+
         return;
     }
 
