@@ -204,7 +204,7 @@ void do_transfer(orbital* o)
     vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
     vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};
 
-    float speed = 6.f;
+    /*float speed = 6.f;
 
     ///this is the real speed here
     vec2f calc_dir = (calculated_next - calculated_cur).norm() / speed;
@@ -212,7 +212,7 @@ void do_transfer(orbital* o)
     vec2f calc_real_next = calculated_cur + calc_dir;
 
     iangle = calc_real_next.angle();
-    irad = calc_real_next.length();
+    irad = calc_real_next.length();*/
 
     o->orbital_angle = iangle;
     o->orbital_length = irad;
