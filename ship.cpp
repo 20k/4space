@@ -2233,6 +2233,9 @@ bool ship::can_move_in_system()
 
 void ship::apply_disengage_penalty()
 {
+    if(fully_disabled())
+        return;
+
     std::map<ship_component_elements::types, float> damage_fractions;
 
     damage_fractions[ship_component_elements::HP] = 0.45f;
@@ -2260,7 +2263,7 @@ void ship::apply_disengage_penalty()
 bool ship::can_disengage()
 {
     if(fully_disabled())
-        return false;
+        return true;
 
     const float mandatory_combat_time_s = combat_variables::mandatory_combat_time_s;
 
