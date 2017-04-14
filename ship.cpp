@@ -1888,9 +1888,9 @@ void ship::add(const component& c)
     entity_list.push_back(c);
 }
 
-void ship::hit(projectile* p)
+void ship::hit(projectile* p, system_manager& system_manage)
 {
-    return hit_raw_damage(p->base.get_tag(component_tag::DAMAGE));
+    return hit_raw_damage(p->base.get_tag(component_tag::DAMAGE), p->fired_by, p->ship_fired_by, &system_manage);
 }
 
 void distribute_damage(float hp_damage, int num, ship* s, bool hit_crew = false)
@@ -1915,7 +1915,7 @@ void distribute_damage(float hp_damage, int num, ship* s, bool hit_crew = false)
 }
 
 ///should we spread damage over multiple components?
-void ship::hit_raw_damage(float damage)
+void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, system_manager* system_manage)
 {
     float shields = get_stored_resources()[ship_component_element::SHIELD_POWER];
     float armour = get_stored_resources()[ship_component_element::ARMOUR];
@@ -1967,6 +1967,20 @@ void ship::hit_raw_damage(float damage)
     hp_diff[ship_component_element::HP] = -hp_damage;
 
     h->apply_diff(hp_diff);
+
+
+    empire* being_hit_empire = owned_by->parent_empire;
+
+    if(hit_by == nullptr || ship_hit_by == nullptr || system_manage == nullptr)
+        return;
+
+    ///do faction relations here because they might change later
+    float information = being_hit_empire->available_scanning_power_on(ship_hit_by, *system_manage);
+
+    if(information <= 0)
+        return;
+
+    hit_by->propagage_relationship_modification_from_damaging_ship(being_hit_empire);
 }
 
 void set_center_sfml(sf::RectangleShape& shape)
@@ -2408,7 +2422,7 @@ void ship::random_damage(float frac)
 
     for(int i=0; i<10.f; i++)
     {
-        hit_raw_damage(hp * frac / 10.f);
+        hit_raw_damage(hp * frac / 10.f, nullptr, nullptr, nullptr);
     }
 }
 
@@ -2608,6 +2622,8 @@ void ship::recrew_derelict(empire* owner, empire* claiming)
 
         attr.cur_amount = attr.max_amount;
     }
+
+    //damage_taken.clear();
 }
 
 bool ship::can_recrew(empire* claiming)

@@ -124,6 +124,9 @@ struct empire
     void negative_interaction(empire* e);
     void positive_interaction(empire* e);
 
+    ///we damage enemy which decreases relationship, enemies of enemy gets updated with +friendliness
+    void propagage_relationship_modification_from_damaging_ship(empire* damaged);
+
     ///theoretically, not practically
     bool can_colonise(orbital* o);
     void tick_cleanup_colonising(); ///and claim
@@ -145,6 +148,7 @@ struct empire
     bool is_derelict = false;
 
     bool toggle_systems_ui = true;
+
 };
 
 struct fleet_manager;
@@ -176,6 +180,7 @@ struct empire_manager
 
     void draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage);
     void draw_resource_donation_ui(empire* viewer_empire);
+
 
     bool confirm_break_alliance = false;
     bool confirm_declare_war = false;

@@ -473,8 +473,11 @@ struct ship : positional
 
     void add(const component& c);
 
-    void hit(projectile* p);
-    void hit_raw_damage(float val);
+    //std::map<empire*, float> damage_taken;
+
+    void hit(projectile* p, system_manager& system_manage);
+    ///last 3 parameters are optional, allow for faction relation mechanics degradation
+    void hit_raw_damage(float val, empire* hit_by, ship* s_hit_by, system_manager* system_manage);
 
     void check_load(vec2i dim);
     void generate_image(vec2i dim);

@@ -608,6 +608,28 @@ void empire::positive_interaction(empire* e)
     relations_map[e].positivity += 1.f;
 }
 
+void empire::propagage_relationship_modification_from_damaging_ship(empire* damaged)
+{
+    float relationship_change = 0.01f;
+
+    if(relations_map[damaged].friendliness > -1)
+        relations_map[damaged].friendliness -= relationship_change;
+
+    if(damaged->relations_map[this].friendliness > -1)
+        damaged->relations_map[this].friendliness -= relationship_change;
+
+    for(auto& rel : damaged->relations_map)
+    {
+        empire* e = rel.first;
+        faction_relations& relations = rel.second;
+
+        if(e->is_hostile(damaged) && e != this)
+        {
+            e->positive_relations(this, relationship_change/2.f);
+        }
+    }
+}
+
 bool empire::can_colonise(orbital* o)
 {
     if(owns(o))

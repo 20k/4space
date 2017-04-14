@@ -78,7 +78,7 @@ bool projectile_within_ship(projectile* p, ship* s)
     return point_within_ship(p->local_pos, s);
 }
 
-void projectile_manager::tick(battle_manager& manage, float step_s)
+void projectile_manager::tick(battle_manager& manage, float step_s, system_manager& system_manage)
 {
     //for(auto& i : projectiles)
     for(int kk=0; kk < projectiles.size(); kk++)
@@ -99,7 +99,7 @@ void projectile_manager::tick(battle_manager& manage, float step_s)
                 {
                     //printf("hi\n");
 
-                    found_ship->hit(p);
+                    found_ship->hit(p, system_manage);
 
                     destroy(p);
                     kk--;
@@ -311,6 +311,9 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
                 p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
 
                 p->load(kk.get_weapon_type());
+
+                p->fired_by = s->owned_by->parent_empire;
+                p->ship_fired_by = s;
             }
         }
         //ship& s = *i.second;
@@ -321,7 +324,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
 
     keep_fleets_together(system_manage);
 
-    projectile_manage.tick(*this, step_s);
+    projectile_manage.tick(*this, step_s, system_manage);
 }
 
 void battle_manager::draw(sf::RenderWindow& win)

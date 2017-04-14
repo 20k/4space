@@ -4,6 +4,9 @@
 #include "ship.hpp"
 #include <SFML/Graphics.hpp>
 
+struct empire;
+struct ship;
+
 struct projectile : positional
 {
     int type = 0;
@@ -18,6 +21,9 @@ struct projectile : positional
     sf::Texture tex;
 
     void load(int type);
+
+    empire* fired_by = nullptr;
+    ship* ship_fired_by = nullptr;
 };
 
 struct battle_manager;
@@ -34,7 +40,7 @@ struct projectile_manager
 
     projectile* make_new();
 
-    void tick(battle_manager& manager, float step_s);
+    void tick(battle_manager& manager, float step_s, system_manager& system_manage);
 
     void destroy(projectile* proj);
     void destroy_all();

@@ -1971,6 +1971,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
     for(orbital_system* os : systems)
     {
+        if(os->get_base()->parent_empire == nullptr)
+            continue;
+
         empire_to_systems[os->get_base()->parent_empire].push_back(os);
     }
 
