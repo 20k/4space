@@ -1482,6 +1482,9 @@ void system_manager::repulse_fleets()
                 if(k == o)
                     continue;
 
+                if(k->type != orbital_info::FLEET)
+                    continue;
+
                 vec2f a1 = o->absolute_pos;
                 vec2f a2 = k->absolute_pos;
 
