@@ -2191,7 +2191,15 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     ///could solve a few of our ui problems!
                     ImGui::Text((pad + combat_pad + fleet_name + combat_pad + pad).c_str());
 
-                    if(ImGui::IsItemClicked())
+                    bool shipname_clicked = ImGui::IsItemClicked();
+
+                    if(sm->all_derelict())
+                    {
+                        ImGui::SameLine();
+                        ImGui::Text("(Derelict)");
+                    }
+
+                    if(shipname_clicked)
                     {
                         sm->toggle_fleet_ui = !sm->toggle_fleet_ui;
 
