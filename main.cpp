@@ -789,7 +789,8 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
 
-    if(lclick && !lshift && system_manage.in_system_view())
+    ///this is where we click away fleets
+    if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()))
     {
         for(popup_element& pe : popup.elements)
         {
@@ -1009,7 +1010,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             }
         }
 
-        if(system_manage.in_system_view())
+        //if(system_manage.in_system_view())
         {
             for(orbital* kk : selected)
             {
@@ -1072,7 +1073,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                     ship_manager* sm = (ship_manager*)kk->data;
 
-                    if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire && kk->parent_system == system_manage.currently_viewed && !sm->any_colonising())
+                    if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire && kk->parent_system == system_manage.currently_viewed && !sm->any_colonising() && system_manage.in_system_view())
                     {
                         kk->request_transfer({transformed.x, transformed.y});
                     }
