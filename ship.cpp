@@ -2791,6 +2791,7 @@ float ship::get_scanning_power_on(orbital* o, int difficulty_modifier)
 
 float ship::get_drive_signature()
 {
+    ///should we use drained for power? Or just take into account etc?
     auto store = get_produced_resources(1.f);
 
     float power = store[ship_component_elements::ENERGY];

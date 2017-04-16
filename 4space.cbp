@@ -49,6 +49,7 @@
 			<Add option="-Wno-narrowing" />
 			<Add option="-Wno-sign-compare" />
 			<Add option="-Wno-unused-variable" />
+			<Add option="-Werror=return-type" />
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32" />
