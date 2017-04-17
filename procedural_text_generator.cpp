@@ -3,6 +3,22 @@
 #include <fstream>
 #include "util.hpp"
 
+std::vector<std::string> procedural_text::parse_default(const std::string& file)
+{
+    std::vector<std::string> ret;
+
+    std::ifstream in(file);
+
+    std::string str;
+
+    while(std::getline(in, str))
+    {
+        ret.push_back(str);
+    }
+
+    return ret;
+}
+
 std::vector<std::string> procedural_text::parse_planet_names()
 {
     std::vector<std::string> ret;
