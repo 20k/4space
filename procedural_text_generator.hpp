@@ -19,6 +19,8 @@ namespace procedural_text
     static std::vector<std::string> ship_names = parse_default("./data/ships.txt");
     static std::vector<std::string> empires_1 = parse_default("./data/empires_1.txt");
     static std::vector<std::string> empires_2 = parse_default("./data/empires_2.txt");
+
+    static std::string select_random(const std::vector<std::string>& dataset);
 }
 
 struct procedural_text_generator

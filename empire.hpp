@@ -152,6 +152,7 @@ struct empire
 
     bool toggle_systems_ui = true;
 
+    uint16_t fleet_name_counter = 0;
 };
 
 struct fleet_manager;
@@ -193,8 +194,6 @@ struct empire_manager
     bool giving_resources_ui_clicked = false;
     resource_manager offering;
     bool giving_are_you_sure = false;
-
-    uint16_t ship_name_counter = 0;
 };
 
 #endif // EMPIRE_HPP_INCLUDED

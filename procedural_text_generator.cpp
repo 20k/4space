@@ -2,6 +2,7 @@
 #include "system_manager.hpp"
 #include <fstream>
 #include "util.hpp"
+#include "empire.hpp"
 
 std::vector<std::string> procedural_text::parse_default(const std::string& file)
 {
@@ -58,6 +59,11 @@ std::vector<std::string> procedural_text::parse_star_names()
     }
 
     return ret;
+}
+
+std::string procedural_text::select_random(const std::vector<std::string>& dataset)
+{
+    return dataset[(int)randf_s(0.f, dataset.size())];
 }
 
 std::string procedural_text_generator::generate_planetary_name()
@@ -197,4 +203,26 @@ std::string procedural_text_generator::generate_star_text(orbital* o)
            "Temperature: " + to_string_with_precision(round(temperature / 100)*100, 6) + "K";
 
     return ret;
+}
+
+std::string procedural_text_generator::generate_ship_name()
+{
+    return procedural_text::select_random(procedural_text::ship_names);
+}
+
+std::string procedural_text_generator::generate_fleet_name(orbital* o)
+{
+    int fname = o->parent_empire->fleet_name_counter++;
+
+    return std::string("Fleet ") + std::to_string(fname);
+}
+
+std::string procedural_text_generator::generate_empire_name()
+{
+    std::string b1 = procedural_text::select_random(procedural_text::empires_1);
+    std::string b2 = procedural_text::select_random(procedural_text::empires_2);
+
+    std::string the = randf_s(0.f, 1.f) < 0.5 ? "" : "The ";
+
+    return the + b1 + " " + b2;
 }
