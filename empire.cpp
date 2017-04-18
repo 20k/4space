@@ -7,6 +7,7 @@
 #include "../../render_projects/imgui/imgui.h"
 #include "top_bar.hpp"
 #include "util.hpp"
+#include "procedural_text_generator.hpp"
 
 empire::empire()
 {
@@ -936,7 +937,7 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
         for(int j = 0; j < 2; j++)
         {
             ship* test_ship = fleet1->make_new_from(team_id, make_default());
-            test_ship->name = "SS " + std::to_string(i) + std::to_string(j);
+            //test_ship->name = "SS " + std::to_string(i) + std::to_string(j);
 
             std::map<ship_component_element, float> res;
 
@@ -975,7 +976,10 @@ empire* empire_manager::make_new()
 {
     empire* e = new empire;
 
+    procedural_text_generator generator;
+
     e->parent = this;
+    e->name = generator.generate_empire_name();
 
     empires.push_back(e);
 
@@ -1021,6 +1025,8 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
     {
         emp->tick_invasion_timer(step_s, system_manage, fleet_manage);
     }
+
+    tick_name_fleets();
 }
 
 void empire_manager::tick_cleanup_colonising()
@@ -1039,12 +1045,31 @@ void empire_manager::tick_decolonisation()
     }
 }
 
+void empire_manager::tick_name_fleets()
+{
+    for(empire* e : empires)
+    {
+        for(orbital* o : e->owned)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            if(o->name != "")
+                continue;
+
+            procedural_text_generator generator;
+
+            o->name = generator.generate_fleet_name(o);
+        }
+    }
+}
+
 void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
     ship_manager* fleet1 = fleet_manage.make_new();
 
     ship* test_ship = fleet1->make_new_from(e->team_id, make_default());
-    test_ship->name = "SS Still Todo";
+    //test_ship->name = "SS Still Todo";
 
     orbital* ofleet = os->make_new(orbital_info::FLEET, 5.f);
 
@@ -1076,7 +1101,7 @@ empire* empire_manager::birth_empire(system_manager& system_manage, fleet_manage
 
     empire* e = make_new();
 
-    e->name = "Rando";
+    //e->name = "Rando";
     e->has_ai = true;
 
     claim_system(e, os, fleet_manage);
@@ -1142,7 +1167,7 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
         for(int kk=0; kk < ships_per_fleet; kk++)
         {
             ship* test_ship = fleet1->make_new_from(e->team_id, make_default());
-            test_ship->name = "SS Still Todo " + std::to_string(i) + std::to_string(kk);
+            //test_ship->name = "SS Still Todo " + std::to_string(i) + std::to_string(kk);
         }
 
         orbital* ofleet = os->make_new(orbital_info::FLEET, 5.f);

@@ -191,7 +191,7 @@ ship* spawn_ship_base(game_event& event)
     ship_manager* derelict_fleet = fleet_manage->make_new();
 
     ship* new_ship = derelict_fleet->make_new_from(owner_faction->team_id, make_default());
-    new_ship->name = "SS Toimplement name generation";
+    //new_ship->name = "SS Toimplement name generation";
 
     orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);
     onew_fleet->orbital_angle = o->orbital_angle;

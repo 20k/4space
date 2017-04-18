@@ -174,6 +174,7 @@ struct empire_manager
 
     void tick_cleanup_colonising();
     void tick_decolonisation();
+    void tick_name_fleets();
 
     ///if system_size > 1, explores nearby uncolonised systems
     empire* birth_empire(system_manager& system_manage,fleet_manager& fleet_manage, orbital_system* os, int system_size = 1);
@@ -194,6 +195,7 @@ struct empire_manager
     bool giving_resources_ui_clicked = false;
     resource_manager offering;
     bool giving_are_you_sure = false;
+
 };
 
 #endif // EMPIRE_HPP_INCLUDED

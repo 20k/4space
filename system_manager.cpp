@@ -758,6 +758,12 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     {
         n->col = {1, 1, 1};
     }
+    else if(type == orbital_info::FLEET)
+    {
+        //n->name = generator.generate_fleet_name(n);
+
+        n->name = "";
+    }
 
     n->render_type = orbital_info::render_type[type];
 

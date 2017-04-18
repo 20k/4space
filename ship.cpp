@@ -5,6 +5,7 @@
 #include "system_manager.hpp"
 #include "util.hpp"
 #include "top_bar.hpp"
+#include "procedural_text_generator.hpp"
 
 int ship::gid;
 
@@ -2815,7 +2816,10 @@ ship* ship_manager::make_new(int team)
 
     ships.push_back(s);
 
+    procedural_text_generator generator;
+
     s->team = team;
+    s->name = generator.generate_ship_name();
 
     s->owned_by = this;
 
@@ -2828,7 +2832,10 @@ ship* ship_manager::make_new_from(int team, const ship& ns)
 
     ships.push_back(s);
 
+    procedural_text_generator generator;
+
     s->team = team;
+    s->name = generator.generate_ship_name();
 
     s->owned_by = this;
 

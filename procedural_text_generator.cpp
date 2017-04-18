@@ -4,6 +4,8 @@
 #include "util.hpp"
 #include "empire.hpp"
 
+//uint16_t procedural_text::fid;
+
 std::vector<std::string> procedural_text::parse_default(const std::string& file)
 {
     std::vector<std::string> ret;
@@ -207,11 +209,15 @@ std::string procedural_text_generator::generate_star_text(orbital* o)
 
 std::string procedural_text_generator::generate_ship_name()
 {
-    return procedural_text::select_random(procedural_text::ship_names);
+    ///make the ss bit also random
+    return "SS " + procedural_text::select_random(procedural_text::ship_names);
 }
 
 std::string procedural_text_generator::generate_fleet_name(orbital* o)
 {
+    if(o->parent_empire == nullptr)
+        throw;
+
     int fname = o->parent_empire->fleet_name_counter++;
 
     return std::string("Fleet ") + std::to_string(fname);

@@ -1565,7 +1565,7 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
                 ship_manager* new_fleet = fleet_manage.make_new();
 
                 ship* new_ship = new_fleet->make_new_from(player_empire->team_id, test_ship);
-                new_ship->name = "SS Toimplement name generation";
+                //new_ship->name = "SS Toimplement name generation";
 
                 orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);
                 onew_fleet->orbital_angle = o->orbital_angle;
