@@ -14,6 +14,10 @@ empire::empire()
     culture_similarity = {randf_s(0.f, 1.f), randf_s(0.f, 1.f)};
 
     colour = randv<3, float>(0.3f, 1.f);
+
+    procedural_text_generator generator;
+
+    ship_prefix = generator.generate_ship_prefix();
 }
 
 int empire::team_gid = 0;
@@ -936,7 +940,7 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
 
         for(int j = 0; j < 2; j++)
         {
-            ship* test_ship = fleet1->make_new_from(team_id, make_default());
+            ship* test_ship = fleet1->make_new_from(this, make_default());
             //test_ship->name = "SS " + std::to_string(i) + std::to_string(j);
 
             std::map<ship_component_element, float> res;
@@ -1068,7 +1072,7 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
     ship_manager* fleet1 = fleet_manage.make_new();
 
-    ship* test_ship = fleet1->make_new_from(e->team_id, make_default());
+    ship* test_ship = fleet1->make_new_from(e, make_default());
     //test_ship->name = "SS Still Todo";
 
     orbital* ofleet = os->make_new(orbital_info::FLEET, 5.f);
@@ -1166,7 +1170,7 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
 
         for(int kk=0; kk < ships_per_fleet; kk++)
         {
-            ship* test_ship = fleet1->make_new_from(e->team_id, make_default());
+            ship* test_ship = fleet1->make_new_from(e, make_default());
             //test_ship->name = "SS Still Todo " + std::to_string(i) + std::to_string(kk);
         }
 

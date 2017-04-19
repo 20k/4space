@@ -19,6 +19,7 @@ namespace procedural_text
     static std::vector<std::string> ship_names = parse_default("./data/ships.txt");
     static std::vector<std::string> empires_1 = parse_default("./data/empires_1.txt");
     static std::vector<std::string> empires_2 = parse_default("./data/empires_2.txt");
+    static std::vector<std::string> ship_prefixes = parse_default("./data/ship_prefixes.txt");
 
     static std::string select_random(const std::vector<std::string>& dataset);
 }
@@ -36,6 +37,7 @@ struct procedural_text_generator
     std::string generate_fleet_name(orbital* o);
 
     std::string generate_empire_name();
+    std::string generate_ship_prefix();
 };
 
 #endif // PROCEDURAL_TEXT_GENERATOR_HPP_INCLUDED

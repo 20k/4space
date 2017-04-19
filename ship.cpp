@@ -2810,7 +2810,7 @@ float ship::get_scanning_ps()
     return scan_ps;
 }
 
-ship* ship_manager::make_new(int team)
+/*ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;
 
@@ -2824,9 +2824,9 @@ ship* ship_manager::make_new(int team)
     s->owned_by = this;
 
     return s;
-}
+}*/
 
-ship* ship_manager::make_new_from(int team, const ship& ns)
+ship* ship_manager::make_new_from(empire* e, const ship& ns)
 {
     ship* s = new ship(ns);
 
@@ -2834,8 +2834,8 @@ ship* ship_manager::make_new_from(int team, const ship& ns)
 
     procedural_text_generator generator;
 
-    s->team = team;
-    s->name = generator.generate_ship_name();
+    s->team = e->team_id;
+    s->name = e->ship_prefix + " " + generator.generate_ship_name();
 
     s->owned_by = this;
 

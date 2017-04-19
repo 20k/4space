@@ -46,6 +46,7 @@ struct empire
     static int team_gid;
 
     std::string name;
+    std::string ship_prefix;
 
     std::vector<orbital*> owned;
     std::vector<ship_manager*> owned_fleets;

@@ -594,8 +594,9 @@ struct ship_manager
 
     std::vector<ship*> ships;
 
-    ship* make_new(int team);
-    ship* make_new_from(int team, const ship& s);
+    //ship* make_new(int team);
+    //ship* make_new_from(int team, const ship& s);
+    ship* make_new_from(empire* e, const ship& s);
 
     void destroy(ship* s);
 

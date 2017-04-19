@@ -210,7 +210,7 @@ std::string procedural_text_generator::generate_star_text(orbital* o)
 std::string procedural_text_generator::generate_ship_name()
 {
     ///make the ss bit also random
-    return "SS " + procedural_text::select_random(procedural_text::ship_names);
+    return procedural_text::select_random(procedural_text::ship_names);
 }
 
 std::string procedural_text_generator::generate_fleet_name(orbital* o)
@@ -231,4 +231,9 @@ std::string procedural_text_generator::generate_empire_name()
     std::string the = randf_s(0.f, 1.f) < 0.5 ? "" : "The ";
 
     return the + b1 + " " + b2;
+}
+
+std::string procedural_text_generator::generate_ship_prefix()
+{
+    return procedural_text::select_random(procedural_text::ship_prefixes);
 }

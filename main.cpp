@@ -1564,7 +1564,7 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
                 ship_manager* new_fleet = fleet_manage.make_new();
 
-                ship* new_ship = new_fleet->make_new_from(player_empire->team_id, test_ship);
+                ship* new_ship = new_fleet->make_new_from(player_empire, test_ship);
                 //new_ship->name = "SS Toimplement name generation";
 
                 orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);
@@ -1614,6 +1614,7 @@ int main()
 
     empire* player_empire = empire_manage.make_new();
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
+    player_empire->ship_prefix = "SS";
 
     player_empire->resources.resources[resource::IRON].amount = 5000.f;
     player_empire->resources.resources[resource::COPPER].amount = 5000.f;
@@ -1661,18 +1662,18 @@ int main()
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
 
-    ship* test_ship = fleet1->make_new_from(player_empire->team_id, make_default());
-    ship* test_ship3 = fleet1->make_new_from(player_empire->team_id, make_default());
+    ship* test_ship = fleet1->make_new_from(player_empire, make_default());
+    ship* test_ship3 = fleet1->make_new_from(player_empire, make_default());
 
-    ship* test_ship2 = fleet2->make_new_from(hostile_empire->team_id, make_default());
+    ship* test_ship2 = fleet2->make_new_from(hostile_empire, make_default());
 
     test_ship2->set_tech_level_from_empire(hostile_empire);
 
-    ship* test_ship4 = fleet3->make_new_from(player_empire->team_id, make_default());
+    ship* test_ship4 = fleet3->make_new_from(player_empire, make_default());
 
-    ship* derelict_ship = fleet4->make_new_from(hostile_empire->team_id, make_default());
+    ship* derelict_ship = fleet4->make_new_from(hostile_empire, make_default());
 
-    ship* scout_ship = fleet3->make_new_from(player_empire->team_id, make_colony_ship());
+    ship* scout_ship = fleet3->make_new_from(player_empire, make_colony_ship());
     //ship* scout_ship2 = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
 
     test_ship->name = "SS Icarus";
@@ -1696,7 +1697,7 @@ int main()
 
     sf::RenderWindow window;
 
-    window.create(sf::VideoMode(1200, 900),"Wowee", sf::Style::Default, settings);
+    window.create(sf::VideoMode(1500, 900),"Wowee", sf::Style::Default, settings);
 
     ImGui::SFML::Init(window);
 
