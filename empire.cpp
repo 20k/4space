@@ -399,6 +399,20 @@ void empire::tick_ai(all_battles_manager& all_battles, system_manager& system_ma
     }
 }
 
+///evaluate enemy empire strengths
+///launch attacks on weaker hostile empires
+///expand and colonise space
+///alliance of alliance system needs work.. somehow
+///maybe ai should come to the aid of allies?
+///maybe declaring war on someone automatically declares war on their allies?
+void empire::tick_high_level_ai()
+{
+    if(!has_ai)
+        return;
+
+
+}
+
 void empire::draw_ui()
 {
     research_tech_level.draw_ui(this);
@@ -1021,6 +1035,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick(step_s);
         emp->tick_system_claim();
         emp->tick_ai(all_battles, system_manage);
+        emp->tick_high_level_ai();
         emp->tick_relation_ship_occupancy_loss(step_s, system_manage);
         emp->tick_relation_alliance_changes(player_empire);
     }

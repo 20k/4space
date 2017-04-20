@@ -93,6 +93,7 @@ struct empire
     void tick_system_claim();
     void tick(float step_s);
     void tick_ai(all_battles_manager& all_battles, system_manager& system_manage);
+    void tick_high_level_ai();
     void draw_ui();
 
     float empire_culture_distance(empire* e);
@@ -107,6 +108,8 @@ struct empire
     ///two way street
     ///when we implement proposing alliances, culture shift will be a thing
     ///if we're allied with another faction, culture shift
+    ///maybe become_hostile and become_unhostile should be recursive?
+    ///Or just make it a ticking relations drain (easier to implement)
     void become_hostile(empire* e);
     void become_unhostile(empire* e);
     void trade_space_access(empire* e, bool status);
