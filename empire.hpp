@@ -5,6 +5,7 @@
 #include <map>
 #include "research.hpp"
 #include <vec/vec.hpp>
+#include "ai_empire.hpp"
 
 struct orbital;
 struct orbital_system;

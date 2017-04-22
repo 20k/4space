@@ -21,7 +21,7 @@ namespace ai_empire_info
 ///more ships can be repurposed for defence depending on amount of hostile ships in a system
 ///otherwise returned to the general pool
 
-using ship_general_state = ai_empire::ship_state;
+using ship_general_state = ai_empire_info::ship_state;
 
 struct ai_empire
 {
