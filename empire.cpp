@@ -651,6 +651,11 @@ float empire::get_culture_modified_friendliness(empire* e)
     return current_friendliness;
 }
 
+bool empire::could_invade(empire* e)
+{
+    return is_hostile(e) && (get_military_strength() > (e->get_military_strength() * 1.1f));
+}
+
 void empire::negative_interaction(empire* e)
 {
     e->relations_map[this].hostility += 1.f;

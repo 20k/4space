@@ -123,6 +123,7 @@ struct empire
     bool can_traverse_space(empire* e); ///without diplomatic penalty
 
     float get_culture_modified_friendliness(empire* e);
+    bool could_invade(empire* e);
 
 
     ///make sure all relations have valid values
