@@ -99,6 +99,7 @@ struct empire
     float empire_culture_distance(empire* e);
 
     float get_research_level(research_info::types type);
+    float get_military_strength();
 
     float available_scanning_power_on(orbital* o);
     float available_scanning_power_on(ship* s, system_manager& system_manage);

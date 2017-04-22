@@ -433,6 +433,21 @@ float empire::get_research_level(research_info::types type)
     return research_tech_level.categories[(int)type].amount;
 }
 
+float empire::get_military_strength()
+{
+    float accum = 0;
+
+    for(ship_manager* sm : owned_fleets)
+    {
+        for(ship* s : sm->ships)
+        {
+            accum += s->get_tech_adjusted_military_power();
+        }
+    }
+
+    return accum;
+}
+
 float empire::available_scanning_power_on(orbital* passed_other)
 {
     if(passed_other->parent_empire == this)

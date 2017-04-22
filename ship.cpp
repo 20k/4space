@@ -814,6 +814,11 @@ void component::set_tag(component_tag::tag tag, float val)
     tag_list[tag] = val;
 }
 
+bool component::is_weapon()
+{
+    return ship_component_elements::weapons_map[primary_attribute] >= 0;
+}
+
 /*void component::set_tech_level(float tech_level)
 {
     for(auto& i : components)
@@ -2471,6 +2476,21 @@ float ship::get_real_total_cost()
     for(component& c : entity_list)
     {
         accum += c.get_real_component_cost();
+    }
+
+    return accum;
+}
+
+float ship::get_tech_adjusted_military_power()
+{
+    float accum = 0.f;
+
+    for(component& c : entity_list)
+    {
+        if(!c.is_weapon())
+            continue;
+
+        accum += c.get_tech_level_of_primary();
     }
 
     return accum;

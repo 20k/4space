@@ -58,6 +58,14 @@ namespace ship_component_elements
         NONE,
     };
 
+    static std::vector<types> weapons_map_def
+    {
+        RAILGUN,
+        TORPEDO,
+        PLASMAGUN,
+        COILGUN,
+    };
+
     static std::vector<types> skippable_in_display_def
     {
         COLONISER,
@@ -126,6 +134,7 @@ namespace ship_component_elements
     static std::vector<int> repair_out_combat_map = generate_repair_priorities(repair_priorities_out_combat_def);
     static std::vector<int> allowed_skip_repair = generate_repair_priorities(allowed_skip_repair_def);
     static std::vector<int> skippable_in_display = generate_repair_priorities(skippable_in_display_def);
+    static std::vector<int> weapons_map = generate_repair_priorities(weapons_map_def);
 
     ///we could just take the inverse of cooling_potential when displaying
     ///might be more friendly for the player
@@ -384,6 +393,8 @@ struct component
 
     void set_tag(component_tag::tag tag, float val);
 
+    bool is_weapon();
+
     ///BLANKET SETS ALL SUB COMPONENTS TO TECH LEVEL
     void set_tech_level(float tech_level);
     void set_tech_level_from_empire(empire* e);
@@ -537,6 +548,7 @@ struct ship : positional
 
     float get_total_cost();
     float get_real_total_cost();
+    float get_tech_adjusted_military_power();
 
     std::map<resource::types, float> resources_needed_to_recrew_total();
     std::map<resource::types, float> resources_needed_to_repair_total();
