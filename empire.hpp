@@ -125,6 +125,16 @@ struct empire
     float get_culture_modified_friendliness(empire* e);
     bool could_invade(empire* e);
 
+    ///invasion mechanics conceptually
+    ///find all spare ships leftover for invasions, group together and launch invasion
+    ///if battles go poorly, pull invasion fleet out and cooldown/build more ships
+    ///some ships will want to be tagged as defence ships
+    ///lets create an empire_ai class so we can tag stuff and manage better
+    ///reserve % of forces for defences, % of forces for general
+    ///if we're invaded, repurpose general for defence
+    ///if we're invading, repurpose general for attacking
+
+    ///will also need colony ship mechanics
 
     ///make sure all relations have valid values
     void clamp_relations();
