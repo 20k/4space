@@ -583,6 +583,9 @@ struct ship : positional
     float get_drive_signature();
     float get_scanning_ps();
 
+    bool can_colonise();
+    bool is_military();
+
     static sf::RenderTexture* intermediate;
 
     //sf::RenderTexture* intermediate_texture = nullptr;

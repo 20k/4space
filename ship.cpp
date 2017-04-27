@@ -2830,6 +2830,28 @@ float ship::get_scanning_ps()
     return scan_ps;
 }
 
+bool ship::can_colonise()
+{
+    for(component& i : entity_list)
+    {
+        if(i.primary_attribute == ship_component_elements::COLONISER)
+            return true;
+    }
+
+    return false;
+}
+
+bool ship::is_military()
+{
+    for(component& i : entity_list)
+    {
+        if(i.is_weapon())
+            return true;
+    }
+
+    return false;
+}
+
 /*ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;

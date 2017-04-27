@@ -5,6 +5,7 @@
 #include <map>
 
 struct ship_manager;
+struct empire;
 
 ///need to set ship ai to be able to path
 ///maybe literally do in ai_fleet?
@@ -29,6 +30,8 @@ using ship_general_state = ai_empire_info::ship_state;
 struct ai_empire
 {
     std::map<ship_manager*, ship_general_state> general_purpose_state;
+
+    void tick(empire* e);
 };
 
 #endif // AI_EMPIRE_HPP_INCLUDED

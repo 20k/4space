@@ -414,7 +414,7 @@ void empire::tick_high_level_ai()
     if(!has_ai)
         return;
 
-
+    ai_empire_controller.tick(this);
 }
 
 void empire::draw_ui()
