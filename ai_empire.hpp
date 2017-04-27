@@ -6,12 +6,15 @@
 
 struct ship_manager;
 
+///need to set ship ai to be able to path
+///maybe literally do in ai_fleet?
 namespace ai_empire_info
 {
     enum ship_state
     {
         IDLE,
         DEFENCE,
+        STAGING,
         INVASION,
     };
 }
@@ -25,7 +28,7 @@ using ship_general_state = ai_empire_info::ship_state;
 
 struct ai_empire
 {
-    std::vector<ship_manager*> general_purpose;
+    //std::vector<ship_manager*> general_purpose;
 
     std::map<ship_manager*, ship_general_state> general_purpose_state;
 };

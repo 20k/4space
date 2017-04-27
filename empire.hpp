@@ -30,6 +30,8 @@ struct fleet_manager;
 
 struct empire
 {
+    ai_empire ai_empire_controller;
+
     bool has_ai = false;
     vec3f colour = {1,1,1};
 

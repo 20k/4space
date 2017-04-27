@@ -74,6 +74,8 @@
 			<Add option="-limm32" />
 			<Add option="-lSDL2" />
 		</Linker>
+		<Unit filename="ai_empire.cpp" />
+		<Unit filename="ai_empire.hpp" />
 		<Unit filename="ai_fleet.cpp" />
 		<Unit filename="ai_fleet.hpp" />
 		<Unit filename="battle_manager.cpp" />
