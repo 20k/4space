@@ -28,8 +28,6 @@ using ship_general_state = ai_empire_info::ship_state;
 
 struct ai_empire
 {
-    //std::vector<ship_manager*> general_purpose;
-
     std::map<ship_manager*, ship_general_state> general_purpose_state;
 };
 
