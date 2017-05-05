@@ -37,7 +37,7 @@ void ship_command_queue::tick(orbital* parent)
 
     while(is_front_complete() && command_queue.size() > 0)
     {
-        command_queue.pop_front();
+        command_queue.pop();
     }
 }
 
