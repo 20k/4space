@@ -8,6 +8,7 @@
 #include "resource_manager.hpp"
 #include "research.hpp"
 #include "ai_fleet.hpp"
+#include "ship_command_queue.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -601,34 +602,12 @@ struct ship : positional
 
 struct orbital_system;
 struct orbital;
-struct ship_manager;
-
-namespace ship_queue_info
-{
-    enum queue_element_type
-    {
-        IN_SYSTEM_PATH,
-        WARP,
-        COLONISE,
-        FIGHT,
-    };
-
-    ///given that target might become invalid, we need to check it still exists or clear it if invalid
-    ///creates memory management difficulties in this method. Is there a better way? Targeting an orbital system is fine
-    ///they're never going away. But orbital* ship targets might
-    struct queue_element_data
-    {
-        queue_element_type type;
-
-        vec2f pos = {0,0};
-        orbital_system* dest = nullptr;
-        orbital* target = nullptr;
-    };
-}
 
 ///can be used as a fleet
 struct ship_manager
 {
+    ship_command_queue command_queue;
+
     ai_fleet ai_controller;
 
     std::vector<ship*> ships;
