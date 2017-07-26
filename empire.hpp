@@ -128,6 +128,8 @@ struct empire
     float get_culture_modified_friendliness(empire* e);
     bool could_invade(empire* e);
 
+    std::string get_relations_string(empire* e);
+
     ///invasion mechanics conceptually
     ///find all spare ships leftover for invasions, group together and launch invasion
     ///if battles go poorly, pull invasion fleet out and cooldown/build more ships
