@@ -648,6 +648,9 @@ bool empire::can_traverse_space(empire* e)
 
 float empire::get_culture_modified_friendliness(empire* e)
 {
+    if(e == nullptr)
+        return 0.f;
+
     float culture_dist = empire_culture_distance(e);
 
     float current_friendliness = (culture_dist - 0.5f) + relations_map[e].friendliness;
@@ -662,6 +665,9 @@ bool empire::could_invade(empire* e)
 
 std::string empire::get_relations_string(empire* e)
 {
+    if(e == nullptr)
+        return "Unknown";
+
     if(is_allied(e))
     {
         return "Allied";

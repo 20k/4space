@@ -2212,7 +2212,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
                 ImGui::TextColored(col, empire_name.c_str());
 
-                if(ImGui::IsItemHovered())
+                if(ImGui::IsItemHovered() && e != nullptr)
                 {
                     std::string relations_str = to_string_with_enforced_variable_dp(viewing_empire->get_culture_modified_friendliness(e));
 
@@ -2222,7 +2222,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                         tooltip::add("(Your Empire)");
                 }
 
-                //ImGui::Text(empire_name.c_str());
+                ImGui::Indent();
 
                 for(orbital* o : kk.second)
                 {
@@ -2358,6 +2358,8 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     }
 
                 }
+
+                ImGui::Unindent();
             }
 
             ImGui::Unindent();
