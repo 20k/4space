@@ -1597,6 +1597,8 @@ void system_manager::set_viewed_system(orbital_system* s, bool reset_zoom)
     {
         //printf("Warning no base object!\n");
     }
+
+    top_bar::active[top_bar_info::UNIVERSE] = false;
 }
 
 bool intersect(vec2f p1, vec2f p2, float r)
@@ -1801,7 +1803,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 
     ///ok, i've done this in a stupid way which means that I can't set the pad on the top bar
     ///:(
-    if(top_bar::active[top_bar_info::UNIVERSE])
+    /*if(top_bar::active[top_bar_info::UNIVERSE])
     {
         if(in_system_view())
             enter_universe_view();
@@ -1809,6 +1811,21 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
             set_viewed_system(get_nearest_to_camera(), true);
 
         top_bar::active[top_bar_info::UNIVERSE] = false;
+    }*/
+
+    if(top_bar::active[top_bar_info::UNIVERSE])
+    {
+        if(in_system_view())
+        {
+            enter_universe_view();
+        }
+    }
+    else
+    {
+        if(!in_system_view())
+        {
+            set_viewed_system(get_nearest_to_camera(), true);
+        }
     }
 
     if(in_system_view())
@@ -1912,6 +1929,8 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
         camera = currently_viewed->universe_pos * universe_scale;
         //camera = camera + currently_viewed->universe_pos * universe_scale;
     }
+
+    top_bar::active[top_bar_info::UNIVERSE] = !is_in_system_view;
 }
 
 void system_manager::pan_camera(vec2f dir)
@@ -1928,6 +1947,8 @@ void system_manager::enter_universe_view()
 {
     //zoom_level = 10;
     set_zoom(10.f, true);
+
+    top_bar::active[top_bar_info::UNIVERSE] = true;
 }
 
 orbital_system* system_manager::get_nearest_to_camera()
