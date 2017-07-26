@@ -1333,10 +1333,6 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
         if(e->is_derelict)
             continue;
 
-        //float culture_dist = viewer_empire->empire_culture_distance(e);
-
-        //float current_friendliness = (culture_dist - 0.5f) + relations.friendliness;
-
         float current_friendliness = viewer_empire->get_culture_modified_friendliness(e);
 
         std::string rel_str = to_string_with_enforced_variable_dp(current_friendliness);
