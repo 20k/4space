@@ -1312,7 +1312,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                 if(ImGui::IsItemHovered() || hovered)
                 {
                     if(can_open_window)
-                        ImGui::SetTooltip("Left Click to view fleet");
+                        ImGui::SetTooltip("Left Click to view ship");
                     if(i.mergeable)
                         ImGui::SetTooltip("Shift-Click to add to fleet");
                 }
