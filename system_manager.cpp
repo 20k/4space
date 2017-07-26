@@ -2051,6 +2051,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
         int sys_c = 0;
 
         bool first_of_empire = true;
+        bool first_system_seen = true;
 
         std::string empire_name_str;
 
@@ -2123,8 +2124,10 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
             ImGui::Indent();
 
             ///spacing between systems
-            if(sys_c != 0)
+            if(!first_system_seen)
                 ImGui::Text("\n");
+
+            first_system_seen = false;
 
             std::string sys_pad = "-";
 
@@ -2208,6 +2211,17 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                 }
 
                 ImGui::TextColored(col, empire_name.c_str());
+
+                if(ImGui::IsItemHovered())
+                {
+                    std::string relations_str = to_string_with_enforced_variable_dp(viewing_empire->get_culture_modified_friendliness(e));
+
+                    if(viewing_empire != e)
+                        tooltip::add(relations_str + " (" + viewing_empire->get_relations_string(e) + ")");
+                    else
+                        tooltip::add("(Your Empire)");
+                }
+
                 //ImGui::Text(empire_name.c_str());
 
                 for(orbital* o : kk.second)
