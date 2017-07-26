@@ -1361,46 +1361,6 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
         ImGui::Text(("" + rel_str).c_str());
 
-        /*if(viewer_empire->is_allied(e))
-        {
-            ImGui::SameLine();
-
-            ImGui::Text("(Allied)");
-        }
-        else if(!viewer_empire->is_hostile(e))
-        {
-            float friendliness = current_friendliness;
-
-            ImGui::SameLine();
-
-            if(friendliness >= 0.9f)
-            {
-                ImGui::Text("(Very Friendly)");
-            }
-            else if(friendliness >= 0.7)
-            {
-                ImGui::Text("(Friendly)");
-            }
-            else if(friendliness < 0.3f)
-            {
-                ImGui::Text("(Unfriendly)");
-            }
-            else if(friendliness < 0.1f)
-            {
-                ImGui::Text("(Extreme dislike)");
-            }
-            else
-            {
-                ImGui::Text("(Neutral)");
-            }
-        }
-        else
-        {
-            ImGui::SameLine();
-
-            ImGui::Text("(Hostile)");
-        }*/
-
         std::string relations_str = viewer_empire->get_relations_string(e);
 
         ImGui::SameLine();
