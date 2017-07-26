@@ -784,7 +784,10 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
             if(ImGui::IsItemHovered())
             {
-                ImGui::SetTooltip("Warning, this fleet will take heavy damage!");
+                if(bm->can_disengage(player_empire))
+                    ImGui::SetTooltip("Warning, this fleet will take heavy damage!");
+                else
+                    ImGui::SetTooltip("Cannot disengage");
             }
         }
         else
