@@ -34,6 +34,7 @@ void empire::take_ownership(orbital* o)
     }
 
     o->parent_empire = this;
+    o->viewed_by[this] = true;
 
     owned.push_back(o);
 }
