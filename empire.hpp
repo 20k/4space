@@ -28,6 +28,20 @@ struct faction_relations
 struct empire_manager;
 struct fleet_manager;
 
+namespace relations_info
+{
+    ///below means we unally
+    constexpr float unally_threshold = 0.7f;
+    ///below means hostile
+    constexpr float hostility_threshold = 0.f;
+    ///above means ally
+    constexpr float ally_threshold = 1.f;
+    ///above means make peace
+    constexpr float unhostility_threshold = 0.1f;
+
+    constexpr float fudge = 0.01f;
+}
+
 struct empire
 {
     ai_empire ai_empire_controller;
@@ -85,6 +99,7 @@ struct empire
     void culture_shift(float culture_units, empire* destination);
     void positive_relations(empire* e, float amount);
     void negative_relations(empire* e, float amount);
+    void offset_relations(empire* e, float amount);
 
     ///returns real amount
     void dispense_resource(const resource_manager& res);
@@ -127,6 +142,10 @@ struct empire
 
     float get_culture_modified_friendliness(empire* e);
     bool could_invade(empire* e);
+
+    //float constrain_relations(empire* e, float val, float lower, float upper) const;
+    float get_relation_constraint_offset_upper(empire* e, float upper);
+    float get_relation_constraint_offset_lower(empire* e, float lower);
 
     std::string get_relations_string(empire* e);
 

@@ -237,6 +237,9 @@ void empire::culture_shift(float culture_units, empire* destination)
 
 void empire::positive_relations(empire* e, float amount)
 {
+    if(e == nullptr)
+        return;
+
     relations_map[e].friendliness += amount;
     relations_map[e].positivity += amount;
 
@@ -246,11 +249,23 @@ void empire::positive_relations(empire* e, float amount)
 
 void empire::negative_relations(empire* e, float amount)
 {
+    if(e == nullptr)
+        return;
+
     relations_map[e].friendliness -= amount;
     relations_map[e].hostility += amount;
 
     e->relations_map[this].friendliness -= amount;
     e->relations_map[this].hostility += amount;
+}
+
+void empire::offset_relations(empire* e, float amount)
+{
+    if(e == nullptr)
+        return;
+
+    relations_map[e].friendliness += amount;
+    e->relations_map[this].friendliness += amount;
 }
 
 void empire::dispense_resource(const resource_manager& res)
@@ -454,6 +469,9 @@ float empire::get_military_strength()
 
 float empire::available_scanning_power_on(orbital* passed_other)
 {
+    if(passed_other == nullptr)
+        return 0.f;
+
     if(passed_other->parent_empire == this)
         return 1.f;
 
@@ -482,7 +500,13 @@ float empire::available_scanning_power_on(orbital* passed_other)
 
 float empire::available_scanning_power_on(ship* s, system_manager& system_manage)
 {
+    if(s == nullptr)
+        return 0.f;
+
     ship_manager* sm = s->owned_by;
+
+    if(sm == nullptr)
+        return 1.f;
 
     if(sm->parent_empire == this)
         return 1.f;
@@ -512,6 +536,9 @@ float empire::available_scanning_power_on(ship* s, system_manager& system_manage
 
 float empire::available_scanning_power_on(ship_manager* sm, system_manager& system_manage)
 {
+    if(sm == nullptr)
+        return 1.f;
+
     float max_v = 0.f;
 
     for(ship* s : sm->ships)
@@ -536,6 +563,9 @@ void empire::become_hostile(empire* e)
     trade_space_access(e, false);
 
     unally(e);
+
+    offset_relations(e, get_relation_constraint_offset_upper(e, relations_info::unhostility_threshold));
+    e->offset_relations(this, e->get_relation_constraint_offset_upper(this, relations_info::unhostility_threshold));
 }
 
 void empire::become_unhostile(empire* e)
@@ -548,6 +578,9 @@ void empire::become_unhostile(empire* e)
 
     e->relations_map[this].hostile = false;
     e->relations_map[this].friendliness += 0.5f;
+
+    offset_relations(e, get_relation_constraint_offset_lower(e, relations_info::hostility_threshold));
+    e->offset_relations(this, e->get_relation_constraint_offset_lower(this, relations_info::hostility_threshold));
 }
 
 void empire::trade_space_access(empire* e, bool status)
@@ -587,6 +620,8 @@ void empire::ally(empire* e)
     e->relations_map[this].allied = true;
     e->relations_map[this].friendliness += 0.5f;
 
+    offset_relations(e, get_relation_constraint_offset_lower(e, relations_info::unally_threshold));
+    e->offset_relations(this, e->get_relation_constraint_offset_lower(this, relations_info::unally_threshold));
 
     for(orbital* o : e->owned)
     {
@@ -615,6 +650,9 @@ void empire::unally(empire* e)
     e->relations_map[this].friendliness -= 0.5f;
 
     trade_space_access(e, false);
+
+    offset_relations(e, get_relation_constraint_offset_upper(e, relations_info::ally_threshold));
+    e->offset_relations(this, e->get_relation_constraint_offset_upper(this, relations_info::ally_threshold));
 }
 
 bool empire::is_allied(empire* e)
@@ -661,6 +699,50 @@ float empire::get_culture_modified_friendliness(empire* e)
 bool empire::could_invade(empire* e)
 {
     return is_hostile(e) && (get_military_strength() > (e->get_military_strength() * 1.1f));
+}
+
+/*float empire::constrain_relations(empire* e, float val, float lower, float upper) const
+{
+    if(e == nullptr)
+        return val;
+
+    float friendliness = get_culture_modified_friendliness(e);
+
+    if(val < lower)
+    {
+        friendliness += lower - val + relations_info::fudge;
+    }
+
+    if(val > upper)
+    {
+        friendliness += upper - val - relations_info::fudge;
+    }
+
+    return friendliness;
+}*/
+
+float empire::get_relation_constraint_offset_upper(empire* e, float upper)
+{
+    float friendliness = get_culture_modified_friendliness(e);
+
+    if(friendliness > upper)
+    {
+        return upper - friendliness - relations_info::fudge;
+    }
+
+    return 0.f;
+}
+
+float empire::get_relation_constraint_offset_lower(empire* e, float lower)
+{
+    float friendliness = get_culture_modified_friendliness(e);
+
+    if(friendliness < lower)
+    {
+        return lower - friendliness + relations_info::fudge;
+    }
+
+    return 0.f;
 }
 
 std::string empire::get_relations_string(empire* e)
@@ -889,27 +971,35 @@ void empire::tick_relation_alliance_changes(empire* player_empire)
 
         float current_friendliness = get_culture_modified_friendliness(e);
 
-        if(e->is_allied(this) && current_friendliness < 0.7f)
+        if(e->is_allied(this) && current_friendliness < relations_info::unally_threshold)
         {
             e->unally(this);
+
+            current_friendliness = get_culture_modified_friendliness(e);
         }
 
-        if(!e->is_hostile(this) && current_friendliness < 0)
+        if(!e->is_hostile(this) && current_friendliness < relations_info::hostility_threshold)
         {
             e->become_hostile(this);
+
+            current_friendliness = get_culture_modified_friendliness(e);
         }
 
         if(e == player_empire)
             continue;
 
-        if(!is_allied(e) && current_friendliness >= 1.f)
+        if(!is_allied(e) && current_friendliness >= relations_info::ally_threshold)
         {
             ally(e);
+
+            current_friendliness = get_culture_modified_friendliness(e);
         }
 
-        if(is_hostile(e) && current_friendliness > 0.1f)
+        if(is_hostile(e) && current_friendliness > relations_info::unhostility_threshold)
         {
             become_unhostile(e);
+
+            current_friendliness = get_culture_modified_friendliness(e);
         }
     }
 }
