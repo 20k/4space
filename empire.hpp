@@ -148,6 +148,7 @@ struct empire
     float get_relation_constraint_offset_lower(empire* e, float lower);
 
     std::string get_relations_string(empire* e);
+    vec3f get_relations_colour(empire* e);
 
     ///invasion mechanics conceptually
     ///find all spare ships leftover for invasions, group together and launch invasion

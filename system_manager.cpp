@@ -11,6 +11,7 @@
 #include "top_bar.hpp"
 #include <deque>
 #include "popup.hpp"
+#include <unordered_map>
 
 
 float system_manager::universe_scale = 100.f;
@@ -1786,6 +1787,84 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         os->highlight = false;
 
+        if(os->get_base() == nullptr)
+            continue;
+
+        auto win_pos = win.mapCoordsToPixel({pos.x(), pos.y()});
+
+        std::unordered_map<empire*, std::vector<orbital*>> sorted_orbitals;
+
+        /*int num_owned = 0;
+        int num_friendly = 0;
+        int num_neutral = 0;
+        int num_hostile = 0;*/
+
+        for(int i=0; i<os->orbitals.size(); i++)
+        {
+            orbital* o = os->orbitals[i];
+
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            sorted_orbitals[o->parent_empire].push_back(o);
+        }
+
+        if(sorted_orbitals.size() == 0)
+            continue;
+
+        ImGui::SetNextWindowPos(ImVec2(win_pos.x, win_pos.y));
+
+        ImGui::Begin(("###" + os->get_base()->name + std::to_string(i)).c_str(), nullptr,
+                     ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
+                     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing |
+                     ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+
+        /*ImGui::Columns(sorted_orbitals.size());
+
+        for(auto& i : sorted_orbitals)
+        {
+            empire* e = i.first;
+
+            const std::vector<orbital*>& orbital_list = i.second;
+
+            for(orbital* o : orbital_list)
+            {
+                vec3f col = viewer_empire->get_relations_colour(e);
+
+                ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), (o->name + "  ").c_str());
+            }
+
+            ImGui::NextColumn();
+        }*/
+
+        for(auto& i : sorted_orbitals)
+        {
+            empire* e = i.first;
+
+            const std::vector<orbital*>& orbital_list = i.second;
+
+            int num_ships = 0;
+
+            for(orbital* o : orbital_list)
+            {
+                ship_manager* sm = (ship_manager*)o->data;
+
+                num_ships += sm->ships.size();
+            }
+
+            int num_fleets = orbital_list.size();
+
+            std::string display_str = std::to_string(num_fleets) + std::string(" fleet") + (num_ships > 1 ? "s" : "");
+
+            vec3f col = viewer_empire->get_relations_colour(e);
+
+            ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), display_str.c_str());
+        }
+
+
+        ImGui::End();
+
         /*std::string owner_str = "";
 
         if(os->get_base()->parent_empire != nullptr)
@@ -2194,23 +2273,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     empire_name = "Empire: Unknown";
                 }
 
-                ImVec4 col(1,1,1,1);
+                vec3f col = viewing_empire->get_relations_colour(e);
 
-                if(e != nullptr && viewing_empire->is_hostile(e) && e != viewing_empire)
-                {
-                    col = ImVec4(1, 0.5, 0.5, 1);
-                }
-                if(e != nullptr && viewing_empire->is_allied(e) && e != viewing_empire)
-                {
-                    col = ImVec4(0.5, 1, 0.5, 1);
-                }
-
-                if(e == viewing_empire)
-                {
-                    col = ImVec4(0.5, 0.5, 1, 1);
-                }
-
-                ImGui::TextColored(col, empire_name.c_str());
+                ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1.f), empire_name.c_str());
 
                 if(ImGui::IsItemHovered() && e != nullptr)
                 {

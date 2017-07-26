@@ -786,6 +786,31 @@ std::string empire::get_relations_string(empire* e)
     }
 }
 
+vec3f empire::get_relations_colour(empire* e)
+{
+    vec3f col = {1, 1, 1};
+
+    if(e == nullptr)
+        return col;
+
+    if(e != nullptr && is_hostile(e) && e != this)
+    {
+        col = {1, 0.5, 0.5};
+    }
+
+    if(e != nullptr && is_allied(e) && e != this)
+    {
+        col = {0.5, 1, 0.5, 1};
+    }
+
+    if(e == this)
+    {
+        col = {0.5, 0.5, 1, 1};
+    }
+
+    return col;
+}
+
 void empire::negative_interaction(empire* e)
 {
     e->relations_map[this].hostility += 1.f;

@@ -1994,8 +1994,11 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
     std::map<ship_component_element, float> hp_diff;
     hp_diff[ship_component_element::HP] = -hp_damage;
 
-    h->apply_diff(hp_diff);
+    auto res = h->apply_diff(hp_diff);
 
+    float leftover = res[ship_component_element::HP];
+
+    distribute_damage(leftover/2.f, 1, this);
 
     empire* being_hit_empire = owned_by->parent_empire;
 
