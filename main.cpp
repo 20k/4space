@@ -1592,7 +1592,8 @@ void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 {
     sf::View view = window.getDefaultView();
 
-    view.zoom(system_manage.zoom_level);
+    view.setSize(window.getSize().x * system_manage.zoom_level, window.getSize().y * system_manage.zoom_level);
+    //view.zoom(system_manage.zoom_level);
     view.setCenter({system_manage.camera.x(), system_manage.camera.y()});
 
     window.setView(view);
@@ -1889,7 +1890,7 @@ int main()
         system_manage.pan_camera(cdir * diff_s * 300);
 
         if(no_suppress_mouse)
-            system_manage.change_zoom(scrollwheel_delta);
+            system_manage.change_zoom(-scrollwheel_delta);
 
         ///BATTLE MANAGER IS NO LONGER TICKING SHIP COMPONENTS, IT IS ASSUMED TO BE DONE GLOBALLY WHICH WE WONT WANT
         ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME

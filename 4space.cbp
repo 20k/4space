@@ -97,6 +97,8 @@
 		<Unit filename="resource_manager.hpp" />
 		<Unit filename="ship.cpp" />
 		<Unit filename="ship.hpp" />
+		<Unit filename="ship_command_queue.cpp" />
+		<Unit filename="ship_command_queue.hpp" />
 		<Unit filename="ship_definitions.hpp" />
 		<Unit filename="system_manager.cpp" />
 		<Unit filename="system_manager.hpp" />

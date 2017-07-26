@@ -1860,18 +1860,20 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
     }
 }
 
-void system_manager::change_zoom(float zoom)
+void system_manager::change_zoom(float amount)
 {
-    float scale = zoom_level;
+    float zoom = zoom_level;
 
-    zoom *= 0.4f;
+    if(amount > 0)
+    {
+        zoom *= pow(1.3, amount + 1);
+    }
+    else if(amount < 0)
+    {
+        zoom /= pow(1.3, fabs(amount) + 1);
+    }
 
-    if(zoom < 0)
-        zoom = scale * zoom;
-    else
-        zoom = scale/2 * zoom;
-
-    set_zoom(zoom_level - zoom, true);
+    set_zoom(zoom, true);
 }
 
 void system_manager::set_zoom(float zoom, bool auto_enter_system)
@@ -1879,7 +1881,7 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
     bool was_in_system_view = in_system_view();
 
     float min_zoom = 1.f / 1000.f;
-    float max_zoom = 5.f;
+    //float max_zoom = 5.f;
 
     zoom_level = zoom;
 
