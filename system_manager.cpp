@@ -1799,6 +1799,8 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 {
     hovered_system = currently_viewed;
 
+    ///ok, i've done this in a stupid way which means that I can't set the pad on the top bar
+    ///:(
     if(top_bar::active[top_bar_info::UNIVERSE])
     {
         if(in_system_view())
@@ -1864,13 +1866,15 @@ void system_manager::change_zoom(float amount)
 {
     float zoom = zoom_level;
 
+    float root_2 = sqrt(2.f);
+
     if(amount > 0)
     {
-        zoom *= pow(1.3, amount + 1);
+        zoom *= pow(root_2, amount + 1);
     }
     else if(amount < 0)
     {
-        zoom /= pow(1.3, fabs(amount) + 1);
+        zoom /= pow(root_2, fabs(amount) + 1);
     }
 
     set_zoom(zoom, true);
