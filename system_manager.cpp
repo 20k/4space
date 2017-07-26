@@ -2191,7 +2191,24 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     empire_name = "Empire: Unknown";
                 }
 
-                ImGui::Text(empire_name.c_str());
+                ImVec4 col(1,1,1,1);
+
+                if(e != nullptr && viewing_empire->is_hostile(e) && e != viewing_empire)
+                {
+                    col = ImVec4(1, 0.5, 0.5, 1);
+                }
+                if(e != nullptr && viewing_empire->is_allied(e) && e != viewing_empire)
+                {
+                    col = ImVec4(0.5, 1, 0.5, 1);
+                }
+
+                if(e == viewing_empire)
+                {
+                    col = ImVec4(0.5, 0.5, 1, 1);
+                }
+
+                ImGui::TextColored(col, empire_name.c_str());
+                //ImGui::Text(empire_name.c_str());
 
                 for(orbital* o : kk.second)
                 {
