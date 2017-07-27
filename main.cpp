@@ -850,11 +850,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         }
     }
 
-    //if(!system_manage.in_system_view())
-    //    continue;
-
-    //bool term = false;
-
     for(orbital* orb : valid_selection_targets)
     {
         ///not necessarily valid
@@ -898,8 +893,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
             if(orb->type == orbital_info::FLEET)
                 sm->toggle_fleet_ui = true;
-
-            //term = true;
         }
 
         if(orb->type == orbital_info::STAR)
@@ -918,19 +911,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
             ImGui::SetTooltip(res_first.c_str());
         }
-
-        //if(term)
-        //    break;
     }
 
-
-    ///dis me
-    //if(popup.fetch(orb) != nullptr && orb->parent_system != nullptr)
     for(popup_element& elem : popup.elements)
     {
         orbital* orb = (orbital*)elem.element;
-
-        //selected.push_back(orb);
 
         if(orb->type != orbital_info::FLEET)
             continue;
@@ -938,8 +923,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         ship_manager* sm = (ship_manager*)orb->data;
 
         orbital_system* parent_system = orb->parent_system;
-
-        //popup_element& elem = *popup.fetch(orb);
 
         ///if orb not a fleet, this is empty
         std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
