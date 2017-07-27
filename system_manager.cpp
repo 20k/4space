@@ -2288,26 +2288,26 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                 set_viewed_system(sys);
             }
 
-            std::string view_str;
+            int remove_len = sys_name.length();
 
             if(viewing)
             {
-                view_str = "(viewing)";
+                std::string view_str = "(viewing)";
 
                 ImGui::SameLine();
 
                 ImGui::Text(view_str.c_str());
+
+                remove_len += view_str.length() + 1;
             }
 
             #define DASH_LINES
             #ifdef DASH_LINES
             ImGui::SameLine();
 
-            int str_len = sys_name.length() + (view_str.length() > 0 ? view_str.length() + 1 : 0);
-
             std::string str;
 
-            for(int i=0; i<40 - str_len; i++)
+            for(int i=0; i<40 - remove_len; i++)
             {
                 str = str + "-";
             }
