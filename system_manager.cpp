@@ -1602,6 +1602,19 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
     return {avg - o2dir * 1.02f, avg + o2dir * 1.02f};
 }
 
+void fleet_draw(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
+{
+    auto scr_pos = win.mapCoordsToPixel({pos.x(), pos.y()});
+
+    fleet_sprite.setPosition(scr_pos.x + screen_offset.x(), scr_pos.y + screen_offset.y() - fleet_sprite.getGlobalBounds().height/2.f);
+    fleet_sprite.setColor(sf::Color(col.x() * 255.f, col.y() * 255.f, col.z() * 255.f, 255));
+
+    auto backup_view = win.getView();
+    win.setView(win.getDefaultView());
+    win.draw(fleet_sprite);
+    win.setView(backup_view);
+}
+
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire)
 {
     //printf("zoom %f\n", zoom_level);
@@ -1776,9 +1789,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         if(!viewer_empire->has_vision(os))
             continue;
 
-
-        auto win_pos = win.mapCoordsToPixel({pos.x(), pos.y()});
-
+        ///ok this all works for the moment
+        ///next up clicking the fleet icon should select all ships of that class
         std::unordered_map<empire*, std::vector<orbital*>> sorted_orbitals;
 
         int num_owned = 0;
@@ -1818,25 +1830,57 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         if(sorted_orbitals.size() == 0)
             continue;
 
-        /*ImGui::SetNextWindowPos(ImVec2(win_pos.x, win_pos.y));
-
-        ImGui::Begin(("###" + os->get_base()->name + std::to_string(i)).c_str(), nullptr,
-                     ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
-                     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing |
-                     ImGuiWindowFlags_NoBringToFrontOnFocus);*/
+        float height = fleet_sprite.getGlobalBounds().height;
+        float draw_offset = height + 1.f;
 
         vec2f fleet_draw_pos = pos + (vec2f){sun_universe_rad, 0.f};
+        vec2f screen_offset = {2, 0};
+
+        int num_offsets = 0;
+
+        if(num_owned > 0)
+            num_offsets++;
+
+        if(num_allied > 0)
+            num_offsets++;
+
+        if(num_neutral > 0)
+            num_offsets++;
+
+        if(num_hostile > 0)
+            num_offsets++;
+
+        if(num_offsets > 0)
+        {
+            screen_offset.y() = -(num_offsets - 1) * draw_offset / 2.f;
+        }
 
         if(num_owned > 0)
         {
-            auto scr_pos = win.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
+            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::base_col);
 
-            fleet_sprite.setPosition(scr_pos.x, scr_pos.y - fleet_sprite.getGlobalBounds().height/2.f);
+            screen_offset.y() += draw_offset;
+        }
 
-            auto backup_view = win.getView();
-            win.setView(win.getDefaultView());
-            win.draw(fleet_sprite);
-            win.setView(backup_view);
+        if(num_allied > 0)
+        {
+            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::friendly_col);
+
+            screen_offset.y() += draw_offset;
+        }
+
+        if(num_neutral > 0)
+        {
+            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::neutral_col);
+
+            screen_offset.y() += draw_offset;
+        }
+
+        if(num_hostile > 0)
+        {
+            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::hostile_col);
+
+            screen_offset.y() += draw_offset;
         }
 
 
