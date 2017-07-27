@@ -6,6 +6,7 @@
 #include "util.hpp"
 #include "top_bar.hpp"
 #include "procedural_text_generator.hpp"
+#include <unordered_map>
 
 int ship::gid;
 
@@ -658,15 +659,29 @@ std::map<ship_component_element, float> component::apply_diff(const std::map<shi
             continue;
         }
 
-        auto attr = components[type];
+        /*auto attr = components[type];
 
         float extra = attr.add_amount(diff_amount);
 
         components[type] = attr;
+        ret_extra[type] += extra;*/
+
+        float extra = components[type].add_amount(diff_amount);
+
         ret_extra[type] += extra;
     }
 
     return ret_extra;
+}
+
+void component::apply_diff_single(const ship_component_element& type, float amount)
+{
+    if(!has_element(type))
+    {
+        return;
+    }
+
+    float extra = components[type].add_amount(amount);
 }
 
 void component::update_time(float step_s)
@@ -1160,7 +1175,7 @@ void ship::tick_all_components(float step_s)
 
     ///DIRTY HACK ALERT
 
-    std::map<ship_component_element, float> to_apply_prop;
+    std::unordered_map<int, float> to_apply_prop;
 
     //for(auto& i : needed)
 
@@ -1190,7 +1205,7 @@ void ship::tick_all_components(float step_s)
 
         float frac = i.drained_per_s / i.produced_per_s;
 
-        to_apply_prop[(ship_component_element)type] = frac;
+        to_apply_prop[type] = frac;
 
         type++;
     }
@@ -1208,7 +1223,7 @@ void ship::tick_all_components(float step_s)
     {
         for(auto& c : i.components)
         {
-            float my_proportion_of_total = to_apply_prop[c.first];
+            float my_proportion_of_total = to_apply_prop[(int)c.first];
 
             component_attribute& me = c.second;
 
@@ -1385,16 +1400,19 @@ void ship::tick_all_components(float step_s)
 
             float applying_to_this = proportion * fully_merge[i.first].produced_per_s;
 
-            std::map<ship_component_element, float> tmap;
+            ///this is slow
+            //std::map<ship_component_element, float> tmap;
 
-            tmap[i.first] = applying_to_this;
+            //tmap[i.first] = applying_to_this;
 
             /*if(i.first == ship_component_elements::OXYGEN)
             {
                 printf("test %f\n", applying_to_this);
             }*/
 
-            auto r = c.apply_diff(tmap);
+            //auto r = c.apply_diff(tmap);
+
+            c.apply_diff_single(i.first, applying_to_this);
 
             ///can be none left over as we're using available capacities
             //auto left_over = r;

@@ -371,6 +371,7 @@ struct component
     //std::pair<component, std::map<ship_component_element, float>> apply_diff(const std::map<ship_component_element, float>& diff);
 
     std::map<ship_component_element, float> apply_diff(const std::map<ship_component_element, float>& available);
+    void apply_diff_single(const ship_component_element& elem, float amount);
 
     void update_time(float step_s);
 
