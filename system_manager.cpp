@@ -1602,11 +1602,29 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
     return {avg - o2dir * 1.02f, avg + o2dir * 1.02f};
 }
 
-void fleet_draw(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
+void universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
 {
+    bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
+
+    sf::Mouse mouse;
+
+    vec2f mpos = {mouse.getPosition(win).x, mouse.getPosition(win).y};
+
     auto scr_pos = win.mapCoordsToPixel({pos.x(), pos.y()});
 
-    fleet_sprite.setPosition(scr_pos.x + screen_offset.x(), scr_pos.y + screen_offset.y() - fleet_sprite.getGlobalBounds().height/2.f);
+    vec2f real_pos = {scr_pos.x + screen_offset.x(), scr_pos.y + screen_offset.y() - fleet_sprite.getGlobalBounds().height/2.f};
+
+    vec2f dim = {fleet_sprite.getGlobalBounds().width, fleet_sprite.getGlobalBounds().height};
+
+    vec2f tl = real_pos;// - dim/2.f;
+    vec2f br = real_pos + dim;
+
+    if(no_suppress_mouse && mpos.x() > tl.x() && mpos.y() > tl.y() && mpos.x() < br.x() && mpos.y() < br.y())
+    {
+        col = {0, 0.5, 1};
+    }
+
+    fleet_sprite.setPosition(real_pos.x(), real_pos.y());
     fleet_sprite.setColor(sf::Color(col.x() * 255.f, col.y() * 255.f, col.z() * 255.f, 255));
 
     auto backup_view = win.getView();
@@ -1857,28 +1875,28 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         if(num_owned > 0)
         {
-            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::base_col);
+            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::base_col);
 
             screen_offset.y() += draw_offset;
         }
 
         if(num_allied > 0)
         {
-            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::friendly_col);
+            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::friendly_col);
 
             screen_offset.y() += draw_offset;
         }
 
         if(num_neutral > 0)
         {
-            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::neutral_col);
+            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::neutral_col);
 
             screen_offset.y() += draw_offset;
         }
 
         if(num_hostile > 0)
         {
-            fleet_draw(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::hostile_col);
+            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::hostile_col);
 
             screen_offset.y() += draw_offset;
         }
