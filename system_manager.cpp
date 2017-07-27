@@ -457,7 +457,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         return;
 
 
-    vec3f base_sprite_col = {1,1,1};
+    /*vec3f base_sprite_col = {1,1,1};
     vec3f current_simple_col = col;
 
     vec3f current_sprite_col = base_sprite_col;
@@ -484,7 +484,10 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     if(parent_empire != nullptr && parent_empire->is_allied(viewer_empire))
     {
         current_sprite_col = base_sprite_col * friendly_empire_mult;
-    }
+    }*/
+
+    vec3f current_simple_col = col;
+    vec3f current_sprite_col = viewer_empire->get_relations_colour(parent_empire);
 
     if(not_currently_viewed_fleet)
     {
@@ -1769,6 +1772,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     {
         orbital_system* os = systems[i];
 
+
         vec2f pos = os->universe_pos * universe_scale;
 
         sf::CircleShape circle;
@@ -1788,8 +1792,14 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         os->highlight = false;
 
+        ///BEGIN SHIP DISPLAY
+
         if(os->get_base() == nullptr)
             continue;
+
+        if(!viewer_empire->has_vision(os))
+            continue;
+
 
         auto win_pos = win.mapCoordsToPixel({pos.x(), pos.y()});
 
@@ -1798,7 +1808,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         int num_owned = 0;
         int num_allied = 0;
         int num_neutral = 0;
-        int num_trespassing;
+        //int num_trespassing = 0;
         int num_hostile = 0;
 
         for(int i=0; i<os->orbitals.size(); i++)
@@ -1859,7 +1869,39 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             ImGui::NextColumn();
         }*/
 
-        for(auto& i : sorted_orbitals)
+        ImGui::Text("Fleets:");
+
+        bool can_traverse = true;
+
+        if(os->get_base()->parent_empire != nullptr)
+            can_traverse = viewer_empire->can_traverse_space(os->get_base()->parent_empire);
+
+        if(os->get_base()->parent_empire == viewer_empire)
+        {
+            can_traverse = true;
+        }
+
+        if(num_owned > 0)
+        {
+            ImGui::Text((std::to_string(num_owned) + " owned").c_str());
+
+            if(!can_traverse)
+            {
+                ImGui::SameLine();
+                ImGui::Text("(Trespassing)");
+            }
+        }
+
+        if(num_allied > 0)
+            ImGui::Text((std::to_string(num_allied) + " allied").c_str());
+
+        if(num_neutral > 0)
+            ImGui::Text((std::to_string(num_neutral) + " neutral").c_str());
+
+        if(num_hostile > 0)
+            ImGui::Text((std::to_string(num_hostile) + " hostile").c_str());
+
+        /*for(auto& i : sorted_orbitals)
         {
             empire* e = i.first;
 
@@ -1881,8 +1923,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             vec3f col = viewer_empire->get_relations_colour(e);
 
             ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), display_str.c_str());
-        }
-
+        }*/
 
         ImGui::End();
 

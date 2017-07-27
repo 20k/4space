@@ -788,7 +788,7 @@ std::string empire::get_relations_string(empire* e)
 
 vec3f empire::get_relations_colour(empire* e)
 {
-    vec3f col = {1, 1, 1};
+    /*vec3f col = {1, 1, 1};
 
     if(e == nullptr)
         return col;
@@ -808,7 +808,40 @@ vec3f empire::get_relations_colour(empire* e)
         col = {0.5, 0.5, 1, 1};
     }
 
-    return col;
+    return col;*/
+
+    if(e == nullptr)
+    {
+        return {0.7, 0.7, 0.7};
+    }
+
+    vec3f base_sprite_col = {1,1,1};
+
+    vec3f current_sprite_col = base_sprite_col;
+
+    vec3f hostile_empire_mult = {1, 0, 0};
+
+    vec3f friendly_empire_mult = {0.5, 1, 0.5};
+
+    vec3f neutral_empire_mult = {1.f, 0.5, 0.f};
+
+    if(e == this)
+        return current_sprite_col;
+
+    current_sprite_col = base_sprite_col * hostile_empire_mult;
+
+    if(e != nullptr && !is_hostile(e))
+    {
+        current_sprite_col = base_sprite_col * neutral_empire_mult;
+    }
+
+    ///if the orbital has no parent!
+    if(e != nullptr && is_allied(e))
+    {
+        current_sprite_col = base_sprite_col * friendly_empire_mult;
+    }
+
+    return current_sprite_col;
 }
 
 void empire::negative_interaction(empire* e)
