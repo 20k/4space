@@ -789,35 +789,25 @@ std::string empire::get_relations_string(empire* e)
 vec3f empire::get_relations_colour(empire* e)
 {
     if(e == nullptr)
-        return {0.7, 0.7, 0.7};
-
-    vec3f base_col = {1,1,1};
-
-    vec3f current_col = base_col;
-
-    vec3f hostile_empire_mult = {1, 0, 0};
-
-    vec3f friendly_empire_mult = {0.5, 1, 0.5};
-
-    vec3f neutral_empire_mult = {1.f, 0.5, 0.f};
+        return relations_info::hidden_col;
 
     if(e == this)
-        return current_col;
+        return relations_info::base_col;
 
-    current_col = base_col * hostile_empire_mult;
+    vec3f found_col = relations_info::hostile_col;
 
     if(e != nullptr && !is_hostile(e))
     {
-        current_col = base_col * neutral_empire_mult;
+        found_col = relations_info::neutral_col;
     }
 
     ///if the orbital has no parent!
     if(e != nullptr && is_allied(e))
     {
-        current_col = base_col * friendly_empire_mult;
+        found_col = relations_info::friendly_col;
     }
 
-    return current_col;
+    return found_col;
 }
 
 void empire::negative_interaction(empire* e)

@@ -40,6 +40,12 @@ namespace relations_info
     constexpr float unhostility_threshold = 0.1f;
 
     constexpr float fudge = 0.01f;
+
+    constexpr vec3f base_col = {1, 1, 1}; ///used for owned objects
+    constexpr vec3f hidden_col = {0.6, 0.6, 0.6};
+    constexpr vec3f hostile_col = {1, 0, 0};
+    constexpr vec3f friendly_col = {0.5, 1, 0.5};
+    constexpr vec3f neutral_col = {1, 0.5, 0};
 }
 
 struct empire

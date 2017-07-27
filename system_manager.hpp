@@ -238,6 +238,11 @@ struct popup_info;
 
 struct system_manager
 {
+    sf::Texture fleet_tex;
+    sf::Sprite fleet_sprite;
+
+    system_manager();
+
     std::vector<orbital_system*> systems;
     orbital_system* currently_viewed = nullptr;
     orbital_system* hovered_system = nullptr;

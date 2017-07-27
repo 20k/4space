@@ -1316,6 +1316,12 @@ std::string orbital_system::get_resource_str(bool include_vision, empire* viewer
     return resources.get_processed_str(true);
 }
 
+system_manager::system_manager()
+{
+    fleet_tex.loadFromFile(orbital_info::load_strs[orbital_info::FLEET]);
+    fleet_sprite.setTexture(fleet_tex);
+}
+
 orbital_system* system_manager::make_new()
 {
     orbital_system* sys = new orbital_system;
@@ -1778,7 +1784,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         int num_owned = 0;
         int num_allied = 0;
         int num_neutral = 0;
-        //int num_trespassing = 0;
         int num_hostile = 0;
 
         for(int i=0; i<os->orbitals.size(); i++)
@@ -1813,12 +1818,26 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         if(sorted_orbitals.size() == 0)
             continue;
 
-        ImGui::SetNextWindowPos(ImVec2(win_pos.x, win_pos.y));
+        /*ImGui::SetNextWindowPos(ImVec2(win_pos.x, win_pos.y));
 
         ImGui::Begin(("###" + os->get_base()->name + std::to_string(i)).c_str(), nullptr,
                      ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
                      ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing |
-                     ImGuiWindowFlags_NoBringToFrontOnFocus);
+                     ImGuiWindowFlags_NoBringToFrontOnFocus);*/
+
+        vec2f fleet_draw_pos = pos + (vec2f){sun_universe_rad, 0.f};
+
+        if(num_owned > 0)
+        {
+            auto scr_pos = win.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
+
+            fleet_sprite.setPosition(scr_pos.x, scr_pos.y - fleet_sprite.getGlobalBounds().height/2.f);
+
+            auto backup_view = win.getView();
+            win.setView(win.getDefaultView());
+            win.draw(fleet_sprite);
+            win.setView(backup_view);
+        }
 
 
         /*ImGui::Columns(sorted_orbitals.size());
@@ -1839,7 +1858,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             ImGui::NextColumn();
         }*/
 
-        ImGui::Text("Fleets:");
+
+
+        /*ImGui::Text("Fleets:");
 
         bool can_traverse = true;
 
@@ -1851,27 +1872,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             can_traverse = true;
         }
 
-        if(num_owned > 0)
-        {
-            ImGui::Text((std::to_string(num_owned) + " owned").c_str());
-
-            if(!can_traverse)
-            {
-                ImGui::SameLine();
-                ImGui::Text("(Trespassing)");
-            }
-        }
-
-        if(num_allied > 0)
-            ImGui::Text((std::to_string(num_allied) + " allied").c_str());
-
-        if(num_neutral > 0)
-            ImGui::Text((std::to_string(num_neutral) + " neutral").c_str());
-
-        if(num_hostile > 0)
-            ImGui::Text((std::to_string(num_hostile) + " hostile").c_str());
-
-        /*for(auto& i : sorted_orbitals)
+        for(auto& i : sorted_orbitals)
         {
             empire* e = i.first;
 
@@ -1895,7 +1896,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), display_str.c_str());
         }*/
 
-        ImGui::End();
+        //ImGui::End();
 
         /*std::string owner_str = "";
 
