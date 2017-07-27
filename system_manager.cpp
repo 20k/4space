@@ -12,6 +12,7 @@
 #include <deque>
 #include "popup.hpp"
 #include <unordered_map>
+#include "ui_util.hpp"
 
 
 float system_manager::universe_scale = 100.f;
@@ -1794,10 +1795,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         std::unordered_map<empire*, std::vector<orbital*>> sorted_orbitals;
 
-        /*int num_owned = 0;
-        int num_friendly = 0;
+        int num_owned = 0;
+        int num_allied = 0;
         int num_neutral = 0;
-        int num_hostile = 0;*/
+        int num_trespassing;
+        int num_hostile = 0;
 
         for(int i=0; i<os->orbitals.size(); i++)
         {
@@ -1807,6 +1809,25 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 continue;
 
             sorted_orbitals[o->parent_empire].push_back(o);
+
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(viewer_empire == sm->parent_empire)
+            {
+                num_owned++;
+            }
+            else if(viewer_empire->is_allied(sm->parent_empire))
+            {
+                num_allied++;
+            }
+            else if(viewer_empire->is_hostile(sm->parent_empire))
+            {
+                num_hostile++;
+            }
+            else
+            {
+                num_neutral++;
+            }
         }
 
         if(sorted_orbitals.size() == 0)
