@@ -456,36 +456,6 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     if(!viewed_by[viewer_empire] && type == orbital_info::FLEET)
         return;
 
-
-    /*vec3f base_sprite_col = {1,1,1};
-    vec3f current_simple_col = col;
-
-    vec3f current_sprite_col = base_sprite_col;
-
-
-    vec3f hostile_empire_mult = {1, 0, 0};
-
-    vec3f friendly_empire_mult = {0.5, 1, 0.5};
-
-    vec3f neutral_empire_mult = {1.f, 0.5, 0.f};
-
-    if(parent_empire != viewer_empire)
-    {
-        current_sprite_col = base_sprite_col * hostile_empire_mult;
-        //current_simple_col = current_simple_col * hostile_empire_mult;
-    }
-
-    if(parent_empire != nullptr && !parent_empire->is_hostile(viewer_empire) && parent_empire != viewer_empire)
-    {
-        current_sprite_col = base_sprite_col * neutral_empire_mult;
-    }
-
-    ///if the orbital has no parent!
-    if(parent_empire != nullptr && parent_empire->is_allied(viewer_empire))
-    {
-        current_sprite_col = base_sprite_col * friendly_empire_mult;
-    }*/
-
     vec3f current_simple_col = col;
     vec3f current_sprite_col = viewer_empire->get_relations_colour(parent_empire);
 
