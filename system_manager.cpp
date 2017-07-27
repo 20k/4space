@@ -1868,8 +1868,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         vec2f fleet_draw_pos = pos + (vec2f){sun_universe_rad, 0.f};
         vec2f screen_offset = {2, 0};
 
-        sf::Keyboard key;
-
         vec3f colours[4] =
                            {relations_info::base_col,
                             relations_info::friendly_col,
