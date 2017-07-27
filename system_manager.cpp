@@ -2230,7 +2230,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                 if(sys_emp.first->toggle_systems_ui)
                     pad = "+";
 
-                ImGui::Text((pad + empire_name_str).c_str());
+                vec3f col = viewing_empire->get_relations_colour(sys_emp.first);
+
+                ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), (pad + empire_name_str).c_str());
 
                 if(ImGui::IsItemClicked())
                 {
@@ -2256,7 +2258,21 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
             if(sys->toggle_fleet_ui)
                 sys_pad = "+";
 
-            ImGui::Text((sys_pad + sys_name).c_str());
+            ImVec4 system_col(1,1,1,1);
+
+            bool viewing = (currently_viewed == sys && in_system_view());
+
+            if(viewing)
+            {
+                system_col = ImVec4(0.35, 0.55, 1.f, 1.f);
+            }
+
+            if(hovered_system == sys && !in_system_view())
+            {
+                system_col = ImVec4(1, 1, 0.05, 1);
+            }
+
+            ImGui::TextColored(system_col, (sys_pad + sys_name).c_str());
 
             if(ImGui::IsItemClicked())
             {
@@ -2272,11 +2288,22 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                 set_viewed_system(sys);
             }
 
+            std::string view_str;
+
+            if(viewing)
+            {
+                view_str = "(viewing)";
+
+                ImGui::SameLine();
+
+                ImGui::Text(view_str.c_str());
+            }
+
             #define DASH_LINES
             #ifdef DASH_LINES
             ImGui::SameLine();
 
-            int str_len = sys_name.length();
+            int str_len = sys_name.length() + (view_str.length() > 0 ? view_str.length() + 1 : 0);
 
             std::string str;
 
