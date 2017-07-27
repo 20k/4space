@@ -1898,7 +1898,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 {
                     any_highlighted = true;
                     o->highlight = false;
-                    break;
                 }
             }
 
