@@ -18,51 +18,6 @@
 #include "tooltip_handler.hpp"
 #include "top_bar.hpp"
 
-template<sf::Keyboard::Key k>
-bool once()
-{
-    static bool last;
-
-    sf::Keyboard key;
-
-    if(key.isKeyPressed(k) && !last)
-    {
-        last = true;
-
-        return true;
-    }
-
-    if(!key.isKeyPressed(k))
-    {
-        last = false;
-    }
-
-    return false;
-}
-
-template<sf::Mouse::Button b>
-bool once()
-{
-    static bool last;
-
-    sf::Mouse mouse;
-
-    if(mouse.isButtonPressed(b) && !last)
-    {
-        last = true;
-
-        return true;
-    }
-
-    if(!mouse.isButtonPressed(b))
-    {
-        last = false;
-    }
-
-    return false;
-}
-
-
 #include "ship_definitions.hpp"
 
 #include "popup.hpp"
@@ -1906,12 +1861,12 @@ int main()
 
         handle_camera(window, system_manage);
 
-        if(once<sf::Keyboard::M>() && focused)
+        if(ONCE_MACRO(sf::Keyboard::M) && focused)
         {
             system_manage.enter_universe_view();
         }
 
-        if(once<sf::Keyboard::F1>())
+        if(ONCE_MACRO(sf::Keyboard::F1))
         {
             state = (state + 1) % 2;
 
@@ -1930,7 +1885,7 @@ int main()
             }
         }
 
-        if(once<sf::Keyboard::F3>())
+        if(ONCE_MACRO(sf::Keyboard::F3))
         {
             system_manage.set_viewed_system(sys_2);
             state = 0;
@@ -1941,8 +1896,8 @@ int main()
             test_ship->resupply(*player_empire);
         }*/
 
-        bool lclick = once<sf::Mouse::Left>() && no_suppress_mouse;
-        bool rclick = once<sf::Mouse::Right>() && no_suppress_mouse;
+        bool lclick = ONCE_MACRO(sf::Mouse::Left) && no_suppress_mouse;
+        bool rclick = ONCE_MACRO(sf::Mouse::Right) && no_suppress_mouse;
 
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);

@@ -1602,6 +1602,7 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
     return {avg - o2dir * 1.02f, avg + o2dir * 1.02f};
 }
 
+///do clicking next, bump up to higher level?
 void universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
 {
     bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
