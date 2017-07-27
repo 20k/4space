@@ -275,7 +275,7 @@ struct system_manager
 
     void set_viewed_system(orbital_system* s, bool reset_zoom = true);
 
-    void draw_universe_map(sf::RenderWindow& win, empire* viewer_empire);
+    void draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup);
     void process_universe_map(sf::RenderWindow& win, bool lclick, empire* viewer_empire);
 
     ///camera. Set here because zoom will be useful
@@ -299,6 +299,9 @@ struct system_manager
     void draw_ship_ui(empire* viewing_empire, popup_info& popup);
 
     sf::RenderTexture temp;
+
+    bool suppress_click_away_fleet = false;
+    std::vector<orbital*> hovered_orbitals;
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

@@ -765,6 +765,8 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     ImGui::End();
 }
 
+///this function is one of the worst in the code, there's a lot of duplication that's gradually being exposed
+///new functionality is however forcing this to be refactored to be less dumb
 void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage)
 {
     sf::Mouse mouse;
@@ -812,172 +814,212 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     bool first = true;
 
-    for(orbital_system* sys : system_manage.systems)
+    //orbital_system* sys = system_manage.currently_viewed;
+
+    std::vector<orbital*> valid_selection_targets;
+
+    if(system_manage.currently_viewed != nullptr && system_manage.in_system_view())
     {
-        //if(!system_manage.in_system_view())
-        //    continue;
-
-        bool term = false;
-
-        for(orbital* orb : sys->orbitals)
+        for(orbital* orb : system_manage.currently_viewed->orbitals)
         {
-            ///not necessarily valid
-            ship_manager* sm = (ship_manager*)orb->data;
-
-            orb->clicked = false;
-
-            if(system_manage.in_system_view() && orb->point_within({transformed.x, transformed.y}) && system_manage.currently_viewed == sys)
+            if(orb->point_within({transformed.x, transformed.y}))
             {
-                if(first)
-                {
-                    orb->highlight = true;
-                    first = false;
-                }
+                valid_selection_targets.push_back(orb);
 
-                if(lclick)
-                {
-                    orb->clicked = true;
-                }
-
-                if(lclick && popup.fetch(orb))
-                {
-                    if(orb->type == orbital_info::FLEET)
-                    {
-                        ship_manager* sm = (ship_manager*)orb->data;
-
-                        sm->toggle_fleet_ui = false;
-                    }
-
-                    popup.rem(orb);
-                    break;
-                }
-
-                if(lclick && popup.fetch(orb) == nullptr)
-                {
-                    popup.going = true;
-
-                    ///do buttons here
-                    popup_element elem;
-                    elem.element = orb;
-
-                    popup.elements.push_back(elem);
-
-                    if(orb->type == orbital_info::FLEET)
-                        sm->toggle_fleet_ui = true;
-
-                    term = true;
-                }
-
-                if(orb->type == orbital_info::STAR)
-                {
-                    ImGui::SetTooltip((orb->name + "\n" + orb->get_empire_str() + orb->description).c_str());
-                }
-
-                if(orb->is_resource_object)
-                {
-                    std::string res_first = orb->name;
-
-                    res_first += "\n" + orb->get_empire_str();
-
-                    if(orb->viewed_by[player_empire])
-                        res_first += orb->produced_resources_ps.get_formatted_str();
-
-                    ImGui::SetTooltip(res_first.c_str());
-                }
-            }
-
-            ///dis me
-            if(popup.fetch(orb) != nullptr)
-            {
-                orbital_system* parent_system = sys;
-
-                popup_element& elem = *popup.fetch(orb);
-
-                ///if orb not a fleet, this is empty
-                std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
-
-                ///atm battle just immediately ends if no enemies are hostile
-                ///need a declare war button perhaps?
-                if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat())
-                {
-                    elem.buttons_map[popup_element_type::ENGAGE].name = "Engage Fleets";
-                }
-                else
-                {
-                    elem.buttons_map.erase(popup_element_type::ENGAGE);
-                }
-
-                if(orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire)
-                {
-                    elem.buttons_map[popup_element_type::DECLARE_WAR].name = "Declare War";
-                }
-                else
-                {
-                    elem.buttons_map.erase(popup_element_type::DECLARE_WAR);
-                }
-
-                if(orb->type == orbital_info::FLEET && !sm->can_engage() && sm->parent_empire == player_empire)
-                {
-                    elem.buttons_map[popup_element_type::ENGAGE_COOLDOWN].name = sm->get_engage_str();
-                }
-                else
-                {
-                    elem.buttons_map.erase(popup_element_type::ENGAGE_COOLDOWN);
-                }
-
-                if(orb->type == orbital_info::FLEET && (sm->any_in_combat() || sm->all_derelict()))
-                {
-                    elem.buttons_map.erase(popup_element_type::RESUPPLY);
-                }
-
-                if(orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr)
-                {
-                    elem.buttons_map[popup_element_type::COLONISE].name = "Colonise";
-                }
-                else
-                {
-                    elem.buttons_map.erase(popup_element_type::COLONISE);
-                }
-
-
-                ///disabling merging here and resupply invalides all fleet actions except moving atm
-                ///unexpected fix to fleet merging problem
-                ///disable resupply if in combat
-                if(orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)))
-                {
-                    if(orb->parent_empire == player_empire)
-                        elem.mergeable = true;
-
-                    elem.buttons_map[popup_element_type::RESUPPLY].name = "Resupply";
-                }
-                else
-                {
-                    elem.buttons_map.erase(popup_element_type::RESUPPLY);
-                }
-
-                if(orb->type == orbital_info::FLEET)
-                {
-                    elem.toggle_clickable = true;
-                }
-
-
-                ///for drawing warp radiuses, but will take anything and might be extended later
-                system_manage.add_selected_orbital(orb);
-
-                selected.push_back(orb);
-            }
-
-            if(term)
                 break;
+            }
         }
     }
 
-    if(selected.size() > 0 && popup.going)
+    for(auto& i : system_manage.hovered_orbitals)
+    {
+        valid_selection_targets.push_back(i);
+    }
+
+    for(popup_element& elem : popup.elements)
+    {
+        orbital* o = (orbital*)elem.element;
+
+        o->highlight = true;
+
+        if(o->type == orbital_info::FLEET)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            sm->toggle_fleet_ui = true;
+        }
+    }
+
+    //if(!system_manage.in_system_view())
+    //    continue;
+
+    //bool term = false;
+
+    for(orbital* orb : valid_selection_targets)
+    {
+        ///not necessarily valid
+        ship_manager* sm = (ship_manager*)orb->data;
+
+        orb->clicked = false;
+
+        if(first)
+        {
+            orb->highlight = true;
+            first = false;
+        }
+
+        if(lclick)
+        {
+            orb->clicked = true;
+        }
+
+        if(lclick && popup.fetch(orb))
+        {
+            if(orb->type == orbital_info::FLEET)
+            {
+                ship_manager* sm = (ship_manager*)orb->data;
+
+                sm->toggle_fleet_ui = false;
+            }
+
+            popup.rem(orb);
+            break;
+        }
+
+        if(lclick && popup.fetch(orb) == nullptr)
+        {
+            popup.going = true;
+
+            ///do buttons here
+            popup_element elem;
+            elem.element = orb;
+
+            popup.elements.push_back(elem);
+
+            if(orb->type == orbital_info::FLEET)
+                sm->toggle_fleet_ui = true;
+
+            //term = true;
+        }
+
+        if(orb->type == orbital_info::STAR)
+        {
+            ImGui::SetTooltip((orb->name + "\n" + orb->get_empire_str() + orb->description).c_str());
+        }
+
+        if(orb->is_resource_object)
+        {
+            std::string res_first = orb->name;
+
+            res_first += "\n" + orb->get_empire_str();
+
+            if(orb->viewed_by[player_empire])
+                res_first += orb->produced_resources_ps.get_formatted_str();
+
+            ImGui::SetTooltip(res_first.c_str());
+        }
+
+        //if(term)
+        //    break;
+    }
+
+
+    ///dis me
+    //if(popup.fetch(orb) != nullptr && orb->parent_system != nullptr)
+    for(popup_element& elem : popup.elements)
+    {
+        orbital* orb = (orbital*)elem.element;
+
+        //selected.push_back(orb);
+
+        if(orb->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)orb->data;
+
+        orbital_system* parent_system = orb->parent_system;
+
+        //popup_element& elem = *popup.fetch(orb);
+
+        ///if orb not a fleet, this is empty
+        std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
+
+        ///atm battle just immediately ends if no enemies are hostile
+        ///need a declare war button perhaps?
+        if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat())
+        {
+            elem.buttons_map[popup_element_type::ENGAGE].name = "Engage Fleets";
+        }
+        else
+        {
+            elem.buttons_map.erase(popup_element_type::ENGAGE);
+        }
+
+        if(orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire)
+        {
+            elem.buttons_map[popup_element_type::DECLARE_WAR].name = "Declare War";
+        }
+        else
+        {
+            elem.buttons_map.erase(popup_element_type::DECLARE_WAR);
+        }
+
+        if(orb->type == orbital_info::FLEET && !sm->can_engage() && sm->parent_empire == player_empire)
+        {
+            elem.buttons_map[popup_element_type::ENGAGE_COOLDOWN].name = sm->get_engage_str();
+        }
+        else
+        {
+            elem.buttons_map.erase(popup_element_type::ENGAGE_COOLDOWN);
+        }
+
+        if(orb->type == orbital_info::FLEET && (sm->any_in_combat() || sm->all_derelict()))
+        {
+            elem.buttons_map.erase(popup_element_type::RESUPPLY);
+        }
+
+        if(orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr)
+        {
+            elem.buttons_map[popup_element_type::COLONISE].name = "Colonise";
+        }
+        else
+        {
+            elem.buttons_map.erase(popup_element_type::COLONISE);
+        }
+
+
+        ///disabling merging here and resupply invalides all fleet actions except moving atm
+        ///unexpected fix to fleet merging problem
+        ///disable resupply if in combat
+        if(orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)))
+        {
+            if(orb->parent_empire == player_empire)
+                elem.mergeable = true;
+
+            elem.buttons_map[popup_element_type::RESUPPLY].name = "Resupply";
+        }
+        else
+        {
+            elem.buttons_map.erase(popup_element_type::RESUPPLY);
+        }
+
+        if(orb->type == orbital_info::FLEET)
+        {
+            elem.toggle_clickable = true;
+        }
+
+        ///for drawing warp radiuses, but will take anything and might be extended later
+        system_manage.add_selected_orbital(orb);
+    }
+
+    if(popup.elements.size() > 0 && popup.going)
     {
         if(system_manage.hovered_system != nullptr)
         {
-            for(orbital* o : selected)
+            for(popup_element& elem : popup.elements)
             {
+                orbital* o = (orbital*)elem.element;
+
                 if(o->type != orbital_info::FLEET)
                     continue;
 
@@ -1009,73 +1051,67 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             }
         }
 
-        //if(system_manage.in_system_view())
+        for(popup_element& elem : popup.elements)
         {
-            for(orbital* kk : selected)
+            orbital* o = (orbital*)elem.element;
+
+            bool do_obfuscate = false;
+
+            if(o->type == orbital_info::FLEET)
             {
-                popup_element* elem = popup.fetch(kk);
-
-                if(elem == nullptr)
-                    continue;
-
-                bool do_obfuscate = false;
-
-                if(kk->type == orbital_info::FLEET)
+                if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= 0 && !player_empire->is_allied(o->parent_empire))
                 {
-                    if(player_empire->available_scanning_power_on((ship_manager*)kk->data, system_manage) <= 0 && !player_empire->is_allied(kk->parent_empire))
-                    {
-                        do_obfuscate = true;
-                    }
+                    do_obfuscate = true;
                 }
+            }
 
-                elem->header = kk->name;
+            elem.header = o->name;
 
-                if(elem->header == "")
-                    elem->header = orbital_info::names[kk->type];
+            if(elem.header == "")
+                elem.header = orbital_info::names[o->type];
 
-                if(do_obfuscate)
+            if(do_obfuscate)
+            {
+                elem.header = "Unknown";
+            }
+
+            if(!do_obfuscate && o->parent_empire != nullptr)
+            {
+                elem.header = elem.header + "\n" + o->get_empire_str(false);
+            }
+
+            if(do_obfuscate && o->parent_empire != nullptr)
+            {
+                if(o->parent_empire != nullptr)
                 {
-                    elem->header = "Unknown";
+                    elem.header = elem.header + "\nEmpire: Unknown";
                 }
+            }
 
-                if(!do_obfuscate && kk->parent_empire != nullptr)
+            elem.data = o->get_info_str(player_empire);
+
+            if(o->description != "" && o->viewed_by[player_empire])
+                elem.data.push_back(o->description);
+
+            if(do_obfuscate)
+            {
+                //elem.header = obfuscate(elem.header, true);
+
+                for(auto& i : elem.data)
                 {
-                    elem->header = elem->header + "\n" + kk->get_empire_str(false);
+                    i = obfuscate(i, true);
                 }
+            }
 
-                if(do_obfuscate && kk->parent_empire != nullptr)
+            if(popup.going)
+            {
+                o->highlight = true;
+
+                ship_manager* sm = (ship_manager*)o->data;
+
+                if(rclick && (o->type == orbital_info::FLEET) && o->parent_empire == player_empire && o->parent_system == system_manage.currently_viewed && !sm->any_colonising() && system_manage.in_system_view())
                 {
-                    if(kk->parent_empire != nullptr)
-                    {
-                        elem->header = elem->header + "\nEmpire: Unknown";
-                    }
-                }
-
-                elem->data = kk->get_info_str(player_empire);
-
-                if(kk->description != "" && kk->viewed_by[player_empire])
-                    elem->data.push_back(kk->description);
-
-                if(do_obfuscate)
-                {
-                    //elem->header = obfuscate(elem->header, true);
-
-                    for(auto& i : elem->data)
-                    {
-                        i = obfuscate(i, true);
-                    }
-                }
-
-                if(popup.going)
-                {
-                    kk->highlight = true;
-
-                    ship_manager* sm = (ship_manager*)kk->data;
-
-                    if(rclick && (kk->type == orbital_info::FLEET) && kk->parent_empire == player_empire && kk->parent_system == system_manage.currently_viewed && !sm->any_colonising() && system_manage.in_system_view())
-                    {
-                        kk->request_transfer({transformed.x, transformed.y});
-                    }
+                    o->request_transfer({transformed.x, transformed.y});
                 }
             }
         }
@@ -1930,7 +1966,7 @@ int main()
             ///this is slow
             system_manage.draw_viewed_system(window, player_empire);
             ///dis kinda slow too
-            system_manage.draw_universe_map(window, player_empire);
+            system_manage.draw_universe_map(window, player_empire, popup);
             system_manage.process_universe_map(window, lclick, player_empire);
             system_manage.draw_warp_radiuses(window, player_empire);
         }

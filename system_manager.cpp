@@ -1603,7 +1603,7 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
 }
 
 ///do clicking next, bump up to higher level?
-void universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
+bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
 {
     bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
 
@@ -1620,9 +1620,18 @@ void universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec
     vec2f tl = real_pos;// - dim/2.f;
     vec2f br = real_pos + dim;
 
+    bool is_hovered = false;
+
     if(no_suppress_mouse && mpos.x() > tl.x() && mpos.y() > tl.y() && mpos.x() < br.x() && mpos.y() < br.y())
     {
         col = {0, 0.5, 1};
+
+        /*if(ONCE_MACRO(sf::Mouse::Left))
+        {
+            was_clicked = true;
+        }*/
+
+        is_hovered = true;
     }
 
     fleet_sprite.setPosition(real_pos.x(), real_pos.y());
@@ -1632,11 +1641,16 @@ void universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec
     win.setView(win.getDefaultView());
     win.draw(fleet_sprite);
     win.setView(backup_view);
+
+    return is_hovered;
 }
 
-void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire)
+void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
 {
     //printf("zoom %f\n", zoom_level);
+
+    suppress_click_away_fleet = false;
+    hovered_orbitals.clear();
 
     if(in_system_view())
         return;
@@ -1812,11 +1826,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         ///next up clicking the fleet icon should select all ships of that class
         std::unordered_map<empire*, std::vector<orbital*>> sorted_orbitals;
 
-        int num_owned = 0;
-        int num_allied = 0;
-        int num_neutral = 0;
-        int num_hostile = 0;
+        std::map<int, std::vector<orbital*>> classed_orbitals;
 
+        ///the index for classed_orbital represents the draw order, must be synced with colours
         for(int i=0; i<os->orbitals.size(); i++)
         {
             orbital* o = os->orbitals[i];
@@ -1828,21 +1840,22 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             ship_manager* sm = (ship_manager*)o->data;
 
+            ///we could probably retrieve colour here?
             if(viewer_empire == sm->parent_empire)
             {
-                num_owned++;
+                classed_orbitals[0].push_back(o); ///owned
             }
             else if(viewer_empire->is_allied(sm->parent_empire))
             {
-                num_allied++;
+                classed_orbitals[1].push_back(o); ///allied
             }
             else if(viewer_empire->is_hostile(sm->parent_empire))
             {
-                num_hostile++;
+                classed_orbitals[3].push_back(o); ///hostile
             }
             else
             {
-                num_neutral++;
+                classed_orbitals[2].push_back(o); ///neutral
             }
         }
 
@@ -1855,49 +1868,54 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         vec2f fleet_draw_pos = pos + (vec2f){sun_universe_rad, 0.f};
         vec2f screen_offset = {2, 0};
 
-        int num_offsets = 0;
+        sf::Keyboard key;
 
-        if(num_owned > 0)
-            num_offsets++;
+        vec3f colours[4] =
+                           {relations_info::base_col,
+                            relations_info::friendly_col,
+                            relations_info::neutral_col,
+                            relations_info::hostile_col};
 
-        if(num_allied > 0)
-            num_offsets++;
-
-        if(num_neutral > 0)
-            num_offsets++;
-
-        if(num_hostile > 0)
-            num_offsets++;
+        int num_offsets = classed_orbitals.size();
 
         if(num_offsets > 0)
         {
             screen_offset.y() = -(num_offsets - 1) * draw_offset / 2.f;
         }
 
-        if(num_owned > 0)
+        ///ok. Instead, this should advertise which orbitals are hovered
+        for(auto& i : classed_orbitals)
         {
-            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::base_col);
+            int num = i.first;
 
-            screen_offset.y() += draw_offset;
-        }
+            vec3f col = colours[num];
 
-        if(num_allied > 0)
-        {
-            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::friendly_col);
+            bool any_highlighted = false;
 
-            screen_offset.y() += draw_offset;
-        }
+            for(orbital* o : i.second)
+            {
+                if(o->highlight)
+                {
+                    any_highlighted = true;
+                    o->highlight = false;
+                    break;
+                }
+            }
 
-        if(num_neutral > 0)
-        {
-            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::neutral_col);
+            if(any_highlighted)
+            {
+                col = {0, 0.5, 1};
+            }
 
-            screen_offset.y() += draw_offset;
-        }
+            bool hovered = universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, col);
 
-        if(num_hostile > 0)
-        {
-            universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, relations_info::hostile_col);
+            if(hovered)
+            {
+                for(auto& o : i.second)
+                {
+                    hovered_orbitals.push_back(o);
+                }
+            }
 
             screen_offset.y() += draw_offset;
         }

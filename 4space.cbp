@@ -22,6 +22,7 @@
 				<Option type="1" />
 				<Option compiler="mingw64" />
 				<Compiler>
+					<Add option="-fexpensive-optimizations" />
 					<Add option="-O3" />
 					<Add option="-march=native" />
 				</Compiler>
@@ -108,6 +109,7 @@
 		<Unit filename="tooltip_handler.hpp" />
 		<Unit filename="top_bar.cpp" />
 		<Unit filename="top_bar.hpp" />
+		<Unit filename="ui_util.hpp" />
 		<Unit filename="util.hpp" />
 		<Extensions>
 			<code_completion />
