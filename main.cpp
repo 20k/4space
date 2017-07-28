@@ -207,7 +207,12 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         elements.insert(i.first);
     }
 
-    std::string name_str = s.name;
+    if(player_empire->is_allied(owner))
+    {
+        known_information = 1.f;
+    }
+
+    std::string name_str = obfuscate(s.name, known_information < 0.99f);
 
     if(s.in_combat())
     {
