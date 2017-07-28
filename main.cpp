@@ -1861,6 +1861,9 @@ int main()
         if(key.isKeyPressed(sf::Keyboard::D))
             cdir.x() -= 1;
 
+        if(key.isKeyPressed(sf::Keyboard::LShift))
+            cdir = cdir * 5.f;
+
         if(!focused)
             cdir = 0.f;
 
