@@ -443,6 +443,12 @@ struct ship_manager;
 struct empire;
 struct orbital;
 
+namespace ship_info
+{
+    constexpr float ship_obfuscation_level = 0.99f;
+    constexpr float accessory_information_obfuscation_level = 0.f;
+};
+
 struct ship : positional
 {
     std::string name;
@@ -625,6 +631,7 @@ struct ship_manager
     void destroy(ship* s);
 
     std::vector<std::string> get_info_strs();
+    std::vector<std::string> get_info_strs_with_info_warfare(empire* viewing, orbital* my_orbital);
 
     void merge_into_me(ship_manager& other);
 

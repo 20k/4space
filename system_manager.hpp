@@ -136,7 +136,7 @@ struct orbital
 
     bool point_within(vec2f pos);
 
-    std::vector<std::string> get_info_str(empire* viewer_empire);
+    std::vector<std::string> get_info_str(empire* viewer_empire, bool use_info_warfare);
     std::string get_empire_str(bool newline = true);
 
     void transfer(float new_rad, float new_angle);

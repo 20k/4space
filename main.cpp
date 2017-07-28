@@ -154,23 +154,6 @@ std::vector<std::string> get_components_display_string(ship& s)
     return "??/??";
 }*/
 
-std::string obfuscate(const std::string& str, bool should_obfuscate)
-{
-    if(!should_obfuscate)
-        return str;
-
-    std::string ret = str;
-
-    for(int i=0; i<ret.length(); i++)
-    {
-        if(isalnum(ret[i]))
-        {
-            ret[i] = '?';
-        }
-    }
-
-    return ret;
-}
 
 ///claiming_empire for salvage, can be nullptr
 void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
@@ -212,7 +195,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         known_information = 1.f;
     }
 
-    std::string name_str = obfuscate(s.name, known_information < 0.99f);
+    std::string name_str = obfuscate(s.name, known_information < ship_info::ship_obfuscation_level);
 
     if(s.in_combat())
     {
@@ -1057,13 +1040,19 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         {
             orbital* o = (orbital*)elem.element;
 
-            bool do_obfuscate = false;
+            bool do_obfuscate_name = false;
+            bool do_obfuscate_misc = false;
 
-            if(o->type == orbital_info::FLEET)
+            if(o->type == orbital_info::FLEET && !player_empire->is_allied(o->parent_empire))
             {
-                if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= 0 && !player_empire->is_allied(o->parent_empire))
+                if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= ship_info::ship_obfuscation_level)
                 {
-                    do_obfuscate = true;
+                    do_obfuscate_name = true;
+                }
+
+                if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= ship_info::accessory_information_obfuscation_level)
+                {
+                    do_obfuscate_misc = true;
                 }
             }
 
@@ -1072,17 +1061,22 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             if(elem.header == "")
                 elem.header = orbital_info::names[o->type];
 
-            if(do_obfuscate)
+            if(do_obfuscate_name)
             {
                 elem.header = "Unknown";
+
+                if(o->type == orbital_info::FLEET)
+                {
+                    elem.header = "Unknown Fleet";
+                }
             }
 
-            if(!do_obfuscate && o->parent_empire != nullptr)
+            if(!do_obfuscate_misc && o->parent_empire != nullptr)
             {
                 elem.header = elem.header + "\n" + o->get_empire_str(false);
             }
 
-            if(do_obfuscate && o->parent_empire != nullptr)
+            if(do_obfuscate_misc && o->parent_empire != nullptr)
             {
                 if(o->parent_empire != nullptr)
                 {
@@ -1090,12 +1084,12 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 }
             }
 
-            elem.data = o->get_info_str(player_empire);
+            elem.data = o->get_info_str(player_empire, true);
 
             if(o->description != "" && o->viewed_by[player_empire])
                 elem.data.push_back(o->description);
 
-            if(do_obfuscate)
+            /*if(do_obfuscate_name)
             {
                 //elem.header = obfuscate(elem.header, true);
 
@@ -1103,7 +1097,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 {
                     i = obfuscate(i, true);
                 }
-            }
+            }*/
 
             if(popup.going)
             {

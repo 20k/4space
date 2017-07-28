@@ -535,7 +535,7 @@ bool orbital::point_within(vec2f pos)
     return false;
 }
 
-std::vector<std::string> orbital::get_info_str(empire* viewer_empire)
+std::vector<std::string> orbital::get_info_str(empire* viewer_empire, bool use_info_warfare)
 {
     if(type != orbital_info::FLEET || data == nullptr)
     {
@@ -563,7 +563,12 @@ std::vector<std::string> orbital::get_info_str(empire* viewer_empire)
     {
         ship_manager* mgr = (ship_manager*)data;
 
-        std::vector<std::string> ret = mgr->get_info_strs();
+        std::vector<std::string> ret;
+
+        if(use_info_warfare)
+            ret = mgr->get_info_strs_with_info_warfare(viewer_empire, this);
+        else
+            ret = mgr->get_info_strs();
 
         //ret.push_back("Position: " + std::to_string(absolute_pos.x()) + " " + std::to_string(absolute_pos.y()));
 
@@ -2249,7 +2254,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
                 bool do_obfuscate = false;
 
-                if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= 0 && !viewing_empire->is_allied(sm->parent_empire))
+                if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= ship_info::accessory_information_obfuscation_level && !viewing_empire->is_allied(sm->parent_empire))
                 {
                     do_obfuscate = true;
                 }
@@ -2410,7 +2415,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
                     bool do_obfuscate = false;
 
-                    if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= 0 && !viewing_empire->is_allied(sm->parent_empire))
+                    if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= ship_info::ship_obfuscation_level && !viewing_empire->is_allied(sm->parent_empire))
                     {
                         do_obfuscate = true;
                     }

@@ -127,4 +127,23 @@ bool once()
 
 #define ONCE_MACRO(x) once<x, __LINE__, __COUNTER__>()
 
+inline
+std::string obfuscate(const std::string& str, bool should_obfuscate)
+{
+    if(!should_obfuscate)
+        return str;
+
+    std::string ret = str;
+
+    for(int i=0; i<ret.length(); i++)
+    {
+        if(isalnum(ret[i]))
+        {
+            ret[i] = '?';
+        }
+    }
+
+    return ret;
+}
+
 #endif // UTIL_HPP_INCLUDED

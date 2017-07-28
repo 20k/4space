@@ -2996,6 +2996,33 @@ std::vector<std::string> ship_manager::get_info_strs()
     return ret;
 }
 
+std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* viewing, orbital* my_orbital)
+{
+    bool should_obfuscate = false;
+
+    if(viewing->available_scanning_power_on(my_orbital) < ship_info::ship_obfuscation_level)
+        should_obfuscate = true;
+
+    if(viewing->is_allied(my_orbital->parent_empire))
+        should_obfuscate = false;
+
+    std::vector<std::string> ret;
+
+    for(ship* s : ships)
+    {
+        std::string name_str = obfuscate(s->name, should_obfuscate);
+
+        if(s->fully_disabled())
+        {
+            name_str += " (Derelict)";
+        }
+
+        ret.push_back(name_str);
+    }
+
+    return ret;
+}
+
 void ship_manager::merge_into_me(ship_manager& other)
 {
     if(this == &other)
