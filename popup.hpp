@@ -40,6 +40,19 @@ struct popup_element
     std::map<popup_element_type::types, button_element> buttons_map;
 
     void* element = nullptr;
+
+    void try_set_button_map(bool should_set, popup_element_type::types type, const std::string& name)
+    {
+        if(!should_set)
+        {
+            buttons_map.erase(type);
+            return;
+        }
+        else
+        {
+            buttons_map[type].name = name;
+        }
+    }
 };
 
 struct popup_info

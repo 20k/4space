@@ -937,64 +937,44 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         ///if orb not a fleet, this is empty
         std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
 
-        ///atm battle just immediately ends if no enemies are hostile
-        ///need a declare war button perhaps?
-        if(hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat())
+        bool can_engage = hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat();
+
+        elem.try_set_button_map(can_engage, popup_element_type::ENGAGE, "Engage Fleets");
+
+
+        bool can_declare_war = orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire;
+
+        elem.try_set_button_map(can_declare_war, popup_element_type::DECLARE_WAR, "Declare War");
+
+
+        if(orb->type == orbital_info::FLEET)
         {
-            elem.buttons_map[popup_element_type::ENGAGE].name = "Engage Fleets";
-        }
-        else
-        {
-            elem.buttons_map.erase(popup_element_type::ENGAGE);
+            bool enable_engage_cooldown = !sm->can_engage() && sm->parent_empire == player_empire;
+
+            elem.try_set_button_map(enable_engage_cooldown, popup_element_type::ENGAGE_COOLDOWN, sm->get_engage_str());
+
+            bool remove_resupply = (sm->any_in_combat() || sm->all_derelict());
+
+            if(remove_resupply)
+            {
+                elem.try_set_button_map(false, popup_element_type::RESUPPLY, "");
+            }
         }
 
-        if(orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire)
-        {
-            elem.buttons_map[popup_element_type::DECLARE_WAR].name = "Declare War";
-        }
-        else
-        {
-            elem.buttons_map.erase(popup_element_type::DECLARE_WAR);
-        }
+        bool can_colonise = orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr;
 
-        if(orb->type == orbital_info::FLEET && !sm->can_engage() && sm->parent_empire == player_empire)
-        {
-            elem.buttons_map[popup_element_type::ENGAGE_COOLDOWN].name = sm->get_engage_str();
-        }
-        else
-        {
-            elem.buttons_map.erase(popup_element_type::ENGAGE_COOLDOWN);
-        }
+        elem.try_set_button_map(can_colonise, popup_element_type::COLONISE, "Colonise");
 
-        if(orb->type == orbital_info::FLEET && (sm->any_in_combat() || sm->all_derelict()))
-        {
-            elem.buttons_map.erase(popup_element_type::RESUPPLY);
-        }
 
-        if(orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr)
-        {
-            elem.buttons_map[popup_element_type::COLONISE].name = "Colonise";
-        }
-        else
-        {
-            elem.buttons_map.erase(popup_element_type::COLONISE);
-        }
+        bool can_resupply = orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire));
 
+        elem.try_set_button_map(can_resupply, popup_element_type::RESUPPLY, "Resupply");
 
         ///disabling merging here and resupply invalides all fleet actions except moving atm
         ///unexpected fix to fleet merging problem
         ///disable resupply if in combat
-        if(orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)))
-        {
-            if(orb->parent_empire == player_empire)
-                elem.mergeable = true;
-
-            elem.buttons_map[popup_element_type::RESUPPLY].name = "Resupply";
-        }
-        else
-        {
-            elem.buttons_map.erase(popup_element_type::RESUPPLY);
-        }
+        if(can_resupply && orb->parent_empire == player_empire)
+            elem.mergeable = true;
 
         if(orb->type == orbital_info::FLEET)
         {
