@@ -40,7 +40,7 @@ sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, cons
     return pixel;
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col)
+void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, vec3f col)
 {
     col = col * 255.f;
 
@@ -62,7 +62,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
 
-    if(pixel_rad.x - win.getSize().x/2 < 2.f)
+    if(!force_high_quality && pixel_rad.x - win.getSize().x/2 < 2.f)
     {
         static sf::CircleShape shape;
 
@@ -476,6 +476,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
             }
         }
     }*/
+
     bool currently_has_vision = viewer_empire->has_vision(parent_system);
 
     bool not_currently_viewed_fleet = false;
@@ -506,8 +507,10 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         current_sprite_col = current_sprite_col/2.f;
     }
 
+    bool force_high_quality = type != orbital_info::ASTEROID;
+
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, last_viewed_position, current_simple_col);
+        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, current_simple_col);
     else if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
