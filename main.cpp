@@ -1089,16 +1089,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             if(o->description != "" && o->viewed_by[player_empire])
                 elem.data.push_back(o->description);
 
-            /*if(do_obfuscate_name)
-            {
-                //elem.header = obfuscate(elem.header, true);
-
-                for(auto& i : elem.data)
-                {
-                    i = obfuscate(i, true);
-                }
-            }*/
-
             if(popup.going)
             {
                 o->highlight = true;
