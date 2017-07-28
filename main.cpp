@@ -1274,6 +1274,8 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                 {
                     can_open_window = true;
                 }
+                #else
+                can_open_window = true;
                 #endif // NO_OPEN_STEALTH_SHIPS
 
                 if(smanage->parent_empire->is_allied(player_empire))

@@ -2233,21 +2233,22 @@ ship::~ship()
 }
 
 ///resupply probably needs to distribute fairly from global, or use different resources
-void ship::resupply(empire* emp, int num)
+///modify this to take a parameter for types
+void ship::resupply_elements(empire* emp, const std::vector<ship_component_element>& to_resupply, int num)
 {
-    std::vector<ship_component_elements::types> types =
+    /*std::vector<ship_component_elements::types> types =
     {
         ship_component_elements::HP,
         ship_component_elements::FUEL,
         ship_component_elements::AMMO,
         ship_component_elements::ARMOUR,
-    };
+    };*/
 
     std::map<resource::types, float> hp_repair_costs = resources_needed_to_repair_total();
 
     auto capacities = get_available_capacities_vec();
 
-    for(ship_component_elements::types& type : types)
+    for(const ship_component_element& type : to_resupply)
     {
         float current_capacity = capacities[type].second;
 
@@ -2267,7 +2268,7 @@ void ship::resupply(empire* emp, int num)
             requested_resource_amounts = hp_repair_costs;
         }
 
-        std::map<ship_component_elements::types, float> to_add;
+        std::map<ship_component_element, float> to_add;
 
         if(emp != nullptr)
         {
@@ -2284,6 +2285,16 @@ void ship::resupply(empire* emp, int num)
 
         distribute_resources(to_add);
     }
+}
+
+void ship::resupply(empire* emp, int num)
+{
+    return resupply_elements(emp, {ship_component_elements::FUEL, ship_component_elements::AMMO}, num);
+}
+
+void ship::repair(empire* emp, int num)
+{
+    return resupply_elements(emp, {ship_component_elements::HP, ship_component_elements::ARMOUR}, num);
 }
 
 bool ship::can_move_in_system()
@@ -3057,15 +3068,15 @@ void ship_manager::resupply_from_nobody()
     }
 }
 
-bool ship_manager::should_resupply()
+bool ship_manager::should_resupply_base(const std::vector<ship_component_element>& to_test)
 {
-    std::vector<ship_component_elements::types> types =
+    /*std::vector<ship_component_elements::types> types =
     {
         ship_component_elements::HP,
         ship_component_elements::FUEL,
         ship_component_elements::AMMO,
         ship_component_elements::ARMOUR,
-    };
+    };*/
 
     for(ship* s : ships)
     {
@@ -3073,7 +3084,7 @@ bool ship_manager::should_resupply()
 
         auto max_stored = s->get_max_resources();
 
-        for(auto& i : types)
+        for(auto& i : to_test)
         {
             if(max_stored[i] < 0.0001f)
                 continue;
@@ -3086,6 +3097,16 @@ bool ship_manager::should_resupply()
     }
 
     return false;
+}
+
+bool ship_manager::should_resupply()
+{
+    return should_resupply_base({ship_component_elements::FUEL, ship_component_elements::AMMO});
+}
+
+bool ship_manager::should_repair()
+{
+    return should_resupply_base({ship_component_elements::HP, ship_component_elements::ARMOUR});
 }
 
 void ship_manager::tick_all(float step_s)

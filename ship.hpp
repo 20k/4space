@@ -519,7 +519,9 @@ struct ship : positional
     bool display_ui = false;
 
     ///fallback on nullptr emp is to force resupply
+    void resupply_elements(empire* emp, const std::vector<ship_component_element>& to_resupply, int num = 1);
     void resupply(empire* emp, int num = 1);
+    void repair(empire* emp, int num = 1);
 
     bool can_move_in_system();
     float get_move_system_speed();
@@ -634,7 +636,9 @@ struct ship_manager
     void resupply(empire* from, bool can_resupply_derelicts = true);
     void resupply_from_nobody();
     ///for the ai to use
+    bool should_resupply_base(const std::vector<ship_component_element>& to_test);
     bool should_resupply();
+    bool should_repair();
 
     void tick_all(float step_s);
 
