@@ -5,7 +5,7 @@
 #include "battle_manager.hpp"
 #include <assert.h>
 
-int ai_fleet::gid;
+uint32_t ai_fleet::gid;
 
 std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbital*, ship_manager*>>& targets, orbital* me)
 {
@@ -57,7 +57,8 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     ///we're not in combat here
 
-    int resupply_frames = 10;
+    ///spread resupply check across this many frames
+    uint32_t resupply_frames = 10;
 
     if(((current_resupply_frame + resupply_offset) % resupply_frames) == 0 && ship_manage->should_resupply())
     {
