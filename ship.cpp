@@ -2472,6 +2472,8 @@ void ship::set_max_tech_level_from_empire_and_ship(empire* e)
     {
         c.set_max_tech_level_from_empire_and_component(e);
     }
+
+    repair(nullptr, 1);
 }
 
 void ship::set_tech_level_from_empire(empire* e)
@@ -2480,6 +2482,8 @@ void ship::set_tech_level_from_empire(empire* e)
     {
         c.set_tech_level_from_empire(e);
     }
+
+    repair(nullptr, 1);
 }
 
 void ship::set_tech_level_from_research(research& r)
@@ -2488,6 +2492,8 @@ void ship::set_tech_level_from_research(research& r)
     {
         c.set_tech_level_from_research(r);
     }
+
+    repair(nullptr, 1);
 }
 
 ///randomise tech?

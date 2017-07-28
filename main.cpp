@@ -424,9 +424,17 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         if(s.owned_by->parent_empire != nullptr)
             c_cpy.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
 
+        ///this doesn't include armour, so we're kind of getting it for free atm
+        auto repair_resources = c_cpy.resources_needed_to_repair_total();
+
         //c_cpy.intermediate_texture = nullptr;
 
         auto res_cost = c_cpy.resources_cost();
+
+        for(auto& i : repair_resources)
+        {
+            res_cost[i.first] += i.second;
+        }
 
         auto current_resources = s.resources_cost();
 
@@ -444,7 +452,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             {
                 owner->dispense_resources(res_remaining);
 
-                s.set_tech_level_from_empire(owner);
+                s.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
             }
         }
 
