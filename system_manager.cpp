@@ -2526,7 +2526,11 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                         {
                             ImGui::Text((combat_pad + i + combat_pad).c_str());
 
+                            #ifdef NO_OPEN_STEALTH_SHIPS_SYSTEM
+                            if(ImGui::IsItemClicked() && !do_obfuscate)
+                            #else
                             if(ImGui::IsItemClicked())
+                            #endif
                             {
                                 sm->ships[num]->display_ui = !sm->ships[num]->display_ui;
                             }

@@ -1267,10 +1267,14 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                 float scanning_capacity = player_empire->available_scanning_power_on(s, all_systems);
 
                 ///um. We probably want to adjust the scanner thing to return levels, not rando floats
+
+                //#define NO_OPEN_STEALTH_SHIPS
+                #ifdef NO_OPEN_STEALTH_SHIPS
                 if(scanning_capacity > 0.4f)
                 {
                     can_open_window = true;
                 }
+                #endif // NO_OPEN_STEALTH_SHIPS
 
                 if(smanage->parent_empire->is_allied(player_empire))
                 {
