@@ -640,6 +640,13 @@ struct ship_manager
     bool should_resupply();
     bool should_repair();
 
+    ///Am i able to be repaired
+    ///This is defined as any system which is allied, owned by me, or I have passage rights
+    ///If there are orbitals hostile to me in my system, we cannot repair
+    ///If any ship is derelict we cannot repair
+    ///If in combat cannot repair
+    bool has_access_to_repair(orbital_system* sys);
+
     void tick_all(float step_s);
 
     bool can_move_in_system();

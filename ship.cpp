@@ -3109,6 +3109,67 @@ bool ship_manager::should_repair()
     return should_resupply_base({ship_component_elements::HP, ship_component_elements::ARMOUR});
 }
 
+bool ship_manager::has_access_to_repair(orbital_system* sys)
+{
+    if(any_derelict())
+        return false;
+
+    if(any_in_combat())
+        return false;
+
+    ///should be impossible, however parent_empire for ships
+    ///is a concept that is moderately likely to change, so if I do change it later
+    ///this is here for future proofing
+    if(parent_empire == nullptr)
+        return false;
+
+    orbital* base = sys->get_base();
+
+    ///should be impossible
+    if(base == nullptr)
+    {
+        printf("warning, bad system with no base in has access to repair");
+        return false;
+    }
+
+    ///if any orbital in the system is hostile to me
+    ///I cannot repair
+    for(orbital* o : sys->orbitals)
+    {
+        if(o->parent_empire == nullptr)
+            continue;
+
+        if(o->parent_empire == parent_empire)
+            continue;
+
+        if(o->type == orbital_info::FLEET)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(sm->all_derelict())
+                continue;
+        }
+
+        if(o->parent_empire->is_hostile(parent_empire))
+            return false;
+    }
+
+    ///my system
+    if(parent_empire == base->parent_empire)
+        return true;
+
+    ///ally's system
+    if(parent_empire->is_allied(base->parent_empire))
+        return true;
+
+    ///this is a system for which i have passage rights
+    if(parent_empire->can_traverse_space(base->parent_empire))
+        return true;
+
+    ///otherwise false
+    return false;
+}
+
 void ship_manager::tick_all(float step_s)
 {
     //sf::Clock clk;
