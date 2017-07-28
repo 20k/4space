@@ -27,6 +27,19 @@ void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
     }
 }
 
+sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, const sf::RenderTarget& target)
+{
+    sf::Vector2f normalized = view.getTransform().transformPoint(x, y);
+
+    // Then convert to viewport coordinates
+    sf::Vector2f pixel;
+    sf::IntRect viewport = target.getViewport(view);
+    pixel.x = (( normalized.x + 1.f) / 2.f * viewport.width  + viewport.left);
+    pixel.y = ((-normalized.y + 1.f) / 2.f * viewport.height + viewport.top);
+
+    return pixel;
+}
+
 void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col)
 {
     col = col * 255.f;
@@ -35,6 +48,35 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     if(real_coord.x < 0 || real_coord.x > win.getSize().x || real_coord.y < 0 || real_coord.y >= win.getSize().y)
         return;
+
+    #define CHEAPDRAW_SMALL_ASTEROIDS
+    #ifdef CHEAPDRAW_SMALL_ASTEROIDS
+    float rad_to_check = 0;
+
+    for(auto& rad : vert_dist)
+    {
+        rad_to_check += rad;
+    }
+
+    rad_to_check /= vert_dist.size();
+
+    auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
+
+    if(pixel_rad.x - win.getSize().x/2 < 2.f)
+    {
+        static sf::CircleShape shape;
+
+        shape.setRadius(rad_to_check);
+        shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+
+        shape.setPosition(absolute_pos.x(), absolute_pos.y());
+        shape.setOrigin({rad_to_check, rad_to_check});
+
+        win.draw(shape);
+
+        return;
+    }
+    #endif // CHEAPDRAW_SMALL_ASTEROIDS
 
     sf::RectangleShape shape;
     shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
