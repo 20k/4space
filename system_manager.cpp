@@ -78,7 +78,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
     }
     #endif // CHEAPDRAW_SMALL_ASTEROIDS
 
-    sf::RectangleShape shape;
+    static sf::RectangleShape shape;
     shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
 
     for(int i=0; i<vert_dist.size(); i++)
