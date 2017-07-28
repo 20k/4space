@@ -270,6 +270,20 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         bool obfuscd = primary_obfuscated[id];
 
+        ///none of these systems have a component with them as a primary
+        ///weird and hardcoded. Armour will when ships carry armour
+        ///ammo too, hp and fuel only real special case
+        if(id == ship_component_element::AMMO ||
+           id == ship_component_element::ARMOUR ||
+           id == ship_component_element::HP ||
+           id == ship_component_element::FUEL)
+        {
+            if(known_information < 0.5f)
+            {
+                obfuscd = true;
+            }
+        }
+
         if(s.owned_by->parent_empire->is_allied(player_empire))
         {
             obfuscd = false;
@@ -403,7 +417,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     float cost = s.get_real_total_cost();
 
-    std::string cost_str = "Cost: " + std::to_string((int)cost);
+    std::string cost_str = "Cost: " + obfuscate(std::to_string((int)cost), known_information < 0.8f);
 
     ImGui::Text(cost_str.c_str());
 
