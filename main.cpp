@@ -420,7 +420,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         ship c_cpy = s;
 
         if(s.owned_by->parent_empire != nullptr)
-            c_cpy.set_tech_level_from_empire(s.owned_by->parent_empire);
+            c_cpy.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
 
         //c_cpy.intermediate_texture = nullptr;
 

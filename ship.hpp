@@ -324,6 +324,7 @@ struct component_attribute
     ///perform actual upgrade
     void upgrade_tech_level(int type, float from, float to);
 
+    void set_max_tech_level_from_empire_and_component_attribute(int type, empire* e);
     void set_tech_level_from_empire(int type, empire* e);
     void set_tech_level_from_research(int type, research& r);
     void set_tech_level(float level);
@@ -399,6 +400,7 @@ struct component
 
     ///BLANKET SETS ALL SUB COMPONENTS TO TECH LEVEL
     void set_tech_level(float tech_level);
+    void set_max_tech_level_from_empire_and_component(empire* e);
     void set_tech_level_from_empire(empire* e);
     void set_tech_level_from_research(research& r);
     void set_tech_level_of_element(ship_component_elements::types type, float tech_level);
@@ -541,6 +543,7 @@ struct ship : positional
     bool is_fully_disabled = false;
 
     void set_tech_level_of_component(int component_offset, float tech_level);
+    void set_max_tech_level_from_empire_and_ship(empire* e); ///takes max(ship, empire) tech
     void set_tech_level_from_empire(empire* e);
     void set_tech_level_from_research(research& r);
 

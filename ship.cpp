@@ -366,6 +366,20 @@ void component_attribute::upgrade_tech_level(int type, float from, float to)
     ship_component_elements::upgrade_component(*this, type, from, to);
 }
 
+void component_attribute::set_max_tech_level_from_empire_and_component_attribute(int type, empire* e)
+{
+    int appropriate_tech = ship_component_elements::component_element_to_research_type[type];
+
+    int new_tech_level = e->research_tech_level.categories[appropriate_tech].amount;
+
+    if(tech_level >= new_tech_level)
+        return;
+
+    upgrade_tech_level(type, tech_level, new_tech_level);
+
+    tech_level = new_tech_level;
+}
+
 void component_attribute::set_tech_level_from_empire(int type, empire* e)
 {
     int appropriate_tech = ship_component_elements::component_element_to_research_type[type];
@@ -861,6 +875,31 @@ void component::set_tech_level_from_empire(empire* e)
     for(auto& i : components)
     {
         i.second.set_tech_level_from_empire(i.first, e);
+    }
+}
+
+void component::set_max_tech_level_from_empire_and_component(empire* e)
+{
+    if(primary_attribute == ship_component_elements::WARP_POWER)
+    {
+        float tl = get_tech_level_of_primary();
+
+        int appropriate_tech = ship_component_elements::component_element_to_research_type[primary_attribute];
+        float new_tech_level = e->research_tech_level.categories[appropriate_tech].amount;
+
+        if(tl < new_tech_level)
+        {
+            float old_value = get_tag(component_tag::WARP_DISTANCE);
+
+            float new_value = ship_component_elements::upgrade_value(old_value, tl, new_tech_level);
+
+            set_tag(component_tag::WARP_DISTANCE, new_value);
+        }
+    }
+
+    for(auto& i : components)
+    {
+        i.second.set_max_tech_level_from_empire_and_component_attribute(i.first, e);
     }
 }
 
@@ -2415,6 +2454,14 @@ void ship::test_set_disabled()
 
     component_offset[i].set_tech_level
 }*/
+
+void ship::set_max_tech_level_from_empire_and_ship(empire* e)
+{
+    for(component& c : entity_list)
+    {
+        c.set_max_tech_level_from_empire_and_component(e);
+    }
+}
 
 void ship::set_tech_level_from_empire(empire* e)
 {
