@@ -19,6 +19,11 @@ struct system_manager;
 ///may contain state
 struct ai_fleet
 {
+    static int gid;
+
+    int resupply_offset = gid++;
+    int current_resupply_frame = 0;
+
     void tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage);
 };
 

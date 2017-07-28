@@ -5,6 +5,8 @@
 #include "battle_manager.hpp"
 #include <assert.h>
 
+int ai_fleet::gid;
+
 std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbital*, ship_manager*>>& targets, orbital* me)
 {
     float min_dist = 999999.f;
@@ -29,6 +31,7 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
     return ret;
 }
 
+///this takes like 4ms
 void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
 {
     ///split fleets up after we finish basic ai
@@ -54,12 +57,16 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     ///we're not in combat here
 
-    if(ship_manage->should_resupply())
+    int resupply_frames = 10;
+
+    if(((current_resupply_frame + resupply_offset) % resupply_frames) == 0 && ship_manage->should_resupply())
     {
         ship_manage->resupply(ship_manage->parent_empire);
 
         //printf("ai resupply\n");
     }
+
+    current_resupply_frame++;
 
     ///fly around?
     if(!ship_manage->can_engage())
