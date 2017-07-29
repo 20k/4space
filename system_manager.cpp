@@ -40,7 +40,7 @@ sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, cons
     return pixel;
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, vec3f col)
+void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, vec3f col)
 {
     col = col * 255.f;
 
@@ -80,7 +80,26 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     static sf::RectangleShape shape;
     shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+    shape.setOutlineColor(sf::Color(102, 51, 0));
 
+    if(draw_outline)
+    {
+        shape.setOutlineThickness(1.f);
+
+        main_rendering(shape, win, rotation, absolute_pos);
+
+        shape.setOutlineThickness(0.f);
+    }
+    else
+    {
+        shape.setOutlineThickness(0.f);
+    }
+
+    main_rendering(shape, win, rotation, absolute_pos);
+}
+
+void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos)
+{
     for(int i=0; i<vert_dist.size(); i++)
     {
         int cur = i;
@@ -510,7 +529,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     bool force_high_quality = type != orbital_info::ASTEROID;
 
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, current_simple_col);
+        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, type == orbital_info::PLANET, current_simple_col);
     else if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
