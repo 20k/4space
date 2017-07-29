@@ -1351,7 +1351,7 @@ bool orbital_system::is_owned()
     return get_base()->parent_empire != nullptr;
 }
 
-std::string orbital_system::get_resource_str(bool include_vision, empire* viewer_empire)
+std::string orbital_system::get_resource_str(bool include_vision, empire* viewer_empire, bool only_owned)
 {
     resource_manager resources;
 
@@ -1361,6 +1361,9 @@ std::string orbital_system::get_resource_str(bool include_vision, empire* viewer
             continue;
 
         if(!o->viewed_by[viewer_empire] && include_vision)
+            continue;
+
+        if(only_owned && o->parent_empire != viewer_empire)
             continue;
 
         for(int res = 0; res < o->produced_resources_ps.resources.size(); res++)
@@ -2041,7 +2044,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
                     str += "\n" + s->get_base()->get_empire_str(false);
                 }
 
-                str += "\n" + s->get_resource_str(true, viewer_empire);
+                str += "\n" + s->get_resource_str(true, viewer_empire, false);
 
                 //ImGui::SetTooltip(str.c_str());
                 tooltip::add(str.c_str());
