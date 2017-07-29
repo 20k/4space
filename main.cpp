@@ -777,7 +777,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
 ///this function is one of the worst in the code, there's a lot of duplication that's gradually being exposed
 ///new functionality is however forcing this to be refactored to be less dumb
-void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage)
+void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage, all_events_manager& all_events)
 {
     sf::Mouse mouse;
 
@@ -803,9 +803,16 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             ship_manager* sm = (ship_manager*)o->data;
 
             sm->toggle_fleet_ui = false;
+
+            for(ship* s : sm->ships)
+            {
+                s->shift_clicked = false;
+            }
         }
 
         popup.going = false;
+
+        popup.declaring_war = false;
 
         popup.elements.clear();
     }
@@ -823,8 +830,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     std::vector<orbital*> selected;
 
     bool first = true;
-
-    //orbital_system* sys = system_manage.currently_viewed;
 
     std::vector<orbital*> valid_selection_targets;
 
@@ -927,107 +932,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     {
         orbital* orb = (orbital*)elem.element;
 
-        if(orb->type != orbital_info::FLEET)
-            continue;
+        orbital* o = (orbital*)elem.element;
 
-        ship_manager* sm = (ship_manager*)orb->data;
-
-        orbital_system* parent_system = orb->parent_system;
-
-        ///if orb not a fleet, this is empty
-        std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
-
-        bool can_engage = hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat();
-
-        elem.try_set_button_map(can_engage, popup_element_type::ENGAGE, "Engage Fleets");
-
-
-        bool can_declare_war = orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire;
-
-        elem.try_set_button_map(can_declare_war, popup_element_type::DECLARE_WAR, "Declare War");
-
-
-        if(orb->type == orbital_info::FLEET)
         {
-            bool enable_engage_cooldown = !sm->can_engage() && sm->parent_empire == player_empire;
-
-            elem.try_set_button_map(enable_engage_cooldown, popup_element_type::ENGAGE_COOLDOWN, sm->get_engage_str());
-
-            bool remove_resupply = (sm->any_in_combat() || sm->all_derelict());
-
-            if(remove_resupply)
-            {
-                elem.try_set_button_map(false, popup_element_type::RESUPPLY, "");
-            }
-        }
-
-        bool can_colonise = orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr;
-
-        elem.try_set_button_map(can_colonise, popup_element_type::COLONISE, "Colonise");
-
-
-        bool can_resupply = orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire));
-
-        elem.try_set_button_map(can_resupply, popup_element_type::RESUPPLY, "Resupply");
-
-        ///disabling merging here and resupply invalides all fleet actions except moving atm
-        ///unexpected fix to fleet merging problem
-        ///disable resupply if in combat
-        if(can_resupply && orb->parent_empire == player_empire)
-            elem.mergeable = true;
-
-        if(orb->type == orbital_info::FLEET)
-        {
-            elem.toggle_clickable = true;
-        }
-
-        ///for drawing warp radiuses, but will take anything and might be extended later
-        system_manage.add_selected_orbital(orb);
-    }
-
-    if(popup.elements.size() > 0 && popup.going)
-    {
-        if(system_manage.hovered_system != nullptr)
-        {
-            for(popup_element& elem : popup.elements)
-            {
-                orbital* o = (orbital*)elem.element;
-
-                if(o->type != orbital_info::FLEET)
-                    continue;
-
-                orbital_system* parent = system_manage.get_parent(o);
-
-                if(parent == system_manage.hovered_system || parent == nullptr)
-                    continue;
-
-                if(o->parent_empire != player_empire)
-                    continue;
-
-                ship_manager* sm = (ship_manager*)o->data;
-
-                if(!sm->can_warp(system_manage.hovered_system, parent, o))
-                {
-                    //ImGui::SetTooltip("Cannot Warp");
-                    tooltip::add("Cannot Warp");
-                }
-                else
-                {
-                    //ImGui::SetTooltip("Right click to Warp");
-                    tooltip::add("Right click to Warp");
-                }
-
-                if(rclick && sm->parent_empire == player_empire)
-                {
-                    sm->try_warp(system_manage.hovered_system, parent, o);
-                }
-            }
-        }
-
-        for(popup_element& elem : popup.elements)
-        {
-            orbital* o = (orbital*)elem.element;
-
             bool do_obfuscate_name = false;
             bool do_obfuscate_misc = false;
 
@@ -1088,28 +995,62 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                     o->request_transfer({transformed.x, transformed.y});
                 }
             }
-        }
-    }
 
-    for(popup_element& elem : popup.elements)
-    {
-        //for(auto& map_element : elem.buttons_map)
+            ImGui::Text(elem.header.c_str());
 
-        for(auto iter = elem.buttons_map.begin(); iter != elem.buttons_map.end(); iter++)
-        {
-            auto map_element = *iter;
-
-            ///this seems the least hitler method we have so far to handle this
-            if(map_element.first == popup_element_type::RESUPPLY && map_element.second.pressed)
+            for(int i=0; i<elem.data.size(); i++)
             {
-                orbital* o = (orbital*)elem.element;
+                std::string str = elem.data[i];
 
-                ship_manager* sm = (ship_manager*)o->data;
+                if(o->type == orbital_info::FLEET)
+                {
+                    ship_manager* sm = (ship_manager*)o->data;
 
-                sm->resupply(player_empire, false);
+                    if(sm->ships[i]->shift_clicked)
+                    {
+                        str = str + "+";
+                    }
+                }
+
+                ImGui::Text(str.c_str());
+
+                bool shift = key.isKeyPressed(sf::Keyboard::LShift);
+
+                bool can_open_window = true;
+
+                if(can_open_window && ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Left Click to view ship");
+                if(elem.mergeable && ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Shift-Click to add to fleet");
+
+                if(ImGui::IsItemClicked() && !shift && can_open_window && o->type == orbital_info::FLEET)
+                {
+                    ship_manager* sm = (ship_manager*)o->data;
+
+                    sm->ships[i]->display_ui = !sm->ships[i]->display_ui;
+                }
+                if(ImGui::IsItemClicked() && shift && elem.mergeable && o->type == orbital_info::FLEET)
+                {
+                    ship_manager* sm = (ship_manager*)o->data;
+
+                    sm->ships[i]->shift_clicked = !sm->ships[i]->shift_clicked;
+                }
             }
+        }
 
-            if(map_element.first == popup_element_type::ENGAGE && map_element.second.pressed)
+        ship_manager* sm = (ship_manager*)orb->data;
+
+        orbital_system* parent_system = orb->parent_system;
+
+        std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
+
+        bool can_engage = hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat();
+
+        if(can_engage)
+        {
+            ImGui::Text("(Engage Fleets)");
+
+            if(ImGui::IsItemClicked())
             {
                 orbital* o = (orbital*)elem.element;
 
@@ -1129,8 +1070,54 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 all_battles.make_new_battle(hostile_fleets);
             }
+        }
 
-            if(map_element.first == popup_element_type::COLONISE && map_element.second.pressed)
+        bool can_declare_war = orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire;
+
+        if(can_declare_war)
+        {
+            ImGui::Text("(Declare War)");
+
+            if(ImGui::IsItemClicked())
+                popup.declaring_war = true;
+
+            if(popup.declaring_war)
+            {
+                ImGui::Text("(Are you sure?)");
+
+                if(ImGui::IsItemClicked())
+                {
+                    orbital* o = orb;
+
+                    assert(o);
+
+                    empire* parent = o->parent_empire;
+
+                    if(!parent->is_hostile(player_empire))
+                    {
+                        parent->become_hostile(player_empire);
+                    }
+                }
+            }
+        }
+
+        if(orb->type == orbital_info::FLEET)
+        {
+            bool enable_engage_cooldown = !sm->can_engage() && sm->parent_empire == player_empire;
+
+            if(enable_engage_cooldown)
+            {
+                ImGui::Text(sm->get_engage_str().c_str());
+            }
+        }
+
+        bool can_colonise = orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr;
+
+        if(can_colonise)
+        {
+            ImGui::Text("(Colonise)");
+
+            if(ImGui::IsItemClicked())
             {
                 orbital* o = (orbital*)elem.element;
 
@@ -1138,187 +1125,50 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
                 ship* nearest = fleet_manage.nearest_free_colony_ship_of_empire(o, player_empire);
 
-                if(!nearest)
-                    continue;
-
-                nearest->colonising = true;
-                nearest->colonise_target = o;
-            }
-
-
-            if(map_element.first == popup_element_type::DECLARE_WAR && map_element.second.pressed)
-            {
-                elem.buttons_map[popup_element_type::DECLARE_WAR_SURE].name = "Are you sure?";
-            }
-
-            bool declaring = false;
-
-            if(map_element.first == popup_element_type::DECLARE_WAR_SURE && map_element.second.pressed)
-            {
-                declaring = true;
-
-                orbital* o = (orbital*)elem.element;
-
-                assert(o);
-
-                empire* parent = o->parent_empire;
-
-                if(!parent->is_hostile(player_empire))
+                if(nearest)
                 {
-                    parent->become_hostile(player_empire);
+                    nearest->colonising = true;
+                    nearest->colonise_target = o;
                 }
             }
-
-            if(declaring)
-            {
-                elem.buttons_map.erase(popup_element_type::DECLARE_WAR_SURE);
-
-                iter--;
-            }
         }
-    }
-}
 
-void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events)
-{
-    if(popup.elements.size() == 0)
-        popup.going = false;
-
-    if(!popup.going)
-        return;
-
-    ImGui::Begin(("Selected###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
-
-    std::set<ship*> potential_new_fleet;
-
-    sf::Keyboard key;
-
-    int g_elem_id = 0;
-
-    ///remember we'll need to make an orbital associated with the new fleet
-    ///going to need the ability to drag and drop these
-    ///nah use checkboxes
-    for(popup_element& i : popup.elements)
-    {
-        int id = i.id;
-
-        ImGui::Text(i.header.c_str());
-
-        int num = 0;
-
-        i.checked.resize(i.data.size());
-
-        //for(std::string& str : i.data)
-        for(int kk=0; kk < i.data.size(); kk++)
+        if(orb->type == orbital_info::FLEET)
         {
-            const std::string& str = i.data[kk];
+            bool can_resupply = orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)) && !(sm->any_in_combat() || sm->all_derelict());
 
-            ImGui::Text(str.c_str());
-
-            bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
-
-            bool shift_clicked = ImGui::IsItemClicked() && lshift;
-            bool non_shift_clicked = ImGui::IsItemClicked() && !lshift;
-            bool hovered = ImGui::IsItemHovered();
-
-            bool can_open_window = i.mergeable;
-
-            if(i.toggle_clickable)
+            if(can_resupply)
             {
-                orbital* o = (orbital*)i.element;
+                ImGui::Text("(Resupply)");
 
-                ship_manager* smanage = (ship_manager*)o->data;
-
-                ship* s = smanage->ships[num];
-
-                if(s->fully_disabled())
+                if(ImGui::IsItemClicked())
                 {
-                    can_open_window = true;
-                }
+                    orbital* o = (orbital*)elem.element;
 
-                float scanning_capacity = player_empire->available_scanning_power_on(s, all_systems);
+                    ship_manager* sm = (ship_manager*)o->data;
 
-                ///um. We probably want to adjust the scanner thing to return levels, not rando floats
-
-                //#define NO_OPEN_STEALTH_SHIPS
-                #ifdef NO_OPEN_STEALTH_SHIPS
-                if(scanning_capacity > 0.4f)
-                {
-                    can_open_window = true;
-                }
-                #else
-                can_open_window = true;
-                #endif // NO_OPEN_STEALTH_SHIPS
-
-                if(smanage->parent_empire->is_allied(player_empire))
-                {
-                    can_open_window = true;
+                    sm->resupply(player_empire, false);
                 }
             }
 
-            if(i.toggle_clickable)
-            {
-                ImGui::SameLine();
-                //ImGui::Checkbox(("###" + std::to_string(id) + std::to_string(num)).c_str(), &i.checked[kk]);
-
-                std::string label_str = "";
-
-                if(i.checked[kk])
-                    label_str += "+";
-
-                ImGui::Text((label_str).c_str());
-
-                if(((ImGui::IsItemClicked() && lshift) || shift_clicked) && i.mergeable)
-                {
-                    i.checked[kk] = !i.checked[kk];
-                }
-
-                ///and sufficient information
-                if(non_shift_clicked && can_open_window)
-                {
-                    orbital* o = (orbital*)i.element;
-
-                    ship_manager* smanage = (ship_manager*)o->data;
-
-                    smanage->ships[num]->display_ui = !smanage->ships[num]->display_ui;
-                }
-
-                if(ImGui::IsItemHovered() || hovered)
-                {
-                    if(can_open_window)
-                        ImGui::SetTooltip("Left Click to view ship");
-                    if(i.mergeable)
-                        ImGui::SetTooltip("Shift-Click to add to fleet");
-                }
-
-                if(i.checked[kk])
-                {
-                    orbital* o = (orbital*)i.element;
-
-                    ship_manager* smanage = (ship_manager*)o->data;
-
-                    potential_new_fleet.insert(smanage->ships[num]);
-                }
-
-                num++;
-            }
+            ///disabling merging here and resupply invalides all fleet actions except moving atm
+            ///unexpected fix to fleet merging problem
+            ///disable resupply if in combat
+            if(can_resupply && orb->parent_empire == player_empire)
+                elem.mergeable = true;
         }
 
-        int kk = 0;
 
-        for(auto& map_element : i.buttons_map)
+        if(orb->type == orbital_info::FLEET)
         {
-            map_element.second.pressed = ImGui::Button((map_element.second.name + "##" + std::to_string(kk) + std::to_string(g_elem_id)).c_str());
-
-            kk++;
+            elem.toggle_clickable = true;
         }
 
-        orbital* o = (orbital*)i.element;
+        ///for drawing warp radiuses, but will take anything and might be extended later
+        system_manage.add_selected_orbital(orb);
 
         if(o->has_quest_alert)
         {
-            orbital* o = (orbital*)i.element;
-
             game_event_manager* event = all_events.orbital_to_game_event(o);
 
             //ship_manager* nearest_fleet = event->get_nearest_fleet(player_empire);
@@ -1372,13 +1222,90 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
             ImGui::Text(decolo_time.c_str());
         }
+    }
 
-        g_elem_id++;
+    if(popup.elements.size() > 0 && popup.going)
+    {
+        if(system_manage.hovered_system != nullptr)
+        {
+            for(popup_element& elem : popup.elements)
+            {
+                orbital* o = (orbital*)elem.element;
+
+                if(o->type != orbital_info::FLEET)
+                    continue;
+
+                orbital_system* parent = system_manage.get_parent(o);
+
+                if(parent == system_manage.hovered_system || parent == nullptr)
+                    continue;
+
+                if(o->parent_empire != player_empire)
+                    continue;
+
+                ship_manager* sm = (ship_manager*)o->data;
+
+                if(!sm->can_warp(system_manage.hovered_system, parent, o))
+                {
+                    //ImGui::SetTooltip("Cannot Warp");
+                    tooltip::add("Cannot Warp");
+                }
+                else
+                {
+                    //ImGui::SetTooltip("Right click to Warp");
+                    tooltip::add("Right click to Warp");
+                }
+
+                if(rclick && sm->parent_empire == player_empire)
+                {
+                    sm->try_warp(system_manage.hovered_system, parent, o);
+                }
+            }
+        }
+    }
+}
+
+void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events)
+{
+    if(popup.elements.size() == 0)
+        popup.going = false;
+
+    if(!popup.going)
+        return;
+
+    //ImGui::Begin(("Selected###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    std::set<ship*> potential_new_fleet;
+
+    sf::Keyboard key;
+
+    ///remember we'll need to make an orbital associated with the new fleet
+    ///going to need the ability to drag and drop these
+    ///nah use checkboxes
+    ///put element into a function, move up
+    for(popup_element& i : popup.elements)
+    {
+        orbital* o = (orbital*)i.element;
+
+        if(o->type == orbital_info::FLEET)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            for(ship* s : sm->ships)
+            {
+                if(s->shift_clicked)
+                {
+                    potential_new_fleet.insert(s);
+                }
+            }
+        }
     }
 
     if(potential_new_fleet.size() > 0)
     {
-        if(ImGui::Button("Make New Fleet"))
+        ImGui::Text("(Make New Fleet)");
+
+        if(ImGui::IsItemClicked())
         {
             bool bad = false;
 
@@ -1419,6 +1346,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
                     }
 
                     i->owned_by->toggle_fleet_ui = false;
+                    i->shift_clicked = false;
 
                     ns->steal(i);
                 }
@@ -1446,7 +1374,7 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
     all_systems.cull_empty_orbital_fleets(empires);
     fleet_manage.cull_dead(empires);
 
-    ImGui::End();
+    //ImGui::End();
 }
 
 struct construction_window_state
@@ -1941,11 +1869,19 @@ int main()
 
         system_manage.tick(diff_s);
 
+        popup.imgui_begin();
 
         if(state == 0)
         {
-            debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage);
+            debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage, all_events);
+        }
 
+        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events);
+
+        popup.imgui_end();
+
+        if(state == 0)
+        {
             ///this is slow
             system_manage.draw_viewed_system(window, player_empire);
             ///dis kinda slow too
@@ -1997,7 +1933,6 @@ int main()
 
         //printf("prepp\n");
 
-        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events);
 
         ///being post do_popup seems to fix some flickering
         ///i guess its an imgui ordering thing

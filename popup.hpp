@@ -5,6 +5,8 @@
 #include <deque>
 #include <vector>
 #include <map>
+#include "../../render_projects/imgui/imgui.h"
+#include "top_bar.hpp"
 
 namespace popup_element_type
 {
@@ -83,6 +85,33 @@ struct popup_info
     }
 
     bool going = false;
+
+    bool declaring_war = false;
+
+    bool started = false;
+
+    void imgui_begin()
+    {
+        if(elements.size() == 0)
+            going = false;
+
+        if(!going)
+            return;
+
+        started = true;
+
+        ImGui::Begin(("Selected###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    }
+
+    void imgui_end()
+    {
+        if(!started)
+            return;
+
+        ImGui::End();
+
+        started = false;
+    }
 };
 
 

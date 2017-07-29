@@ -608,6 +608,8 @@ struct ship : positional
     bool colonising = false;
     orbital* colonise_target = nullptr;
 
+    bool shift_clicked = false;
+
     ///?
     //void fire();
 };
