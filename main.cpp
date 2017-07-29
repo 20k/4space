@@ -928,6 +928,28 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         }
     }
 
+}
+
+void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_manage, system_manager& system_manage, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events, all_battles_manager& all_battles, bool rclick)
+{
+    if(popup.elements.size() == 0)
+        popup.going = false;
+
+    if(!popup.going)
+        return;
+
+    sf::Mouse mouse;
+    sf::Keyboard key;
+
+    int x = mouse.getPosition(win).x;
+    int y = mouse.getPosition(win).y;
+
+    auto transformed = win.mapPixelToCoords({x, y});
+
+    ImGui::Begin(("Selected###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    std::set<ship*> potential_new_fleet;
+
     for(popup_element& elem : popup.elements)
     {
         orbital* orb = (orbital*)elem.element;
@@ -1263,21 +1285,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             }
         }
     }
-}
 
-void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& all_systems, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events)
-{
-    if(popup.elements.size() == 0)
-        popup.going = false;
-
-    if(!popup.going)
-        return;
-
-    //ImGui::Begin(("Selected###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
-
-    std::set<ship*> potential_new_fleet;
-
-    sf::Keyboard key;
 
     ///remember we'll need to make an orbital associated with the new fleet
     ///going to need the ability to drag and drop these
@@ -1311,11 +1319,11 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
 
             ship* test_ship = (*potential_new_fleet.begin());
 
-            orbital_system* test_parent = all_systems.get_by_element(test_ship->owned_by);
+            orbital_system* test_parent = system_manage.get_by_element(test_ship->owned_by);
 
             for(ship* i : potential_new_fleet)
             {
-                if(all_systems.get_by_element(i->owned_by) != test_parent)
+                if(system_manage.get_by_element(i->owned_by) != test_parent)
                     bad = true;
             }
 
@@ -1369,12 +1377,12 @@ void do_popup(popup_info& popup, fleet_manager& fleet_manage, system_manager& al
         }
     }
 
-    all_systems.cull_empty_orbital_fleets(empires);
+    system_manage.cull_empty_orbital_fleets(empires);
     fleet_manage.cull_dead(empires);
-    all_systems.cull_empty_orbital_fleets(empires);
+    system_manage.cull_empty_orbital_fleets(empires);
     fleet_manage.cull_dead(empires);
 
-    //ImGui::End();
+    ImGui::End();
 }
 
 struct construction_window_state
@@ -1869,16 +1877,12 @@ int main()
 
         system_manage.tick(diff_s);
 
-        popup.imgui_begin();
-
         if(state == 0)
         {
             debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage, all_events);
         }
 
-        do_popup(popup, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events);
-
-        popup.imgui_end();
+        do_popup(popup, window, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events, all_battles, rclick);
 
         if(state == 0)
         {

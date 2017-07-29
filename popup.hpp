@@ -88,7 +88,7 @@ struct popup_info
 
     bool declaring_war = false;
 
-    bool started = false;
+    /*bool started = false;
 
     void imgui_begin()
     {
@@ -111,7 +111,7 @@ struct popup_info
         ImGui::End();
 
         started = false;
-    }
+    }*/
 };
 
 
