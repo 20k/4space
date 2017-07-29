@@ -1056,7 +1056,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             ImGui::Unindent();
         }
 
-
         orbital_system* parent_system = orb->parent_system;
 
         std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
@@ -1069,17 +1068,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(ImGui::IsItemClicked())
             {
-                assert(o);
+                assert(parent_system);
 
-                ship_manager* sm = (ship_manager*)o->data;
-
-                assert(sm);
-
-                orbital_system* parent = o->parent_system;
-
-                assert(parent);
-
-                std::vector<orbital*> hostile_fleets = parent->get_fleets_within_engagement_range(o);
+                std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(o);
 
                 hostile_fleets.push_back(o);
 
