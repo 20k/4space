@@ -1679,6 +1679,12 @@ int main()
 
     ImGui::NewFrame();
 
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    style.FrameRounding = 2;
+    style.WindowRounding = 2;
+    style.ChildWindowRounding = 2;
+
     sf::Clock clk;
 
     float last_time_s = 0.f;
