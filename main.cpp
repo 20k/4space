@@ -1366,6 +1366,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 associated->parent = current_system->get_base();
                 associated->set_orbit(fleet_pos);
                 associated->data = ns;
+                associated->tick(0.f);
 
                 parent->take_ownership(associated);
                 parent->take_ownership(ns);
