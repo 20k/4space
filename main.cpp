@@ -1019,6 +1019,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     o->request_transfer({transformed.x, transformed.y});
                 }
 
+                float hp_frac = 1.f;
+
                 ImGui::Text(name.c_str());
 
                 /*if(popup.elements.size() > 1)
@@ -1055,7 +1057,25 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         }
                     }
 
-                    ImGui::Text(str.c_str());
+                    ship* cur_ship = nullptr;
+
+                    float hp_frac = 1.f;
+
+                    vec3f full_col = {1,1,1};
+                    vec3f damaged_col = {1, 0.1, 0.1};
+
+                    vec3f draw_col = full_col;
+
+                    if(o->type == orbital_info::FLEET)
+                    {
+                        cur_ship = sm->ships[i];
+
+                        hp_frac = cur_ship->get_stored_resources()[ship_component_element::HP] / cur_ship->get_max_resources()[ship_component_element::HP];
+
+                        draw_col = mix(damaged_col, full_col, hp_frac*hp_frac);
+                    }
+
+                    ImGui::TextColored(ImVec4(draw_col.x(), draw_col.y(), draw_col.z(), 1), str.c_str());
 
                     if(o->type == orbital_info::FLEET)
                     {
@@ -1070,12 +1090,12 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                         if(ImGui::IsItemClicked() && !shift && can_open_window && o->type == orbital_info::FLEET)
                         {
-                            sm->ships[i]->display_ui = !sm->ships[i]->display_ui;
+                            cur_ship->display_ui = !cur_ship->display_ui;
                         }
 
                         if(ImGui::IsItemClicked() && shift && sm->can_merge && o->type == orbital_info::FLEET)
                         {
-                            sm->ships[i]->shift_clicked = !sm->ships[i]->shift_clicked;
+                            cur_ship->shift_clicked = !cur_ship->shift_clicked;
                         }
                     }
                 }
