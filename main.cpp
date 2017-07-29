@@ -827,8 +827,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         sm->to_close_ui = false;
     }
 
-    std::vector<orbital*> selected;
-
     bool first = true;
 
     std::vector<orbital*> valid_selection_targets;
@@ -973,38 +971,33 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
-            elem.header = o->name;
+            std::string name = o->name;
 
-            if(elem.header == "")
-                elem.header = orbital_info::names[o->type];
+            if(name == "")
+                name = orbital_info::names[o->type];
 
             if(do_obfuscate_name)
             {
-                elem.header = "Unknown";
+                name = "Unknown";
 
                 if(o->type == orbital_info::FLEET)
                 {
-                    elem.header = "Unknown Fleet";
+                    name = "Unknown Fleet";
                 }
             }
 
             if(!do_obfuscate_misc && o->parent_empire != nullptr)
             {
-                elem.header = elem.header + "\n" + o->get_empire_str(false);
+                name = name + "\n" + o->get_empire_str(false);
             }
 
             if(do_obfuscate_misc && o->parent_empire != nullptr)
             {
                 if(o->parent_empire != nullptr)
                 {
-                    elem.header = elem.header + "\nEmpire: Unknown";
+                    name = name + "\nEmpire: Unknown";
                 }
             }
-
-            elem.data = o->get_info_str(player_empire, true);
-
-            if(o->description != "" && o->viewed_by[player_empire])
-                elem.data.push_back(o->description);
 
             if(popup.going)
             {
@@ -1018,11 +1011,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
-            ImGui::Text(elem.header.c_str());
+            ImGui::Text(name.c_str());
 
-            for(int i=0; i<elem.data.size(); i++)
+            std::vector<std::string> data = o->get_info_str(player_empire, true);
+
+            if(o->description != "" && o->viewed_by[player_empire])
+                data.push_back(o->description);
+
+            ImGui::Indent();
+
+            for(int i=0; i<data.size(); i++)
             {
-                std::string str = elem.data[i];
+                std::string str = data[i];
 
                 if(o->type == orbital_info::FLEET)
                 {
@@ -1058,6 +1058,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     sm->ships[i]->shift_clicked = !sm->ships[i]->shift_clicked;
                 }
             }
+
+            ImGui::Unindent();
         }
 
         ship_manager* sm = (ship_manager*)orb->data;
@@ -1074,8 +1076,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(ImGui::IsItemClicked())
             {
-                orbital* o = (orbital*)elem.element;
-
                 assert(o);
 
                 ship_manager* sm = (ship_manager*)o->data;
@@ -1141,8 +1141,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(ImGui::IsItemClicked())
             {
-                orbital* o = (orbital*)elem.element;
-
                 assert(o);
 
                 ship* nearest = fleet_manage.nearest_free_colony_ship_of_empire(o, player_empire);
@@ -1165,8 +1163,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(ImGui::IsItemClicked())
                 {
-                    orbital* o = (orbital*)elem.element;
-
                     ship_manager* sm = (ship_manager*)o->data;
 
                     sm->resupply(player_empire, false);
@@ -1178,12 +1174,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             ///disable resupply if in combat
             if(can_resupply && orb->parent_empire == player_empire)
                 elem.mergeable = true;
-        }
-
-
-        if(orb->type == orbital_info::FLEET)
-        {
-            elem.toggle_clickable = true;
         }
 
         ///for drawing warp radiuses, but will take anything and might be extended later

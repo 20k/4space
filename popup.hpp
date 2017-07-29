@@ -33,11 +33,10 @@ struct popup_element
     static int gid;
     int id = gid++;
 
-    std::string header;
-    std::vector<std::string> data;
+    //std::string header;
+    //std::vector<std::string> data;
     std::deque<bool> checked;
     bool mergeable = false;
-    bool toggle_clickable = false;
 
     std::map<popup_element_type::types, button_element> buttons_map;
 
