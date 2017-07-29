@@ -949,6 +949,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     std::set<ship*> potential_new_fleet;
 
+    bool last_wasnt_fleet = false;
+
     std::map<empire*, std::vector<orbital*>> orbitals_grouped_by_empire;
 
     for(popup_element& elem : popup.elements)
@@ -995,6 +997,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
         for(orbital* orb : grouped_orbitals.second)
         {
+            if(last_wasnt_fleet && orb->type != orbital_info::FLEET)
+                ImGui::NewLine();
+
             orbital* o = orb;
 
             ship_manager* sm = (ship_manager*)orb->data;
@@ -1248,8 +1253,13 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 ImGui::Text(decolo_time.c_str());
             }
 
-            ImGui::NewLine();
+            if(o->type != orbital_info::FLEET)
+            {
+                last_wasnt_fleet = true;
+            }
         }
+
+        last_wasnt_fleet = false;
 
         ImGui::Unindent();
     }
