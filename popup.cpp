@@ -24,6 +24,6 @@ void popup_info::clear()
         }
     }
 
-    declaring_war = false;
+    //declaring_war = false;
     elements.clear();
 }

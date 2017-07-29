@@ -49,6 +49,7 @@ struct popup_element
     int id = gid++;
 
     void* element = nullptr;
+    bool declaring_war = false;
 };
 
 struct popup_info
@@ -94,8 +95,6 @@ struct popup_info
     void clear();
 
     bool going = false;
-
-    bool declaring_war = false;
 };
 
 

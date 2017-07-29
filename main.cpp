@@ -1019,7 +1019,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::Text(name.c_str());
 
-                if(popup.elements.size() > 1)
+                /*if(popup.elements.size() > 1)
                 {
                     ImGui::SameLine();
 
@@ -1029,7 +1029,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 if(ImGui::IsItemClicked())
                 {
                     popup.rem_all_but(o);
-                }
+                }*/
 
                 std::vector<std::string> data = o->get_info_str(player_empire, true);
 
@@ -1082,6 +1082,47 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     ImGui::Unindent();
             }
 
+            //ImGui::SameLine();
+
+            ImGui::Text("");
+
+            if(popup.elements.size() > 1)
+            {
+                ImGui::SameLine(0.f, 0.f);
+
+                ImGui::Text("(Select) ");
+            }
+
+            if(ImGui::IsItemClicked())
+            {
+                popup.rem_all_but(o);
+            }
+
+            if(orb->type == orbital_info::FLEET)
+            {
+                bool can_resupply = orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)) && !(sm->any_in_combat() || sm->all_derelict());
+
+                if(can_resupply)
+                {
+                    ImGui::SameLine(0.f, 0.f);
+
+                    ImGui::GoodText("(Resupply) ");
+
+                    if(ImGui::IsItemClicked())
+                    {
+                        ship_manager* sm = (ship_manager*)o->data;
+
+                        sm->resupply(player_empire, false);
+                    }
+                }
+
+                ///disabling merging here and resupply invalides all fleet actions except moving atm
+                ///unexpected fix to fleet merging problem
+                ///disable resupply if in combat
+                if(can_resupply && orb->parent_empire == player_empire)
+                    sm->can_merge = true;
+            }
+
             orbital_system* parent_system = orb->parent_system;
 
             std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb, true);
@@ -1090,7 +1131,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_engage)
             {
-                ImGui::BadText("(Engage Fleets)");
+                ImGui::SameLine(0.f, 0.f);
+
+                ImGui::BadText("(Engage Fleets) ");
 
                 if(ImGui::IsItemClicked())
                 {
@@ -1108,14 +1151,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_declare_war)
             {
-                ImGui::BadText("(Declare War)");
+                ImGui::SameLine(0.f, 0.f);
 
-                if(ImGui::IsItemClicked())
-                    popup.declaring_war = true;
+                ImGui::BadText("(Declare War) ");
 
-                if(popup.declaring_war)
+                if(ImGui::IsItemClicked() && popup.fetch(orb) != nullptr)
+                    popup.fetch(orb)->declaring_war = true;
+
+                if(popup.fetch(orb) != nullptr && popup.fetch(orb)->declaring_war)
                 {
-                    ImGui::BadText("(Are you sure?)");
+                    ImGui::SameLine(0.f, 0.f);
+
+                    ImGui::BadText("(Are you sure?) ");
 
                     if(ImGui::IsItemClicked())
                     {
@@ -1147,7 +1194,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_colonise)
             {
-                ImGui::GoodText("(Colonise)");
+                ImGui::SameLine(0.f, 0.f);
+
+                ImGui::GoodText("(Colonise) ");
 
                 if(ImGui::IsItemClicked())
                 {
@@ -1161,29 +1210,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         nearest->colonise_target = o;
                     }
                 }
-            }
-
-            if(orb->type == orbital_info::FLEET)
-            {
-                bool can_resupply = orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)) && !(sm->any_in_combat() || sm->all_derelict());
-
-                if(can_resupply)
-                {
-                    ImGui::GoodText("(Resupply)");
-
-                    if(ImGui::IsItemClicked())
-                    {
-                        ship_manager* sm = (ship_manager*)o->data;
-
-                        sm->resupply(player_empire, false);
-                    }
-                }
-
-                ///disabling merging here and resupply invalides all fleet actions except moving atm
-                ///unexpected fix to fleet merging problem
-                ///disable resupply if in combat
-                if(can_resupply && orb->parent_empire == player_empire)
-                    sm->can_merge = true;
             }
 
             ///for drawing warp radiuses, but will take anything and might be extended later
