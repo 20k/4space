@@ -54,7 +54,7 @@ inline component make_default_crew()
 inline component make_default_life_support()
 {
     component_attribute oxygen;
-    oxygen.produced_per_s = 2.f;
+    oxygen.produced_per_s = 0.7f;
 
     component_attribute power;
     power.drained_per_s = 5.f;
