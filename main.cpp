@@ -954,6 +954,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
         orbital* o = (orbital*)elem.element;
 
+        ship_manager* sm = (ship_manager*)orb->data;
+
         {
             bool do_obfuscate_name = false;
             bool do_obfuscate_misc = false;
@@ -999,16 +1001,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
-            if(popup.going)
+            o->highlight = true;
+
+            if(rclick && (o->type == orbital_info::FLEET) && o->parent_empire == player_empire && o->parent_system == system_manage.currently_viewed && !sm->any_colonising() && system_manage.in_system_view())
             {
-                o->highlight = true;
-
-                ship_manager* sm = (ship_manager*)o->data;
-
-                if(rclick && (o->type == orbital_info::FLEET) && o->parent_empire == player_empire && o->parent_system == system_manage.currently_viewed && !sm->any_colonising() && system_manage.in_system_view())
-                {
-                    o->request_transfer({transformed.x, transformed.y});
-                }
+                o->request_transfer({transformed.x, transformed.y});
             }
 
             ImGui::Text(name.c_str());
@@ -1047,14 +1044,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(ImGui::IsItemClicked() && !shift && can_open_window && o->type == orbital_info::FLEET)
                 {
-                    ship_manager* sm = (ship_manager*)o->data;
-
                     sm->ships[i]->display_ui = !sm->ships[i]->display_ui;
                 }
+
                 if(ImGui::IsItemClicked() && shift && elem.mergeable && o->type == orbital_info::FLEET)
                 {
-                    ship_manager* sm = (ship_manager*)o->data;
-
                     sm->ships[i]->shift_clicked = !sm->ships[i]->shift_clicked;
                 }
             }
@@ -1062,7 +1056,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             ImGui::Unindent();
         }
 
-        ship_manager* sm = (ship_manager*)orb->data;
 
         orbital_system* parent_system = orb->parent_system;
 
