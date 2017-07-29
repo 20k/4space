@@ -803,6 +803,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             ship_manager* sm = (ship_manager*)o->data;
 
             sm->toggle_fleet_ui = false;
+            sm->can_merge = false;
 
             for(ship* s : sm->ships)
             {
@@ -1015,9 +1016,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             if(o->description != "" && o->viewed_by[player_empire])
                 data.push_back(o->description);
 
-            ImGui::Indent();
+            if(o->type == orbital_info::FLEET)
+                ImGui::Indent();
 
-            for(int i=0; i<data.size(); i++)
+            for(int i=0; i<data.size() && o->type == orbital_info::FLEET; i++)
             {
                 std::string str = data[i];
 
@@ -1039,7 +1041,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(can_open_window && ImGui::IsItemHovered())
                     ImGui::SetTooltip("Left Click to view ship");
-                if(elem.mergeable && ImGui::IsItemHovered())
+                if(sm->can_merge && ImGui::IsItemHovered())
                     ImGui::SetTooltip("Shift-Click to add to fleet");
 
                 if(ImGui::IsItemClicked() && !shift && can_open_window && o->type == orbital_info::FLEET)
@@ -1047,13 +1049,14 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     sm->ships[i]->display_ui = !sm->ships[i]->display_ui;
                 }
 
-                if(ImGui::IsItemClicked() && shift && elem.mergeable && o->type == orbital_info::FLEET)
+                if(ImGui::IsItemClicked() && shift && sm->can_merge && o->type == orbital_info::FLEET)
                 {
                     sm->ships[i]->shift_clicked = !sm->ships[i]->shift_clicked;
                 }
             }
 
-            ImGui::Unindent();
+            if(o->type == orbital_info::FLEET)
+                ImGui::Unindent();
         }
 
         orbital_system* parent_system = orb->parent_system;
@@ -1157,7 +1160,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             ///unexpected fix to fleet merging problem
             ///disable resupply if in combat
             if(can_resupply && orb->parent_empire == player_empire)
-                elem.mergeable = true;
+                sm->can_merge = true;
         }
 
         ///for drawing warp radiuses, but will take anything and might be extended later

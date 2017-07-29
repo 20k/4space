@@ -36,7 +36,7 @@ struct popup_element
     //std::string header;
     //std::vector<std::string> data;
     std::deque<bool> checked;
-    bool mergeable = false;
+    //bool mergeable = false;
 
     std::map<popup_element_type::types, button_element> buttons_map;
 

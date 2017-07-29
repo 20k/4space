@@ -694,6 +694,8 @@ struct ship_manager
     bool decolonising = false;
     bool toggle_fleet_ui = false;
     bool to_close_ui = false;
+
+    bool can_merge = false;
 };
 
 struct empire_manager;
