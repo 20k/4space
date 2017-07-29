@@ -21,6 +21,7 @@ inline component make_default_crew()
     component_attribute oxygen;
     oxygen.drained_per_s = 0.5f;
     oxygen.max_amount = 10.f;
+    //oxygen.cur_amount = oxygen.max_amount;
 
     //component_attribute repair;
     //repair.produced_per_s = 0.2f;
@@ -43,6 +44,9 @@ inline component make_default_crew()
     crew.name = "Crew";
     crew.primary_attribute = ship_component_elements::COMMAND;
     crew.repair_this_when_recrewing = true;
+
+    crew.set_tag(component_tag::DAMAGED_WITHOUT_O2, 0.5f);
+    crew.set_tag(component_tag::OXYGEN_STARVATION, 0.0f);
 
     return crew;
 }
@@ -132,7 +136,7 @@ inline component make_default_power_core(float effectiveness = 1.f)
     component_attribute hp;
     hp.max_amount = default_room_hp;
     hp.cur_amount = hp.max_amount;
-    hp.cur_amount = 0;
+    //hp.cur_amount = 0;
 
     component core;
     core.add(ship_component_element::ENERGY, power);

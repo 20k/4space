@@ -363,7 +363,12 @@ float component_attribute::consume_max_stored(float amount_to_try)
 
 void component_attribute::calculate_efficiency(float step_s)
 {
-    cur_efficiency = currently_drained / (drained_per_s * step_s);
+    cur_efficiency = get_efficiency(step_s);
+}
+
+float component_attribute::get_efficiency(float step_s)
+{
+    return currently_drained / (drained_per_s * step_s);
 }
 
 void component_attribute::upgrade_tech_level(int type, float from, float to)
@@ -1198,6 +1203,19 @@ void ship::tick_all_components(float step_s)
             if(producing_ps > using_ps && ship_component_elements::allowed_skip_repair[c.primary_attribute] != -1)
                 continue;
 
+            bool in_starvation = false;
+
+
+            if(c.has_tag(component_tag::DAMAGED_WITHOUT_O2))
+            {
+                float val = c.get_tag(component_tag::OXYGEN_STARVATION);
+
+                if(val > 0.99f && val < 1.01f)
+                {
+                    continue;
+                }
+            }
+
             float available = fully_merge[ship_component_elements::HP].produced_per_s;
 
 
@@ -1475,8 +1493,27 @@ void ship::tick_all_components(float step_s)
         }
     }
 
-    for(auto& c : entity_list)
+    for(component& c : entity_list)
     {
+        if(c.has_tag(component_tag::DAMAGED_WITHOUT_O2))
+        {
+            float eff_without_hp = c.components[ship_component_element::OXYGEN].get_efficiency(step_s);
+
+            if(eff_without_hp < 1)
+            {
+                float damage = (1.f - eff_without_hp) * step_s * c.get_tag(component_tag::DAMAGED_WITHOUT_O2);
+
+                c.apply_diff_single(ship_component_element::HP, -damage);
+
+                c.set_tag(component_tag::OXYGEN_STARVATION, 1.f);
+            }
+            else
+            {
+                c.set_tag(component_tag::OXYGEN_STARVATION, 0.f);
+            }
+
+        }
+
         c.propagate_total_efficiency(step_s);
     }
 

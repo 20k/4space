@@ -268,6 +268,8 @@ namespace component_tag
         SPEED = 2,
         SCALE = 4, ///render scale
         WARP_DISTANCE = 8,
+        DAMAGED_WITHOUT_O2 = 16,
+        OXYGEN_STARVATION = 32,
     };
 }
 
@@ -321,6 +323,7 @@ struct component_attribute
     float consume_max_stored(float amount);
 
     void calculate_efficiency(float step_s);
+    float get_efficiency(float step_s);
 
     ///perform actual upgrade
     void upgrade_tech_level(int type, float from, float to);
