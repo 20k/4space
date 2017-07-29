@@ -358,19 +358,26 @@ void empire::tick_system_claim()
     }
 
 
+    ///Ok. Change this from own all to own 1 if nobody else owns any
     for(auto& i : systems)
     {
-        bool own_all_planets = true;
+        bool own_uncontested_planet = true;
+        bool own_any_planet = false;
 
         for(orbital* o : i->orbitals)
         {
-            if(o->type == orbital_info::PLANET && o->parent_empire != this)
+            if(o->type == orbital_info::PLANET && o->parent_empire != this && o->parent_empire != nullptr)
             {
-                own_all_planets = false;
+                own_uncontested_planet = false;
+            }
+
+            if(o->type == orbital_info::PLANET && o->parent_empire == this)
+            {
+                own_any_planet = true;
             }
         }
 
-        if(!own_all_planets)
+        if(!own_uncontested_planet || !own_any_planet)
             continue;
 
         for(orbital* o : i->orbitals)
