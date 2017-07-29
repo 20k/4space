@@ -2465,6 +2465,8 @@ void ship::test_set_disabled()
     float avg_efficiency = 0.f;
     int num_components = 0;
 
+    bool crew_dying = false;
+
     for(component& c : entity_list)
     {
         if(c.skip_in_derelict_calculations)
@@ -2489,6 +2491,21 @@ void ship::test_set_disabled()
 
             avg_efficiency += ceff;
             num_components++;
+        }
+
+        float oxygen_starvation_level = 0.f;
+
+        if(c.has_tag(component_tag::OXYGEN_STARVATION))
+        {
+            oxygen_starvation_level = c.get_tag(component_tag::OXYGEN_STARVATION);
+        }
+
+        if(oxygen_starvation_level > 0.99f && oxygen_starvation_level < 1.01f)
+        {
+            if(c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP] < 0.2f)
+            {
+                full_disabled = true;
+            }
         }
     }
 
