@@ -1266,7 +1266,7 @@ void orbital_system::generate_full_random_system()
     return generate_random_system(rplanets, rasteroids, rbelts, rresource);
 }
 
-std::vector<orbital*> orbital_system::get_fleets_within_engagement_range(orbital* me)
+std::vector<orbital*> orbital_system::get_fleets_within_engagement_range(orbital* me, bool only_hostile)
 {
     std::vector<orbital*> ret;
 
@@ -1289,6 +1289,12 @@ std::vector<orbital*> orbital_system::get_fleets_within_engagement_range(orbital
 
         if(!sm->can_engage())
             continue;
+
+        if(only_hostile)
+        {
+            if(!me->parent_empire->is_hostile(o->parent_empire))
+                continue;
+        }
 
         vec2f their_pos = o->absolute_pos;
 

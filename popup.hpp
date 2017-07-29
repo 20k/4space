@@ -22,6 +22,27 @@ namespace popup_element_type
     };
 }
 
+namespace popup_colour_info
+{
+    static ImVec4 good_ui_colour(0.5, 0.5, 1, 1);
+    static ImVec4 bad_ui_colour(1, 0.5, 0.5, 1);
+}
+
+namespace ImGui
+{
+    inline
+    void GoodText(const std::string& str)
+    {
+        ImGui::TextColored(popup_colour_info::good_ui_colour, str.c_str());
+    }
+
+    inline
+    void BadText(const std::string& str)
+    {
+        ImGui::TextColored(popup_colour_info::bad_ui_colour, str.c_str());
+    }
+}
+
 struct popup_element
 {
     static int gid;

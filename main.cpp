@@ -1042,7 +1042,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 if(o->type == orbital_info::FLEET)
                     ImGui::Indent();
 
-                for(int i=0; i<data.size() && o->type == orbital_info::FLEET; i++)
+                for(int i=0; i<data.size(); i++)
                 {
                     std::string str = data[i];
 
@@ -1058,23 +1058,26 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     ImGui::Text(str.c_str());
 
-                    bool shift = key.isKeyPressed(sf::Keyboard::LShift);
-
-                    bool can_open_window = true;
-
-                    if(can_open_window && ImGui::IsItemHovered())
-                        ImGui::SetTooltip("Left Click to view ship");
-                    if(sm->can_merge && ImGui::IsItemHovered())
-                        ImGui::SetTooltip("Shift-Click to add to fleet");
-
-                    if(ImGui::IsItemClicked() && !shift && can_open_window && o->type == orbital_info::FLEET)
+                    if(o->type == orbital_info::FLEET)
                     {
-                        sm->ships[i]->display_ui = !sm->ships[i]->display_ui;
-                    }
+                        bool shift = key.isKeyPressed(sf::Keyboard::LShift);
 
-                    if(ImGui::IsItemClicked() && shift && sm->can_merge && o->type == orbital_info::FLEET)
-                    {
-                        sm->ships[i]->shift_clicked = !sm->ships[i]->shift_clicked;
+                        bool can_open_window = true;
+
+                        if(can_open_window && ImGui::IsItemHovered())
+                            ImGui::SetTooltip("Left Click to view ship");
+                        if(sm->can_merge && ImGui::IsItemHovered())
+                            ImGui::SetTooltip("Shift-Click to add to fleet");
+
+                        if(ImGui::IsItemClicked() && !shift && can_open_window && o->type == orbital_info::FLEET)
+                        {
+                            sm->ships[i]->display_ui = !sm->ships[i]->display_ui;
+                        }
+
+                        if(ImGui::IsItemClicked() && shift && sm->can_merge && o->type == orbital_info::FLEET)
+                        {
+                            sm->ships[i]->shift_clicked = !sm->ships[i]->shift_clicked;
+                        }
                     }
                 }
 
@@ -1084,19 +1087,19 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             orbital_system* parent_system = orb->parent_system;
 
-            std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb);
+            std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(orb, true);
 
             bool can_engage = hostile_fleets.size() > 0 && orb->parent_empire == player_empire && orb->type == orbital_info::FLEET && sm->can_engage() && !sm->any_in_combat();
 
             if(can_engage)
             {
-                ImGui::Text("(Engage Fleets)");
+                ImGui::BadText("(Engage Fleets)");
 
                 if(ImGui::IsItemClicked())
                 {
                     assert(parent_system);
 
-                    std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(o);
+                    std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(o, true);
 
                     hostile_fleets.push_back(o);
 
@@ -1108,14 +1111,14 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_declare_war)
             {
-                ImGui::Text("(Declare War)");
+                ImGui::BadText("(Declare War)");
 
                 if(ImGui::IsItemClicked())
                     popup.declaring_war = true;
 
                 if(popup.declaring_war)
                 {
-                    ImGui::Text("(Are you sure?)");
+                    ImGui::BadText("(Are you sure?)");
 
                     if(ImGui::IsItemClicked())
                     {
@@ -1147,7 +1150,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_colonise)
             {
-                ImGui::Text("(Colonise)");
+                ImGui::GoodText("(Colonise)");
 
                 if(ImGui::IsItemClicked())
                 {
@@ -1169,7 +1172,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(can_resupply)
                 {
-                    ImGui::Text("(Resupply)");
+                    ImGui::GoodText("(Resupply)");
 
                     if(ImGui::IsItemClicked())
                     {
@@ -1244,6 +1247,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::Text(decolo_time.c_str());
             }
+
+            ImGui::NewLine();
         }
 
         ImGui::Unindent();

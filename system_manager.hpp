@@ -218,7 +218,7 @@ struct orbital_system
     bool highlight = false;
 
     ///hostile fleets
-    std::vector<orbital*> get_fleets_within_engagement_range(orbital* me);
+    std::vector<orbital*> get_fleets_within_engagement_range(orbital* me, bool only_hostile);
 
     bool can_engage(orbital* me, orbital* them);
 
