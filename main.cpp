@@ -793,29 +793,9 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     ///this is where we click away fleets
     if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()))
     {
-        for(popup_element& pe : popup.elements)
-        {
-            orbital* o = (orbital*)pe.element;
-
-            if(o->type != orbital_info::FLEET)
-                continue;
-
-            ship_manager* sm = (ship_manager*)o->data;
-
-            sm->toggle_fleet_ui = false;
-            sm->can_merge = false;
-
-            for(ship* s : sm->ships)
-            {
-                s->shift_clicked = false;
-            }
-        }
-
         popup.going = false;
 
-        popup.declaring_war = false;
-
-        popup.elements.clear();
+        popup.clear();
     }
 
     for(ship_manager* sm : fleet_manage.fleets)
@@ -1038,6 +1018,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
 
                 ImGui::Text(name.c_str());
+
+                if(popup.elements.size() > 1)
+                {
+                    ImGui::SameLine();
+
+                    ImGui::Text("(Select)");
+                }
+
+                if(ImGui::IsItemClicked())
+                {
+                    popup.rem_all_but(o);
+                }
 
                 std::vector<std::string> data = o->get_info_str(player_empire, true);
 
@@ -1374,6 +1366,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     i->owned_by->toggle_fleet_ui = false;
                     i->shift_clicked = false;
 
+                    ///if we're going to be removed from popup
+                    if(real != nullptr && i->owned_by->ships.size() == 1)
+                        popup.rem(real);
+
                     ns->steal(i);
                 }
 
@@ -1386,8 +1382,17 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 parent->take_ownership(associated);
                 parent->take_ownership(ns);
 
-                popup.elements.clear();
-                popup.going = false;
+                //popup.clear();
+                //popup.elements.clear();
+                //popup.going = false;
+
+                popup_element elem;
+                elem.element = associated;
+
+                popup.elements.push_back(elem);
+
+                if(associated->type == orbital_info::FLEET)
+                    ns->toggle_fleet_ui = true;
             }
             else
             {

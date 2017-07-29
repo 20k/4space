@@ -78,6 +78,21 @@ struct popup_info
         }
     }
 
+    void rem_all_but(void* element)
+    {
+        for(int i=0; i<elements.size(); i++)
+        {
+            if(elements[i].element != element)
+            {
+                elements.erase(elements.begin() + i);
+                i--;
+                continue;
+            }
+        }
+    }
+
+    void clear();
+
     bool going = false;
 
     bool declaring_war = false;
