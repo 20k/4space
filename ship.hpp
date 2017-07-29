@@ -299,6 +299,7 @@ struct component_attribute
     void use();
     float get_available_capacity();
     float get_total_capacity(float step_s); ///including drain
+    float get_drain_capacity(float step_s); ///not including storage
 
     float get_produced_amount(float step_s);
 
@@ -330,7 +331,7 @@ struct component_attribute
     void set_tech_level(float level);
     float get_tech_level();
 
-//private:
+private:
     float currently_drained = 0.f;
 };
 

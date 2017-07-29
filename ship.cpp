@@ -270,6 +270,11 @@ float component_attribute::get_total_capacity(float step_s)
     return get_available_capacity() + (drained_per_s * step_s - currently_drained);
 }
 
+float component_attribute::get_drain_capacity(float step_s)
+{
+    return drained_per_s * step_s - currently_drained;
+}
+
 float component_attribute::get_produced_amount(float step_s)
 {
     return produced_per_s * cur_efficiency * step_s;
@@ -1292,12 +1297,11 @@ void ship::tick_all_components(float step_s)
 
                     float take_amount = frac * other.get_produced_amount(step_s) + extra;
 
-                    #ifndef NON_FRACTION_DRANAGE
+                    ///for fractional drainage
                     if(frac > 1)
                     {
-                        take_amount = (1.f / frac) * (me.drained_per_s * step_s - me.currently_drained) + extra;
+                        take_amount = (1.f / frac) * me.get_drain_capacity(step_s) + extra;
                     }
-                    #endif
 
                     if(take_amount > me.get_total_capacity(step_s))
                         take_amount = me.get_total_capacity(step_s);
@@ -1321,10 +1325,9 @@ void ship::tick_all_components(float step_s)
                     fully_merge[c.first].produced_per_s -= drained;
                     fully_merge[c.first].drained_per_s -= drained;
 
-                    #ifndef NON_FRACTION_DRAINAGE
+                    ///the conditional fixes specifically fractional drainage
                     if(frac <= 1)
                         extra += (take_amount - drained);
-                    #endif
                 }
 
             }
