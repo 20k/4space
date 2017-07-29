@@ -1214,7 +1214,7 @@ void ship::tick_all_components(float step_s)
 
     ///DIRTY HACK ALERT
 
-    std::unordered_map<int, float> to_apply_prop;
+    std::map<ship_component_element, float> to_apply_prop;
 
     //for(auto& i : needed)
 
@@ -1244,10 +1244,12 @@ void ship::tick_all_components(float step_s)
 
         float frac = i.drained_per_s / i.produced_per_s;
 
-        to_apply_prop[type] = frac;
+        to_apply_prop[(ship_component_element)type] = frac;
 
         type++;
     }
+
+    //printf("%f\n", to_apply_prop[ship_component_element::ENERGY]);
 
     //printf("%f need\n", needed[ship_component_element::OXYGEN]);
 
@@ -1262,7 +1264,7 @@ void ship::tick_all_components(float step_s)
     {
         for(auto& c : i.components)
         {
-            float my_proportion_of_total = to_apply_prop[(int)c.first];
+            float my_proportion_of_total = to_apply_prop[c.first];
 
             component_attribute& me = c.second;
 
@@ -1272,8 +1274,10 @@ void ship::tick_all_components(float step_s)
             //if(c.first == ship_component_element::ENERGY)
             //    printf("Dfrac %f\n", frac);
 
-            if(frac > 1)
-                frac = 1;
+            #ifdef NON_FRACTION_DRAINAGE
+            //if(frac > 1)
+            //    frac = 1;
+            #endif
 
             float extra = 0;
 
@@ -1287,6 +1291,13 @@ void ship::tick_all_components(float step_s)
                     component_attribute& other = c2.second;
 
                     float take_amount = frac * other.get_produced_amount(step_s) + extra;
+
+                    #ifndef NON_FRACTION_DRANAGE
+                    if(frac > 1)
+                    {
+                        take_amount = (1.f / frac) * (me.drained_per_s * step_s - me.currently_drained) + extra;
+                    }
+                    #endif
 
                     if(take_amount > me.get_total_capacity(step_s))
                         take_amount = me.get_total_capacity(step_s);
@@ -1310,7 +1321,10 @@ void ship::tick_all_components(float step_s)
                     fully_merge[c.first].produced_per_s -= drained;
                     fully_merge[c.first].drained_per_s -= drained;
 
-                    extra += (take_amount - drained);
+                    #ifndef NON_FRACTION_DRAINAGE
+                    if(frac <= 1)
+                        extra += (take_amount - drained);
+                    #endif
                 }
 
             }
@@ -1553,7 +1567,7 @@ std::vector<component_attribute> ship::get_fully_merged(float step_s)
         {
             component_attribute& which = ret[attr.first];
 
-            component_attribute& other = attr.second;
+            const component_attribute& other = attr.second;
 
             which.cur_amount += other.cur_amount;
             which.max_amount += other.max_amount;
@@ -2443,10 +2457,10 @@ void ship::test_set_disabled()
         avg_efficiency /= num_components;
     }
 
-    if(avg_efficiency < eff_disabled_frac)
+    /*if(avg_efficiency < eff_disabled_frac)
     {
         full_disabled = true;
-    }
+    }*/
 
     float available_command = get_produced_resources(1.f)[ship_component_elements::COMMAND];
 

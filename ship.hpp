@@ -330,7 +330,7 @@ struct component_attribute
     void set_tech_level(float level);
     float get_tech_level();
 
-private:
+//private:
     float currently_drained = 0.f;
 };
 
