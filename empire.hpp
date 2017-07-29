@@ -43,7 +43,7 @@ namespace relations_info
 
     constexpr vec3f base_col = {1, 1, 1}; ///used for owned objects
     constexpr vec3f hidden_col = {0.6, 0.6, 0.6};
-    constexpr vec3f hostile_col = {1, 0, 0};
+    constexpr vec3f hostile_col = {1, 0.15f, 0.15f};
     constexpr vec3f friendly_col = {0.5, 1, 0.5};
     constexpr vec3f neutral_col = {1, 0.5, 0};
 }
