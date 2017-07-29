@@ -925,7 +925,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     auto transformed = win.mapPixelToCoords({x, y});
 
-    ImGui::Begin(("Selected###INFO_PANEL"), nullptr, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    ImGui::Begin(("Selected###INFO_PANEL"), &popup.going, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     std::set<ship*> potential_new_fleet;
 

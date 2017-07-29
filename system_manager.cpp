@@ -40,7 +40,7 @@ sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, cons
     return pixel;
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, vec3f col)
+void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col)
 {
     col = col * 255.f;
 
@@ -62,7 +62,9 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
 
-    if(!force_high_quality && pixel_rad.x - win.getSize().x/2 < 2.f)
+    pixel_rad.x -= win.getSize().x/2;
+
+    if(!force_high_quality && pixel_rad.x < 2.f)
     {
         static sf::CircleShape shape;
 
@@ -80,33 +82,90 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     static sf::RectangleShape shape;
     shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
-    shape.setOutlineColor(sf::Color(102, 51, 0));
+    //shape.setOutlineColor(sf::Color(102, 51, 0));
 
-    if(draw_outline)
+    ///try drawing gradient circle for outlining
+    /*if(draw_outline)
     {
-        shape.setOutlineThickness(1.f);
-
-        main_rendering(shape, win, rotation, absolute_pos);
+        shape.setFillColor(sf::Color(102, 51, 0));
 
         shape.setOutlineThickness(0.f);
+
+        main_rendering(shape, win, rotation, absolute_pos, 1.4f);
+
+        shape.setOutlineThickness(0.f);
+
+        shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
     }
     else
     {
         shape.setOutlineThickness(0.f);
+    }*/
+
+    ///this was almost ok but i hate it as well
+    ///maybe lets just have the names of the planets floating after them
+    /*if(draw_outline)
+    {
+        static sf::CircleShape cshape;
+
+        float rad = 1.f;
+
+        int bound = 3;
+
+        for(int i=0; i<bound; i++)
+        {
+            float final_rad = rad * i * 2.5f + rad_to_check * 1.2f;
+
+            cshape.setRadius(final_rad);
+
+            cshape.setFillColor(sf::Color(0,0,0,0));
+            cshape.setOutlineColor(sf::Color(255, 255, 255, 255 * (1.f - (float)i/bound)));
+            cshape.setOutlineThickness(1.5f);
+
+            cshape.setPosition(absolute_pos.x(), absolute_pos.y());
+
+            cshape.setOrigin(final_rad, final_rad);
+
+            win.draw(cshape);
+        }
+    }*/
+
+    if(draw_outline)
+    {
+        ImGui::SetNextWindowPos(ImVec2(real_coord.x + pixel_rad.x, real_coord.y));
+
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
+
+        ImGui::Begin(tag.c_str(), nullptr,
+                     ImGuiWindowFlags_AlwaysAutoResize |
+                     ImGuiWindowFlags_NoBringToFrontOnFocus|
+                     ImGuiWindowFlags_NoCollapse|
+                     ImGuiWindowFlags_NoFocusOnAppearing |
+                     ImGuiWindowFlags_NoInputs |
+                     ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoResize |
+                     ImGuiWindowFlags_NoTitleBar);
+
+        ImGui::Text(tag.c_str());
+
+
+        ImGui::End();
+
+        ImGui::PopStyleColor();
     }
 
-    main_rendering(shape, win, rotation, absolute_pos);
+    main_rendering(shape, win, rotation, absolute_pos, 1.f);
 }
 
-void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos)
+void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale)
 {
     for(int i=0; i<vert_dist.size(); i++)
     {
         int cur = i;
         int next = (i + 1) % vert_dist.size();
 
-        float d1 = vert_dist[cur];
-        float d2 = vert_dist[next];
+        float d1 = vert_dist[cur] * scale;
+        float d2 = vert_dist[next] * scale;
 
         float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
         float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
@@ -529,7 +588,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     bool force_high_quality = type != orbital_info::ASTEROID;
 
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, type == orbital_info::PLANET, current_simple_col);
+        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, type == orbital_info::PLANET, name, current_simple_col);
     else if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
