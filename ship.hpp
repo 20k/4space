@@ -78,8 +78,8 @@ namespace ship_component_elements
 
     static std::vector<types> repair_priorities_in_combat_def
     {
-        COMMAND,
         OXYGEN,
+        COMMAND,
         ENERGY,
         SHIELD_POWER,
         COOLING_POTENTIAL,
@@ -93,8 +93,8 @@ namespace ship_component_elements
 
     static std::vector<types> repair_priorities_out_combat_def
     {
-        COMMAND,
         OXYGEN,
+        COMMAND,
         ENERGY,
         WARP_POWER,
         SHIELD_POWER,
