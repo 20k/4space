@@ -99,7 +99,8 @@ struct orbital
     float internal_time_s = 0.f;
 
     bool highlight = false;
-    bool is_hovered = false;
+    bool was_highlight = false;
+    bool was_hovered = false;
 
     orbital_simple_renderable simple_renderable;
     sprite_renderable sprite;
@@ -111,6 +112,7 @@ struct orbital
     int num_moons = 0;
 
     vec2f absolute_pos;
+    vec2f universe_view_pos;
 
     //float angular_velocity_ps = 0.f;
     float rotation_velocity_ps = 0;
@@ -312,6 +314,7 @@ struct system_manager
 
     bool suppress_click_away_fleet = false;
     std::vector<orbital*> hovered_orbitals;
+    std::vector<orbital*> advertised_universe_orbitals;
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

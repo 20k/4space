@@ -536,7 +536,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         ImGui::PopStyleColor();
     }
 
-    is_hovered = highlight;
+    was_highlight = highlight;
 
     highlight = false;
 }
@@ -1781,6 +1781,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     suppress_click_away_fleet = false;
     hovered_orbitals.clear();
+    advertised_universe_orbitals.clear();
 
     if(in_system_view())
         return;
@@ -1966,6 +1967,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             if(o->type != orbital_info::FLEET)
                 continue;
 
+            advertised_universe_orbitals.push_back(o);
+
             sorted_orbitals[o->parent_empire].push_back(o);
 
             ship_manager* sm = (ship_manager*)o->data;
@@ -2027,6 +2030,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                     any_highlighted = true;
                     o->highlight = false;
                 }
+
+                o->universe_view_pos = fleet_draw_pos;
             }
 
             if(any_highlighted)

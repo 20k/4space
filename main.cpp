@@ -781,6 +781,9 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     ImGui::End();
 }
 
+///mostly working except we cant rebox select if we have something selected
+///this was to prevent box selecting an object, but we could probably do this by limiting
+///distance
 struct box_selection
 {
     bool going = false;
@@ -789,8 +792,9 @@ struct box_selection
     vec2f end_pos;
 
     bool last_was_not_click = false;
+    bool cannot_click = false;
 
-    void tick(orbital_system* cur, sf::RenderWindow& win, popup_info& popup)
+    void tick(system_manager& system_manage, orbital_system* cur, sf::RenderWindow& win, popup_info& popup, empire* viewer_empire)
     {
         if(cur == nullptr)
             return;
@@ -803,12 +807,23 @@ struct box_selection
 
         if(going)
         {
-            for(orbital* o : cur->orbitals)
+            std::vector<orbital*>* orbitals = &cur->orbitals;
+
+            if(!system_manage.in_system_view())
+                orbitals = &system_manage.advertised_universe_orbitals;
+
+            for(orbital* o : *orbitals)
             {
                 if(o->type != orbital_info::FLEET)
                     continue;
 
-                vec2f pos = o->absolute_pos;
+                if(!o->viewed_by[viewer_empire])
+                    continue;
+
+                vec2f pos = o->last_viewed_position;
+
+                if(!system_manage.in_system_view())
+                    pos = o->universe_view_pos;
 
                 vec2f tl = min(mpos, start_pos);
                 vec2f br = max(mpos, start_pos);
@@ -817,9 +832,10 @@ struct box_selection
 
                 if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
                 {
+                    ship_manager* sm = (ship_manager*)o->data;
+
                     if(!lclick)
                     {
-                        ship_manager* sm = (ship_manager*)o->data;
                         sm->toggle_fleet_ui = true;
 
                         popup.insert(o);
@@ -848,8 +864,9 @@ struct box_selection
         {
             for(orbital* o : cur->orbitals)
             {
-                if(o->is_hovered)
+                if(o->was_hovered)
                 {
+                    cannot_click = true;
                     return;
                 }
             }
@@ -858,9 +875,10 @@ struct box_selection
         if(!mouse.isButtonPressed(sf::Mouse::Left))
         {
             last_was_not_click = true;
+            cannot_click = false;
         }
 
-        if(last_was_not_click && mouse.isButtonPressed(sf::Mouse::Left))
+        if(last_was_not_click && mouse.isButtonPressed(sf::Mouse::Left) && !cannot_click)
         {
             going = true;
             start_pos = mpos;
@@ -935,9 +953,13 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     {
         for(orbital* orb : system_manage.currently_viewed->orbitals)
         {
+            orb->was_hovered = false;
+
             if(orb->point_within({transformed.x, transformed.y}))
             {
                 valid_selection_targets.push_back(orb);
+
+                orb->was_hovered = true;
 
                 break;
             }
@@ -2219,7 +2241,8 @@ int main()
             system_manage.draw_warp_radiuses(window, player_empire);
         }
 
-        box_selector.tick(system_manage.currently_viewed, window, popup);
+        //if(system_manage.in_system_view())
+            box_selector.tick(system_manage, system_manage.currently_viewed, window, popup, player_empire);
 
 
         //printf("ui\n");
