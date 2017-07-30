@@ -1077,6 +1077,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     std::set<ship*> potential_new_fleet;
 
+    ///use a custom sorter here to make sure that we end up at the top etc
     std::map<empire*, std::vector<orbital*>> orbitals_grouped_by_empire;
 
     std::map<ship_manager*, std::vector<ship*>> steal_map;
@@ -1097,7 +1098,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
         if(player_empire->is_allied(orb->parent_empire))
         {
             do_obfuscate_misc = false;
-
         }
 
         if(do_obfuscate_misc)
