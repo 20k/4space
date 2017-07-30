@@ -26,6 +26,7 @@
 #include <windows.h>
 
 #include "drag_and_drop.hpp"
+#include "ui_util.hpp"
 
 
 ///so display this (ish) on mouseover for a component
@@ -370,7 +371,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             c.clicked = !c.clicked;
         }
@@ -451,7 +452,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
 
         ///setting tech level currently does not have a cost associated with it
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             if(owner->can_fully_dispense(res_remaining))
             {
@@ -501,7 +502,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
 
         ///if originating empire is not the claiming empire, get some tech
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             ///depletes resources
             ///should probably pull the resource stuff outside of here as there might be other sources of recrewing
@@ -575,7 +576,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             ImGui::SetTooltip(rstr.c_str());
         }
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             ///destroy ship?
 
@@ -710,7 +711,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
                 ImGui::Text((team + " | " + name + " " + damage_str).c_str());
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     kk->display_ui = !kk->display_ui;
                 }
@@ -724,7 +725,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         ImGui::Text(jump_to_str.c_str());
         ImGui::PopID();
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             all_battles.set_viewing(bm, system_manage);
         }
@@ -742,7 +743,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             ImGui::Text(disengage_str.c_str());
             ImGui::PopID();
 
-            if(ImGui::IsItemClicked())
+            if(ImGui::IsItemClicked_Registered())
             {
                 if(bm->can_disengage(player_empire))
                 {
@@ -768,7 +769,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             ImGui::Text(leave_str.c_str());
             ImGui::PopID();
 
-            if(ImGui::IsItemClicked())
+            if(ImGui::IsItemClicked_Registered())
             {
                 all_battles.end_battle_peacefully(bm);
             }
@@ -1062,7 +1063,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     ImGui::Text("(Select)");
                 }
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     popup.rem_all_but(o);
                 }*/
@@ -1120,17 +1121,17 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         if(sm->can_merge && ImGui::IsItemHovered())
                             ImGui::SetTooltip("Shift-Click to add to fleet");
 
-                        if(ImGui::IsItemClicked() && !shift && !lctrl && can_open_window)
+                        if(ImGui::IsItemClicked_DragCompatible() && !shift && !lctrl && can_open_window)
                         {
                             cur_ship->display_ui = !cur_ship->display_ui;
                         }
 
-                        if(ImGui::IsItemClicked() && shift && !lctrl && sm->can_merge)
+                        if(ImGui::IsItemClicked_DragCompatible() && shift && !lctrl && sm->can_merge)
                         {
                             cur_ship->shift_clicked = !cur_ship->shift_clicked;
                         }
 
-                        if(ImGui::IsItemClicked() && lctrl && sm->can_merge)
+                        if(ImGui::IsItemClicked_UnRegistered() && sm->can_merge)
                         {
                             global_drag_and_drop.begin_dragging(cur_ship, drag_and_drop_info::SHIP, cur_ship->name);
                         }
@@ -1156,7 +1157,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::Text("(Select) ");
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     popup.rem_all_but(o);
                 }
@@ -1172,7 +1173,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     ImGui::GoodText("(Resupply) ");
 
-                    if(ImGui::IsItemClicked())
+                    if(ImGui::IsItemClicked_Registered())
                     {
                         ship_manager* sm = (ship_manager*)o->data;
 
@@ -1199,7 +1200,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::BadText("(Engage Fleets) ");
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     assert(parent_system);
 
@@ -1219,7 +1220,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::BadText("(Declare War) ");
 
-                if(ImGui::IsItemClicked() && popup.fetch(orb) != nullptr)
+                if(ImGui::IsItemClicked_Registered() && popup.fetch(orb) != nullptr)
                     popup.fetch(orb)->declaring_war = true;
 
                 if(popup.fetch(orb) != nullptr && popup.fetch(orb)->declaring_war)
@@ -1228,7 +1229,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     ImGui::BadText("(Are you sure?) ");
 
-                    if(ImGui::IsItemClicked())
+                    if(ImGui::IsItemClicked_Registered())
                     {
                         orbital* o = orb;
 
@@ -1262,7 +1263,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::GoodText("(Colonise) ");
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     assert(o);
 
@@ -1302,7 +1303,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     else
                         ImGui::Text("(View Alert)");
 
-                    if(ImGui::IsItemClicked())
+                    if(ImGui::IsItemClicked_Registered())
                     {
                         if(event->interacting_faction == nullptr)
                         {
@@ -1322,7 +1323,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 else
                     ImGui::Text("(Show Construction Window)");
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     o->construction_ui_open = !o->construction_ui_open;
                 }
@@ -1406,7 +1407,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     {
         ImGui::Text("(Make New Fleet)");
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             bool bad = false;
 
@@ -1516,7 +1517,7 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         ImGui::Text("(-)");
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             category.amount -= 1.f;
 
@@ -1535,7 +1536,7 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         ImGui::Text("(+)");
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             category.amount += 1.f;
 
@@ -1567,7 +1568,7 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         ImGui::Text(("(Make " + str + " Ship)").c_str());
 
-        bool clicked = ImGui::IsItemClicked();
+        bool clicked = ImGui::IsItemClicked_Registered();
 
         ImGui::Text(str_resources.c_str());
 
@@ -2145,6 +2146,8 @@ int main()
 
         top_bar::display();
         tooltip::set_clear_tooltip();
+
+        ImGui::tick_suppress_frames();
 
         ImGui::Render();
         //playing_music.debug(window);

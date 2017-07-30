@@ -2435,7 +2435,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
                 ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), (pad + empire_name_str).c_str());
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     sys_emp.first->toggle_systems_ui = !sys_emp.first->toggle_systems_ui;
                 }
@@ -2475,7 +2475,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             ImGui::TextColored(system_col, (sys_pad + sys_name).c_str());
 
-            if(ImGui::IsItemClicked())
+            if(ImGui::IsItemClicked_Registered())
             {
                 sys->toggle_fleet_ui = !sys->toggle_fleet_ui;
             }
@@ -2484,7 +2484,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             ImGui::Text("(goto)");
 
-            if(ImGui::IsItemClicked())
+            if(ImGui::IsItemClicked_Registered())
             {
                 set_viewed_system(sys);
             }
@@ -2515,7 +2515,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             ImGui::Text(str.c_str());
 
-            if(ImGui::IsItemClicked())
+            if(ImGui::IsItemClicked_Registered())
             {
                 sys->toggle_fleet_ui = !sys->toggle_fleet_ui;
             }
@@ -2601,7 +2601,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     ///could solve a few of our ui problems!
                     ImGui::Text((pad + combat_pad + fleet_name + combat_pad + pad).c_str());
 
-                    bool shipname_clicked = ImGui::IsItemClicked();
+                    bool shipname_clicked = ImGui::IsItemClicked_Registered();
 
                     if(sm->all_derelict())
                     {
@@ -2683,9 +2683,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                             ImGui::Text((combat_pad + i + combat_pad).c_str());
 
                             #ifdef NO_OPEN_STEALTH_SHIPS_SYSTEM
-                            if(ImGui::IsItemClicked() && !do_obfuscate)
+                            if(ImGui::IsItemClicked_Registered() && !do_obfuscate)
                             #else
-                            if(ImGui::IsItemClicked())
+                            if(ImGui::IsItemClicked_Registered())
                             #endif
                             {
                                 sm->ships[num]->display_ui = !sm->ships[num]->display_ui;

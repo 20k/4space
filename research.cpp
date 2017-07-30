@@ -4,6 +4,7 @@
 
 #include "../../render_projects/imgui/imgui.h"
 #include "top_bar.hpp"
+#include "ui_util.hpp"
 
 ///good for science, makes the progression feel a little non linear
 ///bad for ship cost scaling, harder to balance and gets exponentially more expensive. Although may be quite flat atm
@@ -87,7 +88,7 @@ void research::draw_ui(empire* emp)
         ImGui::Text(purchase_string.c_str());
 
         ///we need an are you sure dialogue, but that will come with popup notifications
-        if(ImGui::IsItemClicked() && research_cost < current_research_resource)
+        if(ImGui::IsItemClicked_Registered() && research_cost < current_research_resource)
         {
             emp->resources.resources[resource::RESEARCH].amount -= research_cost;
 

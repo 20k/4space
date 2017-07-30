@@ -1,5 +1,6 @@
 #include "top_bar.hpp"
 #include "../../render_projects/imgui/imgui.h"
+#include "ui_util.hpp"
 
 std::vector<std::string> top_bar::headers = top_bar_info::names;
 std::map<top_bar_info::types, bool> top_bar::active;
@@ -26,7 +27,7 @@ void top_bar::display()
 
         ImGui::Text((pad + i + pad).c_str());
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             active[(top_bar_info::types)num] = !active[(top_bar_info::types)num];
         }

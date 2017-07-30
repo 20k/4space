@@ -5,6 +5,7 @@
 #include "ship.hpp"
 #include "ship_definitions.hpp"
 #include "empire.hpp"
+#include "ui_util.hpp"
 
 bool wait_ev(game_event& event, float time_s)
 {
@@ -875,7 +876,7 @@ int present_dialogue(const std::vector<std::string>& options)
             ImGui::NewLine();
         }
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             selected = num;
         }

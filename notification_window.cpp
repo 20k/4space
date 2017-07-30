@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "../../render_projects/imgui/imgui.h"
+#include "ui_util.hpp"
 
 void notification_window::tick_draw()
 {
@@ -14,7 +15,7 @@ void notification_window::tick_draw()
 
         ImGui::Text(elem.text.c_str());
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             elem.pressed = true;
 

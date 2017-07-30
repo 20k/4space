@@ -8,6 +8,7 @@
 #include "top_bar.hpp"
 #include "util.hpp"
 #include "procedural_text_generator.hpp"
+#include "ui_util.hpp"
 
 empire::empire()
 {
@@ -1476,7 +1477,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
         ImGui::Text((pad + empire_name + pad).c_str());
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             e->toggle_ui = !e->toggle_ui;
         }
@@ -1503,7 +1504,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
         ImGui::Text((rpad + "Offer Resources" + rpad).c_str());
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             offer_resources_ui = !offer_resources_ui;
 
@@ -1519,7 +1520,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
                 ImGui::SetTooltip("Need at least 0.9 relationship to trade starcharts");
             }
         }
-        else if(ImGui::IsItemClicked())
+        else if(ImGui::IsItemClicked_Registered())
         {
             e->trade_vision(viewer_empire);
         }
@@ -1535,7 +1536,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
                     ImGui::SetTooltip("Need at least 1.2 relationship to trade territory access");
                 }
             }
-            else if(ImGui::IsItemClicked())
+            else if(ImGui::IsItemClicked_Registered())
             {
                 viewer_empire->trade_space_access(e, true);
             }
@@ -1556,7 +1557,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
                     ImGui::SetTooltip("Need relation > 1");
                 }
             }
-            else if(ImGui::IsItemClicked())
+            else if(ImGui::IsItemClicked_Registered())
             {
                 viewer_empire->ally(e);
             }
@@ -1565,7 +1566,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
         {
             ImGui::Text("(Break Alliance)");
 
-            if(ImGui::IsItemClicked())
+            if(ImGui::IsItemClicked_Registered())
             {
                 confirm_break_alliance = true;
             }
@@ -1574,7 +1575,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
             {
                 ImGui::Text("(Are you sure?)");
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     viewer_empire->unally(e);
 
@@ -1592,7 +1593,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
                 if(ImGui::IsItemHovered())
                     ImGui::SetTooltip("Need relation > 0.5");
             }
-            else if(ImGui::IsItemClicked())
+            else if(ImGui::IsItemClicked_Registered())
             {
                 viewer_empire->become_unhostile(e);
             }
@@ -1601,7 +1602,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
         {
             ImGui::Text("(Declare War)");
 
-            if(ImGui::IsItemClicked())
+            if(ImGui::IsItemClicked_Registered())
             {
                 confirm_declare_war = true;
             }
@@ -1610,7 +1611,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
             {
                 ImGui::Text("(Are you sure?)");
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     if(viewer_empire->is_allied(e))
                     {
@@ -1635,7 +1636,7 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
             {
                 ImGui::Text(("System: " + o->parent_system->get_base()->name).c_str());
 
-                if(ImGui::IsItemClicked())
+                if(ImGui::IsItemClicked_Registered())
                 {
                     system_manage.set_viewed_system(o->parent_system);
                 }
@@ -1672,7 +1673,7 @@ void empire_manager::draw_resource_donation_ui(empire* viewer_empire)
 
     ImGui::Text("(Offer Resource)");
 
-    if(ImGui::IsItemClicked())
+    if(ImGui::IsItemClicked_Registered())
     {
         giving_are_you_sure = true;
     }
@@ -1681,7 +1682,7 @@ void empire_manager::draw_resource_donation_ui(empire* viewer_empire)
     {
         ImGui::Text("(Are you sure?)");
 
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked_Registered())
         {
             giving_are_you_sure = false;
 

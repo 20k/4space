@@ -29,6 +29,9 @@ struct drag_and_drop
     bool dragging = false;
     void* data = nullptr;
 
+    vec2f drag_mouse_pos = {0,0};
+    float min_drag_distance = 10.f;
+
     std::map<std::string, window_info> window_map;
 
     drag_and_drop_info::type currently_dragging = drag_and_drop_info::NONE;
@@ -39,16 +42,20 @@ struct drag_and_drop
     std::string tooltip_str;
 
     void begin_drag_section(const std::string& tag);
-    void end_drag_section(const std::string& tag);
 
     void tick_locking_window();
 
+    ///"soft" dragging
     void begin_dragging(void* data, drag_and_drop_info::type type, const std::string& tooltip_str);
     void finish_dragging();
 
     bool let_go_on_item();
 
     void tick();
+
+    bool adequate_drag_distance();
+
+    bool is_dragging();
 };
 
 extern drag_and_drop global_drag_and_drop;

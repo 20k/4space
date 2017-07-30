@@ -35,6 +35,10 @@ void drag_and_drop::begin_dragging(void* _data, drag_and_drop_info::type type, c
 
     currently_dragging = type;
     data = _data;
+
+    sf::Mouse mouse;
+
+    drag_mouse_pos = {mouse.getPosition().x, mouse.getPosition().y};
 }
 
 void drag_and_drop::finish_dragging()
@@ -62,7 +66,10 @@ bool drag_and_drop::let_go_on_item()
     {
         finish_dragging();
 
-        return true;
+        if(adequate_drag_distance())
+            return true;
+        else
+            return false;
     }
 
     return false;
@@ -85,5 +92,22 @@ void drag_and_drop::tick()
         finish_dragging();
     }
 
-    ImGui::SetTooltip(tooltip_str.c_str());
+    if(adequate_drag_distance())
+        ImGui::SetTooltip(tooltip_str.c_str());
+}
+
+bool drag_and_drop::adequate_drag_distance()
+{
+    sf::Mouse mouse;
+
+    vec2f nmouse_pos = {mouse.getPosition().x, mouse.getPosition().y};
+
+    float dist = (nmouse_pos - drag_mouse_pos).length();
+
+    return dist >= min_drag_distance;
+}
+
+bool drag_and_drop::is_dragging()
+{
+    return dragging && adequate_drag_distance();
 }
