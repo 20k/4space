@@ -16,7 +16,7 @@ inline float get_cost_mod(float cost)
 inline component make_default_crew()
 {
     component_attribute command;
-    command.produced_per_s = 4.f;
+    command.produced_per_s = 5.f;
 
     component_attribute oxygen;
     oxygen.drained_per_s = 0.5f;
