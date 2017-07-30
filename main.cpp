@@ -1036,8 +1036,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::Text(name.c_str());
 
-                //bool should_merge_into_fleet = global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item();
-
                 /*if(popup.elements.size() > 1)
                 {
                     ImGui::SameLine();
@@ -1117,11 +1115,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         {
                             global_drag_and_drop.begin_dragging(cur_ship, drag_and_drop_info::SHIP, cur_ship->name);
                         }
-
-                        /*if(global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item())
-                        {
-                            should_merge_into_fleet = true;
-                        }*/
                     }
                 }
 
