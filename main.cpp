@@ -1094,6 +1094,12 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             do_obfuscate_misc = true;
         }
 
+        if(player_empire->is_allied(orb->parent_empire))
+        {
+            do_obfuscate_misc = false;
+
+        }
+
         if(do_obfuscate_misc)
         {
             cur_empire = nullptr;
