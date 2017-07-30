@@ -584,13 +584,11 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     else if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
-    if(highlight)
-    //if(type == orbital_info::FLEET)
+    if(highlight && type == orbital_info::FLEET)
     {
-        //auto real_coord = win.mapCoordsToPixel({last_viewed_position.x(), last_viewed_position.y()});
         auto real_coord = mapCoordsToPixel_float(last_viewed_position.x(), last_viewed_position.y(), win.getView(), win);
 
-        ImGui::SetNextWindowPos(ImVec2(real_coord.x + get_pixel_radius(win), real_coord.y));
+        ImGui::SetNextWindowPos(ImVec2(round(real_coord.x + get_pixel_radius(win)), round(real_coord.y)));
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
