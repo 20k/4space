@@ -536,6 +536,8 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         ImGui::PopStyleColor();
     }
 
+    is_hovered = highlight;
+
     highlight = false;
 }
 

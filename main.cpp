@@ -781,6 +781,117 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     ImGui::End();
 }
 
+struct box_selection
+{
+    bool going = false;
+
+    vec2f start_pos;
+    vec2f end_pos;
+
+    bool last_was_not_click = false;
+
+    void tick(orbital_system* cur, sf::RenderWindow& win, popup_info& popup)
+    {
+        if(cur == nullptr)
+            return;
+
+        sf::Mouse mouse;
+
+        vec2f mpos = {mouse.getPosition(win).x, mouse.getPosition(win).y};
+
+        bool lclick = mouse.isButtonPressed(sf::Mouse::Left);
+
+        if(going)
+        {
+            for(orbital* o : cur->orbitals)
+            {
+                if(o->type != orbital_info::FLEET)
+                    continue;
+
+                vec2f pos = o->absolute_pos;
+
+                vec2f tl = min(mpos, start_pos);
+                vec2f br = max(mpos, start_pos);
+
+                auto spos = win.mapCoordsToPixel({pos.x(), pos.y()});
+
+                if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
+                {
+                    if(!lclick)
+                    {
+                        ship_manager* sm = (ship_manager*)o->data;
+                        sm->toggle_fleet_ui = true;
+
+                        popup.insert(o);
+
+                        popup.going = true;
+                    }
+                    else
+                    {
+                        o->highlight = true;
+                    }
+                }
+            }
+
+            if(!lclick)
+                going = false;
+        }
+
+        bool suppress_mouse = ImGui::IsAnyItemHovered() || ImGui::IsMouseHoveringAnyWindow();
+
+        if(suppress_mouse)
+            return;
+
+        sf::Keyboard key;
+
+        if(!key.isKeyPressed(sf::Keyboard::LShift) && !going)
+        {
+            for(orbital* o : cur->orbitals)
+            {
+                if(o->is_hovered)
+                {
+                    return;
+                }
+            }
+        }
+
+        if(!mouse.isButtonPressed(sf::Mouse::Left))
+        {
+            last_was_not_click = true;
+        }
+
+        if(last_was_not_click && mouse.isButtonPressed(sf::Mouse::Left))
+        {
+            going = true;
+            start_pos = mpos;
+
+            last_was_not_click = false;
+        }
+
+        if(going)
+        {
+            sf::RectangleShape shape;
+
+            vec2f tl = min(mpos, start_pos);
+
+            auto backup_view = win.getView();
+
+            win.setView(win.getDefaultView());
+
+            shape.setSize({fabs(mpos.x() - start_pos.x()), fabs(mpos.y() - start_pos.y())});
+            shape.setOutlineColor(sf::Color(0, 128, 255));
+            shape.setFillColor(sf::Color(0,128,255,60));
+            shape.setOutlineThickness(1);
+
+            shape.setPosition(tl.x(), tl.y());
+
+            win.draw(shape);
+
+            win.setView(backup_view);
+        }
+    }
+};
+
 ///this function is one of the worst in the code, there's a lot of duplication that's gradually being exposed
 ///new functionality is however forcing this to be refactored to be less dumb
 void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage, all_events_manager& all_events)
@@ -1911,6 +2022,8 @@ int main()
     sf::Keyboard key;
     sf::Mouse mouse;
 
+    box_selection box_selector;
+
     int state = 0;
 
     bool focused = true;
@@ -2090,6 +2203,7 @@ int main()
 
         if(state == 0)
         {
+            ///must happen before drawing system
             debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage, all_events);
         }
 
@@ -2104,6 +2218,8 @@ int main()
             system_manage.process_universe_map(window, lclick, player_empire);
             system_manage.draw_warp_radiuses(window, player_empire);
         }
+
+        box_selector.tick(system_manage.currently_viewed, window, popup);
 
 
         //printf("ui\n");

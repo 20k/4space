@@ -99,6 +99,7 @@ struct orbital
     float internal_time_s = 0.f;
 
     bool highlight = false;
+    bool is_hovered = false;
 
     orbital_simple_renderable simple_renderable;
     sprite_renderable sprite;

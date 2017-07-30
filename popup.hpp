@@ -138,6 +138,20 @@ struct popup_info
         }
     }
 
+    void insert(void* data)
+    {
+        for(popup_element& elem : elements)
+        {
+            if(elem.element == data)
+                return;
+        }
+
+        popup_element e;
+        e.element = data;
+
+        elements.push_back(e);
+    }
+
     void clear();
 
     bool going = false;
