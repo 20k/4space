@@ -104,7 +104,7 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
         l1 += absolute_pos;
         l2 += absolute_pos;
 
-        vec2f perp = perpendicular((l2 - l1).norm()).norm();
+        vec2f perp = perpendicular((l2 - l1).norm());
 
         sf::Vertex v[4];
 
