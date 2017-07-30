@@ -282,7 +282,7 @@ struct system_manager
 
     ///camera. Set here because zoom will be useful
     ///Camera panning should also probably go here
-    void change_zoom(float zoom);
+    void change_zoom(float zoom, vec2f mouse_pos, sf::RenderWindow& win);
     void set_zoom(float zoom, bool auto_enter_system = false);
     void pan_camera(vec2f dir);
 

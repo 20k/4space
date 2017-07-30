@@ -2138,8 +2138,10 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
     }
 }
 
-void system_manager::change_zoom(float amount)
+void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow& win)
 {
+    auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
+
     float zoom = zoom_level;
 
     float root_2 = sqrt(2.f);
@@ -2150,7 +2152,13 @@ void system_manager::change_zoom(float amount)
     }
     else if(amount < 0)
     {
+        #ifdef ZOOM_TOWARDS
+        camera = (vec2f){game_pos.x, game_pos.y};
+        #endif
+
         zoom /= pow(root_2, fabs(amount) + 1);
+
+        ///zoom into position
     }
 
     set_zoom(zoom, true);

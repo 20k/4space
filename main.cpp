@@ -1804,6 +1804,7 @@ int main()
     test_event2->set_faction(derelict_empire);
 
     sf::Keyboard key;
+    sf::Mouse mouse;
 
     int state = 0;
 
@@ -1819,6 +1820,8 @@ int main()
         {
             playing_music.tg.make_cell_random();
         }*/
+
+        vec2f mpos = {mouse.getPosition(window).x, mouse.getPosition(window).y};
 
         sf::Event event;
 
@@ -1906,7 +1909,7 @@ int main()
         system_manage.pan_camera(cdir * diff_s * 300);
 
         if(no_suppress_mouse)
-            system_manage.change_zoom(-scrollwheel_delta);
+            system_manage.change_zoom(-scrollwheel_delta, mpos, window);
 
         ///BATTLE MANAGER IS NO LONGER TICKING SHIP COMPONENTS, IT IS ASSUMED TO BE DONE GLOBALLY WHICH WE WONT WANT
         ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME
