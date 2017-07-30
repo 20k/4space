@@ -50,8 +50,6 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
     if(real_coord.x < 0 || real_coord.x > win.getSize().x || real_coord.y < 0 || real_coord.y >= win.getSize().y)
         return;
 
-    #define CHEAPDRAW_SMALL_ASTEROIDS
-    #ifdef CHEAPDRAW_SMALL_ASTEROIDS
     float rad_to_check = 0;
 
     for(auto& rad : vert_dist)
@@ -64,141 +62,6 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
     auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
 
     pixel_rad.x -= win.getSize().x/2;
-
-    static std::vector<sf::Vertex> vertices;
-
-    if(!force_high_quality && pixel_rad.x < 2.f)
-    {
-        /*float rad = rad_to_check;
-        //float rad = pixel_rad.x;
-
-        //static sf::VertexArray triangle(sf::Triangles, 3);
-
-        sf::Vertex triangle[3];
-
-        triangle[0].position = sf::Vector2f(absolute_pos.x() - rad, absolute_pos.y() + rad);
-        triangle[1].position = sf::Vector2f(absolute_pos.x(), absolute_pos.y() - rad);
-        triangle[2].position = sf::Vector2f(absolute_pos.x() + rad, absolute_pos.y() + rad);
-
-        sf::Color scol(col.x(), col.y(), col.z());
-
-        triangle[0].color = scol;
-        triangle[1].color = scol;
-        triangle[2].color = scol;
-
-        //vertices.push_back(triangle[0]);
-        //vertices.push_back(triangle[1]);
-        //vertices.push_back(triangle[2]);
-
-        //win.draw(triangle);
-
-        if(vertices.size() > 500000)
-        {
-            //win.draw(&vertices[0], vertices.size(), sf::Triangles);
-            //vertices.clear();
-        }*/
-
-        return;
-
-        ///suffers from intermittent pauses
-        #if 0
-        static sf::CircleShape shape;
-
-        shape.setPointCount(5);
-
-        shape.setRadius(rad_to_check);
-
-        shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
-
-        shape.setPosition(absolute_pos.x(), absolute_pos.y());
-        shape.setOrigin({rad_to_check, rad_to_check});
-
-        win.draw(shape);
-
-        return;
-        #endif
-
-        ///slower
-        #if 0
-        static bool img_loaded;
-        static sf::Texture tex;
-        static sf::Sprite spr;
-
-        static float crad;
-
-        if(!img_loaded)
-        {
-            tex.loadFromFile("./pics/circle.png");
-            img_loaded = true;
-
-            spr.setTexture(tex);
-
-            auto dim = tex.getSize();
-            tex.setSmooth(false);
-
-            crad = 1.f / (dim.x / 2);
-        }
-
-        float scale = pixel_rad.x * crad;
-
-        spr.setScale(scale, scale);
-        spr.setPosition(absolute_pos.x(), absolute_pos.y());
-
-        win.draw(spr);
-        return;
-        #endif
-    }
-    #endif // CHEAPDRAW_SMALL_ASTEROIDS
-
-    static sf::RectangleShape shape;
-    shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
-    //shape.setOutlineColor(sf::Color(102, 51, 0));
-
-    ///try drawing gradient circle for outlining
-    /*if(draw_outline)
-    {
-        shape.setFillColor(sf::Color(102, 51, 0));
-
-        shape.setOutlineThickness(0.f);
-
-        main_rendering(shape, win, rotation, absolute_pos, 1.4f);
-
-        shape.setOutlineThickness(0.f);
-
-        shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
-    }
-    else
-    {
-        shape.setOutlineThickness(0.f);
-    }*/
-
-    ///this was almost ok but i hate it as well
-    ///maybe lets just have the names of the planets floating after them
-    /*if(draw_outline)
-    {
-        static sf::CircleShape cshape;
-
-        float rad = 1.f;
-
-        int bound = 3;
-
-        for(int i=0; i<bound; i++)
-        {
-            float final_rad = rad * i * 2.5f + rad_to_check * 1.2f;
-
-            cshape.setRadius(final_rad);
-
-            cshape.setFillColor(sf::Color(0,0,0,0));
-            cshape.setOutlineColor(sf::Color(255, 255, 255, 255 * (1.f - (float)i/bound)));
-            cshape.setOutlineThickness(1.5f);
-
-            cshape.setPosition(absolute_pos.x(), absolute_pos.y());
-
-            cshape.setOrigin(final_rad, final_rad);
-
-            win.draw(cshape);
-        }
-    }*/
 
     if(draw_outline)
     {
@@ -215,37 +78,11 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         ImGui::PopStyleColor();
     }
 
-    main_rendering(shape, win, rotation, absolute_pos, 1.f, col);
+    main_rendering(win, rotation, absolute_pos, 1.f, col);
 }
 
-void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
+void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
 {
-    static std::vector<sf::Vertex> vertices;
-
-    /*sf::Vertex triangle[3];
-
-    triangle[0].position = sf::Vector2f(absolute_pos.x() - vert_dist[0], absolute_pos.y() + vert_dist[0]);
-    triangle[1].position = sf::Vector2f(absolute_pos.x(), absolute_pos.y() - vert_dist[0]);
-    triangle[2].position = sf::Vector2f(absolute_pos.x() + vert_dist[0], absolute_pos.y() + vert_dist[0]);
-
-    sf::Color scol(col.x(), col.y(), col.z());
-
-    triangle[0].color = scol;
-    triangle[1].color = scol;
-    triangle[2].color = scol;
-
-    vertices.push_back(triangle[0]);
-    vertices.push_back(triangle[1]);
-    vertices.push_back(triangle[2]);
-
-    //win.draw(triangle);
-
-    if(vertices.size() > 50)
-    {
-        win.draw(&vertices[0], vertices.size(), sf::Triangles);
-        vertices.clear();
-    }*/
-
     #if 1
     for(int i=0; i<vert_dist.size(); i++)
     {
@@ -267,22 +104,9 @@ void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::Re
         l1 += absolute_pos;
         l2 += absolute_pos;
 
-
-        float width = (l1 - l2).length();
-        float height = 1;
-
-        shape.setPosition(l1.x(), l1.y());
-        shape.setSize({width, height});
-        shape.setRotation(r2d((l2 - l1).angle()));
-
         vec2f perp = perpendicular((l2 - l1).norm()).norm();
 
         sf::Vertex v[4];
-
-        /*v[0].position = sf::Vector2f(l1.x() - perp.x(), l1.y() - perp.y());
-        v[1].position = sf::Vector2f(l2.x() - perp.x(), l2.y() - perp.y());
-        v[2].position = sf::Vector2f(l2.x() + perp.x(), l2.y() + perp.y());
-        v[3].position = sf::Vector2f(l1.x() + perp.x(), l1.y() + perp.y());*/
 
         v[0].position = sf::Vector2f(l1.x(), l1.y());
         v[1].position = sf::Vector2f(l2.x(), l2.y());
@@ -296,27 +120,9 @@ void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::Re
         v[2].color = scol;
         v[3].color = scol;
 
-        /*vertices.push_back(v[0]);
-        vertices.push_back(v[1]);
-        vertices.push_back(v[2]);
-        vertices.push_back(v[3]);*/
-
         win.draw(v, 4, sf::Quads);
-
-        #ifdef HOLLOWISH
-        if((i % 2) == 0)
-            continue;
-        #endif
-
-        //win.draw(shape);
     }
     #endif
-
-    if(vertices.size() == 4)
-    {
-        //win.draw(&vertices[0], vertices.size(), sf::Quads);
-        //vertices.clear();
-    }
 }
 
 void sprite_renderable::load(const std::string& str)
