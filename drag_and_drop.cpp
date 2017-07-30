@@ -75,6 +75,30 @@ bool drag_and_drop::let_go_on_item()
     return false;
 }
 
+bool drag_and_drop::let_go_outside_window()
+{
+    if(!dragging)
+        return false;
+
+    window_info& inf = window_map[current_tag];
+
+    sf::Mouse mouse;
+
+    bool lclick = mouse.isButtonPressed(sf::Mouse::Left);
+
+    if(!ImGui::IsWindowHovered() && !lclick && dragging)
+    {
+        finish_dragging();
+
+        if(adequate_drag_distance())
+            return true;
+        else
+            return false;
+    }
+
+    return false;
+}
+
 void drag_and_drop::tick()
 {
     if(!dragging)

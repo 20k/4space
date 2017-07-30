@@ -1120,11 +1120,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         {
                             should_merge_into_fleet = true;
                         }
-
-                        /*if(global_drag_and_drop.let_go_on_item())
-                        {
-                            printf("dropped\n");
-                        }*/
                     }
                 }
 
@@ -1143,7 +1138,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                             popup.rem(my_o);
                         }
 
-                        sm->steal(s);
+                        orbital_system* base_sm = system_manage.get_by_element(sm);
+
+                        if(base_sm == my_o->parent_system)
+                            sm->steal(s);
                     }
                 }
 
@@ -1431,24 +1429,19 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 vec2f fleet_pos;
 
-                float fleet_angle = 0;
-                float fleet_length = 200;
                 empire* parent = nullptr;
 
                 for(ship* i : potential_new_fleet)
                 {
                     ///we don't want to free associated orbital if it still exists from empire
                     ///only an issue if we cull, which is why ownership is culled there
-                    orbital* real = current_system->get_by_element((void*)i->owned_by);
+                    orbital* real = test_parent->get_by_element((void*)i->owned_by);
 
                     if(real != nullptr)
                     {
                         parent = real->parent_empire;
 
                         fleet_pos = real->absolute_pos;
-
-                        fleet_angle = real->orbital_angle;
-                        fleet_length = real->orbital_length;
                     }
 
                     i->owned_by->toggle_fleet_ui = false;
@@ -1461,18 +1454,14 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     ns->steal(i);
                 }
 
-                orbital* associated = current_system->make_new(orbital_info::FLEET, 5.f);
-                associated->parent = current_system->get_base();
+                orbital* associated = test_parent->make_new(orbital_info::FLEET, 5.f);
+                associated->parent = test_parent->get_base();
                 associated->set_orbit(fleet_pos);
                 associated->data = ns;
                 associated->tick(0.f);
 
                 parent->take_ownership(associated);
                 parent->take_ownership(ns);
-
-                //popup.clear();
-                //popup.elements.clear();
-                //popup.going = false;
 
                 popup_element elem;
                 elem.element = associated;
@@ -1486,6 +1475,45 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             {
                 printf("Tried to create fleets cross systems\n");
             }
+        }
+    }
+
+    if(global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_outside_window())
+    {
+        ship* s = (ship*)global_drag_and_drop.data;
+
+        ship_manager* sm = s->owned_by;
+
+        orbital* real = system_manage.get_by_element_orbital(sm);
+
+        orbital_system* test_parent = real->parent_system;
+
+        empire* parent = sm->parent_empire;
+
+        vec2f fleet_pos = real->absolute_pos;
+
+        if(sm->ships.size() > 1 && real && parent)
+        {
+            ship_manager* ns = fleet_manage.make_new();
+
+            ns->steal(s);
+
+            orbital* associated = test_parent->make_new(orbital_info::FLEET, 5.f);
+            associated->parent = test_parent->get_base();
+            associated->set_orbit(fleet_pos);
+            associated->data = ns;
+            associated->tick(0.f);
+
+            parent->take_ownership(associated);
+            parent->take_ownership(ns);
+
+            popup_element elem;
+            elem.element = associated;
+
+            popup.elements.push_back(elem);
+
+            if(associated->type == orbital_info::FLEET)
+                ns->toggle_fleet_ui = true;
         }
     }
 

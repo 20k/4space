@@ -50,6 +50,7 @@ struct drag_and_drop
     void finish_dragging();
 
     bool let_go_on_item();
+    bool let_go_outside_window();
 
     void tick();
 
