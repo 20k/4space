@@ -1032,9 +1032,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 float hp_frac = 1.f;
 
+                ImGui::BeginGroup();
+
                 ImGui::Text(name.c_str());
 
-                bool should_merge_into_fleet = global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item();
+                //bool should_merge_into_fleet = global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item();
 
                 /*if(popup.elements.size() > 1)
                 {
@@ -1116,11 +1118,23 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                             global_drag_and_drop.begin_dragging(cur_ship, drag_and_drop_info::SHIP, cur_ship->name);
                         }
 
-                        if(global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item())
+                        /*if(global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item())
                         {
                             should_merge_into_fleet = true;
-                        }
+                        }*/
                     }
+                }
+
+                if(o->type == orbital_info::FLEET)
+                    ImGui::Unindent();
+
+                ImGui::EndGroup();
+
+                bool should_merge_into_fleet = false;
+
+                if(global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item())
+                {
+                    should_merge_into_fleet = true;
                 }
 
                 if(should_merge_into_fleet)
@@ -1144,9 +1158,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                             sm->steal(s);
                     }
                 }
-
-                if(o->type == orbital_info::FLEET)
-                    ImGui::Unindent();
             }
 
             //ImGui::SameLine();
