@@ -23,6 +23,8 @@ struct window_info
 
 struct drag_and_drop
 {
+    int frames_to_drop = 2;
+
     bool dragging = false;
     void* data = nullptr;
 
@@ -33,14 +35,19 @@ struct drag_and_drop
     vec2f locked_window_pos = {0,0};
 
     std::string current_tag;
+    std::string tooltip_str;
 
     void begin_drag_section(const std::string& tag);
     void end_drag_section(const std::string& tag);
 
     void tick_locking_window();
 
-    void begin_dragging(void* data, drag_and_drop_info::type type);
+    void begin_dragging(void* data, drag_and_drop_info::type type, const std::string& tooltip_str);
     void finish_dragging();
+
+    bool let_go_on_item();
+
+    void tick();
 };
 
 extern drag_and_drop global_drag_and_drop;

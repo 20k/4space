@@ -924,6 +924,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     sf::Mouse mouse;
     sf::Keyboard key;
 
+    bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
+
     int x = mouse.getPosition(win).x;
     int y = mouse.getPosition(win).y;
 
@@ -1031,6 +1033,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::Text(name.c_str());
 
+                if(global_drag_and_drop.let_go_on_item())
+                {
+
+                }
+
                 /*if(popup.elements.size() > 1)
                 {
                     ImGui::SameLine();
@@ -1096,15 +1103,25 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         if(sm->can_merge && ImGui::IsItemHovered())
                             ImGui::SetTooltip("Shift-Click to add to fleet");
 
-                        if(ImGui::IsItemClicked() && !shift && can_open_window && o->type == orbital_info::FLEET)
+                        if(ImGui::IsItemClicked() && !shift && !lctrl && can_open_window)
                         {
                             cur_ship->display_ui = !cur_ship->display_ui;
                         }
 
-                        if(ImGui::IsItemClicked() && shift && sm->can_merge && o->type == orbital_info::FLEET)
+                        if(ImGui::IsItemClicked() && shift && !lctrl && sm->can_merge)
                         {
                             cur_ship->shift_clicked = !cur_ship->shift_clicked;
                         }
+
+                        if(ImGui::IsItemClicked() && lctrl && sm->can_merge)
+                        {
+                            global_drag_and_drop.begin_dragging(nullptr, drag_and_drop_info::ORBITAL, cur_ship->name);
+                        }
+
+                        /*if(global_drag_and_drop.let_go_on_item())
+                        {
+                            printf("dropped\n");
+                        }*/
                     }
                 }
 
@@ -2106,6 +2123,8 @@ int main()
         fleet_manage.cull_dead(empire_manage);
 
         //printf("Prerender\n");
+
+        global_drag_and_drop.tick();
 
         top_bar::display();
         tooltip::set_clear_tooltip();
