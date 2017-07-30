@@ -3713,6 +3713,11 @@ void fleet_manager::tick_all(float step_s)
 
         sm->accumulated_dt = 0;
 
+        if(sm->auto_resupply && sm->should_resupply() && sm->parent_empire)
+        {
+            sm->resupply(sm->parent_empire, false);
+        }
+
         tcount++;
     }
 
