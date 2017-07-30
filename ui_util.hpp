@@ -115,7 +115,7 @@ namespace ImGui
         p2.x += dim.x;
         p2.y += dim.y;
 
-        int thickness = 2;
+        int thickness = 1;
 
         if(ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2))
         {
