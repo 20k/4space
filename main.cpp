@@ -22,6 +22,9 @@
 
 #include "popup.hpp"
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 
 ///so display this (ish) on mouseover for a component
 std::string get_component_display_string(component& c)
@@ -1854,6 +1857,41 @@ int main()
         {
             if(!fullscreen)
             {
+                #if 0
+                auto last_pos = window.getPosition();
+
+                HWND hwnd = window.getSystemHandle();
+
+                MONITORINFO mi = { sizeof(mi) };
+
+                GetMonitorInfo(MonitorFromWindow(hwnd, MONITOR_DEFAULTTOPRIMARY), &mi);
+
+                // move the window
+                /*SetWindowPos(hwnd, HWND_TOP,
+                mi.rcMonitor.left, mi.rcMonitor.top,
+                mi.rcMonitor.right - mi.rcMonitor.left,
+                mi.rcMonitor.bottom - mi.rcMonitor.top,
+                SWP_NOOWNERZORDER | SWP_FRAMECHANGED);*/
+
+                //printf("%i\n", mi.rcMonitor.left);
+
+                window.create(sf::VideoMode(1679, 1050), "Wowee", sf::Style::None, settings);
+                //window.create(sf::VideoMode(mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top), "Wowee", sf::Style::None, settings);
+                fullscreen = true;
+
+                //window.setPosition({mi.rcMonitor.left, mi.rcMonitor.top});
+                window.setPosition({-1680, 0});
+
+                /*hwnd = window.getSystemHandle();
+
+                SetWindowPos(hwnd, HWND_TOP,
+                 mi.rcMonitor.left, mi.rcMonitor.top,
+                 mi.rcMonitor.right - mi.rcMonitor.left,
+                 mi.rcMonitor.bottom - mi.rcMonitor.top,
+                 SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+                //window.setPosition({0,0});*/
+                #endif // 0
+
                 window.create(sf::VideoMode().getFullscreenModes()[0], "Wowee", sf::Style::Fullscreen, settings);
                 fullscreen = true;
             }
@@ -1862,6 +1900,19 @@ int main()
                 window.create(sf::VideoMode().getFullscreenModes()[0], "Wowee", sf::Style::Default, settings);
                 fullscreen = false;
             }
+        }
+
+        if(fullscreen)
+        {
+            auto win_pos = window.getPosition();
+            auto win_dim = window.getSize();
+            RECT r;
+            r.left = win_pos.x;
+            r.top = win_pos.y;
+            r.right = win_pos.x + win_dim.x;
+            r.bottom = win_pos.y + win_dim.y;
+
+            ClipCursor(&r);
         }
 
         if(focused && key.isKeyPressed(sf::Keyboard::F10))
