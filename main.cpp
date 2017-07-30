@@ -1121,11 +1121,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 ImGui::SameLine(0.f, 0.f);
 
                 ImGui::Text("(Select) ");
-            }
 
-            if(ImGui::IsItemClicked())
-            {
-                popup.rem_all_but(o);
+                if(ImGui::IsItemClicked())
+                {
+                    popup.rem_all_but(o);
+                }
             }
 
             if(orb->type == orbital_info::FLEET)
