@@ -135,7 +135,8 @@ namespace ImGui
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetStyleCol(ImGuiCol_WindowBg));
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetStyleCol(ImGuiCol_WindowBg));
 
-            ImGui::Button("", dim);
+            if(!ImGui::IsMouseDown(0))
+                ImGui::Button("", dim);
 
             ImGui::SetCursorScreenPos(ImVec2(screen_pos.x, screen_pos.y));
 
