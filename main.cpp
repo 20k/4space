@@ -25,6 +25,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#include "drag_and_drop.hpp"
+
 
 ///so display this (ish) on mouseover for a component
 std::string get_component_display_string(component& c)
@@ -909,7 +911,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             ImGui::SetTooltip(res_first.c_str());
         }
     }
-
 }
 
 void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_manage, system_manager& system_manage, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events, all_battles_manager& all_battles, bool rclick)
@@ -928,7 +929,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     auto transformed = win.mapPixelToCoords({x, y});
 
+    global_drag_and_drop.begin_drag_section("INFO_PANEL");
+
     ImGui::Begin(("Selected###INFO_PANEL"), &popup.going, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    //global_drag_and_drop.begin_dragging(nullptr, drag_and_drop_info::ORBITAL);
 
     std::set<ship*> potential_new_fleet;
 

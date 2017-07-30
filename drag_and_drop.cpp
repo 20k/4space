@@ -1,8 +1,12 @@
 #include "drag_and_drop.hpp"
 
+drag_and_drop global_drag_and_drop;
+
 void drag_and_drop::begin_drag_section(const std::string& tag)
 {
     current_tag = tag;
+
+    tick_locking_window();
 }
 
 void drag_and_drop::tick_locking_window()
@@ -11,7 +15,7 @@ void drag_and_drop::tick_locking_window()
 
     if(inf.locked)
     {
-        ImGui::SetWindowPos({inf.pos.x(), inf.pos.y()});
+        ImGui::SetNextWindowPos({inf.pos.x(), inf.pos.y()});
     }
 }
 

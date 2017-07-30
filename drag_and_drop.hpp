@@ -43,4 +43,6 @@ struct drag_and_drop
     void finish_dragging();
 };
 
+extern drag_and_drop global_drag_and_drop;
+
 #endif // DRAG_AND_DROP_HPP_INCLUDED
