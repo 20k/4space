@@ -81,6 +81,8 @@
 		<Unit filename="ai_fleet.hpp" />
 		<Unit filename="battle_manager.cpp" />
 		<Unit filename="battle_manager.hpp" />
+		<Unit filename="drag_and_drop.cpp" />
+		<Unit filename="drag_and_drop.hpp" />
 		<Unit filename="empire.cpp" />
 		<Unit filename="empire.hpp" />
 		<Unit filename="event_system.cpp" />
@@ -109,6 +111,7 @@
 		<Unit filename="tooltip_handler.hpp" />
 		<Unit filename="top_bar.cpp" />
 		<Unit filename="top_bar.hpp" />
+		<Unit filename="ui_util.cpp" />
 		<Unit filename="ui_util.hpp" />
 		<Unit filename="util.hpp" />
 		<Extensions>

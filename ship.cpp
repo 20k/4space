@@ -8,6 +8,8 @@
 #include "procedural_text_generator.hpp"
 #include <unordered_map>
 
+int ship_manager::gid;
+
 int ship::gid;
 
 std::map<resource::types, float> ship_component_elements::component_storage_to_resources(const types& type)
@@ -3723,6 +3725,32 @@ void fleet_manager::tick_all(float step_s)
 
     internal_counter += 1;
     internal_counter %= bound;
+
+    /*int bound = 5;
+
+    for(ship_manager* sm : fleets)
+    {
+        sm->accumulated_dt += step_s;
+    }
+
+    for(ship_manager* sm : fleets)
+    {
+        if((sm->my_id % bound) != (internal_counter % bound) && !sm->any_in_combat())
+            continue;
+
+        sm->tick_all(sm->accumulated_dt);
+
+        sm->accumulated_dt = 0;
+
+        if(sm->auto_resupply && sm->should_resupply() && sm->parent_empire)
+        {
+            sm->resupply(sm->parent_empire, false);
+        }
+    }
+
+
+    internal_counter++;
+    internal_counter %= bound;*/
 }
 
 ship* fleet_manager::nearest_free_colony_ship_of_empire(orbital* o, empire* e)

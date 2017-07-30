@@ -68,7 +68,7 @@ struct orbital_simple_renderable
 
     void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col = {1,1,1});
 
-    void main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale);
+    void main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col);
 };
 
 struct sprite_renderable

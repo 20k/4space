@@ -700,6 +700,10 @@ struct ship_manager
     bool to_close_ui = false;
 
     bool can_merge = false;
+
+
+    static int gid;
+    int my_id = gid++;
 };
 
 struct empire_manager;

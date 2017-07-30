@@ -65,11 +65,49 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     pixel_rad.x -= win.getSize().x/2;
 
+    static std::vector<sf::Vertex> vertices;
+
     if(!force_high_quality && pixel_rad.x < 2.f)
     {
+        /*float rad = rad_to_check;
+        //float rad = pixel_rad.x;
+
+        //static sf::VertexArray triangle(sf::Triangles, 3);
+
+        sf::Vertex triangle[3];
+
+        triangle[0].position = sf::Vector2f(absolute_pos.x() - rad, absolute_pos.y() + rad);
+        triangle[1].position = sf::Vector2f(absolute_pos.x(), absolute_pos.y() - rad);
+        triangle[2].position = sf::Vector2f(absolute_pos.x() + rad, absolute_pos.y() + rad);
+
+        sf::Color scol(col.x(), col.y(), col.z());
+
+        triangle[0].color = scol;
+        triangle[1].color = scol;
+        triangle[2].color = scol;
+
+        //vertices.push_back(triangle[0]);
+        //vertices.push_back(triangle[1]);
+        //vertices.push_back(triangle[2]);
+
+        //win.draw(triangle);
+
+        if(vertices.size() > 500000)
+        {
+            //win.draw(&vertices[0], vertices.size(), sf::Triangles);
+            //vertices.clear();
+        }*/
+
+        return;
+
+        ///suffers from intermittent pauses
+        #if 0
         static sf::CircleShape shape;
 
+        shape.setPointCount(5);
+
         shape.setRadius(rad_to_check);
+
         shape.setFillColor(sf::Color(col.x(), col.y(), col.z()));
 
         shape.setPosition(absolute_pos.x(), absolute_pos.y());
@@ -78,6 +116,37 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         win.draw(shape);
 
         return;
+        #endif
+
+        ///slower
+        #if 0
+        static bool img_loaded;
+        static sf::Texture tex;
+        static sf::Sprite spr;
+
+        static float crad;
+
+        if(!img_loaded)
+        {
+            tex.loadFromFile("./pics/circle.png");
+            img_loaded = true;
+
+            spr.setTexture(tex);
+
+            auto dim = tex.getSize();
+            tex.setSmooth(false);
+
+            crad = 1.f / (dim.x / 2);
+        }
+
+        float scale = pixel_rad.x * crad;
+
+        spr.setScale(scale, scale);
+        spr.setPosition(absolute_pos.x(), absolute_pos.y());
+
+        win.draw(spr);
+        return;
+        #endif
     }
     #endif // CHEAPDRAW_SMALL_ASTEROIDS
 
@@ -146,11 +215,38 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         ImGui::PopStyleColor();
     }
 
-    main_rendering(shape, win, rotation, absolute_pos, 1.f);
+    main_rendering(shape, win, rotation, absolute_pos, 1.f, col);
 }
 
-void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale)
+void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
 {
+    static std::vector<sf::Vertex> vertices;
+
+    /*sf::Vertex triangle[3];
+
+    triangle[0].position = sf::Vector2f(absolute_pos.x() - vert_dist[0], absolute_pos.y() + vert_dist[0]);
+    triangle[1].position = sf::Vector2f(absolute_pos.x(), absolute_pos.y() - vert_dist[0]);
+    triangle[2].position = sf::Vector2f(absolute_pos.x() + vert_dist[0], absolute_pos.y() + vert_dist[0]);
+
+    sf::Color scol(col.x(), col.y(), col.z());
+
+    triangle[0].color = scol;
+    triangle[1].color = scol;
+    triangle[2].color = scol;
+
+    vertices.push_back(triangle[0]);
+    vertices.push_back(triangle[1]);
+    vertices.push_back(triangle[2]);
+
+    //win.draw(triangle);
+
+    if(vertices.size() > 50)
+    {
+        win.draw(&vertices[0], vertices.size(), sf::Triangles);
+        vertices.clear();
+    }*/
+
+    #if 1
     for(int i=0; i<vert_dist.size(); i++)
     {
         int cur = i;
@@ -176,17 +272,50 @@ void orbital_simple_renderable::main_rendering(sf::RectangleShape& shape, sf::Re
         float height = 1;
 
         shape.setPosition(l1.x(), l1.y());
-
         shape.setSize({width, height});
-
         shape.setRotation(r2d((l2 - l1).angle()));
+
+        vec2f perp = perpendicular((l2 - l1).norm()).norm();
+
+        sf::Vertex v[4];
+
+        /*v[0].position = sf::Vector2f(l1.x() - perp.x(), l1.y() - perp.y());
+        v[1].position = sf::Vector2f(l2.x() - perp.x(), l2.y() - perp.y());
+        v[2].position = sf::Vector2f(l2.x() + perp.x(), l2.y() + perp.y());
+        v[3].position = sf::Vector2f(l1.x() + perp.x(), l1.y() + perp.y());*/
+
+        v[0].position = sf::Vector2f(l1.x(), l1.y());
+        v[1].position = sf::Vector2f(l2.x(), l2.y());
+        v[2].position = sf::Vector2f(l2.x() + perp.x(), l2.y() + perp.y());
+        v[3].position = sf::Vector2f(l1.x() + perp.x(), l1.y() + perp.y());
+
+        sf::Color scol = sf::Color(col.x(), col.y(), col.z());
+
+        v[0].color = scol;
+        v[1].color = scol;
+        v[2].color = scol;
+        v[3].color = scol;
+
+        /*vertices.push_back(v[0]);
+        vertices.push_back(v[1]);
+        vertices.push_back(v[2]);
+        vertices.push_back(v[3]);*/
+
+        win.draw(v, 4, sf::Quads);
 
         #ifdef HOLLOWISH
         if((i % 2) == 0)
             continue;
         #endif
 
-        win.draw(shape);
+        //win.draw(shape);
+    }
+    #endif
+
+    if(vertices.size() == 4)
+    {
+        //win.draw(&vertices[0], vertices.size(), sf::Quads);
+        //vertices.clear();
     }
 }
 
@@ -581,7 +710,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     if(render_type == 0)
         simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, type == orbital_info::PLANET, name, current_simple_col);
-    else if(render_type == 1)
+    if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
     if(highlight && type == orbital_info::FLEET)
