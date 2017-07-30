@@ -70,6 +70,8 @@ struct popup_element
 
     void* element = nullptr;
     bool declaring_war = false;
+
+    bool schedule_erase = false;
 };
 
 struct popup_info
@@ -85,6 +87,17 @@ struct popup_info
         }
 
         return nullptr;
+    }
+
+    void schedule_rem(void* element)
+    {
+        for(popup_element& elem : elements)
+        {
+            if(elem.element == element)
+            {
+                elem.schedule_erase = true;
+            }
+        }
     }
 
     void rem(void* element)
@@ -104,6 +117,19 @@ struct popup_info
         for(int i=0; i<elements.size(); i++)
         {
             if(elements[i].element != element)
+            {
+                elements.erase(elements.begin() + i);
+                i--;
+                continue;
+            }
+        }
+    }
+
+    void remove_scheduled()
+    {
+        for(int i=0; i<elements.size(); i++)
+        {
+            if(elements[i].schedule_erase)
             {
                 elements.erase(elements.begin() + i);
                 i--;

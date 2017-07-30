@@ -785,6 +785,8 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 ///new functionality is however forcing this to be refactored to be less dumb
 void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage, all_events_manager& all_events)
 {
+    popup.remove_scheduled();
+
     sf::Mouse mouse;
 
     int x = mouse.getPosition(win).x;
@@ -916,6 +918,8 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
 void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_manage, system_manager& system_manage, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events, all_battles_manager& all_battles, bool rclick)
 {
+    popup.remove_scheduled();
+
     if(popup.elements.size() == 0)
         popup.going = false;
 
@@ -941,6 +945,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     std::set<ship*> potential_new_fleet;
 
     std::map<empire*, std::vector<orbital*>> orbitals_grouped_by_empire;
+
+    std::map<ship_manager*, std::vector<ship*>> steal_map;
 
     for(popup_element& elem : popup.elements)
     {
@@ -1142,13 +1148,16 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     {
                         if(found_sm->ships.size() == 1)
                         {
-                            popup.rem(my_o);
+                            popup.schedule_rem(my_o);
                         }
 
                         orbital_system* base_sm = system_manage.get_by_element(sm);
 
+                        ///delay so we dont affect text rendering
                         if(base_sm == my_o->parent_system)
-                            sm->steal(s);
+                        {
+                            steal_map[sm].push_back(s);
+                        }
                     }
                 }
             }
@@ -1523,6 +1532,16 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 ns->toggle_fleet_ui = true;
         }
     }
+
+    for(auto& i : steal_map)
+    {
+        for(auto& s : i.second)
+        {
+            i.first->steal(s);
+        }
+    }
+
+    popup.remove_scheduled();
 
     system_manage.cull_empty_orbital_fleets(empires);
     fleet_manage.cull_dead(empires);
