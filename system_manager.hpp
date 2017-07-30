@@ -88,6 +88,9 @@ struct orbital_system;
 
 struct orbital
 {
+    static int gid;
+    int unique_id = gid++;
+
     std::string name;
     std::string description;
 
@@ -134,12 +137,16 @@ struct orbital
 
     void draw(sf::RenderWindow& win, empire* viewer_empire);
 
+    float get_pixel_radius(sf::RenderWindow& win);
+
     void center_camera(system_manager& system_manage);
 
     bool point_within(vec2f pos);
 
     std::vector<std::string> get_info_str(empire* viewer_empire, bool use_info_warfare);
     std::string get_empire_str(bool newline = true);
+
+    std::string get_name_with_info_warfare(empire* viewing_empire);
 
     void transfer(float new_rad, float new_angle);
     void transfer(vec2f pos);

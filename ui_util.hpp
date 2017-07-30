@@ -3,6 +3,15 @@
 
 #include <imgui/imgui.h>
 
+#define IMGUI_JUST_TEXT_WINDOW ImGuiWindowFlags_AlwaysAutoResize | \
+                     ImGuiWindowFlags_NoBringToFrontOnFocus| \
+                     ImGuiWindowFlags_NoCollapse| \
+                     ImGuiWindowFlags_NoFocusOnAppearing | \
+                     ImGuiWindowFlags_NoInputs | \
+                     ImGuiWindowFlags_NoMove | \
+                     ImGuiWindowFlags_NoResize | \
+                     ImGuiWindowFlags_NoTitleBar
+
 void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
 {
     constexpr int num_divisions = 100;

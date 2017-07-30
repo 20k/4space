@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include "ui_util.hpp"
 
+int orbital::gid;
 
 float system_manager::universe_scale = 100.f;
 
@@ -136,18 +137,9 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
-        ImGui::Begin(tag.c_str(), nullptr,
-                     ImGuiWindowFlags_AlwaysAutoResize |
-                     ImGuiWindowFlags_NoBringToFrontOnFocus|
-                     ImGuiWindowFlags_NoCollapse|
-                     ImGuiWindowFlags_NoFocusOnAppearing |
-                     ImGuiWindowFlags_NoInputs |
-                     ImGuiWindowFlags_NoMove |
-                     ImGuiWindowFlags_NoResize |
-                     ImGuiWindowFlags_NoTitleBar);
+        ImGui::Begin(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
 
         ImGui::Text(tag.c_str());
-
 
         ImGui::End();
 
@@ -592,7 +584,51 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     else if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
+    if(highlight)
+    //if(type == orbital_info::FLEET)
+    {
+        //auto real_coord = win.mapCoordsToPixel({last_viewed_position.x(), last_viewed_position.y()});
+        auto real_coord = mapCoordsToPixel_float(last_viewed_position.x(), last_viewed_position.y(), win.getView(), win);
+
+        ImGui::SetNextWindowPos(ImVec2(real_coord.x + get_pixel_radius(win), real_coord.y));
+
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
+
+        ImGui::Begin((get_name_with_info_warfare(viewer_empire) + "###" + name + std::to_string(unique_id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+
+        ImGui::Text(get_name_with_info_warfare(viewer_empire).c_str());
+
+        ImGui::End();
+
+        ImGui::PopStyleColor();
+    }
+
     highlight = false;
+}
+
+float orbital::get_pixel_radius(sf::RenderWindow& win)
+{
+    float rad_to_check = 0;
+
+    if(render_type == 0)
+    {
+        for(auto& rad : simple_renderable.vert_dist)
+        {
+            rad_to_check += rad;
+        }
+
+        rad_to_check /= simple_renderable.vert_dist.size();
+    }
+    else if(render_type == 1)
+    {
+        rad_to_check = sprite.tex.getSize().x/2.f;
+    }
+
+    auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
+
+    pixel_rad.x -= win.getSize().x/2;
+
+    return pixel_rad.x;
 }
 
 void orbital::center_camera(system_manager& system_manage)
@@ -665,6 +701,28 @@ std::string orbital::get_empire_str(bool newline)
         str += "\n";
 
     return str;
+}
+
+std::string orbital::get_name_with_info_warfare(empire* viewing_empire)
+{
+    float available_scanning_power = viewing_empire->available_scanning_power_on(this);
+
+    if(viewing_empire == parent_empire)
+    {
+        available_scanning_power = 1.f;
+    }
+
+    if(viewing_empire->is_allied(parent_empire))
+    {
+        available_scanning_power = 1.f;
+    }
+
+    if(available_scanning_power < ship_info::ship_obfuscation_level)
+    {
+        return "Unknown Fleet";
+    }
+
+    return name;
 }
 
 void orbital::transfer(float pnew_rad, float pnew_angle)
