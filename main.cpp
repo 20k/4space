@@ -222,7 +222,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }
 
 
-    ImGui::Begin((name_str + "###" + s.name).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -1534,12 +1534,15 @@ struct construction_window_state
     research picked_research_levels;
 };
 
-void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fleet_manage, construction_window_state& window_state)
+///returns whether or not we've modified our system
+bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fleet_manage, construction_window_state& window_state)
 {
     if(!o->construction_ui_open)
-        return;
+        return false;
 
-    ImGui::Begin("Ship Construction", &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
+    bool built = false;
+
+    ImGui::Begin(("Ship Construction (" + o->name + ")").c_str(), &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<window_state.picked_research_levels.categories.size(); i++)
     {
@@ -1635,11 +1638,15 @@ void do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
                 //new_ship->set_tech_level_from_empire(player_empire);
 
                 onew_fleet->tick(0.f);
+
+                built = true;
             }
         }
     }
 
     ImGui::End();
+
+    return built;
 }
 
 void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
@@ -2093,12 +2100,17 @@ int main()
 
         for(orbital_system* os : system_manage.systems)
         {
-            for(orbital* o : os->orbitals)
+            for(int i=0; i<os->orbitals.size(); i++)
             {
+                orbital* o = os->orbitals[i];
+
                 if(o->parent_empire != player_empire)
                     continue;
 
-                do_construction_window(o, player_empire, fleet_manage, window_state);
+                bool built = do_construction_window(o, player_empire, fleet_manage, window_state);
+
+                //if(built)
+                //    break;
             }
         }
 
