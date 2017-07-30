@@ -2,6 +2,7 @@
 #define UI_UTIL_HPP_INCLUDED
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include "drag_and_drop.hpp"
 
 #define IMGUI_JUST_TEXT_WINDOW ImGuiWindowFlags_AlwaysAutoResize | \
@@ -85,6 +86,85 @@ namespace ImGui
             suppress_clicks = false;
             suppress_frames = 2;
         }
+    }
+
+    inline
+    ImVec4 GetStyleCol(ImGuiCol name)
+    {
+        auto res = ImGui::GetColorU32(name, 1.f);
+
+        return ImGui::ColorConvertU32ToFloat4(res);
+    }
+
+    inline
+    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col)
+    {
+        ImGui::BeginGroup();
+
+        auto cursor_pos = ImGui::GetCursorPos();
+        auto screen_pos = ImGui::GetCursorScreenPos();
+
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(text_col.x(), text_col.y(), text_col.z(), 1));
+
+        auto dim = ImGui::CalcTextSize(txt.c_str());
+
+        dim.y += 2;
+        dim.x += 1;
+
+        ImVec2 p2 = screen_pos;
+        p2.x += dim.x;
+        p2.y += dim.y;
+
+        int thickness = 2;
+
+        if(ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2))
+        {
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(col.x(), col.y(), col.z(), 1));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(col.x(), col.y(), col.z(), 1));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(col.x(), col.y(), col.z(), 1));
+
+            ImGui::Button("", ImVec2(dim.x + thickness*2, dim.y + thickness*2));
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x, screen_pos.y));
+
+            ImGui::PushStyleColor(ImGuiCol_Button, GetStyleCol(ImGuiCol_WindowBg));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetStyleCol(ImGuiCol_WindowBg));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetStyleCol(ImGuiCol_WindowBg));
+
+            ImGui::Button("", dim);
+
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x, screen_pos.y));
+
+            ImGui::Text(txt.c_str());
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, GetStyleCol(ImGuiCol_WindowBg));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetStyleCol(ImGuiCol_WindowBg));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetStyleCol(ImGuiCol_WindowBg));
+
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
+
+            ImGui::Button("", ImVec2(dim.x + thickness*2, dim.y + thickness*2));
+
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x, screen_pos.y));
+
+            ImGui::Text(txt.c_str());
+        }
+
+        ImGui::PopStyleColor(4);
+
+        ImGui::EndGroup();
+    }
+
+    inline
+    void OutlineHoverTextAuto(const std::string& txt, vec3f text_col)
+    {
+        return OutlineHoverText(txt, text_col/2.f, text_col);
     }
 }
 

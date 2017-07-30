@@ -7,6 +7,7 @@
 #include <map>
 #include "../../render_projects/imgui/imgui.h"
 #include "top_bar.hpp"
+#include <vec/vec.hpp>
 
 namespace popup_element_type
 {
@@ -24,8 +25,8 @@ namespace popup_element_type
 
 namespace popup_colour_info
 {
-    static ImVec4 good_ui_colour(0.5, 0.5, 1, 1);
-    static ImVec4 bad_ui_colour(1, 0.5, 0.5, 1);
+    static vec3f good_ui_colour{0.5, 0.5, 1};
+    static vec3f bad_ui_colour{1, 0.5, 0.5};
 }
 
 namespace ImGui
@@ -33,13 +34,17 @@ namespace ImGui
     inline
     void GoodText(const std::string& str)
     {
-        ImGui::TextColored(popup_colour_info::good_ui_colour, str.c_str());
+        vec3f col = popup_colour_info::good_ui_colour;
+
+        ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), str.c_str());
     }
 
     inline
     void BadText(const std::string& str)
     {
-        ImGui::TextColored(popup_colour_info::bad_ui_colour, str.c_str());
+        vec3f col = popup_colour_info::bad_ui_colour;
+
+        ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), str.c_str());
     }
 }
 
