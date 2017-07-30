@@ -12,6 +12,7 @@ namespace drag_and_drop_info
     {
         NONE = 0,
         ORBITAL,
+        SHIP,
     };
 }
 

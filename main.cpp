@@ -1033,9 +1033,26 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::Text(name.c_str());
 
-                if(global_drag_and_drop.let_go_on_item())
+                if(global_drag_and_drop.currently_dragging == drag_and_drop_info::SHIP && global_drag_and_drop.let_go_on_item())
                 {
+                    ship* s = (ship*)global_drag_and_drop.data;
 
+                    ship_manager* found_sm = s->owned_by;
+
+                    orbital* my_o = system_manage.get_by_element_orbital(found_sm);
+
+                    if(my_o != nullptr && my_o->type == orbital_info::FLEET && sm != found_sm)
+                    {
+                        if(found_sm->ships.size() == 1)
+                        {
+                            popup.rem(my_o);
+                            //popup.elements.clear();
+                        }
+
+                        sm->steal(s);
+                    }
+
+                    printf("hi\n");
                 }
 
                 /*if(popup.elements.size() > 1)
@@ -1115,7 +1132,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                         if(ImGui::IsItemClicked() && lctrl && sm->can_merge)
                         {
-                            global_drag_and_drop.begin_dragging(nullptr, drag_and_drop_info::ORBITAL, cur_ship->name);
+                            global_drag_and_drop.begin_dragging(cur_ship, drag_and_drop_info::SHIP, cur_ship->name);
                         }
 
                         /*if(global_drag_and_drop.let_go_on_item())

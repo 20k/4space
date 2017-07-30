@@ -26,7 +26,7 @@ void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f p
     if(rounding)
         pos = round(pos);
 
-    sf::Text text(str.c_str(), font);
+    sf::Text text(str, font);
 
     text.setCharacterSize(char_size);
     text.setColor(sf::Color(col.x(), col.y(), col.z()));

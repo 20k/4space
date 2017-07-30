@@ -20,7 +20,7 @@ void drag_and_drop::tick_locking_window()
     }
 }
 
-void drag_and_drop::begin_dragging(void* data, drag_and_drop_info::type type, const std::string& _tooltip_str)
+void drag_and_drop::begin_dragging(void* _data, drag_and_drop_info::type type, const std::string& _tooltip_str)
 {
     frames_to_drop = 2;
 
@@ -32,6 +32,9 @@ void drag_and_drop::begin_dragging(void* data, drag_and_drop_info::type type, co
     dragging = true;
 
     tooltip_str = _tooltip_str;
+
+    currently_dragging = type;
+    data = _data;
 }
 
 void drag_and_drop::finish_dragging()
