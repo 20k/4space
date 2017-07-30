@@ -1806,6 +1806,8 @@ int main()
 
     bool focused = true;
 
+    bool fullscreen = false;
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
@@ -1842,7 +1844,23 @@ int main()
                 int x = event.size.width;
                 int y = event.size.height;
 
-                window.create(sf::VideoMode(x, y), "Wowee", sf::Style::Default, settings);
+                window.setSize({x, y});
+
+                //window.create(sf::VideoMode(x, y), "Wowee", sf::Style::Default, settings);
+            }
+        }
+
+        if(focused && key.isKeyPressed(sf::Keyboard::LAlt) && ONCE_MACRO(sf::Keyboard::Return))
+        {
+            if(!fullscreen)
+            {
+                window.create(sf::VideoMode().getFullscreenModes()[0], "Wowee", sf::Style::Fullscreen, settings);
+                fullscreen = true;
+            }
+            else
+            {
+                window.create(sf::VideoMode().getFullscreenModes()[0], "Wowee", sf::Style::Default, settings);
+                fullscreen = false;
             }
         }
 
