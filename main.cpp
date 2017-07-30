@@ -897,8 +897,8 @@ struct box_selection
             win.setView(win.getDefaultView());
 
             shape.setSize({fabs(mpos.x() - start_pos.x()), fabs(mpos.y() - start_pos.y())});
-            shape.setOutlineColor(sf::Color(0, 128, 255));
-            shape.setFillColor(sf::Color(0,128,255,60));
+            shape.setOutlineColor(sf::Color(0, 128, 255, 255));
+            shape.setFillColor(sf::Color(0, 128, 255, 60));
             shape.setOutlineThickness(1);
 
             shape.setPosition(tl.x(), tl.y());
