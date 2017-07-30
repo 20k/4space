@@ -1155,13 +1155,13 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             //ImGui::SameLine();
 
-            ImGui::Text("");
+            //ImGui::Text("");
 
             if(popup.elements.size() > 1)
             {
-                ImGui::SameLine(0.f, 0.f);
+                ImGui::NeutralText("(Select)");
 
-                ImGui::Text("(Select) ");
+                ImGui::SameLine();
 
                 if(ImGui::IsItemClicked_Registered())
                 {
@@ -1175,10 +1175,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(can_resupply)
                 {
-                    ImGui::SameLine(0.f, 0.f);
+                    //ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour);
+                    ImGui::GoodText("(Resupply)");
 
-                    ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour);
-                    //ImGui::GoodText("(Resupply) ");
+                    ImGui::SameLine();
 
                     if(ImGui::IsItemClicked_Registered())
                     {
@@ -1203,9 +1203,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_engage)
             {
-                ImGui::SameLine(0.f, 0.f);
+                ImGui::BadText("(Engage Fleets)");
 
-                ImGui::BadText("(Engage Fleets) ");
+                ImGui::SameLine();
 
                 if(ImGui::IsItemClicked_Registered())
                 {
@@ -1223,18 +1223,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_declare_war)
             {
-                ImGui::SameLine(0.f, 0.f);
+                ImGui::BadText("(Declare War)");
 
-                ImGui::BadText("(Declare War) ");
+                ImGui::SameLine();
 
                 if(ImGui::IsItemClicked_Registered() && popup.fetch(orb) != nullptr)
                     popup.fetch(orb)->declaring_war = true;
 
                 if(popup.fetch(orb) != nullptr && popup.fetch(orb)->declaring_war)
                 {
-                    ImGui::SameLine(0.f, 0.f);
+                    ImGui::BadText("(Are you sure?)");
 
-                    ImGui::BadText("(Are you sure?) ");
+                    ImGui::SameLine();
 
                     if(ImGui::IsItemClicked_Registered())
                     {
@@ -1258,7 +1258,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(enable_engage_cooldown)
                 {
-                    ImGui::Text(sm->get_engage_str().c_str());
+                    ImGui::NeutralText(sm->get_engage_str().c_str());
                 }
             }
 
@@ -1266,9 +1266,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(can_colonise)
             {
-                ImGui::SameLine(0.f, 0.f);
+                ImGui::GoodText("(Colonise)");
 
-                ImGui::GoodText("(Colonise) ");
+                ImGui::SameLine();
 
                 if(ImGui::IsItemClicked_Registered())
                 {
@@ -1284,6 +1284,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
+            ImGui::Text("");
+
             ///for drawing warp radiuses, but will take anything and might be extended later
             system_manage.add_selected_orbital(orb);
 
@@ -1295,20 +1297,20 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(event != nullptr && event->interacting_faction != nullptr && event->interacting_faction != player_empire)
                 {
-                    ImGui::Text("(Another empire has already claimed this event)");
+                    ImGui::NeutralText("(Another empire has already claimed this event)");
                 }
                 else if(event != nullptr && !event->can_interact(player_empire))
                 {
-                    ImGui::Text("(Requires nearby fleet to view alert)");
+                    ImGui::NeutralText("(Requires nearby fleet to view alert)");
 
                     event->set_dialogue_state(false);
                 }
                 else
                 {
                     if(o->dialogue_open)
-                        ImGui::Text("(Hide Alert)");
+                        ImGui::NeutralText("(Hide Alert)");
                     else
-                        ImGui::Text("(View Alert)");
+                        ImGui::NeutralText("(View Alert)");
 
                     if(ImGui::IsItemClicked_Registered())
                     {
@@ -1326,9 +1328,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             if(o->type == orbital_info::PLANET && o->can_construct_ships && o->parent_empire == player_empire)
             {
                 if(o->construction_ui_open)
-                    ImGui::Text("(Hide Construction Window)");
+                    ImGui::NeutralText("(Hide Construction Window)");
                 else
-                    ImGui::Text("(Show Construction Window)");
+                    ImGui::NeutralText("(Show Construction Window)");
 
                 if(ImGui::IsItemClicked_Registered())
                 {
@@ -1412,7 +1414,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     if(potential_new_fleet.size() > 0)
     {
-        ImGui::Text("(Make New Fleet)");
+        ImGui::NeutralText("(Make New Fleet)");
 
         if(ImGui::IsItemClicked_Registered())
         {
