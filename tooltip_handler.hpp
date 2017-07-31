@@ -7,7 +7,7 @@ struct tooltip
 {
     static std::string tool;
 
-    static void add(std::string str);
+    static void add(const std::string& str);
 
     static void set_clear_tooltip();
 };

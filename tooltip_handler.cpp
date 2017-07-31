@@ -4,7 +4,7 @@
 
 std::string tooltip::tool;
 
-void tooltip::add(std::string str)
+void tooltip::add(const std::string& str)
 {
     tool += str + "\n";
 }

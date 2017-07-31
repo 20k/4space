@@ -1150,12 +1150,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             {
                 bool do_obfuscate_name = false;
+                bool do_obfuscate_misc_resources = false;
 
                 if(o->type == orbital_info::FLEET && !player_empire->is_allied(o->parent_empire))
                 {
                     if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= ship_info::ship_obfuscation_level)
                     {
                         do_obfuscate_name = true;
+                    }
+
+                    if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= ship_info::misc_resources_obfuscation_level)
+                    {
+                        do_obfuscate_misc_resources = true;
                     }
                 }
 
@@ -1181,11 +1187,44 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     o->request_transfer({transformed.x, transformed.y});
                 }
 
-                float hp_frac = 1.f;
-
                 ImGui::BeginGroup();
 
                 ImGui::Text(name.c_str());
+
+
+                ///do warp charging info here
+                if(o->type == orbital_info::FLEET && o->parent_empire == player_empire)
+                {
+                    ImGui::SameLine();
+
+                    ImGui::Text("|");
+
+                    ImGui::SameLine();
+
+                    std::string warp_str = "Warp: ";
+
+                    if(sm->can_use_warp_drives())
+                    {
+                        warp_str += "Ready";
+
+                        ImGui::GoodTextNoHoverEffect(warp_str.c_str());
+                    }
+                    else
+                    {
+                        warp_str += "Charging";
+
+                        ImGui::BadTextNoHoverEffect(warp_str.c_str());
+                    }
+
+                    if(ImGui::IsItemHovered())
+                    {
+                        for(ship* s : sm->ships)
+                        {
+                            tooltip::add(s->name + ": " + s->get_resource_str(ship_component_element::WARP_POWER));
+                        }
+                    }
+                }
+
 
                 /*if(popup.elements.size() > 1)
                 {

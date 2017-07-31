@@ -580,6 +580,8 @@ struct ship : positional
 
     research get_recrew_potential_research(empire* claiming);
 
+    std::string get_resource_str(const ship_component_element& type);
+
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);
 
@@ -675,6 +677,7 @@ struct ship_manager
     void try_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     bool can_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     float get_min_warp_distance(); ///ignores practicalities, purely base distance
+    bool can_use_warp_drives();
 
     void leave_combat();
     void enter_combat();

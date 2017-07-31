@@ -2779,6 +2779,14 @@ research ship::get_recrew_potential_research(empire* claiming)
     return res;
 }
 
+std::string ship::get_resource_str(const ship_component_element& type)
+{
+    auto res = get_stored_resources();
+    auto max_res = get_max_resources();
+
+    return "(" + to_string_with_enforced_variable_dp(res[type]) + "/" + to_string_with_variable_prec(max_res[type]) + ")";
+}
+
 void ship::recrew_derelict(empire* owner, empire* claiming)
 {
     if(claiming == nullptr)
@@ -3111,11 +3119,11 @@ std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* v
             auto res = s->get_stored_resources();
             auto max_res = s->get_max_resources();
 
-            float hp_frac = res[ship_component_element::HP] / max_res[ship_component_element::HP];
+            //float hp_frac = res[ship_component_element::HP] / max_res[ship_component_element::HP];
+            //float percent = hp_frac * 100.f;
+            //std::string hp_name = "(" + to_string_with_enforced_variable_dp(percent) + "%%)";
 
-            float percent = hp_frac * 100.f;
-
-            std::string hp_name = "(" + to_string_with_enforced_variable_dp(percent) + "%%)";
+            std::string hp_name = "(" + to_string_with_enforced_variable_dp(res[ship_component_element::HP]) + "/" + to_string_with_variable_prec(max_res[ship_component_element::HP]) + ")";
 
             if(obfuscate_hp)
             {
@@ -3578,6 +3586,17 @@ float ship_manager::get_min_warp_distance()
     }
 
     return min_dist;
+}
+
+bool ship_manager::can_use_warp_drives()
+{
+    for(ship* s : ships)
+    {
+        if(!s->can_use_warp_drives())
+            return false;
+    }
+
+    return true;
 }
 
 void ship_manager::enter_combat()
