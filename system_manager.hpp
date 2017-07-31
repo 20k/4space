@@ -56,6 +56,59 @@ namespace orbital_info
     static float decolonise_time_s = 60.f;
 }
 
+struct empire;
+
+struct empire_popup
+{
+    empire* e = nullptr;
+    orbital_info::type type = orbital_info::NONE;
+    int id = 0;
+    bool hidden = false;
+    bool is_player = false;
+    bool is_allied;
+};
+
+inline
+bool operator<(const empire_popup& e1, const empire_popup& e2)
+{
+    if(e1.is_player != e2.is_player)
+    {
+        if(e1.is_player && !e2.is_player)
+            return true;
+
+        return false;
+    }
+
+    if(e1.is_allied != e2.is_allied)
+    {
+        if(e1.is_allied && !e2.is_allied)
+            return true;
+
+        return false;
+    }
+
+    if(e1.hidden != e2.hidden)
+    {
+        if(e1.hidden && !e2.hidden)
+            return false;
+
+        return true;
+    }
+
+    if(e1.e != e2.e)
+    {
+        return std::less<empire*>()(e1.e, e2.e);
+    }
+
+    if(e1.type != e2.type);
+    {
+        return e1.type < e2.type;
+    }
+
+    return e1.id < e2.id;
+}
+
+
 namespace sf
 {
     struct RenderWindow;
@@ -245,6 +298,9 @@ struct orbital_system
 
     ///for overall fleet window
     bool toggle_fleet_ui = true;
+
+    static int gid;
+    int unique_id = gid++;
 };
 
 struct popup_info;

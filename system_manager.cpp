@@ -15,6 +15,7 @@
 #include "ui_util.hpp"
 
 int orbital::gid;
+int orbital_system::gid;
 
 float system_manager::universe_scale = 100.f;
 
@@ -2314,6 +2315,16 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
         if(os->get_base()->parent_empire == nullptr)
             continue;
 
+        /*empire_popup pop;
+        pop.e = os->get_base()->parent_empire;
+        pop.id = os->unique_id;
+        pop.hidden = do_obfuscate_misc;
+        //pop.type = orb->type;
+        pop.type = orbital_info::NONE;
+        pop.is_player = os->get_base()->parent_empire == viewing_empire;
+
+        empire_to_systems[pop].push_back(os);*/
+
         empire_to_systems[os->get_base()->parent_empire].push_back(os);
     }
 
@@ -2330,8 +2341,10 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
         std::string empire_name_str;
 
-        if(sys_emp.first != nullptr)
-            empire_name_str = "Systems owned by: " + sys_emp.first->name + " (" + std::to_string(sys_emp.second.size()) + ")";
+        empire* current_empire = sys_emp.first;
+
+        if(current_empire != nullptr)
+            empire_name_str = "Systems owned by: " + current_empire->name + " (" + std::to_string(sys_emp.second.size()) + ")";
 
         ///or... maybe draw for all fleets we know of?
         ///sort these all into a std::map -> vector of empires
@@ -2341,7 +2354,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             std::string sys_name = sys->get_base()->name;
 
-            std::map<empire*, std::vector<orbital*>> ship_map;
+            std::map<empire_popup, std::vector<orbital*>> ship_map;
 
             bool any_orbitals = false;
 
@@ -2362,10 +2375,20 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     do_obfuscate = true;
                 }
 
-                if(!do_obfuscate)
+                empire_popup pop;
+                pop.e = o->parent_empire;
+                pop.id = o->unique_id;
+                pop.hidden = do_obfuscate;
+                pop.type = o->type;
+                pop.is_player = o->parent_empire == viewing_empire;
+                pop.is_allied = viewing_empire->is_allied(o->parent_empire);
+
+                /*if(!do_obfuscate)
                     ship_map[o->parent_empire].push_back(o);
                 else
-                    ship_map[nullptr].push_back(o); ///feels pretty icky doing this
+                    ship_map[nullptr].push_back(o); ///feels pretty icky doing this*/
+
+                ship_map[pop].push_back(o);
             }
 
             if(ship_map.size() == 0)
@@ -2380,22 +2403,22 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
             {
                 std::string pad = "-";
 
-                if(sys_emp.first->toggle_systems_ui)
+                if(current_empire->toggle_systems_ui)
                     pad = "+";
 
-                vec3f col = viewing_empire->get_relations_colour(sys_emp.first);
+                vec3f col = viewing_empire->get_relations_colour(current_empire);
 
                 ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), (pad + empire_name_str).c_str());
 
                 if(ImGui::IsItemClicked_Registered())
                 {
-                    sys_emp.first->toggle_systems_ui = !sys_emp.first->toggle_systems_ui;
+                    current_empire->toggle_systems_ui = !current_empire->toggle_systems_ui;
                 }
 
                 first_of_empire = false;
             }
 
-            if(sys_emp.first->toggle_systems_ui == false)
+            if(current_empire->toggle_systems_ui == false)
                 continue;
 
             ImGui::Indent();
@@ -2483,11 +2506,12 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             for(auto& kk : ship_map)
             {
-                empire* e = kk.first;
+                const empire_popup& pop = kk.first;
+                empire* e = pop.e;
 
                 std::string empire_name;
 
-                if(e != nullptr)
+                if(!pop.hidden)
                 {
                     empire_name = "Empire: " + e->name;
                 }
@@ -2496,7 +2520,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     empire_name = "Empire: Unknown";
                 }
 
-                vec3f col = viewing_empire->get_relations_colour(e);
+                vec3f col = viewing_empire->get_relations_colour(pop.hidden ? nullptr : e);
 
                 ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1.f), empire_name.c_str());
 

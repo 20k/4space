@@ -1049,46 +1049,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     }
 }
 
-struct empire_popup
-{
-    empire* e = nullptr;
-    orbital_info::type type = orbital_info::NONE;
-    int id = 0;
-    bool hidden = false;
-    bool is_player = false;
-};
-
-bool operator<(const empire_popup& e1, const empire_popup& e2)
-{
-    if(e1.is_player != e2.is_player)
-    {
-        if(e1.is_player && !e2.is_player)
-            return true;
-
-        return false;
-    }
-
-    if(e1.hidden != e2.hidden)
-    {
-        if(e1.hidden && !e2.hidden)
-            return false;
-
-        return true;
-    }
-
-    if(e1.e != e2.e)
-    {
-        return std::less<empire*>()(e1.e, e2.e);
-    }
-
-    if(e1.type != e2.type);
-    {
-        return e1.type < e2.type;
-    }
-
-    return e1.id < e2.id;
-}
-
 void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_manage, system_manager& system_manage, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events, all_battles_manager& all_battles, bool rclick)
 {
     popup.remove_scheduled();
@@ -1146,6 +1106,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
         pop.hidden = do_obfuscate_misc;
         pop.type = orb->type;
         pop.is_player = cur_empire == player_empire;
+        pop.is_allied = player_empire->is_allied(cur_empire);
 
         orbitals_grouped_by_empire[pop].push_back(orb);
     }
