@@ -5,6 +5,7 @@
 #include "../../render_projects/imgui/imgui.h"
 #include "top_bar.hpp"
 #include "ui_util.hpp"
+#include "popup.hpp"
 
 ///good for science, makes the progression feel a little non linear
 ///bad for ship cost scaling, harder to balance and gets exponentially more expensive. Although may be quite flat atm
@@ -63,11 +64,11 @@ void research::draw_ui(empire* emp)
         amounts.push_back(to_string_with_variable_prec(i.amount));
     }
 
-    ImGui::Begin("Research", &top_bar::active[top_bar_info::RESEARCH], IMGUI_WINDOW_FLAGS);
+    ImGui::Begin("Research", &top_bar::active[top_bar_info::RESEARCH], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<fnames.size(); i++)
     {
-        std::string display = format(fnames[i], fnames) + " | " + format(amounts[i], amounts);
+        std::string display = format(fnames[i], fnames) + " | " + format(amounts[i], amounts) + " |";
 
         ImGui::Text(display.c_str());
 
@@ -81,11 +82,14 @@ void research::draw_ui(empire* emp)
         //if(research_cost > current_research_resource)
         //    continue;
 
-        std::string purchase_string = "| (Purchase for " + std::to_string((int)research_cost) + ")";
+        std::string purchase_string = "(Purchase for " + std::to_string((int)research_cost) + ")";
 
         ImGui::SameLine();
 
-        ImGui::Text(purchase_string.c_str());
+        if(research_cost < current_research_resource)
+            ImGui::NeutralText(purchase_string.c_str());
+        else
+            ImGui::BadText(purchase_string.c_str());
 
         ///we need an are you sure dialogue, but that will come with popup notifications
         if(ImGui::IsItemClicked_Registered() && research_cost < current_research_resource)
