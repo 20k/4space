@@ -2315,16 +2315,6 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
         if(os->get_base()->parent_empire == nullptr)
             continue;
 
-        /*empire_popup pop;
-        pop.e = os->get_base()->parent_empire;
-        pop.id = os->unique_id;
-        pop.hidden = do_obfuscate_misc;
-        //pop.type = orb->type;
-        pop.type = orbital_info::NONE;
-        pop.is_player = os->get_base()->parent_empire == viewing_empire;
-
-        empire_to_systems[pop].push_back(os);*/
-
         empire_to_systems[os->get_base()->parent_empire].push_back(os);
     }
 
