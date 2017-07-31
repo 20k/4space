@@ -1764,6 +1764,8 @@ bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec
         is_hovered = true;
     }
 
+    real_pos = round(real_pos);
+
     fleet_sprite.setPosition(real_pos.x(), real_pos.y());
     fleet_sprite.setColor(sf::Color(col.x() * 255.f, col.y() * 255.f, col.z() * 255.f, 255));
 
@@ -2031,7 +2033,15 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                     o->highlight = false;
                 }
 
-                o->universe_view_pos = fleet_draw_pos;
+                //o->universe_view_pos = fleet_draw_pos;
+
+                auto mapped_spos = win.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
+
+                mapped_spos = mapped_spos + sf::Vector2i(screen_offset.x(), screen_offset.y());
+
+                auto mapped_wpos = win.mapPixelToCoords(mapped_spos);
+
+                o->universe_view_pos = {mapped_wpos.x, mapped_wpos.y};
             }
 
             if(any_highlighted)
