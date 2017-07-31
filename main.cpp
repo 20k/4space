@@ -1049,6 +1049,30 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     }
 }
 
+struct empire_popup
+{
+    empire* e = nullptr;
+    orbital_info::type type = orbital_info::NONE;
+    int id = 0;
+    bool hidden = false;
+};
+
+
+bool operator<(const empire_popup& e1, const empire_popup& e2)
+{
+    if(e1.e != e2.e)
+    {
+        return std::less<empire*>()(e1.e, e2.e);
+    }
+
+    if(e1.type != e2.type);
+    {
+        return e1.type < e2.type;
+    }
+
+    return e1.id < e2.id;
+}
+
 void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_manage, system_manager& system_manage, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events, all_battles_manager& all_battles, bool rclick)
 {
     popup.remove_scheduled();
@@ -1078,7 +1102,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     std::set<ship*> potential_new_fleet;
 
     ///use a custom sorter here to make sure that we end up at the top etc
-    std::map<empire*, std::vector<orbital*>> orbitals_grouped_by_empire;
+    std::map<empire_popup, std::vector<orbital*>> orbitals_grouped_by_empire;
 
     std::map<ship_manager*, std::vector<ship*>> steal_map;
 
@@ -1100,19 +1124,27 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             do_obfuscate_misc = false;
         }
 
-        if(do_obfuscate_misc)
+        /*if(do_obfuscate_misc)
         {
             cur_empire = nullptr;
-        }
+        }*/
 
-        orbitals_grouped_by_empire[cur_empire].push_back(orb);
+        empire_popup pop;
+        pop.e = cur_empire;
+        pop.id = orb->unique_id;
+        pop.hidden = do_obfuscate_misc;
+        pop.type = orb->type;
+
+        orbitals_grouped_by_empire[pop].push_back(orb);
     }
 
     bool first_orbital = true;
 
     for(auto& grouped_orbitals : orbitals_grouped_by_empire)
     {
-        empire* current_empire = grouped_orbitals.first;
+        const empire_popup& pop = grouped_orbitals.first;
+
+        empire* current_empire = pop.e;
 
         std::string empire_name;
 
@@ -1122,7 +1154,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
         }
         else
         {
-            empire_name = "Empire: Unknown Empire";
+            empire_name = "Empire: Unknown";
         }
 
         vec3f col = player_empire->get_relations_colour(current_empire);
