@@ -1746,6 +1746,8 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
         }
     }
 
+    ImGui::NewLine();
+
     std::vector<ship> ships
     {
         make_default(),
@@ -1766,11 +1768,17 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         std::string str = test_ship.name;
 
-        ImGui::Text(("(Make " + str + " Ship)").c_str());
+        std::string make_ship_full_name = ("(Make " + str + " Ship)");
+
+        if(player_empire->can_fully_dispense(cost))
+            ImGui::NeutralText(make_ship_full_name.c_str());
+        else
+            ImGui::BadText(make_ship_full_name.c_str());
 
         bool clicked = ImGui::IsItemClicked_Registered();
 
         ImGui::Text(str_resources.c_str());
+        ImGui::NewLine();
 
         if(clicked)
         {
