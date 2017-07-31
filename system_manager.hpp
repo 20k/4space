@@ -69,45 +69,7 @@ struct empire_popup
 };
 
 inline
-bool operator<(const empire_popup& e1, const empire_popup& e2)
-{
-    if(e1.is_player != e2.is_player)
-    {
-        if(e1.is_player && !e2.is_player)
-            return true;
-
-        return false;
-    }
-
-    if(e1.is_allied != e2.is_allied)
-    {
-        if(e1.is_allied && !e2.is_allied)
-            return true;
-
-        return false;
-    }
-
-    if(e1.hidden != e2.hidden)
-    {
-        if(e1.hidden && !e2.hidden)
-            return false;
-
-        return true;
-    }
-
-    if(e1.e != e2.e)
-    {
-        return std::less<empire*>()(e1.e, e2.e);
-    }
-
-    if(e1.type != e2.type);
-    {
-        return e1.type < e2.type;
-    }
-
-    return e1.id < e2.id;
-}
-
+bool operator<(const empire_popup& e1, const empire_popup& e2);
 
 namespace sf
 {

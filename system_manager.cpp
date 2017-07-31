@@ -19,6 +19,52 @@ int orbital_system::gid;
 
 float system_manager::universe_scale = 100.f;
 
+inline
+bool operator<(const empire_popup& e1, const empire_popup& e2)
+{
+    if(e1.is_player != e2.is_player)
+    {
+        if(e1.is_player && !e2.is_player)
+            return true;
+
+        return false;
+    }
+
+    if(e1.is_allied != e2.is_allied)
+    {
+        if(e1.is_allied && !e2.is_allied)
+            return true;
+
+        return false;
+    }
+
+    if(e1.hidden != e2.hidden)
+    {
+        if(e1.hidden && !e2.hidden)
+            return false;
+
+        return true;
+    }
+
+    if(e1.e != e2.e)
+    {
+        if(e1.e == nullptr || e2.e == nullptr)
+        {
+            return std::less<empire*>()(e1.e, e2.e);
+        }
+
+        return e1.e->team_id < e2.e->team_id;
+    }
+
+    if(e1.type != e2.type);
+    {
+        return e1.type < e2.type;
+    }
+
+    return e1.id < e2.id;
+}
+
+
 void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
     vert_dist.clear();
