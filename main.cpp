@@ -423,7 +423,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(s.owned_by->parent_empire == player_empire && !s.owned_by->any_in_combat())
     {
-        ImGui::Text("(Upgrade to latest Tech)");
+        ImGui::NeutralText("(Upgrade to latest Tech)");
 
         ship c_cpy = s;
 
@@ -472,13 +472,20 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         if(ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip(rm.get_formatted_str(true).c_str());
+            std::string str = rm.get_formatted_str(true);
+
+            if(str == "")
+            {
+                str = "Already meets or exceeds empire tech";
+            }
+
+            ImGui::SetTooltip(str.c_str());
         }
     }
 
     if(s.fully_disabled() && claiming_empire != nullptr && s.can_recrew(claiming_empire) && !s.owned_by->any_in_combat())
     {
-        ImGui::Text("(Recrew)");
+        ImGui::NeutralText("(Recrew)");
 
         auto res = s.resources_needed_to_recrew_total();
 
@@ -567,7 +574,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         std::string text = "(Scrap for resources)";
 
-        ImGui::Text(text.c_str());
+        ImGui::NeutralText(text.c_str());
 
         std::string rstr = rm.get_formatted_str(true);
 
@@ -589,6 +596,29 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
             popup.going = false;
             popup.elements.clear();
+        }
+    }
+
+    if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr)
+    {
+        ImGui::NeutralText("(Select Fleet)");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            orbital* o = system_manage.get_by_element_orbital(s.owned_by);
+
+            popup_element elem;
+            elem.element = o;
+
+            if(o)
+            {
+                popup.insert(o);
+                popup.going = true;
+            }
+            else
+            {
+                printf("select fleet popup error no orbital\n");
+            }
         }
     }
 
@@ -1211,7 +1241,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     }
                     else
                     {
-                        warp_str += "Charging";
+                        warp_str += "Not Ready";
 
                         ImGui::BadTextNoHoverEffect(warp_str.c_str());
                     }
