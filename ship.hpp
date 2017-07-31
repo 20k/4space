@@ -650,6 +650,7 @@ struct ship_manager
 
     void resupply(empire* from, bool can_resupply_derelicts = true);
     void resupply_from_nobody();
+    void repair(empire* from);
     ///for the ai to use
     bool should_resupply_base(const std::vector<ship_component_element>& to_test);
     bool should_resupply();
@@ -691,6 +692,8 @@ struct ship_manager
 
     bool any_derelict();
     bool all_derelict();
+
+    bool any_damaged();
 
     float accumulated_dt = 0;
 

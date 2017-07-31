@@ -3174,6 +3174,32 @@ void ship_manager::resupply_from_nobody()
     }
 }
 
+void ship_manager::repair(empire* from)
+{
+    if(parent_empire == nullptr)
+        return;
+
+    if(from == nullptr)
+    {
+        from = parent_empire;
+    }
+
+    int num = ships.size();
+
+    for(ship* s : ships)
+    {
+        if(s->fully_disabled())
+        {
+            num--;
+            continue;
+        }
+
+        s->repair(from, num);
+
+        num--;
+    }
+}
+
 bool ship_manager::should_resupply_base(const std::vector<ship_component_element>& to_test)
 {
     /*std::vector<ship_component_elements::types> types =
@@ -3612,6 +3638,20 @@ bool ship_manager::all_derelict()
     }
 
     return true;
+}
+
+bool ship_manager::any_damaged()
+{
+    for(ship* s : ships)
+    {
+        auto stored = s->get_stored_resources();
+        auto max_res = s->get_max_resources();
+
+        if(stored[ship_component_element::HP] < max_res[ship_component_element::HP])
+            return true;
+    }
+
+    return false;
 }
 
 std::string ship_manager::get_engage_str()

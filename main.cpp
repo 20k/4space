@@ -1342,6 +1342,20 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     }
                 }
 
+                bool any_damaged = sm->any_damaged();
+
+                if(can_resupply && any_damaged)
+                {
+                    ImGui::GoodText("(Repair)");
+
+                    ImGui::SameLine();
+
+                    if(ImGui::IsItemClicked_Registered())
+                    {
+                        sm->repair(player_empire);
+                    }
+                }
+
                 ///disabling merging here and resupply invalides all fleet actions except moving atm
                 ///unexpected fix to fleet merging problem
                 ///disable resupply if in combat
