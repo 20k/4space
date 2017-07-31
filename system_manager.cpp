@@ -2354,14 +2354,23 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
     ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
-    std::map<empire*, std::vector<orbital_system*>> empire_to_systems;
+    std::map<empire_popup, std::vector<orbital_system*>> empire_to_systems;
 
     for(orbital_system* os : systems)
     {
         if(os->get_base()->parent_empire == nullptr)
             continue;
 
-        empire_to_systems[os->get_base()->parent_empire].push_back(os);
+        empire_popup pop;
+        pop.e = os->get_base()->parent_empire;
+        pop.id = os->unique_id;
+        pop.hidden = os->get_base()->parent_empire == nullptr; ///currently always false
+        pop.type = orbital_info::NONE;
+        pop.is_player = os->get_base()->parent_empire == viewing_empire;
+
+        empire_to_systems[pop].push_back(os);
+
+        //empire_to_systems[os->get_base()->parent_empire].push_back(os);
     }
 
     int snum = 0;
@@ -2377,7 +2386,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
         std::string empire_name_str;
 
-        empire* current_empire = sys_emp.first;
+        const empire_popup& pop = sys_emp.first;
+
+        empire* current_empire = pop.e;
 
         if(current_empire != nullptr)
             empire_name_str = "Systems owned by: " + current_empire->name + " (" + std::to_string(sys_emp.second.size()) + ")";
