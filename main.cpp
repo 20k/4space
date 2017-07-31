@@ -776,9 +776,9 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         }
     }
 
-    debug_battle(all_battles.currently_viewing, win, lclick, system_manage);
-
     ImGui::End();
+
+    debug_battle(all_battles.currently_viewing, win, lclick, system_manage);
 }
 
 ///mostly working except we cant rebox select if we have something selected
