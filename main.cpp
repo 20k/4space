@@ -1055,11 +1055,27 @@ struct empire_popup
     orbital_info::type type = orbital_info::NONE;
     int id = 0;
     bool hidden = false;
+    bool is_player = false;
 };
-
 
 bool operator<(const empire_popup& e1, const empire_popup& e2)
 {
+    if(e1.is_player != e2.is_player)
+    {
+        if(e1.is_player && !e2.is_player)
+            return true;
+
+        return false;
+    }
+
+    if(e1.hidden != e2.hidden)
+    {
+        if(e1.hidden && !e2.hidden)
+            return false;
+
+        return true;
+    }
+
     if(e1.e != e2.e)
     {
         return std::less<empire*>()(e1.e, e2.e);
@@ -1124,21 +1140,15 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             do_obfuscate_misc = false;
         }
 
-        /*if(do_obfuscate_misc)
-        {
-            cur_empire = nullptr;
-        }*/
-
         empire_popup pop;
         pop.e = cur_empire;
         pop.id = orb->unique_id;
         pop.hidden = do_obfuscate_misc;
         pop.type = orb->type;
+        pop.is_player = cur_empire == player_empire;
 
         orbitals_grouped_by_empire[pop].push_back(orb);
     }
-
-    bool first_orbital = true;
 
     for(auto& grouped_orbitals : orbitals_grouped_by_empire)
     {
@@ -1146,22 +1156,25 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
         empire* current_empire = pop.e;
 
-        std::string empire_name;
+        std::string empire_name = "Empire: None";
 
         if(current_empire != nullptr)
         {
             empire_name = "Empire: " + current_empire->name;
         }
-        else
+
+        if(pop.hidden)
         {
             empire_name = "Empire: Unknown";
         }
 
-        vec3f col = player_empire->get_relations_colour(current_empire);
+        vec3f col = player_empire->get_relations_colour(pop.hidden ? nullptr : current_empire);
 
         ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), empire_name.c_str());
 
         ImGui::Indent();
+
+        bool first_orbital = true;
 
         for(orbital* orb : grouped_orbitals.second)
         {

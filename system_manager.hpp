@@ -8,6 +8,7 @@
 
 namespace orbital_info
 {
+    ///determines order in popup
     enum type
     {
         STAR,
