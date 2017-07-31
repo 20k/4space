@@ -272,7 +272,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
            id == ship_component_element::HP ||
            id == ship_component_element::FUEL)
         {
-            if(known_information < 0.5f)
+            if(known_information < ship_info::misc_resources_obfuscation_level)
             {
                 obfuscd = true;
             }
@@ -1199,7 +1199,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     popup.rem_all_but(o);
                 }*/
 
-                std::vector<std::string> data = o->get_info_str(player_empire, true);
+                std::vector<std::string> data = o->get_info_str(player_empire, true, true);
 
                 if(o->description != "" && o->viewed_by[player_empire])
                     data.push_back(o->description);

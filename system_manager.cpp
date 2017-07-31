@@ -631,7 +631,7 @@ bool orbital::point_within(vec2f pos)
     return false;
 }
 
-std::vector<std::string> orbital::get_info_str(empire* viewer_empire, bool use_info_warfare)
+std::vector<std::string> orbital::get_info_str(empire* viewer_empire, bool use_info_warfare, bool full_detail)
 {
     if(type != orbital_info::FLEET || data == nullptr)
     {
@@ -662,7 +662,7 @@ std::vector<std::string> orbital::get_info_str(empire* viewer_empire, bool use_i
         std::vector<std::string> ret;
 
         if(use_info_warfare)
-            ret = mgr->get_info_strs_with_info_warfare(viewer_empire, this);
+            ret = mgr->get_info_strs_with_info_warfare(viewer_empire, this, full_detail);
         else
             ret = mgr->get_info_strs();
 

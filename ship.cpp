@@ -3075,15 +3075,23 @@ std::vector<std::string> ship_manager::get_info_strs()
     return ret;
 }
 
-std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* viewing, orbital* my_orbital)
+std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* viewing, orbital* my_orbital, bool full_detail)
 {
     bool should_obfuscate = false;
 
-    if(viewing->available_scanning_power_on(my_orbital) < ship_info::ship_obfuscation_level)
+    float scanning_power = viewing->available_scanning_power_on(my_orbital);
+
+    if(scanning_power < ship_info::ship_obfuscation_level)
         should_obfuscate = true;
 
+    bool obfuscate_hp = scanning_power < ship_info::misc_resources_obfuscation_level;
+
     if(viewing->is_allied(my_orbital->parent_empire))
+    {
+        obfuscate_hp = false;
         should_obfuscate = false;
+    }
+
 
     std::vector<std::string> ret;
 
@@ -3094,6 +3102,38 @@ std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* v
         if(s->fully_disabled())
         {
             name_str += " (Derelict)";
+        }
+
+        std::string detail_str;
+
+        if(full_detail && !obfuscate_hp)
+        {
+            auto res = s->get_stored_resources();
+            auto max_res = s->get_max_resources();
+
+            float hp_frac = res[ship_component_element::HP] / max_res[ship_component_element::HP];
+
+            float percent = hp_frac * 100.f;
+
+            std::string hp_name = "(" + to_string_with_enforced_variable_dp(percent) + "%%)";
+
+            if(obfuscate_hp)
+            {
+                hp_name = obfuscate(hp_name, true);
+            }
+
+            /*if(should_obfuscate)
+            {
+                h
+            }*/
+
+            /*std::string s1 = "(" + to_string_with_enforced_variable_dp(res[ship_component_element::HP]) + "/" + to_string_with_variable_prec(max_res[ship_component_element::HP]) + ")";
+            std::string s2 = "(" + to_string_with_enforced_variable_dp(res[ship_component_element::WARP_POWER]) + "/" + to_string_with_variable_prec(max_res[ship_component_element::WARP_POWER]) + ")";
+            std::string s3 = "(" + to_string_with_enforced_variable_dp(res[ship_component_element::FUEL]) + "/" + to_string_with_variable_prec(max_res[ship_component_element::FUEL]) + ")";
+
+            name_str = name_str + " " + s1 + " " + s2 + " " + s3;*/
+
+            name_str += " " + hp_name;
         }
 
         ret.push_back(name_str);
