@@ -582,6 +582,8 @@ struct ship : positional
 
     std::string get_resource_str(const ship_component_element& type);
 
+    float get_fuel_frac();
+
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);
 
@@ -691,6 +693,9 @@ struct ship_manager
     void cull_invalid();
 
     std::string get_engage_str();
+    std::string get_fuel_message();
+
+    float get_min_fuel_frac();
 
     bool any_colonising();
 

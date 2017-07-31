@@ -1223,6 +1223,26 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                             tooltip::add(s->name + ": " + s->get_resource_str(ship_component_element::WARP_POWER));
                         }
                     }
+
+                    ImGui::SameLine();
+
+                    ImGui::Text("|");
+
+                    ImGui::SameLine();
+
+                    std::string fuel_text = sm->get_fuel_message();
+
+                    vec3f col = mix(popup_colour_info::bad_ui_colour, popup_colour_info::good_ui_colour, sm->get_min_fuel_frac());
+
+                    ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), ("Fuel: " + fuel_text).c_str());
+
+                    if(ImGui::IsItemHovered())
+                    {
+                        for(ship* s : sm->ships)
+                        {
+                            tooltip::add(s->name + ": " + s->get_resource_str(ship_component_element::FUEL));
+                        }
+                    }
                 }
 
 

@@ -2787,6 +2787,17 @@ std::string ship::get_resource_str(const ship_component_element& type)
     return "(" + to_string_with_enforced_variable_dp(res[type]) + "/" + to_string_with_variable_prec(max_res[type]) + ")";
 }
 
+float ship::get_fuel_frac()
+{
+    float res = get_stored_resources()[ship_component_element::FUEL];
+    float max_res = get_max_resources()[ship_component_element::FUEL];
+
+    if(max_res < 0.0001f)
+        return 0.f;
+
+    return res / max_res;
+}
+
 void ship::recrew_derelict(empire* owner, empire* claiming)
 {
     if(claiming == nullptr)
@@ -3740,6 +3751,49 @@ std::string ship_manager::get_engage_str()
     }
 
     return cooldown_str;
+}
+
+
+std::string ship_manager::get_fuel_message()
+{
+    float fuel_frac = get_min_fuel_frac();
+
+    if(fuel_frac > 0.9f)
+    {
+        return "Full";
+    }
+    else if(fuel_frac > 0.7f)
+    {
+        return "Good";
+    }
+    else if(fuel_frac > 0.5f)
+    {
+        return "Ok";
+    }
+    else if(fuel_frac > 0.3f)
+    {
+        return "Poor";
+    }
+    else if(fuel_frac > 0.1f)
+    {
+        return "Very Poor";
+    }
+    else
+    {
+        return "Empty";
+    }
+}
+
+float ship_manager::get_min_fuel_frac()
+{
+    float fuel_frac = FLT_MAX;
+
+    for(ship* s : ships)
+    {
+        fuel_frac = std::min(s->get_fuel_frac(), fuel_frac);
+    }
+
+    return fuel_frac;
 }
 
 ship_manager* fleet_manager::make_new()
