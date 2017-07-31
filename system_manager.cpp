@@ -266,7 +266,7 @@ void do_transfer(orbital* o, float diff_s)
     //float speed_s_old = 30;
 
     vec2f end_pos = o->new_rad * (vec2f){cos(o->new_angle), sin(o->new_angle)};
-    vec2f start_pos = o->old_rad * (vec2f){cos(o->old_angle), sin(o->old_angle)};
+    //vec2f start_pos = o->old_rad * (vec2f){cos(o->old_angle), sin(o->old_angle)};
 
     //float distance_lin = (end_pos - start_pos).length();
 
@@ -2195,7 +2195,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 
 void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow& win)
 {
-    auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
+    //auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
 
     float zoom = zoom_level;
 

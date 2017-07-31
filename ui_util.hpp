@@ -101,7 +101,7 @@ namespace ImGui
     {
         ImGui::BeginGroup();
 
-        auto cursor_pos = ImGui::GetCursorPos();
+        //auto cursor_pos = ImGui::GetCursorPos();
         auto screen_pos = ImGui::GetCursorScreenPos();
 
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(text_col.x(), text_col.y(), text_col.z(), 1));

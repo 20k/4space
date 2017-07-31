@@ -55,8 +55,6 @@ namespace ImGui
     inline
     void NeutralText(const std::string& str)
     {
-        vec3f col = popup_colour_info::bad_ui_colour;
-
         //ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), str.c_str());
 
         ImGui::OutlineHoverTextAuto(str, {1,1,1});
