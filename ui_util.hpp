@@ -117,7 +117,7 @@ namespace ImGui
 
         int thickness = 1;
 
-        if(ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2))
+        if(ImGui::IsWindowHovered() && ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2))
         {
             ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
 
