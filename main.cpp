@@ -1245,9 +1245,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     }
                     else
                     {
-                        warp_str += "Not Ready";
+                        //warp_str += "Not Ready";
 
-                        //warp_str += to_string_with_enforced_variable_dp(warp_use_frac * 100.f, 1) + "%%";
+                        warp_str += to_string_with_enforced_variable_dp(warp_use_frac * 100.f, 1) + "%%";
 
                         ImGui::BadTextNoHoverEffect(warp_str.c_str());
                     }
