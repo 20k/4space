@@ -1667,7 +1667,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             ///for drawing warp radiuses, but will take anything and might be extended later
             system_manage.add_selected_orbital(orb);
 
-            if(o->has_quest_alert)
+            if(o->has_quest_alert && o->viewed_by[player_empire])
             {
                 game_event_manager* event = all_events.orbital_to_game_event(o);
 
@@ -2186,6 +2186,10 @@ int main()
 
     system_manager system_manage;
 
+    orbital_system* sys_2 = system_manage.make_new();
+    sys_2->generate_full_random_system();
+    sys_2->universe_pos = {10, 10};
+
     orbital_system* base = system_manage.make_new();
 
     orbital* sun = base->make_new(orbital_info::STAR, 10.f, 10);
@@ -2258,9 +2262,6 @@ int main()
     //orbital_system* sys_2 = system_manage.make_new();
     //sys_2->generate_random_system(3, 100, 3, 5);
 
-    orbital_system* sys_2 = system_manage.make_new();
-    sys_2->generate_full_random_system();
-    sys_2->universe_pos = {10, 10};
 
     empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
     //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);

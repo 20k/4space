@@ -746,10 +746,11 @@ bool orbital::can_dispense_resources()
 
 void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
 {
-    if(parent_empire != viewing_empire)
+    if(parent_system != system_manage.currently_viewed)
         return;
 
-    if(parent_system != system_manage.currently_viewed)
+    //if(!viewing_empire->has_vision(system_manage.currently_viewed))
+    if(!viewed_by[viewing_empire])
         return;
 
     if(type != orbital_info::FLEET)
@@ -761,6 +762,9 @@ void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_
 
         return;
     }
+
+    if(parent_empire != viewing_empire)
+        return;
 
     ship_manager* sm = (ship_manager*)data;
 
