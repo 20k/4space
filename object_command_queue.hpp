@@ -34,6 +34,7 @@ namespace object_command_queue_info
 
         vec2f pos = {0,0};
         orbital_system* fin = nullptr;
+        orbital_system* transfer_within = nullptr;
         orbital* target = nullptr;
 
         ship_manager* sm = nullptr;
@@ -57,8 +58,8 @@ struct object_command_queue
 
     std::queue<queue_type> command_queue;
 
-    void transfer(float new_rad, float new_angle, orbital* o);
-    void transfer(vec2f pos, orbital* o);
+    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system);
+    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system);
     bool transferring();
     bool trying_to_warp();
 

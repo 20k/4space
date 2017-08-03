@@ -29,6 +29,20 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
 {
     object_command_queue_info::queue_element_data& data = type.data;
 
+    if(o->parent_system != data.transfer_within)
+        return true;
+
+    if(o->type == orbital_info::FLEET)
+    {
+        ship_manager* sm = (ship_manager*)o->data;
+
+        if(sm->any_in_combat())
+            return true;
+
+        if(!sm->can_move_in_system())
+            return true;
+    }
+
     vec2f end_pos = data.new_radius * (vec2f){cos(data.new_angle), sin(data.new_angle)};
 
     float straightline_distance = (end_pos - o->absolute_pos).length();
@@ -107,7 +121,7 @@ bool do_warp(orbital* o, queue_type& type)
     return true;
 }
 
-void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o)
+void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system)
 {
     queue_type next;
 
@@ -117,13 +131,14 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
     next.data.new_angle = pnew_angle;
 
     next.data.start_time_s = o->internal_time_s;
+    next.data.transfer_within = viewing_system;
 
     next.type = object_command_queue_info::IN_SYSTEM_PATH;
 
     add(next);
 }
 
-void object_command_queue::transfer(vec2f pos, orbital* o)
+void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system)
 {
     vec2f base;
 
@@ -132,7 +147,7 @@ void object_command_queue::transfer(vec2f pos, orbital* o)
 
     vec2f rel = pos - base;
 
-    transfer(rel.length(), rel.angle(), o);
+    transfer(rel.length(), rel.angle(), o, viewing_system);
 }
 
 bool object_command_queue::transferring()

@@ -900,7 +900,7 @@ void empire::tick_cleanup_colonising()
                 }
                 else
                 {
-                    o->transfer(s->colonise_target->absolute_pos);
+                    o->transfer(s->colonise_target->absolute_pos, o->parent_system);
                 }
             }
         }

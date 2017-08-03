@@ -3663,6 +3663,9 @@ void ship_manager::try_warp(orbital_system* fin, orbital* o)
 
 void ship_manager::force_warp(orbital_system* fin, orbital_system* cur, orbital* o)
 {
+    if(fin == cur)
+        return;
+
     for(ship* s : ships)
     {
         s->use_warp_drives();

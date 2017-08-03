@@ -116,7 +116,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     assert(nearest.first != nullptr);
 
-    o->transfer(nearest.first->absolute_pos);
+    o->transfer(nearest.first->absolute_pos, o->parent_system);
 
     ///can_engage deliberately does not check any_in_combat (so we can chain battles), so be careful that we don't do this
     ///currently fine as check is above

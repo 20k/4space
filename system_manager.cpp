@@ -613,7 +613,7 @@ std::string orbital::get_name_with_info_warfare(empire* viewing_empire)
     return name;
 }
 
-void orbital::transfer(float pnew_rad, float pnew_angle)
+void orbital::transfer(float pnew_rad, float pnew_angle, orbital_system* in_system)
 {
     /*old_rad = orbital_length;
     old_angle = orbital_angle;
@@ -624,10 +624,10 @@ void orbital::transfer(float pnew_rad, float pnew_angle)
 
     start_time_s = internal_time_s;*/
 
-    command_queue.transfer(pnew_rad, pnew_angle, this);
+    command_queue.transfer(pnew_rad, pnew_angle, this, in_system);
 }
 
-void orbital::transfer(vec2f pos)
+void orbital::transfer(vec2f pos, orbital_system* in_system)
 {
     /*vec2f base;
 
@@ -638,21 +638,23 @@ void orbital::transfer(vec2f pos)
 
     transfer(rel.length(), rel.angle());*/
 
-    command_queue.transfer(pos, this);
+    command_queue.transfer(pos, this, in_system);
 }
 
-void orbital::request_transfer(vec2f pos)
+void orbital::request_transfer(vec2f pos, orbital_system* in_system)
 {
     if(type != orbital_info::FLEET)
-        return transfer(pos);
+        return transfer(pos, in_system);
 
-    ship_manager* sm = (ship_manager*)data;
+    /*ship_manager* sm = (ship_manager*)data;
 
     if(sm->any_in_combat())
         return;
 
     if(sm->can_move_in_system())
-        transfer(pos);
+        transfer(pos, in_system);*/
+
+    transfer(pos, in_system);
 }
 
 bool orbital::transferring()
@@ -1559,8 +1561,8 @@ void repulse(orbital* o1, orbital* o2)
     vec2f new_o1_pos = -o1_to_o2.norm() + o1->absolute_pos;
     vec2f new_o2_pos = o1_to_o2.norm() + o2->absolute_pos;
 
-    o1->transfer(new_o1_pos);
-    o2->transfer(new_o2_pos);
+    o1->transfer(new_o1_pos, o1->parent_system);
+    o2->transfer(new_o2_pos, o2->parent_system);
 }
 
 void system_manager::repulse_fleets()

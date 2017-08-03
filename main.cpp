@@ -1212,9 +1212,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 o->highlight = true;
 
-                if(rclick && (o->type == orbital_info::FLEET) && o->parent_empire == player_empire && o->parent_system == system_manage.currently_viewed && !sm->any_colonising() && system_manage.in_system_view())
+                if(rclick && (o->type == orbital_info::FLEET) && o->parent_empire == player_empire && !sm->any_colonising() && system_manage.in_system_view())
                 {
-                    o->request_transfer({transformed.x, transformed.y});
+                    o->request_transfer({transformed.x, transformed.y}, system_manage.currently_viewed);
                 }
 
                 ImGui::BeginGroup();
