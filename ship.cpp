@@ -10,7 +10,7 @@
 
 int ship_manager::gid;
 
-int ship::gid;
+uint32_t ship::gid;
 
 std::map<resource::types, float> ship_component_elements::component_storage_to_resources(const types& type)
 {

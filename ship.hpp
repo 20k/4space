@@ -457,8 +457,8 @@ struct ship : positional
 {
     std::string name;
 
-    int id = gid++;
-    static int gid;
+    uint32_t id = gid++;
+    static uint32_t gid;
 
     int team = 0;
 
