@@ -82,6 +82,28 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
     return false;
 }
 
+///currently warp immediately terminates, whereas it should wait if we've shift clicked
+///potentially should wait if we right click, but it needs ui feedback to do that (destination set)
+bool do_warp(orbital* o, queue_type& type)
+{
+    if(o->type != orbital_info::FLEET)
+        return true;
+
+    ship_manager* sm = (ship_manager*)o->data;
+
+    object_command_queue_info::queue_element_data& data = type.data;
+
+    orbital_system* fin = data.fin;
+    orbital_system* cur = o->parent_system;
+
+    if(!sm->can_warp(fin, cur, o))
+        return true;
+
+    sm->force_warp(fin, o->parent_system, o);
+
+    return true;
+}
+
 void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o)
 {
     queue_type next;
@@ -118,6 +140,17 @@ bool object_command_queue::transferring()
     return command_queue.front().type == object_command_queue_info::IN_SYSTEM_PATH;
 }
 
+void object_command_queue::try_warp(orbital_system* fin)
+{
+    queue_type next;
+
+    next.data.fin = fin;
+
+    next.type = object_command_queue_info::WARP;
+
+    add(next);
+}
+
 /*void object_command_queue::add(object_command_queue_info::queue_element_type type, const object_command_queue_info::queue_element_data& data)
 {
     return add({type, data})
@@ -152,7 +185,10 @@ void object_command_queue::tick(orbital* o, float diff_s)
 
     if(cur == object_command_queue_info::WARP)
     {
-
+        if(do_warp(o, next))
+        {
+            should_pop = true;
+        }
     }
 
     if(cur == object_command_queue_info::COLONISE)

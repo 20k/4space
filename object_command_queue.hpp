@@ -7,6 +7,7 @@
 
 struct orbital_system;
 struct orbital;
+struct ship_manager;
 
 namespace object_command_queue_info
 {
@@ -32,8 +33,10 @@ namespace object_command_queue_info
         float start_time_s = 0.f;
 
         vec2f pos = {0,0};
-        orbital_system* dest = nullptr;
+        orbital_system* fin = nullptr;
         orbital* target = nullptr;
+
+        ship_manager* sm = nullptr;
     };
 
     struct queue_data
@@ -57,6 +60,8 @@ struct object_command_queue
     void transfer(float new_rad, float new_angle, orbital* o);
     void transfer(vec2f pos, orbital* o);
     bool transferring();
+
+    void try_warp(orbital_system* fin);
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
     void add(const queue_type& type);

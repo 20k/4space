@@ -3510,9 +3510,9 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     text_manager::render(win, alert_symbol, abs_pos + (vec2f){8, -20}, alert_colour);
 }
 
-void ship_manager::try_warp(orbital_system* fin, orbital_system* cur, orbital* o)
+void ship_manager::try_warp(orbital_system* fin, orbital* o)
 {
-    if(!can_warp(fin, cur, o))
+    if(!can_warp(fin, o->parent_system, o))
         return;
 
     /*for(ship* s : ships)
@@ -3532,7 +3532,7 @@ void ship_manager::try_warp(orbital_system* fin, orbital_system* cur, orbital* o
     o->absolute_pos = arrive_dir;
     o->set_orbit(arrive_dir);*/
 
-    force_warp(fin, cur, o);
+    force_warp(fin, o->parent_system, o);
 }
 
 void ship_manager::force_warp(orbital_system* fin, orbital_system* cur, orbital* o)

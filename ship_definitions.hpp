@@ -229,7 +229,8 @@ inline component make_default_warp_drive(float charge_rate = 1.f)
     warp_power.produced_per_s = 0.5f * charge_rate;
     warp_power.drained_per_use = 10.f;
     warp_power.max_amount = 10.f;
-    warp_power.cur_amount = warp_power.max_amount * 0.25f;
+    //warp_power.cur_amount = warp_power.max_amount * 0.25f;
+    warp_power.cur_amount = warp_power.max_amount;
 
     component_attribute fuel;
     fuel.drained_per_use = 1.f;

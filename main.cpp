@@ -1617,7 +1617,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 if(o->type != orbital_info::FLEET)
                     continue;
 
-                orbital_system* parent = system_manage.get_parent(o);
+                ///This line of code must have been before parent sysetm right?
+                //orbital_system* parent = system_manage.get_parent(o);
+                orbital_system* parent = o->parent_system;
 
                 if(parent == system_manage.hovered_system || parent == nullptr)
                     continue;
@@ -1640,7 +1642,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(rclick && sm->parent_empire == player_empire)
                 {
-                    sm->try_warp(system_manage.hovered_system, parent, o);
+                    sm->try_warp(system_manage.hovered_system, o);
                 }
             }
         }
