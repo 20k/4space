@@ -246,14 +246,6 @@ float component_attribute::add_amount(float amount)
     return 0.f;
 }
 
-float component_attribute::get_use_frac()
-{
-    if(drained_per_use < 0.00001f)
-        return 0.f;
-
-    return cur_amount / drained_per_use;
-}
-
 bool component_attribute::can_use()
 {
     bool time_valid = current_time_s >= time_last_used_s + time_between_uses_s;
@@ -648,17 +640,31 @@ std::map<ship_component_element, float> component::get_use_diff()
     return ret;
 }
 
-std::map<ship_component_element, float> component::get_use_frac()
+/*float component::get_use_frac()
 {
-    std::map<ship_component_element, float> ret;
+    std::map<ship_component_element, float> use_diff = get_use_diff();
+    std::map<ship_component_element, float> available_diff = get_stored();
 
-    for(auto& i : components)
+    int num = 0;
+    float accum = 0.f;
+
+    for(auto& i : use_diff)
     {
-        ret[i.first] = i.second.get_use_frac();
+        printf("%f %f %i\n", i.second, available_diff[i.first], i.first);
+
+        if(fabs(i.second) < FLOAT_BOUND)
+            continue;
+
+        accum += fabs(available_diff[i.first]) / fabs(i.second);
+
+        num++;
     }
 
-    return ret;
-}
+    if(num > 0)
+        accum /= num;
+
+    return accum;
+}*/
 
 /*std::pair<component, std::map<ship_component_element, float>> component::apply_diff(const std::map<ship_component_element, float>& diff)
 {
@@ -1809,21 +1815,32 @@ std::map<ship_component_element, float> ship::get_max_resources()
 
 float ship::get_use_frac(component& c)
 {
-    auto use_fracs = c.get_use_frac();
+    std::map<ship_component_element, float> use_diff = c.get_use_diff();
+    std::map<ship_component_element, float> available_diff = get_stored_resources();
 
-    int num = use_fracs.size();
-
-    if(num == 0)
-        return 0.f;
-
+    int num = 0;
     float accum = 0.f;
 
-    for(auto& vals : use_fracs)
+    for(auto& i : use_diff)
     {
-        accum += vals.second;
+        //printf("%f %f %i\n", i.second, available_diff[i.first], i.first);
+
+        if(fabs(i.second) < FLOAT_BOUND)
+            continue;
+
+        float frac = fabs(available_diff[i.first]) / fabs(i.second);
+
+        frac = clamp(frac, 0.f, 1.f);
+
+        accum += frac;
+
+        num++;
     }
 
-    return accum / num;
+    if(num > 0)
+        accum /= num;
+
+    return accum;
 }
 
 bool ship::can_use(component& c)
@@ -2837,6 +2854,27 @@ float ship::get_fuel_frac()
     return res / max_res;
 }
 
+float ship::get_warp_use_frac()
+{
+    int num = 0;
+    float accum = 0.f;
+
+    for(component& c : entity_list)
+    {
+        if(c.primary_attribute == ship_component_element::WARP_POWER)
+        {
+            accum += get_use_frac(c);
+
+            num++;
+        }
+    }
+
+    if(num > 0)
+        accum /= num;
+
+    return accum;
+}
+
 void ship::recrew_derelict(empire* owner, empire* claiming)
 {
     if(claiming == nullptr)
@@ -3648,6 +3686,24 @@ bool ship_manager::can_use_warp_drives()
     }
 
     return true;
+}
+
+float ship_manager::get_overall_warp_drive_use_frac()
+{
+    ///afaik this should be impossible
+    int num = ships.size();
+
+    if(num == 0)
+        return 0.f;
+
+    float accum = 0.f;
+
+    for(ship* s : ships)
+    {
+        accum += s->get_warp_use_frac();
+    }
+
+    return accum / num;
 }
 
 void ship_manager::enter_combat()

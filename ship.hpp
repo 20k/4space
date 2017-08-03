@@ -296,7 +296,6 @@ struct component_attribute
     float tech_level = 0.f;
 
     float add_amount(float amount);
-    float get_use_frac();
     bool can_use();
     void use();
     float get_available_capacity();
@@ -371,7 +370,8 @@ struct component
     std::map<ship_component_element, float> get_stored();
     std::map<ship_component_element, float> get_stored_max();
     std::map<ship_component_element, float> get_use_diff();
-    std::map<ship_component_element, float> get_use_frac();
+
+    //float get_use_frac();
 
     ///returns a pair of new component, extra resources left over
     //std::pair<component, std::map<ship_component_element, float>> apply_diff(const std::map<ship_component_element, float>& diff);
@@ -585,6 +585,7 @@ struct ship : positional
     std::string get_resource_str(const ship_component_element& type);
 
     float get_fuel_frac();
+    float get_warp_use_frac();
 
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);
@@ -680,6 +681,7 @@ struct ship_manager
     bool can_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     float get_min_warp_distance(); ///ignores practicalities, purely base distance
     bool can_use_warp_drives();
+    float get_overall_warp_drive_use_frac();
 
     void leave_combat();
     void enter_combat();
