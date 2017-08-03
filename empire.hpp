@@ -149,6 +149,8 @@ struct empire
     float get_culture_modified_friendliness(empire* e);
     bool could_invade(empire* e);
 
+    void update_vision_of_allies(orbital* o);
+
     //float constrain_relations(empire* e, float val, float lower, float upper) const;
     float get_relation_constraint_offset_upper(empire* e, float upper);
     float get_relation_constraint_offset_lower(empire* e, float lower);

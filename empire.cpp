@@ -710,6 +710,18 @@ bool empire::could_invade(empire* e)
     return is_hostile(e) && (get_military_strength() > (e->get_military_strength() * 1.1f));
 }
 
+void empire::update_vision_of_allies(orbital* o)
+{
+    for(auto& relations : relations_map)
+    {
+        if(is_allied(relations.first))
+        {
+            o->viewed_by[relations.first] = true;
+            o->currently_viewed_by[relations.first] = true;
+        }
+    }
+}
+
 /*float empire::constrain_relations(empire* e, float val, float lower, float upper) const
 {
     if(e == nullptr)

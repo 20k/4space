@@ -319,6 +319,9 @@ void orbital::do_vision_test()
     {
         bool currently_has_vision = e->has_vision(parent_system);
 
+        if(currently_has_vision)
+            e->update_vision_of_allies(this);
+
         currently_viewed_by[e] = currently_has_vision;
 
         if(currently_has_vision)
@@ -868,6 +871,9 @@ void orbital_system::tick(float step_s, orbital_system* viewed)
         {
             i->do_vision_test();
         }
+
+        if(i->parent_empire == nullptr)
+            continue;
 
         next_empires.insert(i->parent_empire);
     }
