@@ -897,6 +897,11 @@ void orbital_system::tick(float step_s, orbital_system* viewed)
 
 void orbital_system::destroy(orbital* o)
 {
+    if(context_menu::current == (contextable*)o)
+    {
+        context_menu::set_item(nullptr);
+    }
+
     for(int i=0; i<(int)orbitals.size(); i++)
     {
         if(orbitals[i] == o)

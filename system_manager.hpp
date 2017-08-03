@@ -7,6 +7,7 @@
 #include "resource_manager.hpp"
 #include "object_command_queue.hpp"
 #include <set>
+#include "context_menu.hpp"
 
 namespace orbital_info
 {
@@ -104,7 +105,7 @@ struct empire_manager;
 struct system_manager;
 struct orbital_system;
 
-struct orbital
+struct orbital : contextable
 {
     object_command_queue command_queue;
 
