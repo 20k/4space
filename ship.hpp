@@ -8,7 +8,6 @@
 #include "resource_manager.hpp"
 #include "research.hpp"
 #include "ai_fleet.hpp"
-#include "object_command_queue.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 

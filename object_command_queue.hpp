@@ -25,20 +25,39 @@ namespace object_command_queue_info
     {
         queue_element_type type;
 
+        float old_radius = 0.f;
+        float old_angle = 0.f;
+        float new_radius = 0.f;
+        float new_angle = 0.f;
+        float start_time_s = 0.f;
+
         vec2f pos = {0,0};
         orbital_system* dest = nullptr;
         orbital* target = nullptr;
     };
+
+    struct queue_data
+    {
+        queue_element_type type;
+        queue_element_data data;
+    };
 }
 
-using queue_type = object_command_queue_info::queue_element_type;
+using queue_type = object_command_queue_info::queue_data;
+//using queue_type = object_command_queue_info::queue_element_type;
 
+///so, could deal with queueing vs interrupting by having state set
+///don't want to push the full burden on the user
 struct object_command_queue
 {
     std::queue<queue_type> command_queue;
 
-    void add(queue_type type);
-    void tick(orbital* parent);
+    void transfer(float new_rad, float new_angle, orbital* o);
+    void transfer(vec2f pos, orbital* o);
+    bool transferring();
+
+    void add(const queue_type& type);
+    void tick(orbital* o);
 
     bool is_front_complete();
 

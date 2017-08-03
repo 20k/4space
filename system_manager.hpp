@@ -5,6 +5,7 @@
 #include <vec/vec.hpp>
 #include <SFML/Graphics.hpp>
 #include "resource_manager.hpp"
+#include "object_command_queue.hpp"
 
 namespace orbital_info
 {
@@ -104,6 +105,8 @@ struct orbital_system;
 
 struct orbital
 {
+    object_command_queue command_queue;
+
     static int gid;
     int unique_id = gid++;
 
