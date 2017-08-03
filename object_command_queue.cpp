@@ -241,10 +241,12 @@ void object_command_queue::add(const queue_type& type)
 
 void object_command_queue::tick(orbital* o, float diff_s)
 {
+    cancel_internal(o);
+
     if(command_queue.size() == 0)
         return;
 
-    auto next = command_queue.front();
+    auto& next = command_queue.front();
     object_command_queue_info::queue_element_type cur = next.type;
 
     ///just do like, ship->tick_path destination etc
@@ -252,7 +254,8 @@ void object_command_queue::tick(orbital* o, float diff_s)
     {
         if(do_transfer(o, diff_s, next))
         {
-            should_pop = true;
+            //should_pop = true;
+            next.data.should_pop = true;
         }
     }
 
@@ -260,7 +263,8 @@ void object_command_queue::tick(orbital* o, float diff_s)
     {
         if(do_warp(o, next))
         {
-            should_pop = true;
+            //should_pop = true;
+            next.data.should_pop = true;
         }
     }
 
@@ -268,7 +272,8 @@ void object_command_queue::tick(orbital* o, float diff_s)
     {
         if(do_colonising(o, next))
         {
-            should_pop = true;
+            //should_pop = true;
+            next.data.should_pop = true;
         }
     }
 
@@ -282,6 +287,8 @@ void object_command_queue::tick(orbital* o, float diff_s)
         command_queue.pop_front();
     }
 
+    cancel_internal(o);
+
     should_pop = false;
 }
 
@@ -292,9 +299,61 @@ bool object_command_queue::is_front_complete()
 
 void object_command_queue::cancel()
 {
+    #if 0
+
     while(!command_queue.empty())
     {
-        command_queue.pop_front();
+        /*auto next = command_queue.front();
+        object_command_queue_info::queue_element_type cur = next.type;
+
+        if(cur == object_command_queue_info::COLONISE && o->type == orbital_info::FLEET)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            for(ship* s : sm->ships)
+            {
+                if(s->id == next.data.colony_ship_id)
+                {
+                    s->colonising = false;
+                    s->colonise_target = nullptr;
+                }
+            }
+        }*/
+
+        //command_queue.pop_front();
+    }
+    #endif
+
+    for(auto& next : command_queue)
+    {
+        next.data.should_pop = true;
+    }
+}
+
+void object_command_queue::cancel_internal(orbital* o)
+{
+    for(int i=0; i<command_queue.size(); i++)
+    {
+        if(command_queue[i].data.should_pop)
+        {
+            if(command_queue[i].type == object_command_queue_info::COLONISE && o->type == orbital_info::FLEET)
+            {
+                ship_manager* sm = (ship_manager*)o->data;
+
+                for(ship* s : sm->ships)
+                {
+                    if(s->id == command_queue[i].data.colony_ship_id)
+                    {
+                        s->colonising = false;
+                        s->colonise_target = nullptr;
+                    }
+                }
+            }
+
+            command_queue.erase(command_queue.begin() + i);
+            i--;
+            continue;
+        }
     }
 }
 

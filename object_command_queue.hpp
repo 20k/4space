@@ -42,6 +42,8 @@ namespace object_command_queue_info
 
         orbital* colony_target = nullptr;
         int64_t colony_ship_id = -1;
+
+        bool should_pop = false;
     };
 
     struct queue_data
@@ -81,6 +83,7 @@ struct object_command_queue
     bool should_pop = false;
 
     void cancel();
+    void cancel_internal(orbital* o);
 
     std::vector<orbital_system*> get_warp_destinations();
 };
