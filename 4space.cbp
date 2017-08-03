@@ -90,6 +90,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />
+		<Unit filename="object_command_queue.cpp" />
+		<Unit filename="object_command_queue.hpp" />
 		<Unit filename="popup.cpp" />
 		<Unit filename="popup.hpp" />
 		<Unit filename="procedural_text_generator.cpp" />
@@ -100,8 +102,6 @@
 		<Unit filename="resource_manager.hpp" />
 		<Unit filename="ship.cpp" />
 		<Unit filename="ship.hpp" />
-		<Unit filename="ship_command_queue.cpp" />
-		<Unit filename="ship_command_queue.hpp" />
 		<Unit filename="ship_definitions.hpp" />
 		<Unit filename="system_manager.cpp" />
 		<Unit filename="system_manager.hpp" />
