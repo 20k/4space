@@ -1047,12 +1047,18 @@ bool empire::has_vision(orbital_system* os)
     if(them == this)
         return true;
 
-    for(orbital* o : owned)
+    /*for(orbital* o : owned)
     {
         if(o->type != orbital_info::FLEET)
             continue;
 
         if(o->parent_system == os)
+            return true;
+    }*/
+
+    for(orbital* o : os->orbitals)
+    {
+        if(o->parent_empire == this)
             return true;
     }
 

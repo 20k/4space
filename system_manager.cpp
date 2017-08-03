@@ -13,6 +13,7 @@
 #include "popup.hpp"
 #include <unordered_map>
 #include "ui_util.hpp"
+#include <set>
 
 int orbital::gid;
 int orbital_system::gid;
@@ -312,15 +313,18 @@ inline float impl_cos(float x)
     return cosf(x);
 }
 
-void orbital::do_vision_test(empire* viewer_empire)
+void orbital::do_vision_test()
 {
-    bool currently_has_vision = viewer_empire->has_vision(parent_system);
-
-    currently_viewed_by[viewer_empire] = currently_has_vision;
-
-    if(currently_has_vision)
+    for(empire* e : parent_system->advertised_empires)
     {
-        viewed_by[viewer_empire] = true;
+        bool currently_has_vision = e->has_vision(parent_system);
+
+        currently_viewed_by[e] = currently_has_vision;
+
+        if(currently_has_vision)
+        {
+            viewed_by[e] = true;
+        }
     }
 }
 
@@ -436,10 +440,6 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         }
     }*/
 
-    //bool currently_has_vision = viewer_empire->has_vision(parent_system);
-
-    do_vision_test(viewer_empire);
-
     bool currently_viewed = currently_viewed_by[viewer_empire];
 
     bool not_currently_viewed_fleet = false;
@@ -448,11 +448,6 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     {
         last_viewed_position = absolute_pos;
     }
-
-    /*if(currently_has_vision)
-    {
-        viewed_by[viewer_empire] = true;
-    }*/
 
     if(!currently_viewed && type == orbital_info::FLEET)
     {
@@ -851,12 +846,31 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     return n;
 }
 
+void orbital_system::vision_test_all()
+{
+    for(orbital* o : orbitals)
+    {
+        o->do_vision_test();
+    }
+}
+
 void orbital_system::tick(float step_s, orbital_system* viewed)
 {
-    for(auto& i : orbitals)
+    std::set<empire*> next_empires;
+
+    for(orbital* i : orbitals)
     {
         i->tick(step_s);
+
+        //if(i->parent_empire == viewer_empire)
+        {
+            i->do_vision_test();
+        }
+
+        next_empires.insert(i->parent_empire);
     }
+
+    advertised_empires = next_empires;
 
     accumulated_nonviewed_time += step_s;
 

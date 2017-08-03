@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include "resource_manager.hpp"
 #include "object_command_queue.hpp"
+#include <set>
 
 namespace orbital_info
 {
@@ -155,7 +156,7 @@ struct orbital
     void set_orbit(float ang, float len);
     void set_orbit(vec2f pos);
 
-    void do_vision_test(empire* viewing_empire);
+    void do_vision_test();
     void tick(float step_s);
 
     void draw(sf::RenderWindow& win, empire* viewer_empire);
@@ -226,7 +227,11 @@ struct orbital_system
     std::vector<orbital*> orbitals;
     std::vector<orbital*> asteroids; ///including useless ones
 
+    std::set<empire*> advertised_empires;
+
     orbital* make_new(orbital_info::type type, float rad, int num_verts = 5);
+
+    void vision_test_all();
 
     void tick(float step_s, orbital_system* viewed_system);
 
