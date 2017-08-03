@@ -8,6 +8,7 @@
 struct orbital_system;
 struct orbital;
 struct ship_manager;
+struct ship;
 
 namespace object_command_queue_info
 {
@@ -38,6 +39,9 @@ namespace object_command_queue_info
         orbital* target = nullptr;
 
         ship_manager* sm = nullptr;
+
+        orbital* colony_target = nullptr;
+        int64_t colony_ship_id = -1;
     };
 
     struct queue_data
@@ -46,6 +50,7 @@ namespace object_command_queue_info
         queue_element_data data;
     };
 }
+
 
 using queue_type = object_command_queue_info::queue_data;
 //using queue_type = object_command_queue_info::queue_element_type;
@@ -64,6 +69,8 @@ struct object_command_queue
     bool trying_to_warp();
 
     void try_warp(orbital_system* fin);
+
+    void colonise(orbital* target, ship* colony_ship);
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
     void add(const queue_type& type);

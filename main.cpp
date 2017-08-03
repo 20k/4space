@@ -1655,8 +1655,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     if(ImGui::IsItemClicked_Registered())
                     {
-                        colony_ship->colonising = true;
-                        colony_ship->colonise_target = system_orbital;
+                        //colony_ship->colonising = true;
+                        //colony_ship->colonise_target = system_orbital;
+
+                        o->command_queue.colonise(system_orbital, colony_ship);
                     }
                 }
             }

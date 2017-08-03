@@ -177,6 +177,53 @@ void object_command_queue::try_warp(orbital_system* fin)
     add(next);
 }
 
+void object_command_queue::colonise(orbital* target, ship* colony_ship)
+{
+    queue_type next;
+
+    next.data.colony_ship_id = colony_ship->id;
+    next.data.colony_target = target;
+
+    next.type = object_command_queue_info::COLONISE;
+
+    add(next);
+}
+
+bool do_colonising(orbital* o, queue_type& type)
+{
+    if(o->type != orbital_info::FLEET)
+        return true;
+
+    ship_manager* sm = (ship_manager*)o->data;
+
+    object_command_queue_info::queue_element_data& data = type.data;
+
+    if(data.colony_ship_id == -1)
+        return true;
+
+    ship* colony = nullptr;
+
+    for(ship* s : sm->ships)
+    {
+        if(s->id == data.colony_ship_id)
+        {
+            colony = s;
+            break;
+        }
+    }
+
+    if(colony == nullptr)
+        return true;
+
+    if(sm->any_colonising())
+        return false;
+
+    colony->colonising = true;
+    colony->colonise_target = data.colony_target;
+
+    return !sm->any_colonising();
+}
+
 /*void object_command_queue::add(object_command_queue_info::queue_element_type type, const object_command_queue_info::queue_element_data& data)
 {
     return add({type, data})
@@ -219,7 +266,10 @@ void object_command_queue::tick(orbital* o, float diff_s)
 
     if(cur == object_command_queue_info::COLONISE)
     {
-
+        if(do_colonising(o, next))
+        {
+            should_pop = true;
+        }
     }
 
     if(cur == object_command_queue_info::FIGHT)
