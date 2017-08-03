@@ -35,13 +35,14 @@ void ship_command_queue::tick(orbital* parent)
 
     }
 
-    while(is_front_complete() && command_queue.size() > 0)
+    if(is_front_complete() && command_queue.size() > 0)
     {
         command_queue.pop();
+        should_pop = false;
     }
 }
 
 bool ship_command_queue::is_front_complete()
 {
-    return false;
+    return should_pop;
 }

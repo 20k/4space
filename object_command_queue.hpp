@@ -41,6 +41,8 @@ struct ship_command_queue
     void tick(orbital* parent);
 
     bool is_front_complete();
+
+    bool should_pop = false;
 };
 
 #endif // SHIP_COMMAND_QUEUE_HPP_INCLUDED
