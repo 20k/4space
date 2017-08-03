@@ -296,6 +296,7 @@ struct component_attribute
     float tech_level = 0.f;
 
     float add_amount(float amount);
+    float get_use_frac();
     bool can_use();
     void use();
     float get_available_capacity();
@@ -370,6 +371,7 @@ struct component
     std::map<ship_component_element, float> get_stored();
     std::map<ship_component_element, float> get_stored_max();
     std::map<ship_component_element, float> get_use_diff();
+    std::map<ship_component_element, float> get_use_frac();
 
     ///returns a pair of new component, extra resources left over
     //std::pair<component, std::map<ship_component_element, float>> apply_diff(const std::map<ship_component_element, float>& diff);
@@ -494,6 +496,7 @@ struct ship : positional
     void distribute_resources(std::map<ship_component_element, float> res);
     void add_negative_resources(std::map<ship_component_element, float> res);
 
+    float get_use_frac(component& c);
     bool can_use(component& c);
     void use(component& c);
 

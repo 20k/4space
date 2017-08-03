@@ -246,6 +246,14 @@ float component_attribute::add_amount(float amount)
     return 0.f;
 }
 
+float component_attribute::get_use_frac()
+{
+    if(drained_per_use < 0.00001f)
+        return 0.f;
+
+    return cur_amount / drained_per_use;
+}
+
 bool component_attribute::can_use()
 {
     bool time_valid = current_time_s >= time_last_used_s + time_between_uses_s;
@@ -635,6 +643,18 @@ std::map<ship_component_element, float> component::get_use_diff()
             net = (attr.produced_per_use - attr.drained_per_use);
 
         ret[type] = net;
+    }
+
+    return ret;
+}
+
+std::map<ship_component_element, float> component::get_use_frac()
+{
+    std::map<ship_component_element, float> ret;
+
+    for(auto& i : components)
+    {
+        ret[i.first] = i.second.get_use_frac();
     }
 
     return ret;
@@ -1786,6 +1806,25 @@ std::map<ship_component_element, float> ship::get_max_resources()
     auto needed = get_needed_resources();
     auto produced = get_produced_resources();
 }*/
+
+float ship::get_use_frac(component& c)
+{
+    auto use_fracs = c.get_use_frac();
+
+    int num = use_fracs.size();
+
+    if(num == 0)
+        return 0.f;
+
+    float accum = 0.f;
+
+    for(auto& vals : use_fracs)
+    {
+        accum += vals.second;
+    }
+
+    return accum / num;
+}
 
 bool ship::can_use(component& c)
 {
