@@ -3636,8 +3636,8 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
 
 void ship_manager::try_warp(orbital_system* fin, orbital* o)
 {
-    if(!can_warp(fin, o->parent_system, o))
-        return;
+    //if(!can_warp(fin, o->parent_system, o))
+    //    return;
 
     /*for(ship* s : ships)
     {
@@ -3656,7 +3656,9 @@ void ship_manager::try_warp(orbital_system* fin, orbital* o)
     o->absolute_pos = arrive_dir;
     o->set_orbit(arrive_dir);*/
 
-    force_warp(fin, o->parent_system, o);
+    //force_warp(fin, o->parent_system, o);
+
+    o->command_queue.try_warp(fin);
 }
 
 void ship_manager::force_warp(orbital_system* fin, orbital_system* cur, orbital* o)

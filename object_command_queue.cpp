@@ -204,8 +204,9 @@ void object_command_queue::tick(orbital* o, float diff_s)
     if(is_front_complete() && command_queue.size() > 0)
     {
         command_queue.pop();
-        should_pop = false;
     }
+
+    should_pop = false;
 }
 
 bool object_command_queue::is_front_complete()
