@@ -60,6 +60,7 @@ struct object_command_queue
     void transfer(float new_rad, float new_angle, orbital* o);
     void transfer(vec2f pos, orbital* o);
     bool transferring();
+    bool trying_to_warp();
 
     void try_warp(orbital_system* fin);
 

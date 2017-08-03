@@ -1298,6 +1298,25 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         }
                     }
 
+                    if(o->command_queue.trying_to_warp())
+                    {
+                        ImGui::SameLine();
+
+                        ImGui::NeutralText("(Locked)");
+
+                        if(ImGui::IsItemHovered())
+                        {
+                            tooltip::add("Click to cancel");
+                        }
+
+                        if(ImGui::IsItemClicked_Registered())
+                        {
+                            o->command_queue.cancel();
+                        }
+
+                        ImGui::SameLine();
+                    }
+
                     ImGui::SameLine();
 
                     ImGui::Text("|");

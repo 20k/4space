@@ -96,8 +96,11 @@ bool do_warp(orbital* o, queue_type& type)
     orbital_system* fin = data.fin;
     orbital_system* cur = o->parent_system;
 
-    if(!sm->can_warp(fin, cur, o))
+    if(!sm->within_warp_distance(fin, o))
         return true;
+
+    if(!sm->can_warp(fin, cur, o))
+        return false;
 
     sm->force_warp(fin, o->parent_system, o);
 
@@ -138,6 +141,14 @@ bool object_command_queue::transferring()
         return false;
 
     return command_queue.front().type == object_command_queue_info::IN_SYSTEM_PATH;
+}
+
+bool object_command_queue::trying_to_warp()
+{
+    if(command_queue.size() == 0)
+        return false;
+
+    return command_queue.front().type == object_command_queue_info::WARP;
 }
 
 void object_command_queue::try_warp(orbital_system* fin)

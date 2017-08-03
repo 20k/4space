@@ -3676,7 +3676,7 @@ void ship_manager::force_warp(orbital_system* fin, orbital_system* cur, orbital*
     fin->steal(o, cur);
 
     //o->transferring = false;
-    o->command_queue.cancel();
+    //o->command_queue.cancel();
 
     o->absolute_pos = arrive_dir;
     o->set_orbit(arrive_dir);
@@ -3695,15 +3695,33 @@ bool ship_manager::can_warp(orbital_system* fin, orbital_system* cur, orbital* o
     if(any_in_combat())
         return false;
 
-    vec2f base_dist = fin->universe_pos * system_manager::universe_scale;
+    /*vec2f base_dist = fin->universe_pos * system_manager::universe_scale;
     vec2f end_dist = cur->universe_pos * system_manager::universe_scale;
+
+    if((base_dist - end_dist).length() > get_min_warp_distance() * system_manager::universe_scale)
+    {
+        return false;
+    }*/
+
+    if(!within_warp_distance(fin, o))
+    {
+        return false;
+    }
+
+    return all_use;
+}
+
+bool ship_manager::within_warp_distance(orbital_system* fin, orbital* o)
+{
+    vec2f base_dist = fin->universe_pos * system_manager::universe_scale;
+    vec2f end_dist = o->parent_system->universe_pos * system_manager::universe_scale;
 
     if((base_dist - end_dist).length() > get_min_warp_distance() * system_manager::universe_scale)
     {
         return false;
     }
 
-    return all_use;
+    return true;
 }
 
 float ship_manager::get_min_warp_distance()
