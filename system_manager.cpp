@@ -312,6 +312,18 @@ inline float impl_cos(float x)
     return cosf(x);
 }
 
+void orbital::do_vision_test(empire* viewer_empire)
+{
+    bool currently_has_vision = viewer_empire->has_vision(parent_system);
+
+    currently_viewed_by[viewer_empire] = currently_has_vision;
+
+    if(currently_has_vision)
+    {
+        viewed_by[viewer_empire] = true;
+    }
+}
+
 void orbital::tick(float step_s)
 {
     internal_time_s += step_s;
@@ -424,21 +436,25 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         }
     }*/
 
-    bool currently_has_vision = viewer_empire->has_vision(parent_system);
+    //bool currently_has_vision = viewer_empire->has_vision(parent_system);
+
+    do_vision_test(viewer_empire);
+
+    bool currently_viewed = currently_viewed_by[viewer_empire];
 
     bool not_currently_viewed_fleet = false;
 
-    if(currently_has_vision || type != orbital_info::FLEET)
+    if(currently_viewed || type != orbital_info::FLEET)
     {
         last_viewed_position = absolute_pos;
     }
 
-    if(currently_has_vision)
+    /*if(currently_has_vision)
     {
         viewed_by[viewer_empire] = true;
-    }
+    }*/
 
-    if(!currently_has_vision && type == orbital_info::FLEET)
+    if(!currently_viewed && type == orbital_info::FLEET)
     {
         not_currently_viewed_fleet = true;
     }

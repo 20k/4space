@@ -155,6 +155,7 @@ struct orbital
     void set_orbit(float ang, float len);
     void set_orbit(vec2f pos);
 
+    void do_vision_test(empire* viewing_empire);
     void tick(float step_s);
 
     void draw(sf::RenderWindow& win, empire* viewer_empire);
@@ -213,6 +214,7 @@ struct orbital
     vec2f last_viewed_position;
     //bool ever_viewed = false;
     std::map<empire*, bool> viewed_by;
+    std::map<empire*, bool> currently_viewed_by;
 };
 
 struct orbital_system
