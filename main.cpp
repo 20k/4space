@@ -1258,7 +1258,43 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         {
                             //tooltip::add(s->name + ": " + s->get_resource_str(ship_component_element::WARP_POWER));
 
-                            tooltip::add(s->name + ": " + to_string_with_enforced_variable_dp(s->get_warp_use_frac() * 100.f, 1) + "%%");
+                            tooltip::add(s->name);
+
+                            for(int kk = 0; kk < s->entity_list.size(); kk++)
+                            {
+                                component& c = s->entity_list[kk];
+
+                                if(c.primary_attribute != ship_component_element::WARP_POWER)
+                                    continue;
+
+                                auto warp_fracs = s->get_use_frac(c);
+
+                                bool any = false;
+
+                                for(auto& i : warp_fracs)
+                                {
+                                    int type = i.first;
+
+                                    float amount = i.second;
+
+                                    if(amount >= 1.f - FLOAT_BOUND)
+                                        continue;
+
+                                    any = true;
+
+                                    tooltip::add(ship_component_elements::display_strings[type] + " " + to_string_with_enforced_variable_dp(amount * 100.f, 1) + "%%");
+                                }
+
+                                if(!any)
+                                {
+                                    tooltip::add("Ready to warp");
+                                }
+                            }
+
+                            if(sm->ships.size() > 1 && s != sm->ships[sm->ships.size()-1])
+                                tooltip::add("\n");
+
+                            //tooltip::add(s->name + ": " + to_string_with_enforced_variable_dp(s->get_warp_use_frac() * 100.f, 1) + "%%");
                         }
                     }
 

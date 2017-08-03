@@ -496,7 +496,8 @@ struct ship : positional
     void distribute_resources(std::map<ship_component_element, float> res);
     void add_negative_resources(std::map<ship_component_element, float> res);
 
-    float get_use_frac(component& c);
+    std::map<ship_component_element, float> get_use_frac(component& c);
+    float get_avg_use_frac(component& c);
     bool can_use(component& c);
     void use(component& c);
 
@@ -585,7 +586,8 @@ struct ship : positional
     std::string get_resource_str(const ship_component_element& type);
 
     float get_fuel_frac();
-    float get_warp_use_frac();
+    float get_avg_warp_use_frac();
+    //std::map<ship_component_element, float> get_warp_use_frac();
 
     void recrew_derelict(empire* owner, empire* claiming);
     bool can_recrew(empire* claiming);

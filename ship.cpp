@@ -1813,7 +1813,31 @@ std::map<ship_component_element, float> ship::get_max_resources()
     auto produced = get_produced_resources();
 }*/
 
-float ship::get_use_frac(component& c)
+std::map<ship_component_element, float> ship::get_use_frac(component& c)
+{
+    std::map<ship_component_element, float> use_diff = c.get_use_diff();
+    std::map<ship_component_element, float> available_diff = get_stored_resources();
+
+    std::map<ship_component_element, float> ret;
+
+    for(auto& i : use_diff)
+    {
+        //printf("%f %f %i\n", i.second, available_diff[i.first], i.first);
+
+        if(fabs(i.second) < FLOAT_BOUND)
+            continue;
+
+        float frac = fabs(available_diff[i.first]) / fabs(i.second);
+
+        frac = clamp(frac, 0.f, 1.f);
+
+        ret[i.first] = frac;
+    }
+
+    return ret;
+}
+
+float ship::get_avg_use_frac(component& c)
 {
     std::map<ship_component_element, float> use_diff = c.get_use_diff();
     std::map<ship_component_element, float> available_diff = get_stored_resources();
@@ -2854,7 +2878,25 @@ float ship::get_fuel_frac()
     return res / max_res;
 }
 
-float ship::get_warp_use_frac()
+/*std::map<ship_component_element, float> ship::get_warp_use_frac()
+{
+    std::map<ship_component_element, float> ret;
+
+    for(component& c : entity_list)
+    {
+        if(c.primary_attribute == ship_component_element::WARP_POWER)
+        {
+            auto res =
+        }
+    }
+
+    if(num > 0)
+        accum /= num;
+
+    return accum;
+}*/
+
+float ship::get_avg_warp_use_frac()
 {
     int num = 0;
     float accum = 0.f;
@@ -2863,7 +2905,7 @@ float ship::get_warp_use_frac()
     {
         if(c.primary_attribute == ship_component_element::WARP_POWER)
         {
-            accum += get_use_frac(c);
+            accum += get_avg_use_frac(c);
 
             num++;
         }
@@ -3700,7 +3742,7 @@ float ship_manager::get_overall_warp_drive_use_frac()
 
     for(ship* s : ships)
     {
-        accum += s->get_warp_use_frac();
+        accum += s->get_avg_warp_use_frac();
     }
 
     return accum / num;
