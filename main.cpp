@@ -1292,7 +1292,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                             }
 
                             if(sm->ships.size() > 1 && s != sm->ships[sm->ships.size()-1])
-                                tooltip::add("\n");
+                                tooltip::add("");
 
                             //tooltip::add(s->name + ": " + to_string_with_enforced_variable_dp(s->get_warp_use_frac() * 100.f, 1) + "%%");
                         }
