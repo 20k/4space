@@ -74,10 +74,10 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
     vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
     vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};
 
-    float speed = 5.f;
+    float speed = (1/5.f) * diff_s * 200.f;
 
     ///this is the real speed here
-    vec2f calc_dir = (calculated_next - calculated_cur).norm() / speed;
+    vec2f calc_dir = (calculated_next - calculated_cur).norm() * speed;
 
     vec2f calc_real_next = calculated_cur + calc_dir;
 
