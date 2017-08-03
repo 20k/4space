@@ -1837,13 +1837,13 @@ std::map<ship_component_element, float> ship::get_use_frac(component& c)
     return ret;
 }
 
-float ship::get_avg_use_frac(component& c)
+float ship::get_min_use_frac(component& c)
 {
     std::map<ship_component_element, float> use_diff = c.get_use_diff();
     std::map<ship_component_element, float> available_diff = get_stored_resources();
 
     int num = 0;
-    float accum = 0.f;
+    float accum = 1.f;
 
     for(auto& i : use_diff)
     {
@@ -1856,13 +1856,18 @@ float ship::get_avg_use_frac(component& c)
 
         frac = clamp(frac, 0.f, 1.f);
 
-        accum += frac;
+        //accum += frac;
+
+        accum = std::min(accum, frac);
 
         num++;
     }
 
-    if(num > 0)
-        accum /= num;
+    //if(num > 0)
+    //    accum /= num;
+
+    if(num == 0)
+        accum = 0.f;
 
     return accum;
 }
@@ -2896,23 +2901,23 @@ float ship::get_fuel_frac()
     return accum;
 }*/
 
-float ship::get_avg_warp_use_frac()
+float ship::get_min_warp_use_frac()
 {
     int num = 0;
-    float accum = 0.f;
+    float accum = 1.f;
 
     for(component& c : entity_list)
     {
         if(c.primary_attribute == ship_component_element::WARP_POWER)
         {
-            accum += get_avg_use_frac(c);
+            accum = std::min(accum, get_min_use_frac(c));
 
             num++;
         }
     }
 
-    if(num > 0)
-        accum /= num;
+    if(num == 0)
+        accum = 0.f;
 
     return accum;
 }
@@ -3738,14 +3743,19 @@ float ship_manager::get_overall_warp_drive_use_frac()
     if(num == 0)
         return 0.f;
 
-    float accum = 0.f;
+    float accum = 1.f;
 
     for(ship* s : ships)
     {
-        accum += s->get_avg_warp_use_frac();
+        //accum +=s->get_avg_warp_use_frac();
+
+        accum = std::min(s->get_min_warp_use_frac(), accum);
     }
 
-    return accum / num;
+    if(num == 0)
+        accum = 0.f;
+
+    return accum;
 }
 
 void ship_manager::enter_combat()
