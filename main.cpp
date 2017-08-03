@@ -1237,17 +1237,17 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     if(sm->can_use_warp_drives())
                     {
-                        //warp_str += "Ready";
+                        warp_str += "Ready";
 
-                        warp_str += to_string_with_enforced_variable_dp(warp_use_frac * 100.f, 1) + "%%";
+                        //warp_str += to_string_with_enforced_variable_dp(warp_use_frac * 100.f, 1) + "%%";
 
                         ImGui::GoodTextNoHoverEffect(warp_str.c_str());
                     }
                     else
                     {
-                        //warp_str += "Not Ready";
+                        warp_str += "Not Ready";
 
-                        warp_str += to_string_with_enforced_variable_dp(warp_use_frac * 100.f, 1) + "%%";
+                        //warp_str += to_string_with_enforced_variable_dp(warp_use_frac * 100.f, 1) + "%%";
 
                         ImGui::BadTextNoHoverEffect(warp_str.c_str());
                     }
@@ -1256,7 +1256,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     {
                         for(ship* s : sm->ships)
                         {
-                            tooltip::add(s->name + ": " + s->get_resource_str(ship_component_element::WARP_POWER));
+                            //tooltip::add(s->name + ": " + s->get_resource_str(ship_component_element::WARP_POWER));
+
+                            tooltip::add(s->name + ": " + to_string_with_enforced_variable_dp(s->get_warp_use_frac() * 100.f, 1) + "%%");
                         }
                     }
 
