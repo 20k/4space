@@ -6,6 +6,7 @@
 #include "ship_definitions.hpp"
 #include "empire.hpp"
 #include "ui_util.hpp"
+#include "popup.hpp"
 
 bool wait_ev(game_event& event, float time_s)
 {
@@ -868,7 +869,10 @@ int present_dialogue(const std::vector<std::string>& options)
         std::string display_str = str;
 
         if(display_str.length() > 0 && num != 0)
-            ImGui::BulletText(display_str.c_str());
+        {
+            ImGui::Bullet();
+            ImGui::NeutralText(display_str);
+        }
 
         if(display_str.length() > 0 && num == 0)
         {
