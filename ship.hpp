@@ -8,7 +8,7 @@
 #include "resource_manager.hpp"
 #include "research.hpp"
 #include "ai_fleet.hpp"
-#include "ship_command_queue.hpp"
+#include "object_command_queue.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -629,8 +629,6 @@ struct orbital;
 ///can be used as a fleet
 struct ship_manager
 {
-    ship_command_queue command_queue;
-
     ai_fleet ai_controller;
 
     std::vector<ship*> ships;

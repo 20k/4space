@@ -1,13 +1,13 @@
-#include "ship_command_queue.hpp"
+#include "object_command_queue.hpp"
 #include "system_manager.hpp"
 #include "ship.hpp"
 
-void ship_command_queue::add(queue_type type)
+void object_command_queue::add(queue_type type)
 {
     command_queue.push(type);
 }
 
-void ship_command_queue::tick(orbital* parent)
+void object_command_queue::tick(orbital* parent)
 {
     if(command_queue.size() == 0)
         return;
@@ -15,22 +15,22 @@ void ship_command_queue::tick(orbital* parent)
     queue_type cur = command_queue.front();
 
     ///just do like, ship->tick_path destination etc
-    if(cur == ship_command_queue_info::IN_SYSTEM_PATH)
+    if(cur == object_command_queue_info::IN_SYSTEM_PATH)
     {
 
     }
 
-    if(cur == ship_command_queue_info::WARP)
+    if(cur == object_command_queue_info::WARP)
     {
 
     }
 
-    if(cur == ship_command_queue_info::COLONISE)
+    if(cur == object_command_queue_info::COLONISE)
     {
 
     }
 
-    if(cur == ship_command_queue_info::FIGHT)
+    if(cur == object_command_queue_info::FIGHT)
     {
 
     }
@@ -42,7 +42,7 @@ void ship_command_queue::tick(orbital* parent)
     }
 }
 
-bool ship_command_queue::is_front_complete()
+bool object_command_queue::is_front_complete()
 {
     return should_pop;
 }

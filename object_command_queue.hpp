@@ -1,5 +1,5 @@
-#ifndef SHIP_COMMAND_QUEUE_HPP_INCLUDED
-#define SHIP_COMMAND_QUEUE_HPP_INCLUDED
+#ifndef OBJECT_COMMAND_QUEUE_HPP_INCLUDED
+#define OBJECT_COMMAND_QUEUE_HPP_INCLUDED
 
 #include <vec/vec.hpp>
 #include <vector>
@@ -8,7 +8,7 @@
 struct orbital_system;
 struct orbital;
 
-namespace ship_command_queue_info
+namespace object_command_queue_info
 {
     enum queue_element_type
     {
@@ -31,9 +31,9 @@ namespace ship_command_queue_info
     };
 }
 
-using queue_type = ship_command_queue_info::queue_element_type;
+using queue_type = object_command_queue_info::queue_element_type;
 
-struct ship_command_queue
+struct object_command_queue
 {
     std::queue<queue_type> command_queue;
 
@@ -45,4 +45,4 @@ struct ship_command_queue
     bool should_pop = false;
 };
 
-#endif // SHIP_COMMAND_QUEUE_HPP_INCLUDED
+#endif // OBJECT_COMMAND_QUEUE_HPP_INCLUDED
