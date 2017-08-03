@@ -56,6 +56,7 @@ struct object_command_queue
     void transfer(vec2f pos, orbital* o);
     bool transferring();
 
+    //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
     void add(const queue_type& type);
     void tick(orbital* o);
 
