@@ -3549,7 +3549,8 @@ void ship_manager::force_warp(orbital_system* fin, orbital_system* cur, orbital*
 
     fin->steal(o, cur);
 
-    o->transferring = false;
+    //o->transferring = false;
+    o->command_queue.cancel();
 
     o->absolute_pos = arrive_dir;
     o->set_orbit(arrive_dir);

@@ -141,12 +141,12 @@ struct orbital
     float orbital_length = 0;
     float rad = 0.f;
 
-    float old_rad = 0;
+    /*float old_rad = 0;
     float old_angle = 0;
     float new_rad = 0;
     float new_angle = 0;
-    bool transferring = false;
-    float start_time_s = 0;
+    //bool transferring = false;
+    float start_time_s = 0;*/
 
     orbital* parent = nullptr;
 
@@ -176,6 +176,8 @@ struct orbital
     ///only transfers if some underlying thing says yes
     ///eg for fleets, only if they have fuel
     void request_transfer(vec2f pos);
+
+    bool transferring();
 
     vec3f col = {1,1,1};
 

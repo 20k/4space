@@ -241,113 +241,6 @@ void orbital::set_orbit(vec2f pos)
     set_orbit(rel.angle(), rel.length());
 }
 
-float get_length_circle(vec2f p1, vec2f p2)
-{
-    float max_rad = std::max(p1.length(), p2.length());
-
-    p1 = p1.norm() * max_rad;
-    p2 = p2.norm() * max_rad;
-
-    //float a = (p1 - p2).length();
-
-    float A = acos(clamp(dot(p1.norm(), p2.norm()), -1.f, 1.f));
-
-    //float r = sqrt(a*a / (2 * (1 - cos(A))));
-    ///fuck we know r its just p1.length()
-
-    float r = p1.length();
-
-    return fabs(r * A);
-}
-
-void do_transfer(orbital* o, float diff_s)
-{
-    ///doesn't do speed, ignore me as a concept
-    //float speed_s_old = 30;
-
-    vec2f end_pos = o->new_rad * (vec2f){cos(o->new_angle), sin(o->new_angle)};
-    //vec2f start_pos = o->old_rad * (vec2f){cos(o->old_angle), sin(o->old_angle)};
-
-    //float distance_lin = (end_pos - start_pos).length();
-
-    /*float linear_extra = fabs(end_pos.length() - start_pos.length());
-    float radius_extra = get_length_circle(start_pos, end_pos);
-
-    float dist = sqrt(linear_extra * linear_extra + radius_extra*radius_extra);
-
-    float traverse_time = dist / speed_s_old;
-
-    ///nope. Ok need to work out angular distance on a circle between two points
-
-    float frac = (o->internal_time_s - o->start_time_s) / traverse_time;
-
-    float a1 = start_pos.angle();
-    float a2 = end_pos.angle();
-
-    if(fabs(a2 + 2 * M_PI - a1) < fabs(a2 - a1))
-    {
-        a2 += 2*M_PI;
-    }
-
-    if(fabs(a2 - 2 * M_PI - a1) < fabs(a2 - a1))
-    {
-        a2 -= 2*M_PI;
-    }
-
-    float iangle = o->old_angle + frac * (a2 - a1);
-    float irad = o->new_rad * frac + o->old_rad * (1.f - frac);
-
-    vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
-    vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};*/
-
-    float straightline_distance = (end_pos - o->absolute_pos).length();
-
-    float linear_extra = fabs(end_pos.length() - o->absolute_pos.length());
-    float radius_extra = get_length_circle(o->absolute_pos, end_pos);
-
-    float dist = sqrt(linear_extra * linear_extra + radius_extra*radius_extra);
-
-    float a1 = o->absolute_pos.angle();
-    float a2 = end_pos.angle();
-
-    if(fabs(a2 + 2 * M_PI - a1) < fabs(a2 - a1))
-    {
-        a2 += 2*M_PI;
-    }
-
-    if(fabs(a2 - 2 * M_PI - a1) < fabs(a2 - a1))
-    {
-        a2 -= 2*M_PI;
-    }
-
-    float cur_angle = (o->absolute_pos - o->parent->absolute_pos).angle();
-    float cur_rad = (o->absolute_pos - o->parent->absolute_pos).length();
-
-    float iangle = cur_angle + diff_s * (a2 - a1);
-    float irad = cur_rad + diff_s * (o->new_rad - cur_rad);
-
-    vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
-    vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};
-
-    float speed = 5.f;
-
-    ///this is the real speed here
-    vec2f calc_dir = (calculated_next - calculated_cur).norm() / speed;
-
-    vec2f calc_real_next = calculated_cur + calc_dir;
-
-    iangle = calc_real_next.angle();
-    irad = calc_real_next.length();
-
-    o->orbital_angle = iangle;
-    o->orbital_length = irad;
-
-    if(straightline_distance < 2)
-    {
-        o->transferring = false;
-    }
-}
-
 /*inline
 float impl_cos(float x)
 {
@@ -425,8 +318,10 @@ void orbital::tick(float step_s)
 
     rotation += rotation_velocity_ps * step_s;
 
-    if(transferring)
-        do_transfer(this, step_s);
+    //if(transferring)
+    //    do_transfer(this, step_s);
+
+    command_queue.tick(this, step_s);
 
     if(parent == nullptr)
         return;
@@ -477,7 +372,7 @@ void orbital::tick(float step_s)
 
     float calculated_angular_velocity_ps = sqrtf(vspeed_sq / (scaled_real_dist * scaled_real_dist));
 
-    if(!transferring)
+    if(!transferring())
         orbital_angle += calculated_angular_velocity_ps * step_s;
 
     //if(orbital_angle >= M_PIf)
@@ -709,26 +604,30 @@ std::string orbital::get_name_with_info_warfare(empire* viewing_empire)
 
 void orbital::transfer(float pnew_rad, float pnew_angle)
 {
-    old_rad = orbital_length;
+    /*old_rad = orbital_length;
     old_angle = orbital_angle;
     new_rad = pnew_rad;
     new_angle = pnew_angle;
 
     transferring = true;
 
-    start_time_s = internal_time_s;
+    start_time_s = internal_time_s;*/
+
+    command_queue.transfer(pnew_rad, pnew_angle, this);
 }
 
 void orbital::transfer(vec2f pos)
 {
-    vec2f base;
+    /*vec2f base;
 
     if(parent)
         base = parent->absolute_pos;
 
     vec2f rel = pos - base;
 
-    transfer(rel.length(), rel.angle());
+    transfer(rel.length(), rel.angle());*/
+
+    command_queue.transfer(pos, this);
 }
 
 void orbital::request_transfer(vec2f pos)
@@ -743,6 +642,11 @@ void orbital::request_transfer(vec2f pos)
 
     if(sm->can_move_in_system())
         transfer(pos);
+}
+
+bool orbital::transferring()
+{
+    return command_queue.transferring();
 }
 
 void orbital::make_random_resource_asteroid(float total_ps)
@@ -1612,7 +1516,7 @@ void repulse(orbital* o1, orbital* o2)
         return;
     }*/
 
-    if(o1->transferring || o2->transferring)
+    if(o1->transferring() || o2->transferring())
         return;
 
     vec2f o1_to_o2 = (o2->absolute_pos - o1->absolute_pos);

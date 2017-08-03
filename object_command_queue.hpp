@@ -50,6 +50,8 @@ using queue_type = object_command_queue_info::queue_data;
 ///don't want to push the full burden on the user
 struct object_command_queue
 {
+    bool should_interrupt = false;
+
     std::queue<queue_type> command_queue;
 
     void transfer(float new_rad, float new_angle, orbital* o);
@@ -58,11 +60,13 @@ struct object_command_queue
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
     void add(const queue_type& type);
-    void tick(orbital* o);
+    void tick(orbital* o, float diff_s);
 
     bool is_front_complete();
 
     bool should_pop = false;
+
+    void cancel();
 };
 
 #endif // OBJECT_COMMAND_QUEUE_HPP_INCLUDED
