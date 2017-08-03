@@ -27,6 +27,7 @@
 
 #include "drag_and_drop.hpp"
 #include "ui_util.hpp"
+#include "context_menu.hpp"
 
 
 ///so display this (ish) on mouseover for a component
@@ -1028,6 +1029,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             first = false;
         }
 
+        /*if(rclick)
+        {
+            context_menu::set_item(orb);
+        }*/
+
         if(lclick)
         {
             orb->clicked = true;
@@ -1180,7 +1186,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             {
                 bool do_obfuscate_name = false;
-                bool do_obfuscate_misc_resources = false;
+                //bool do_obfuscate_misc_resources = false;
 
                 if(o->type == orbital_info::FLEET && !player_empire->is_allied(o->parent_empire))
                 {
@@ -1189,10 +1195,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         do_obfuscate_name = true;
                     }
 
-                    if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= ship_info::misc_resources_obfuscation_level)
+                    /*if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= ship_info::misc_resources_obfuscation_level)
                     {
                         do_obfuscate_misc_resources = true;
-                    }
+                    }*/
                 }
 
                 std::string name = o->name;
@@ -1616,6 +1622,45 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             }
 
             ImGui::Text("");
+
+            bool this_fleet_is_coloniser = false;
+            ship* colony_ship = nullptr;
+
+            if(o->type == orbital_info::FLEET && sm->parent_empire == player_empire)
+            {
+                for(ship* s : sm->ships)
+                {
+                    component* fc = s->get_component_with_primary(ship_component_elements::COLONISER);
+
+                    if(fc != nullptr)
+                    {
+                        this_fleet_is_coloniser = true;
+                        colony_ship = s;
+                        break;
+                    }
+                }
+            }
+
+            if(this_fleet_is_coloniser)
+            {
+                for(orbital* system_orbital : orb->parent_system->orbitals)
+                {
+                    if(system_orbital->type != orbital_info::PLANET)
+                        continue;
+
+                    if(!player_empire->can_colonise(system_orbital))
+                        continue;
+
+                    ImGui::NeutralText("(Colonise " + system_orbital->name + ")");
+
+                    if(ImGui::IsItemClicked_Registered())
+                    {
+                        colony_ship->colonising = true;
+                        colony_ship->colonise_target = system_orbital;
+                    }
+                }
+            }
+
 
             ///for drawing warp radiuses, but will take anything and might be extended later
             system_manage.add_selected_orbital(orb);
@@ -2179,9 +2224,12 @@ int main()
     oscout->data = fleet5;*/
 
 
-    player_empire->take_ownership_of_all(base);
+    //player_empire->take_ownership_of_all(base);
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
+
+    player_empire->take_ownership(ofleet);
+    player_empire->take_ownership(ofleet2);
     //player_empire->take_ownership(fleet5);
 
     orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
@@ -2399,6 +2447,11 @@ int main()
         bool lclick = ONCE_MACRO(sf::Mouse::Left) && no_suppress_mouse;
         bool rclick = ONCE_MACRO(sf::Mouse::Right) && no_suppress_mouse;
 
+        /*if(lclick)
+        {
+            context_menu::set_item(nullptr);
+        }*/
+
         sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
         ImGui::SFML::Update(t);
 
@@ -2551,6 +2604,10 @@ int main()
         //printf("Prerender\n");
 
         global_drag_and_drop.tick();
+
+        /*context_menu::start();
+        context_menu::tick();
+        context_menu::stop();*/
 
         top_bar::display();
         tooltip::set_clear_tooltip();

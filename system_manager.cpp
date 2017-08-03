@@ -777,6 +777,19 @@ bool orbital::can_colonise()
     return type == orbital_info::PLANET && parent_empire == nullptr;
 }
 
+/*void orbital::process_context_ui()
+{
+    if(type == orbital_info::FLEET)
+    {
+        ship_manager* sm = (ship_manager*)data;
+    }
+
+    if(type == orbital_info::PLANET)
+    {
+
+    }
+}*/
+
 orbital* orbital_system::get_base()
 {
     for(auto& i : orbitals)

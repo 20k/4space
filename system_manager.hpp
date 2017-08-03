@@ -105,7 +105,7 @@ struct empire_manager;
 struct system_manager;
 struct orbital_system;
 
-struct orbital : contextable
+struct orbital
 {
     object_command_queue command_queue;
 
@@ -209,6 +209,8 @@ struct orbital : contextable
     bool is_colonised();
     bool can_colonise();
 
+    //virtual void process_context_ui() override;
+
     ///if > than amount, remove parent empire
     float decolonise_timer_s = 0.f;
     bool being_decolonised = false;
@@ -218,7 +220,7 @@ struct orbital : contextable
     std::map<empire*, bool> viewed_by;
     std::map<empire*, bool> currently_viewed_by;
 
-    bool context_menu_open = false;
+    virtual ~orbital(){}
 };
 
 struct orbital_system
