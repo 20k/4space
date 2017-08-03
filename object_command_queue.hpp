@@ -3,7 +3,7 @@
 
 #include <vec/vec.hpp>
 #include <vector>
-#include <queue>
+#include <deque>
 
 struct orbital_system;
 struct orbital;
@@ -56,7 +56,7 @@ struct object_command_queue
 {
     bool should_interrupt = false;
 
-    std::queue<queue_type> command_queue;
+    std::deque<queue_type> command_queue;
 
     void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system);
     void transfer(vec2f pos, orbital* o, orbital_system* viewing_system);
@@ -74,6 +74,8 @@ struct object_command_queue
     bool should_pop = false;
 
     void cancel();
+
+    std::vector<orbital_system*> get_warp_destinations();
 };
 
 #endif // OBJECT_COMMAND_QUEUE_HPP_INCLUDED

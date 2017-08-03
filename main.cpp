@@ -1306,6 +1306,17 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                         if(ImGui::IsItemHovered())
                         {
+                            std::vector<orbital_system*> systems = o->command_queue.get_warp_destinations();
+
+                            int num = 1;
+
+                            for(orbital_system* sys : systems)
+                            {
+                                tooltip::add(std::to_string(num) + ". " + sys->get_base()->name);
+
+                                num++;
+                            }
+
                             tooltip::add("Click to cancel");
                         }
 

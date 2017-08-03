@@ -189,7 +189,7 @@ void object_command_queue::add(const queue_type& type)
     if(!key.isKeyPressed(sf::Keyboard::LShift))
         cancel();
 
-    command_queue.push(type);
+    command_queue.push_back(type);
 }
 
 void object_command_queue::tick(orbital* o, float diff_s)
@@ -229,7 +229,7 @@ void object_command_queue::tick(orbital* o, float diff_s)
 
     if(is_front_complete() && command_queue.size() > 0)
     {
-        command_queue.pop();
+        command_queue.pop_front();
     }
 
     should_pop = false;
@@ -244,6 +244,23 @@ void object_command_queue::cancel()
 {
     while(!command_queue.empty())
     {
-        command_queue.pop();
+        command_queue.pop_front();
     }
+}
+
+std::vector<orbital_system*> object_command_queue::get_warp_destinations()
+{
+    std::vector<orbital_system*> systems;
+
+    for(auto& i : command_queue)
+    {
+        if(i.type != object_command_queue_info::WARP)
+            continue;
+
+        object_command_queue_info::queue_element_data& data = i.data;
+
+        systems.push_back(data.fin);
+    }
+
+    return systems;
 }
