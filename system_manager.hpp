@@ -216,6 +216,8 @@ struct orbital
     //bool ever_viewed = false;
     std::map<empire*, bool> viewed_by;
     std::map<empire*, bool> currently_viewed_by;
+
+    bool context_menu_open = false;
 };
 
 struct orbital_system
