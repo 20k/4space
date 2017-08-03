@@ -2517,10 +2517,13 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                 {
                     std::string relations_str = to_string_with_enforced_variable_dp(viewing_empire->get_culture_modified_friendliness(e));
 
-                    if(viewing_empire != e)
-                        tooltip::add(relations_str + " (" + viewing_empire->get_relations_string(e) + ")");
-                    else
-                        tooltip::add("(Your Empire)");
+                    if(!pop.hidden)
+                    {
+                        if(viewing_empire != e)
+                            tooltip::add(relations_str + " (" + viewing_empire->get_relations_string(e) + ")");
+                        else
+                            tooltip::add("(Your Empire)");
+                    }
                 }
 
                 ImGui::Indent();
