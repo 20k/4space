@@ -1169,22 +1169,23 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
         ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), empire_name.c_str());
 
-        if(ImGui::IsItemClicked_Registered())
+        if(orbitals_grouped_by_empire.size() > 1)
         {
-            for(auto& test_popup : orbitals_grouped_by_empire)
+            ImGui::SameLine();
+
+            ImGui::NeutralText("(Select)");
+
+            if(ImGui::IsItemClicked_Registered())
             {
-                /*bool i_am_hidden = pop.hidden;
-                bool test_is_hidden = test_popup.hidden;
-
-                if(!)*/
-
-
-                if(test_popup.first.e == current_empire && test_popup.first.hidden == pop.hidden)
-                    continue;
-
-                for(orbital* orb : test_popup.second)
+                for(auto& test_popup : orbitals_grouped_by_empire)
                 {
-                    popup.schedule_rem(orb);
+                    if(test_popup.first.e == current_empire && test_popup.first.hidden == pop.hidden)
+                        continue;
+
+                    for(orbital* orb : test_popup.second)
+                    {
+                        popup.schedule_rem(orb);
+                    }
                 }
             }
         }
