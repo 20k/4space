@@ -1173,7 +1173,13 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
         {
             for(auto& test_popup : orbitals_grouped_by_empire)
             {
-                if(test_popup.first.e == current_empire)
+                /*bool i_am_hidden = pop.hidden;
+                bool test_is_hidden = test_popup.hidden;
+
+                if(!)*/
+
+
+                if(test_popup.first.e == current_empire && test_popup.first.hidden == pop.hidden)
                     continue;
 
                 for(orbital* orb : test_popup.second)
