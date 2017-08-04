@@ -89,6 +89,10 @@ struct battle_manager
     void destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles);
 
     ///to show the player why they can't disengage
+
+    static uint32_t gid;
+    uint32_t unique_battle_id = gid++;
+    uint32_t frame_counter = 0;
 };
 
 struct orbital;

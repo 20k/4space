@@ -36,8 +36,8 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
     {
         ship_manager* sm = (ship_manager*)o->data;
 
-        if(sm->any_in_combat())
-            return true;
+        //if(sm->any_in_combat())
+        //    return true;
 
         if(!sm->can_move_in_system())
             return true;

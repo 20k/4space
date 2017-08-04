@@ -5,6 +5,8 @@
 #include "util.hpp"
 #include <set>
 
+uint32_t battle_manager::gid = 0;
+
 void projectile::load(int type)
 {
     using namespace ship_component_elements;
@@ -322,9 +324,14 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
 
     }
 
-    keep_fleets_together(system_manage);
+    uint32_t keep_frames = 10;
+
+    if(((frame_counter + unique_battle_id) % keep_frames) == 0)
+        keep_fleets_together(system_manage);
 
     projectile_manage.tick(*this, step_s, system_manage);
+
+    frame_counter++;
 }
 
 void battle_manager::draw(sf::RenderWindow& win)
