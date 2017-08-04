@@ -1248,7 +1248,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 //ImGui::Text(name.c_str());
 
-                if(grouped_orbitals.second.size() > 1)
+                if(grouped_orbitals.second.size() > 1 || orbitals_grouped_by_empire.size() > 1)
                 {
                     ImGui::ColourHoverText(name, {1,1,1});
 
