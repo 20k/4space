@@ -2322,17 +2322,26 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
     std::map<empire_popup, std::vector<orbital_system*>> empire_to_systems;
 
+    empire* unknown_empire = viewing_empire->parent->unknown_empire;
+
     for(orbital_system* os : systems)
     {
-        if(os->get_base()->parent_empire == nullptr)
-            continue;
+        //if(os->get_base()->parent_empire == nullptr)
+        //    continue;
+
+        empire* found_empire = os->get_base()->parent_empire;
+
+        if(found_empire == nullptr)
+        {
+            found_empire = unknown_empire;
+        }
 
         empire_popup pop;
-        pop.e = os->get_base()->parent_empire;
+        pop.e = found_empire;
         pop.id = os->unique_id;
-        pop.hidden = os->get_base()->parent_empire == nullptr; ///currently always false
+        pop.hidden = found_empire == unknown_empire;
         pop.type = orbital_info::NONE;
-        pop.is_player = os->get_base()->parent_empire == viewing_empire;
+        pop.is_player = found_empire == viewing_empire;
 
         empire_to_systems[pop].push_back(os);
 
@@ -2358,6 +2367,8 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
         if(current_empire != nullptr)
             empire_name_str = "Systems owned by: " + current_empire->name + " (" + std::to_string(sys_emp.second.size()) + ")";
+        if(current_empire == unknown_empire)
+            empire_name_str = "Systems Unowned";
 
         ///or... maybe draw for all fleets we know of?
         ///sort these all into a std::map -> vector of empires

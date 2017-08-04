@@ -212,6 +212,15 @@ struct empire_manager
     std::vector<empire*> pirate_empires;
     ///ok so. if a pirate empire has a fleet alive in not an owned system, they can keep launching attacks
 
+    empire* unknown_empire = nullptr;
+
+    empire_manager()
+    {
+        unknown_empire = new empire;
+        unknown_empire->name = "Unknown";
+        unknown_empire->parent = this;
+    }
+
     empire* make_new();
 
     void generate_resources_from_owned(float diff_s);
