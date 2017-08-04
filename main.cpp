@@ -1246,8 +1246,31 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::BeginGroup();
 
-                ImGui::Text(name.c_str());
+                //ImGui::Text(name.c_str());
 
+                if(grouped_orbitals.second.size() > 1)
+                {
+                    ImGui::ColourHoverText(name, {1,1,1});
+
+                    if(ImGui::IsItemHovered())
+                    {
+                        tooltip::add("Click to select this fleet");
+                    }
+
+                    if(ImGui::IsItemClicked_Registered() && !lctrl)
+                    {
+                        popup.schedule_rem_all_but(o);
+                    }
+
+                    if(ImGui::IsItemClicked_Registered() && lctrl)
+                    {
+                        popup.schedule_rem(o);
+                    }
+                }
+                else
+                {
+                    ImGui::ColourNoHoverText(name, {1,1,1});
+                }
 
                 ///do warp charging info here
                 if(o->type == orbital_info::FLEET && o->parent_empire == player_empire)
@@ -1430,7 +1453,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         draw_col = mix(damaged_col, full_col, hp_frac*hp_frac);
                     }
 
-                    ImGui::TextColored(ImVec4(draw_col.x(), draw_col.y(), draw_col.z(), 1), str.c_str());
+                    //ImGui::TextColored(ImVec4(draw_col.x(), draw_col.y(), draw_col.z(), 1), str.c_str());
+
+                    ImGui::ColourHoverText(str, draw_col);
 
                     if(o->type == orbital_info::FLEET)
                     {
@@ -1502,7 +1527,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             //ImGui::Text("");
 
-            if(popup.elements.size() > 1)
+            /*if(popup.elements.size() > 1)
             {
                 ImGui::NeutralText("(Select)");
 
@@ -1517,7 +1542,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 {
                     popup.schedule_rem(o);
                 }
-            }
+            }*/
 
             if(orb->type == orbital_info::FLEET)
             {

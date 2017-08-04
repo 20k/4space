@@ -61,6 +61,18 @@ namespace ImGui
     }
 
     inline
+    void ColourHoverText(const std::string& str, vec3f col)
+    {
+        ImGui::OutlineHoverTextAuto(str, col);
+    }
+
+    inline
+    void ColourNoHoverText(const std::string& str, vec3f col)
+    {
+        ImGui::OutlineHoverTextAuto(str, col, false);
+    }
+
+    inline
     void GoodTextNoHoverEffect(const std::string& str)
     {
         vec3f col = popup_colour_info::good_ui_colour;

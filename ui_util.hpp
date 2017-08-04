@@ -97,7 +97,7 @@ namespace ImGui
     }
 
     inline
-    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col)
+    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col, bool hover = true)
     {
         ImGui::BeginGroup();
 
@@ -117,7 +117,7 @@ namespace ImGui
 
         int thickness = 1;
 
-        if(ImGui::IsWindowHovered() && ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2))
+        if(ImGui::IsWindowHovered() && ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2) && hover)
         {
             ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
 
@@ -163,9 +163,9 @@ namespace ImGui
     }
 
     inline
-    void OutlineHoverTextAuto(const std::string& txt, vec3f text_col)
+    void OutlineHoverTextAuto(const std::string& txt, vec3f text_col, bool hover = true)
     {
-        return OutlineHoverText(txt, text_col/2.f, text_col);
+        return OutlineHoverText(txt, text_col/2.f, text_col, hover);
     }
 }
 
