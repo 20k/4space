@@ -2392,7 +2392,15 @@ int main()
                 int x = event.size.width;
                 int y = event.size.height;
 
-                window.setSize({x, y});
+                window.create(sf::VideoMode(x, y), "Wowee", sf::Style::Default, settings);
+
+                /*window.setSize({x, y});
+
+                auto view = window.getView();
+
+                view = sf::View(sf::FloatRect(0.f, 0.f, window.getSize().x, window.getSize().y));
+
+                window.setView(view);*/
             }
         }
 
