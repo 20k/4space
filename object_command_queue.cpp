@@ -220,6 +220,12 @@ bool do_colonising(orbital* o, queue_type& type)
     if(colony == nullptr)
         return true;
 
+    //if(sm->any_in_combat())
+    //    return true;
+
+    if(sm->any_derelict())
+        return true;
+
     if(sm->any_colonising())
         return false;
 
