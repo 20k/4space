@@ -1169,6 +1169,20 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
         ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), empire_name.c_str());
 
+        if(ImGui::IsItemClicked_Registered())
+        {
+            for(auto& test_popup : orbitals_grouped_by_empire)
+            {
+                if(test_popup.first.e == current_empire)
+                    continue;
+
+                for(orbital* orb : test_popup.second)
+                {
+                    popup.schedule_rem(orb);
+                }
+            }
+        }
+
         ImGui::Indent();
 
         bool first_orbital = true;
@@ -1487,9 +1501,14 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::SameLine();
 
-                if(ImGui::IsItemClicked_Registered())
+                if(ImGui::IsItemClicked_Registered() && !lctrl)
                 {
-                    popup.rem_all_but(o);
+                    popup.schedule_rem_all_but(o);
+                }
+
+                if(ImGui::IsItemClicked_Registered() && lctrl)
+                {
+                    popup.schedule_rem(o);
                 }
             }
 

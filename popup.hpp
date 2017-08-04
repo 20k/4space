@@ -114,6 +114,17 @@ struct popup_info
         }
     }
 
+    void schedule_rem_all_but(void* element)
+    {
+        for(popup_element& elem : elements)
+        {
+            if(elem.element != element)
+            {
+                elem.schedule_erase = true;
+            }
+        }
+    }
+
     void rem(void* element)
     {
         for(int i=0; i<elements.size(); i++)
