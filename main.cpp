@@ -1304,7 +1304,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         }
                     }
 
-                    if(o->command_queue.trying_to_warp())
+                    //if(o->command_queue.trying_to_warp())
+                    if(o->command_queue.get_warp_destinations().size() != 0)
                     {
                         ImGui::SameLine();
 

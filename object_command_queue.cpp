@@ -245,8 +245,6 @@ void object_command_queue::add(const queue_type& type, bool at_back)
         command_queue.push_back(type);
     else
         command_queue.push_front(type);
-
-    std::cout << at_back << std::endl;
 }
 
 void object_command_queue::tick(orbital* o, float diff_s)
@@ -266,8 +264,6 @@ void object_command_queue::tick(orbital* o, float diff_s)
         {
             //should_pop = true;
             next.data.should_pop = true;
-
-            printf("path\n");
         }
     }
 
@@ -286,8 +282,6 @@ void object_command_queue::tick(orbital* o, float diff_s)
         {
             //should_pop = true;
             next.data.should_pop = true;
-
-            printf("col\n");
         }
     }
 
@@ -362,8 +356,6 @@ void object_command_queue::cancel_internal(orbital* o)
                         s->colonise_target = nullptr;
                     }
                 }
-
-                printf("pop c\n");
             }
 
             command_queue.erase(command_queue.begin() + i);
