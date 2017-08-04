@@ -630,7 +630,7 @@ void orbital::transfer(float pnew_rad, float pnew_angle, orbital_system* in_syst
     command_queue.transfer(pnew_rad, pnew_angle, this, in_system);
 }
 
-void orbital::transfer(vec2f pos, orbital_system* in_system)
+void orbital::transfer(vec2f pos, orbital_system* in_system, bool at_back)
 {
     /*vec2f base;
 
@@ -641,7 +641,7 @@ void orbital::transfer(vec2f pos, orbital_system* in_system)
 
     transfer(rel.length(), rel.angle());*/
 
-    command_queue.transfer(pos, this, in_system);
+    command_queue.transfer(pos, this, in_system, at_back);
 }
 
 void orbital::request_transfer(vec2f pos, orbital_system* in_system)

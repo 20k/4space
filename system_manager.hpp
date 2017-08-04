@@ -174,7 +174,7 @@ struct orbital
     std::string get_name_with_info_warfare(empire* viewing_empire);
 
     void transfer(float new_rad, float new_angle, orbital_system* in_system);
-    void transfer(vec2f pos, orbital_system* in_system);
+    void transfer(vec2f pos, orbital_system* in_system, bool at_back = true);
 
     ///only transfers if some underlying thing says yes
     ///eg for fleets, only if they have fuel

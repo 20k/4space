@@ -121,7 +121,7 @@ bool do_warp(orbital* o, queue_type& type)
     return true;
 }
 
-void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system)
+void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back)
 {
     queue_type next;
 
@@ -135,10 +135,15 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
 
     next.type = object_command_queue_info::IN_SYSTEM_PATH;
 
-    add(next);
+    while(command_queue.size() > 0 && command_queue.front().type == object_command_queue_info::IN_SYSTEM_PATH && !at_back)
+    {
+        command_queue.pop_front();
+    }
+
+    add(next, at_back);
 }
 
-void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system)
+void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back)
 {
     vec2f base;
 
@@ -147,7 +152,7 @@ void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewi
 
     vec2f rel = pos - base;
 
-    transfer(rel.length(), rel.angle(), o, viewing_system);
+    transfer(rel.length(), rel.angle(), o, viewing_system, at_back);
 }
 
 bool object_command_queue::transferring()
@@ -229,14 +234,19 @@ bool do_colonising(orbital* o, queue_type& type)
     return add({type, data})
 }*/
 
-void object_command_queue::add(const queue_type& type)
+void object_command_queue::add(const queue_type& type, bool at_back)
 {
     sf::Keyboard key;
 
-    if(!key.isKeyPressed(sf::Keyboard::LShift))
-        cancel();
+    if(!key.isKeyPressed(sf::Keyboard::LShift) && at_back)
+         cancel();
 
-    command_queue.push_back(type);
+    if(at_back)
+        command_queue.push_back(type);
+    else
+        command_queue.push_front(type);
+
+    std::cout << at_back << std::endl;
 }
 
 void object_command_queue::tick(orbital* o, float diff_s)
@@ -256,6 +266,8 @@ void object_command_queue::tick(orbital* o, float diff_s)
         {
             //should_pop = true;
             next.data.should_pop = true;
+
+            printf("path\n");
         }
     }
 
@@ -274,6 +286,8 @@ void object_command_queue::tick(orbital* o, float diff_s)
         {
             //should_pop = true;
             next.data.should_pop = true;
+
+            printf("col\n");
         }
     }
 
@@ -348,6 +362,8 @@ void object_command_queue::cancel_internal(orbital* o)
                         s->colonise_target = nullptr;
                     }
                 }
+
+                printf("pop c\n");
             }
 
             command_queue.erase(command_queue.begin() + i);

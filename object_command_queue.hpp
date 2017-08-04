@@ -65,8 +65,8 @@ struct object_command_queue
 
     std::deque<queue_type> command_queue;
 
-    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system);
-    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system);
+    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system, bool at_back = true);
+    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back = true);
     bool transferring();
     bool trying_to_warp();
 
@@ -75,7 +75,7 @@ struct object_command_queue
     void colonise(orbital* target, ship* colony_ship);
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
-    void add(const queue_type& type);
+    void add(const queue_type& type, bool at_back = true);
     void tick(orbital* o, float diff_s);
 
     bool is_front_complete();
