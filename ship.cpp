@@ -3404,7 +3404,7 @@ bool ship_manager::should_resupply_base(const std::vector<ship_component_element
             if(max_stored[i] < 0.0001f)
                 continue;
 
-            if((cur_res[i] / max_stored[i]) < 0.4f)
+            if((cur_res[i] / max_stored[i]) < 0.8f)
             {
                 return true;
             }
