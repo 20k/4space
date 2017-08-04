@@ -36,8 +36,8 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
     {
         ship_manager* sm = (ship_manager*)o->data;
 
-        //if(sm->any_in_combat())
-        //    return true;
+        if(sm->any_in_combat() && !data.combat_move)
+            return true;
 
         if(!sm->can_move_in_system())
             return true;
@@ -121,7 +121,7 @@ bool do_warp(orbital* o, queue_type& type)
     return true;
 }
 
-void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back)
+void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move)
 {
     queue_type next;
 
@@ -133,6 +133,8 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
     next.data.start_time_s = o->internal_time_s;
     next.data.transfer_within = viewing_system;
 
+    next.data.combat_move = combat_move;
+
     next.type = object_command_queue_info::IN_SYSTEM_PATH;
 
     while(command_queue.size() > 0 && command_queue.front().type == object_command_queue_info::IN_SYSTEM_PATH && !at_back)
@@ -143,7 +145,7 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
     add(next, at_back);
 }
 
-void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back)
+void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move)
 {
     vec2f base;
 
@@ -152,7 +154,7 @@ void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewi
 
     vec2f rel = pos - base;
 
-    transfer(rel.length(), rel.angle(), o, viewing_system, at_back);
+    transfer(rel.length(), rel.angle(), o, viewing_system, at_back, combat_move);
 }
 
 bool object_command_queue::transferring()

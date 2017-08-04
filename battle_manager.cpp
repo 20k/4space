@@ -270,7 +270,7 @@ void battle_manager::keep_fleets_together(system_manager& system_manage)
         if(dist < 40.f)
             continue;
 
-        o->transfer(avg, o->parent_system, false);
+        o->transfer(avg, o->parent_system, false, true);
     }
 }
 
