@@ -990,7 +990,7 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
     //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);
 }
 
-void orbital_system::cull_empty_orbital_fleets(empire_manager& empire_manage)
+void orbital_system::cull_empty_orbital_fleets(empire_manager& empire_manage, popup_info& popup)
 {
     //for(orbital* o : orbitals)
     for(int i=0; i<orbitals.size(); i++)
@@ -1003,6 +1003,8 @@ void orbital_system::cull_empty_orbital_fleets(empire_manager& empire_manage)
 
             if(smanage->ships.size() == 0)
             {
+                popup.rem(o);
+
                 //printf("culled");
 
                 empire_manage.notify_removal(o);
@@ -1625,11 +1627,11 @@ void system_manager::repulse_fleets()
     }
 }
 
-void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage)
+void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage, popup_info& popup)
 {
     for(auto& i : systems)
     {
-        i->cull_empty_orbital_fleets(empire_manage);
+        i->cull_empty_orbital_fleets(empire_manage, popup);
     }
 }
 

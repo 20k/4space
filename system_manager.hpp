@@ -223,6 +223,8 @@ struct orbital
     virtual ~orbital(){}
 };
 
+struct popup_info;
+
 struct orbital_system
 {
     vec2f universe_pos = {0,0};
@@ -247,7 +249,7 @@ struct orbital_system
     ///currently viewed empire is drawn differently, see
     void draw(sf::RenderWindow& win, empire* viewer_empire);
 
-    void cull_empty_orbital_fleets(empire_manager& empire_manage);
+    void cull_empty_orbital_fleets(empire_manager& empire_manage, popup_info& popup);
 
     orbital* get_by_element(void* element);
 
@@ -312,7 +314,7 @@ struct system_manager
 
     void repulse_fleets();
 
-    void cull_empty_orbital_fleets(empire_manager& empire_manage);
+    void cull_empty_orbital_fleets(empire_manager& empire_manage, popup_info& popup);
 
     void add_selected_orbital(orbital* o);
 

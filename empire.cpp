@@ -912,6 +912,7 @@ void empire::tick_cleanup_colonising()
                 }
                 else
                 {
+                    ///this needs to be pushed to the front of the queue
                     o->transfer(s->colonise_target->absolute_pos, o->parent_system);
                 }
             }

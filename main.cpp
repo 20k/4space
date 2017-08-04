@@ -1914,9 +1914,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     popup.remove_scheduled();
 
-    system_manage.cull_empty_orbital_fleets(empires);
+    system_manage.cull_empty_orbital_fleets(empires, popup);
     fleet_manage.cull_dead(empires);
-    system_manage.cull_empty_orbital_fleets(empires);
+    system_manage.cull_empty_orbital_fleets(empires, popup);
     fleet_manage.cull_dead(empires);
 
     ImGui::End();
@@ -2531,9 +2531,9 @@ int main()
         }
 
 
-        system_manage.cull_empty_orbital_fleets(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
         fleet_manage.cull_dead(empire_manage);
-        system_manage.cull_empty_orbital_fleets(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
         fleet_manage.cull_dead(empire_manage);
 
 
@@ -2555,9 +2555,11 @@ int main()
         //printf("precull\n");
 
         empire_manage.tick_cleanup_colonising();
-        system_manage.cull_empty_orbital_fleets(empire_manage);
+
+        ///need to remove any dead items from popup
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
         fleet_manage.cull_dead(empire_manage);
-        system_manage.cull_empty_orbital_fleets(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
         fleet_manage.cull_dead(empire_manage);
 
 
@@ -2599,9 +2601,9 @@ int main()
         ///we cull empty orbital fleets, then we cull the dead fleet itself
         ///ships might have been culled in cull_dead, so we then need to cull any fleets with nothing in them
         ///and then actually remove those ships in the next cull dead
-        system_manage.cull_empty_orbital_fleets(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
         fleet_manage.cull_dead(empire_manage);
-        system_manage.cull_empty_orbital_fleets(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
         fleet_manage.cull_dead(empire_manage);
 
         //printf("Prerender\n");
