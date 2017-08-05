@@ -4029,7 +4029,9 @@ void fleet_manager::tick_all(float step_s)
     {
         tcount %= bound;
 
-        if(tcount != internal_counter && !sm->any_in_combat())
+        bool in_combat = sm->any_in_combat();
+
+        if(tcount != internal_counter && !in_combat)
         {
             tcount++;
             continue;
@@ -4039,7 +4041,14 @@ void fleet_manager::tick_all(float step_s)
 
         sm->accumulated_dt = 0;
 
-        if(sm->auto_resupply && sm->should_resupply() && sm->parent_empire)
+        bool is_ai = false;
+
+        if(sm->parent_empire != nullptr && sm->parent_empire->has_ai)
+        {
+            is_ai = true;
+        }
+
+        if(!in_combat && !is_ai && sm->auto_resupply && sm->should_resupply() && sm->parent_empire)
         {
             sm->resupply(sm->parent_empire, false);
         }
