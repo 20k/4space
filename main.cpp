@@ -1844,6 +1844,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
         }
     }
 
+    ///this is kind of useless now
     if(potential_new_fleet.size() > 0)
     {
         ImGui::NeutralText("(Make New Fleet)");

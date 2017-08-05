@@ -32,6 +32,19 @@ namespace popup_colour_info
 
 namespace ImGui
 {
+    struct ScopedIndent
+    {
+        ScopedIndent()
+        {
+            ImGui::Indent();
+        }
+
+        ~ScopedIndent()
+        {
+            ImGui::Unindent();
+        };
+    };
+
     inline
     void GoodText(const std::string& str)
     {
