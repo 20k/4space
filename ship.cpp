@@ -519,10 +519,8 @@ component_attribute component::get_element(const ship_component_element& type)
     return components[type];
 }
 
-std::map<ship_component_element, float> merge_diffs(const std::map<ship_component_element, float>& one, const std::map<ship_component_element, float>& two)
+std::map<ship_component_element, float> merge_diffs(std::map<ship_component_element, float> ret, const std::map<ship_component_element, float>& two)
 {
-    std::map<ship_component_element, float> ret = one;
-
     ///will correctly expand to everything in both of the elements
     for(auto& i : two)
     {

@@ -337,7 +337,7 @@ private:
     float currently_drained = 0.f;
 };
 
-std::map<ship_component_element, float> merge_diffs(const std::map<ship_component_element, float>& one, const std::map<ship_component_element, float>& two);
+std::map<ship_component_element, float> merge_diffs(std::map<ship_component_element, float> one, const std::map<ship_component_element, float>& two);
 
 ///ie what can things do
 ///this is a ship entity for the moment.. but could likely describe a character as well
