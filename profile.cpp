@@ -3,6 +3,8 @@
 #include <imgui/imgui.h>
 #include <iostream>
 
+#ifdef ENABLE_PROFILING
+
 std::string auto_timer::last_func;
 int auto_timer::last_line;
 
@@ -122,3 +124,4 @@ void auto_timer::dump_imgui()
 
     ImGui::End();
 }
+#endif

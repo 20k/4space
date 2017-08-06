@@ -28,6 +28,12 @@ bool operator<(const timer_info& t1, const timer_info& t2)
     return t1.line < t2.line;
 }
 
+//#define ENABLE_PROFILING
+
+#ifdef ENABLE_PROFILING
+
+#define MAKE_AUTO_TIMER() auto_timer(__PRETTY_FUNCTION__, __LINE__)
+
 struct auto_timer
 {
     std::chrono::high_resolution_clock::time_point start_s;
@@ -56,7 +62,24 @@ struct auto_timer
     static void dump();
     static void dump_imgui();
 };
+#else
 
-#define MAKE_AUTO_TIMER() auto_timer(__PRETTY_FUNCTION__, __LINE__)
+#define MAKE_AUTO_TIMER() auto_timer()
+
+struct auto_timer
+{
+    void start(){}
+    void finish(){}
+
+    static void incremenet_last_num(){}
+    static void increment_last_num(){}
+    static void increment_all(){}
+    static void reduce(){}
+
+    static void reset(){}
+    static void dump(){}
+    static void dump_imgui(){}
+};
+#endif
 
 #endif // PROFILE_HPP_INCLUDED
