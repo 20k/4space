@@ -3,6 +3,9 @@
 #include <imgui/imgui.h>
 #include <iostream>
 
+std::string auto_timer::last_func;
+int auto_timer::last_line;
+
 std::map<timer_info, timer_data> auto_timer::info;
 
 auto_timer::auto_timer(const std::string& pfunc, int pline) : func(pfunc), line(pline){}
@@ -10,6 +13,9 @@ auto_timer::auto_timer(const std::string& pfunc, int pline) : func(pfunc), line(
 void auto_timer::start()
 {
     start_s = std::chrono::high_resolution_clock::now();
+
+    last_func = func;
+    last_line = line;
 }
 
 void auto_timer::finish()
@@ -21,13 +27,43 @@ void auto_timer::finish()
     double time = time_span.count();
 
     auto_timer::info[{func, line}].time_s += time;
-    auto_timer::info[{func, line}].num ++;
+    //auto_timer::info[{func, line}].num ++;
 }
 
+void auto_timer::increment_last_num()
+{
+    auto_timer::info[{last_func, last_line}].num++;
+}
+
+void auto_timer::increment_all()
+{
+    for(auto& i : info)
+    {
+        i.second.num++;
+    }
+}
 
 void auto_timer::reset()
 {
     info.clear();
+}
+
+void auto_timer::reduce()
+{
+    for(std::pair<const timer_info, timer_data>& dat : info)
+    {
+        const timer_info& inf = dat.first;
+        timer_data& data = dat.second;
+
+        int num = data.num;
+
+        double time = data.time_s;
+
+        time = time / num;
+
+        data.num = 50;
+        data.time_s = time * data.num;
+    }
 }
 
 void auto_timer::dump()

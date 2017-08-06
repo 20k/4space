@@ -35,10 +35,17 @@ struct auto_timer
     std::string func;
     int line;
 
+    static std::string last_func;
+    static int last_line;
+
     auto_timer(const std::string& func, int line);
 
     void start();
     void finish();
+
+    static void increment_last_num();
+    static void increment_all();
+    static void reduce();
 
     static std::map<timer_info, timer_data> info;
 
@@ -47,6 +54,6 @@ struct auto_timer
     static void dump_imgui();
 };
 
-#define MAKE_AUTO_TIMER() auto_timer(__PRETTY_FUNCTION__, __LINE)
+#define MAKE_AUTO_TIMER() auto_timer(__PRETTY_FUNCTION__, __LINE__)
 
 #endif // PROFILE_HPP_INCLUDED

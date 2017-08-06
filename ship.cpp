@@ -7,6 +7,7 @@
 #include "top_bar.hpp"
 #include "procedural_text_generator.hpp"
 #include <unordered_map>
+#include "profile.hpp"
 
 int ship_manager::gid;
 
@@ -1138,6 +1139,10 @@ float component::safe_hp_frac_modify(float in)
 
 void ship::tick_all_components(float step_s)
 {
+    auto timer = MAKE_AUTO_TIMER();
+
+    timer.start();
+
     //if(step_s < 0.1)
     //    step_s = 0.1;
 
@@ -1542,6 +1547,8 @@ void ship::tick_all_components(float step_s)
 
         c.propagate_total_efficiency(step_s);
     }
+
+    timer.finish();
 
     ///so amount left over is total_to_apply - available_capacities
 
