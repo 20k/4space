@@ -1911,11 +1911,13 @@ bool ship::can_use(component& c)
             return false;
     }
 
-    auto stored = get_stored_resources();
+    //auto stored = get_stored_resources();
+
+    auto fully_merged = get_fully_merged(1.f);
 
     for(auto& i : requirements)
     {
-        if(stored[i.first] < requirements[i.first])
+        if(fully_merged[i.first].cur_amount < requirements[i.first])
             return false;
     }
 
@@ -2910,16 +2912,20 @@ research ship::get_recrew_potential_research(empire* claiming)
 
 std::string ship::get_resource_str(const ship_component_element& type)
 {
-    auto res = get_stored_resources();
-    auto max_res = get_max_resources();
+    auto fully_merged = get_fully_merged(1.f);
 
-    return "(" + to_string_with_enforced_variable_dp(res[type]) + "/" + to_string_with_variable_prec(max_res[type]) + ")";
+    auto res = fully_merged[type].cur_amount;
+    auto max_res = fully_merged[type].max_amount;
+
+    return "(" + to_string_with_enforced_variable_dp(res) + "/" + to_string_with_variable_prec(max_res) + ")";
 }
 
 float ship::get_fuel_frac()
 {
-    float res = get_stored_resources()[ship_component_element::FUEL];
-    float max_res = get_max_resources()[ship_component_element::FUEL];
+    auto fully_merged = get_fully_merged(1.f);
+
+    auto res = fully_merged[ship_component_element::FUEL].cur_amount;
+    auto max_res = fully_merged[ship_component_element::FUEL].max_amount;
 
     if(max_res < 0.0001f)
         return 0.f;
@@ -3295,14 +3301,13 @@ std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* v
 
         if(full_detail && !obfuscate_hp)
         {
-            auto res = s->get_stored_resources();
-            auto max_res = s->get_max_resources();
+            auto fully_merged = s->get_fully_merged(1.f);
 
             //float hp_frac = res[ship_component_element::HP] / max_res[ship_component_element::HP];
             //float percent = hp_frac * 100.f;
             //std::string hp_name = "(" + to_string_with_enforced_variable_dp(percent) + "%%)";
 
-            std::string hp_name = "(" + to_string_with_enforced_variable_dp(res[ship_component_element::HP]) + "/" + to_string_with_variable_prec(max_res[ship_component_element::HP]) + ")";
+            std::string hp_name = "(" + to_string_with_enforced_variable_dp(fully_merged[ship_component_element::HP].cur_amount) + "/" + to_string_with_variable_prec(fully_merged[ship_component_element::HP].max_amount) + ")";
 
             if(obfuscate_hp)
             {
@@ -3439,16 +3444,14 @@ bool ship_manager::should_resupply_base(const std::vector<ship_component_element
 
     for(ship* s : ships)
     {
-        auto cur_res = s->get_stored_resources();
-
-        auto max_stored = s->get_max_resources();
+        auto fully_merged = s->get_fully_merged(1.f);
 
         for(auto& i : to_test)
         {
-            if(max_stored[i] < 0.0001f)
+            if(fully_merged[i].max_amount < 0.0001f)
                 continue;
 
-            if((cur_res[i] / max_stored[i]) < 0.8f)
+            if((fully_merged[i].cur_amount / fully_merged[i].max_amount) < 0.8f)
             {
                 return true;
             }
@@ -3929,10 +3932,9 @@ bool ship_manager::any_damaged()
 {
     for(ship* s : ships)
     {
-        auto stored = s->get_stored_resources();
-        auto max_res = s->get_max_resources();
+        auto fully_merged = s->get_fully_merged(1.f);
 
-        if(stored[ship_component_element::HP] < max_res[ship_component_element::HP])
+        if(fully_merged[ship_component_element::HP].cur_amount < fully_merged[ship_component_element::HP].max_amount)
             return true;
     }
 

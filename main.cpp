@@ -736,8 +736,11 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             {
                 std::string name = kk->name;
                 std::string team = std::to_string(kk->team);
-                float damage = kk->get_stored_resources()[ship_component_elements::HP];
-                float damage_max = kk->get_max_resources()[ship_component_elements::HP];
+
+                auto fully_merged = kk->get_fully_merged(1.f);
+
+                float damage = fully_merged[ship_component_elements::HP].cur_amount;
+                float damage_max = fully_merged[ship_component_elements::HP].max_amount;
 
                 std::string damage_str = "(" + to_string_with_enforced_variable_dp(damage) + "/" + to_string_with_enforced_variable_dp(damage_max) + ")";
 
@@ -1449,7 +1452,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     {
                         cur_ship = sm->ships[i];
 
-                        hp_frac = cur_ship->get_stored_resources()[ship_component_element::HP] / cur_ship->get_max_resources()[ship_component_element::HP];
+                        auto fully_merged = cur_ship->get_fully_merged(1.f);
+
+                        hp_frac = fully_merged[ship_component_elements::HP].cur_amount / fully_merged[ship_component_elements::HP].max_amount;
 
                         draw_col = mix(damaged_col, full_col, hp_frac*hp_frac);
                     }
