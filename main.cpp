@@ -1556,7 +1556,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(can_resupply)
                 {
-                    //ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour);
                     ImGui::GoodText("(Resupply)");
 
                     ImGui::SameLine();
