@@ -39,6 +39,9 @@ struct auto_timer
     static int last_line;
 
     auto_timer(const std::string& func, int line);
+    ~auto_timer();
+
+    bool finished = false;
 
     void start();
     void finish();

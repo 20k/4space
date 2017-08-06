@@ -2633,8 +2633,6 @@ int main()
         ///this is slow
         fleet_manage.tick_all(diff_s);
 
-        auto_timer::increment_all();
-
         //printf("predrawres\n");
 
         player_empire->resources.draw_ui(window);
@@ -2678,6 +2676,7 @@ int main()
         context_menu::tick();
         context_menu::stop();*/
 
+        auto_timer::increment_all();
         auto_timer::dump_imgui();
         auto_timer::reduce();
 

@@ -10,6 +10,12 @@ std::map<timer_info, timer_data> auto_timer::info;
 
 auto_timer::auto_timer(const std::string& pfunc, int pline) : func(pfunc), line(pline){}
 
+auto_timer::~auto_timer()
+{
+    if(!finished)
+        finish();
+}
+
 void auto_timer::start()
 {
     start_s = std::chrono::high_resolution_clock::now();
@@ -28,6 +34,8 @@ void auto_timer::finish()
 
     auto_timer::info[{func, line}].time_s += time;
     //auto_timer::info[{func, line}].num ++;
+
+    finished = true;
 }
 
 void auto_timer::increment_last_num()

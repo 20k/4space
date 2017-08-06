@@ -1568,6 +1568,9 @@ void ship::tick_all_components(float step_s)
 
 void ship::tick_other_systems(float step_s)
 {
+    auto timer = MAKE_AUTO_TIMER();
+    timer.start();
+
     disengage_clock_s += step_s;
 
     test_set_disabled();
@@ -2172,6 +2175,8 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
 
         distribute_damage(hp_damage/2, 1, this);
 
+        //test_set_disabled();
+
         if(hit_by == nullptr || ship_hit_by == nullptr || system_manage == nullptr)
             return;
 
@@ -2202,6 +2207,8 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
     float leftover = res[ship_component_element::HP];
 
     distribute_damage(-leftover/2.f, 1, this);
+
+    //test_set_disabled();
 
     empire* being_hit_empire = owned_by->parent_empire;
 
@@ -2536,8 +2543,16 @@ void ship::force_fully_disabled(bool disabled)
 
 void ship::test_set_disabled()
 {
-    float cur_hp = get_stored_resources()[ship_component_element::HP];
-    float max_hp = get_max_resources()[ship_component_element::HP];
+    auto timer = MAKE_AUTO_TIMER();
+    timer.start();
+
+    //float cur_hp = get_stored_resources()[ship_component_element::HP];
+    //float max_hp = get_max_resources()[ship_component_element::HP];
+
+    auto full_merge = get_fully_merged(1.f);
+
+    float cur_hp = full_merge[ship_component_element::HP].cur_amount;
+    float max_hp = full_merge[ship_component_element::HP].max_amount;
 
     bool full_disabled = false;
 
@@ -2553,6 +2568,8 @@ void ship::test_set_disabled()
     {
         full_disabled = true;
     }
+
+    timer.finish();
 
     float avg_efficiency = 0.f;
     int num_components = 0;

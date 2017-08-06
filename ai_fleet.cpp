@@ -4,6 +4,7 @@
 #include "ship.hpp"
 #include "battle_manager.hpp"
 #include <assert.h>
+#include "profile.hpp"
 
 uint32_t ai_fleet::gid;
 
@@ -34,6 +35,10 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
 ///this takes like 4ms
 void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
 {
+    auto timer = MAKE_AUTO_TIMER();
+
+    timer.start();
+
     ///split fleets up after we finish basic ai
     if(ship_manage->any_derelict())
     {
