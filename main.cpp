@@ -28,6 +28,7 @@
 #include "drag_and_drop.hpp"
 #include "ui_util.hpp"
 #include "context_menu.hpp"
+#include "profile.hpp"
 
 
 ///so display this (ish) on mouseover for a component
@@ -2674,6 +2675,8 @@ int main()
         /*context_menu::start();
         context_menu::tick();
         context_menu::stop();*/
+
+        auto_timer::dump_imgui();
 
         top_bar::display();
         tooltip::set_clear_tooltip();
