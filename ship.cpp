@@ -1413,6 +1413,9 @@ void ship::tick_all_components(float step_s)
         cur++;
     }
 
+    auto t2 = MAKE_AUTO_TIMER();
+    t2.start();
+
     for(auto& i : entity_list)
     {
         for(auto& c : i.components)
@@ -1436,6 +1439,10 @@ void ship::tick_all_components(float step_s)
             {
                 for(auto& c2 : k.components)
                 {
+                    ///so, the reason why this is slow is because of the number of redundant checks
+                    ///what we really need to do is just map each primary to the components and iterate
+                    ///through those
+                    ///do this through component::add
                     if(c2.first != c.first)
                         continue;
 
@@ -1468,6 +1475,7 @@ void ship::tick_all_components(float step_s)
             }
         }
     }
+    t2.finish();
 
     /*for(auto& i : needed)
     {
@@ -1486,22 +1494,26 @@ void ship::tick_all_components(float step_s)
 
     //printf("leftover %f\n", produced[ship_component_element::ENERGY]);
 
+    auto t3 = MAKE_AUTO_TIMER();
+    t3.start();
 
-    std::map<ship_component_element, float> available_capacities = get_available_capacities();
+    //std::map<ship_component_element, float> available_capacities = get_available_capacities();
+
+    auto available_capacities = get_available_capacities_vec();
 
     ///how to apply the output to systems fairly? Try and distribute evenly? Proportionally?
     ///proportional seems reasonable atm
     ///ok so this step distributes to all the individual storage
     for(component& c : entity_list)
     {
-        const auto& this_entity_available = c.get_available_capacities();
+        const auto& this_entity_available = c.get_available_capacities_vec();
 
         for(auto& i : this_entity_available)
         {
-            if(available_capacities[i.first] <= FLOAT_BOUND)
+            if(available_capacities[i.first].second <= FLOAT_BOUND)
                 continue;
 
-            float proportion = i.second / available_capacities[i.first];
+            float proportion = i.second / available_capacities[i.first].second;
 
             float applying_to_this = proportion * fully_merge[i.first].produced_per_s;
 
@@ -1523,6 +1535,8 @@ void ship::tick_all_components(float step_s)
             //auto left_over = r;
         }
     }
+
+    t3.finish();
 
     for(component& c : entity_list)
     {
