@@ -2199,7 +2199,7 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
 
         distribute_damage(hp_damage/2, 1, this);
 
-        //test_set_disabled();
+        test_set_disabled();
 
         if(hit_by == nullptr || ship_hit_by == nullptr || system_manage == nullptr)
             return;
@@ -2232,7 +2232,7 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
 
     distribute_damage(-leftover/2.f, 1, this);
 
-    //test_set_disabled();
+    test_set_disabled();
 
     empire* being_hit_empire = owned_by->parent_empire;
 
