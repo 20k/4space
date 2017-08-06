@@ -1337,54 +1337,48 @@ void ship::tick_all_components(float step_s)
 
             for(auto& k : entity_list)
             {
-                //for(auto& c2 : k.components)
+                auto it = k.components.find(c.first);
+
+                if(it == k.components.end())
+                    continue;
+
+                component_attribute& other = it->second;
+
+                //component_attribute& other = c2.second;
+
+                float take_amount = frac * other.get_produced_amount(step_s) + extra;
+
+                ///for fractional drainage
+                if(frac > 1)
                 {
-                    //if(c2.first != c.first)
-                    //    continue;
-
-                    auto it = k.components.find(c.first);
-
-                    if(it == k.components.end())
-                        continue;
-
-                    component_attribute& other = it->second;
-
-                    //component_attribute& other = c2.second;
-
-                    float take_amount = frac * other.get_produced_amount(step_s) + extra;
-
-                    ///for fractional drainage
-                    if(frac > 1)
-                    {
-                        take_amount = (1.f / frac) * me.get_drain_capacity(step_s) + extra;
-                    }
-
-                    if(take_amount > me.get_total_capacity(step_s))
-                        take_amount = me.get_total_capacity(step_s);
-
-                    /*if(c.first == ship_component_element::OXYGEN)
-                    {
-                        printf("%f atake\n", take_amount);
-                    }*/
-
-                    ///ie the amount we actually took from other
-                    float drained = me.consume_from_amount_available(other, take_amount, step_s);
-
-                    /*if(c.first == ship_component_element::OXYGEN)
-                    {
-                        printf("%f ataken\n", drained);
-                    }*/
-
-                    //produced[c.first] -= drained;
-                    //needed[c.first] -= drained;
-
-                    fully_merge[c.first].produced_per_s -= drained;
-                    fully_merge[c.first].drained_per_s -= drained;
-
-                    ///the conditional fixes specifically fractional drainage
-                    if(frac <= 1)
-                        extra += (take_amount - drained);
+                    take_amount = (1.f / frac) * me.get_drain_capacity(step_s) + extra;
                 }
+
+                if(take_amount > me.get_total_capacity(step_s))
+                    take_amount = me.get_total_capacity(step_s);
+
+                /*if(c.first == ship_component_element::OXYGEN)
+                {
+                    printf("%f atake\n", take_amount);
+                }*/
+
+                ///ie the amount we actually took from other
+                float drained = me.consume_from_amount_available(other, take_amount, step_s);
+
+                /*if(c.first == ship_component_element::OXYGEN)
+                {
+                    printf("%f ataken\n", drained);
+                }*/
+
+                //produced[c.first] -= drained;
+                //needed[c.first] -= drained;
+
+                fully_merge[c.first].produced_per_s -= drained;
+                fully_merge[c.first].drained_per_s -= drained;
+
+                ///the conditional fixes specifically fractional drainage
+                if(frac <= 1)
+                    extra += (take_amount - drained);
 
             }
         }
@@ -1444,51 +1438,42 @@ void ship::tick_all_components(float step_s)
 
             for(auto& k : entity_list)
             {
-                //for(auto& c2 : k.components)
+                auto it = k.components.find(c.first);
+
+                if(it == k.components.end())
+                    continue;
+
+                component_attribute& other = it->second;
+
+                //component_attribute& other = c2.second;
+
+                float take_amount = frac * other.cur_amount + extra;
+
+                if(take_amount > me.get_total_capacity(step_s))
+                    take_amount = me.get_total_capacity(step_s);
+
+                /*if(c2.first == ship_component_element::OXYGEN)
                 {
-                    ///so, the reason why this is slow is because of the number of redundant checks
-                    ///what we really need to do is just map each primary to the components and iterate
-                    ///through those
-                    ///do this through component::add
-                    /*if(c2.first != c.first)
-                        continue;*/
+                    printf("%f taking from %s\n", take_amount, k.name.c_str());
+                }*/
 
-                    auto it = k.components.find(c.first);
+                ///ie the amount we actually took from other
+                float drained = me.consume_from_amount_stored(other, take_amount, step_s);
 
-                    if(it == k.components.end())
-                        continue;
+                /*if(c2.first == ship_component_element::OXYGEN)
+                {
+                    printf("%f taken\n", drained);
+                }*/
 
-                    component_attribute& other = it->second;
+                ///incorrect, this is taken from STORAGE not PRODUCED
+                //produced[c.first] -= drained;
+                //needed[c.first] -= drained;
 
-                    //component_attribute& other = c2.second;
-
-                    float take_amount = frac * other.cur_amount + extra;
-
-                    if(take_amount > me.get_total_capacity(step_s))
-                        take_amount = me.get_total_capacity(step_s);
-
-                    /*if(c2.first == ship_component_element::OXYGEN)
-                    {
-                        printf("%f taking from %s\n", take_amount, k.name.c_str());
-                    }*/
-
-                    ///ie the amount we actually took from other
-                    float drained = me.consume_from_amount_stored(other, take_amount, step_s);
-
-                    /*if(c2.first == ship_component_element::OXYGEN)
-                    {
-                        printf("%f taken\n", drained);
-                    }*/
-
-                    ///incorrect, this is taken from STORAGE not PRODUCED
-                    //produced[c.first] -= drained;
-                    //needed[c.first] -= drained;
-
-                    extra += (take_amount - drained);
-                }
+                extra += (take_amount - drained);
             }
         }
     }
+
     t2.finish();
 
     /*for(auto& i : needed)
