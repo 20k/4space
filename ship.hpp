@@ -455,6 +455,12 @@ namespace ship_info
     constexpr float misc_resources_obfuscation_level = 0.5f;
 };
 
+/*struct attribute_info
+{
+    int component_offset = 0;
+    int attribute_offset = 0;
+};*/
+
 struct ship : positional
 {
     std::string name;
@@ -463,6 +469,8 @@ struct ship : positional
     static uint32_t gid;
 
     int team = 0;
+
+    std::map<ship_component_element, std::vector<int>> type_to_component_offsets;
 
     std::vector<component> entity_list;
 

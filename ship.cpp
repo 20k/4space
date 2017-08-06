@@ -1337,12 +1337,19 @@ void ship::tick_all_components(float step_s)
 
             for(auto& k : entity_list)
             {
-                for(auto& c2 : k.components)
+                //for(auto& c2 : k.components)
                 {
-                    if(c2.first != c.first)
+                    //if(c2.first != c.first)
+                    //    continue;
+
+                    auto it = k.components.find(c.first);
+
+                    if(it == k.components.end())
                         continue;
 
-                    component_attribute& other = c2.second;
+                    component_attribute& other = it->second;
+
+                    //component_attribute& other = c2.second;
 
                     float take_amount = frac * other.get_produced_amount(step_s) + extra;
 
@@ -1437,16 +1444,23 @@ void ship::tick_all_components(float step_s)
 
             for(auto& k : entity_list)
             {
-                for(auto& c2 : k.components)
+                //for(auto& c2 : k.components)
                 {
                     ///so, the reason why this is slow is because of the number of redundant checks
                     ///what we really need to do is just map each primary to the components and iterate
                     ///through those
                     ///do this through component::add
-                    if(c2.first != c.first)
+                    /*if(c2.first != c.first)
+                        continue;*/
+
+                    auto it = k.components.find(c.first);
+
+                    if(it == k.components.end())
                         continue;
 
-                    component_attribute& other = c2.second;
+                    component_attribute& other = it->second;
+
+                    //component_attribute& other = c2.second;
 
                     float take_amount = frac * other.cur_amount + extra;
 
@@ -2121,6 +2135,15 @@ void ship::add_negative_resources(std::map<ship_component_element, float> res)
 
 void ship::add(const component& c)
 {
+    //primary_to_component_offsets[c.primary_attribute].push_back(entity_list.size());
+
+    for(auto& e : c.components)
+    {
+        auto type = e.first;
+
+        type_to_component_offsets[type].push_back(entity_list.size());
+    }
+
     entity_list.push_back(c);
 }
 
