@@ -441,6 +441,23 @@ inline component make_default_torpedo()
     return torp;
 }
 
+static std::vector<component> full_component_list =
+{
+    make_default_crew(),
+    make_default_life_support(),
+    make_default_ammo_store(),
+    make_default_shields(),
+    make_default_power_core(),
+    make_default_engines(),
+    make_default_warp_drive(),
+    make_default_scanner(),
+    make_default_heatsink(),
+    make_default_railgun(),
+    make_default_torpedo(),
+    make_default_stealth(),
+    make_default_coloniser(),
+};
+
 inline ship make_default()
 {
     /*ship test_ship;
