@@ -2144,6 +2144,7 @@ int main()
     ship* test_ship2 = fleet2->make_new_from(hostile_empire, make_default());
 
     test_ship2->set_tech_level_from_empire(hostile_empire);
+    //test_ship2->add(make_default_stealth());
 
     ship* test_ship4 = fleet3->make_new_from(player_empire, make_default());
 

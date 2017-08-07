@@ -3267,6 +3267,7 @@ float default_scanning_power_curve(float scanner_modified_power)
     return scanner_modified_power;
 }
 
+///nax tech level
 float get_default_scanning_power(ship* s)
 {
     float scanner_modified_power = 0.f;
@@ -3283,13 +3284,14 @@ float get_default_scanning_power(ship* s)
         float tech_level = c.get_tech_level_of_primary() + 0.5f;
 
         tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
-        //scanner_modified_power = std::max(scanner_modified_power, tech_level);
-        scanner_modified_power += tech_level;
+        scanner_modified_power = std::max(scanner_modified_power, tech_level);
+        //scanner_modified_power += tech_level;
     }
 
     return scanner_modified_power;
 }
 
+///max tech level
 float get_stealth_power(ship* s)
 {
     float accum_tech_stealth_system_modified = 0.f;
@@ -3305,9 +3307,9 @@ float get_stealth_power(ship* s)
 
         tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
 
-        //max_tech_stealth_system_modified = std::max(max_tech_stealth_system_modified, tech_level);
+        accum_tech_stealth_system_modified = std::max(accum_tech_stealth_system_modified, tech_level);
 
-        accum_tech_stealth_system_modified += tech_level;
+        //accum_tech_stealth_system_modified += tech_level;
     }
 
     return accum_tech_stealth_system_modified;
@@ -3327,7 +3329,9 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
     if(empire_culture_distance >= 0.5f)
         culture_distance_mod = (empire_culture_distance - 0.5f) * 0.10f;
 
-    float max_tech_stealth_system_modified = get_stealth_power(s);
+    float disabled_bonus = s->fully_disabled() ? 0.25f : 0.f;
+
+    /*float max_tech_stealth_system_modified = get_stealth_power(s);
 
     float modified_scanning_power = get_default_scanning_power(this) - difficulty_modifier;
 
@@ -3341,11 +3345,67 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 
     ///drive signature / 100
 
-    end_val += clamp((get_scanning_ps() - drive_signature) / 100.f, 0.1f, 3.f);
+    end_val += clamp((get_scanning_ps() - drive_signature) / 100.f, -4.f, 4.f);
 
     end_val = clamp(end_val, 0.f, 1.f);
 
-    return end_val;
+    return end_val;*/
+
+    /*float stealth_tech_level = get_stealth_power(s);
+
+    float scan_tech_level = get_default_scanning_power(this) - difficulty_modifier;
+
+
+
+    ///basically between -5 and 5
+    float tech_difference = scan_tech_level - stealth_tech_level;
+
+    ///so. How do we convert scanning power to
+    float excess_power_over_stealth = get_drive_signature();
+    float scanning_power = get_scanning_ps();
+
+    float total_scanning_power = scanning_power * scan_tech_level + excess_power_over_stealth;
+
+    float fin = (total_scanning_power / 100.f) + empire_culture_distance + disabled_bonus;*/
+
+    /*float stealth_accum = 0.f;
+    float scan_accum = 0.f;
+
+    for(int i=0; i<s->entity_list.size(); i++)
+    {
+        component& c = s->entity_list[i];
+
+        if(c.primary_attribute == ship_component_elements::STEALTH)
+        {
+            float tech_level = c.get_tech_level_of_primary() + 0.5f;
+
+            float fval = tech_level * c.components[c.primary_attribute].cur_efficiency * ;
+        }
+
+    }*/
+
+    auto res = get_fully_merged(1.f);
+    auto res2 = s->get_fully_merged(1.f);
+
+    float their_power_excess = res2[ship_component_elements::ENERGY].produced_per_s - res2[ship_component_elements::STEALTH].produced_per_s;
+
+    float diff = res[ship_component_elements::SCANNING_POWER].produced_per_s + their_power_excess;
+
+    float total_scanning_power = (diff / 100.f) + empire_culture_distance + disabled_bonus;
+
+
+    ///so. Say we produce 90 power and have 30 stealth
+    ///excess power over stealth is 60
+    ///enemy scanning power is 30
+    ///that means that the total scan power is 90 (60 power over stealth, 30 scan power)
+
+    //tech_difference = tech_difference + empire_culture_distance + disabled_bonus;
+
+    //tech_difference /= 2.5f;
+
+    //float fin = (total_scanning_power / 100.f) + tech_difference;
+
+    return clamp(total_scanning_power, 0.f, 1.f);
 }
 
 float ship::get_scanning_power_on(orbital* o, int difficulty_modifier)

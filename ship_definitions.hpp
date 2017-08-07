@@ -272,7 +272,7 @@ inline component make_default_stealth(float effectiveness = 1.f)
     hp.cur_amount = hp.max_amount;
 
     component_attribute stealth;
-    stealth.produced_per_s = 30.f * effectiveness;
+    stealth.produced_per_s = 85.f * effectiveness;
 
     component stealth_drive;
     stealth_drive.add(ship_component_element::COOLING_POTENTIAL, cooling);
