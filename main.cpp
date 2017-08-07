@@ -1813,7 +1813,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 //orbital_system* parent = system_manage.get_parent(o);
                 orbital_system* parent = o->parent_system;
 
-                if(parent == system_manage.hovered_system || parent == nullptr)
+                if(parent == nullptr)
                     continue;
 
                 if(o->parent_empire != player_empire)
@@ -1821,16 +1821,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ship_manager* sm = (ship_manager*)o->data;
 
-                if(!sm->can_warp(system_manage.hovered_system, parent, o))
+                if(parent != system_manage.hovered_system)
                 {
-                    //ImGui::SetTooltip("Cannot Warp");
-                    tooltip::add("Cannot Warp");
+                    if(!sm->can_warp(system_manage.hovered_system, parent, o))
+                    {
+                        tooltip::add("Cannot Warp");
+                    }
+                    else
+                    {
+                        tooltip::add("Right click to Warp");
+                    }
                 }
-                else
-                {
-                    //ImGui::SetTooltip("Right click to Warp");
-                    tooltip::add("Right click to Warp");
-                }
+
 
                 auto warp_destinations = o->command_queue.get_warp_destinations();
 

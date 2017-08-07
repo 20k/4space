@@ -2207,15 +2207,24 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             vec2f pos_1 = p1->universe_pos * universe_scale;
             vec2f pos_2 = p2->universe_pos * universe_scale;
 
+            vec2f perp = perpendicular(pos_2 - pos_1);
+
             int width = 32;
 
-            float len = (pos_2 - pos_1).length();
+            float offset_rad = sun_universe_rad * 1.5f;
+
+            float len = (pos_2 - pos_1).length() - offset_rad*2;
 
             sf::RectangleShape rect;
             rect.setSize({len, width});
             rect.setRotation(r2d((pos_2 - pos_1).angle()));
             rect.setOrigin({0, width/2});
-            rect.setPosition(pos_1.x(), pos_1.y());
+
+            //vec2f next_pos = pos_1 + perp.norm() * 50.f;
+            vec2f next_pos = pos_1;
+            next_pos = next_pos + (pos_2 - pos_1).norm() * offset_rad;
+
+            rect.setPosition(next_pos.x(), next_pos.y());
 
             win.draw(rect);
         }
