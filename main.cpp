@@ -1821,26 +1821,13 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ship_manager* sm = (ship_manager*)o->data;
 
-                if(parent != system_manage.hovered_system)
-                {
-                    if(!sm->can_warp(system_manage.hovered_system, parent, o))
-                    {
-                        tooltip::add("Cannot Warp");
-                    }
-                    else
-                    {
-                        tooltip::add("Right click to Warp");
-                    }
-                }
-
-
                 auto warp_destinations = o->command_queue.get_warp_destinations();
 
                 orbital_system* backup = o->parent_system;
 
                 orbital_system* current = o->parent_system;
 
-                if(warp_destinations.size() > 0)
+                if(warp_destinations.size() > 0 && key.isKeyPressed(sf::Keyboard::LShift))
                 {
                     current = warp_destinations.back();
                 }
@@ -1858,6 +1845,24 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     tooltip::add(name);
                 }*/
 
+                if(parent != system_manage.hovered_system)
+                {
+                    if(path.size() == 0)
+                    {
+                        tooltip::add("No path to system");
+                    }
+
+                    if(path.size() > 0 && !sm->can_warp(system_manage.hovered_system, parent, o))
+                    {
+                        tooltip::add("Queue Warp");
+                    }
+
+                    if(sm->can_warp(system_manage.hovered_system, parent, o))
+                    {
+                        tooltip::add("Warp");
+                    }
+                }
+
                 system_manage.add_draw_pathfinding(path);
 
                 if(path.size() > 0)
@@ -1867,11 +1872,24 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(rclick && sm->parent_empire == player_empire)
                 {
+                    bool skip = false;
+
                     if(!key.isKeyPressed(sf::Keyboard::LShift))
+                    {
                         o->command_queue.cancel();
 
-                    for(orbital_system* sys : path)
-                        o->command_queue.try_warp(sys, true);
+                        ///this is where right click toggling warp destinations happens
+                        if(warp_destinations.size() != 0 && warp_destinations.back() == system_manage.hovered_system)
+                        {
+                            skip = true;
+                        }
+                    }
+
+                    if(!skip)
+                    {
+                        for(orbital_system* sys : path)
+                            o->command_queue.try_warp(sys, true);
+                    }
                 }
             }
         }
