@@ -3351,39 +3351,6 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 
     return end_val;*/
 
-    /*float stealth_tech_level = get_stealth_power(s);
-
-    float scan_tech_level = get_default_scanning_power(this) - difficulty_modifier;
-
-
-
-    ///basically between -5 and 5
-    float tech_difference = scan_tech_level - stealth_tech_level;
-
-    ///so. How do we convert scanning power to
-    float excess_power_over_stealth = get_drive_signature();
-    float scanning_power = get_scanning_ps();
-
-    float total_scanning_power = scanning_power * scan_tech_level + excess_power_over_stealth;
-
-    float fin = (total_scanning_power / 100.f) + empire_culture_distance + disabled_bonus;*/
-
-    /*float stealth_accum = 0.f;
-    float scan_accum = 0.f;
-
-    for(int i=0; i<s->entity_list.size(); i++)
-    {
-        component& c = s->entity_list[i];
-
-        if(c.primary_attribute == ship_component_elements::STEALTH)
-        {
-            float tech_level = c.get_tech_level_of_primary() + 0.5f;
-
-            float fval = tech_level * c.components[c.primary_attribute].cur_efficiency * ;
-        }
-
-    }*/
-
     auto res = get_fully_merged(1.f);
     auto res2 = s->get_fully_merged(1.f);
 
@@ -3398,12 +3365,6 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
     ///excess power over stealth is 60
     ///enemy scanning power is 30
     ///that means that the total scan power is 90 (60 power over stealth, 30 scan power)
-
-    //tech_difference = tech_difference + empire_culture_distance + disabled_bonus;
-
-    //tech_difference /= 2.5f;
-
-    //float fin = (total_scanning_power / 100.f) + tech_difference;
 
     return clamp(total_scanning_power, 0.f, 1.f);
 }
