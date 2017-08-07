@@ -61,9 +61,11 @@ void ship_component_elements::generate_element_infos()
     ei[COOLING_POTENTIAL].base_cost = 3.f;
     ei[COOLING_POTENTIAL].research_type = research_info::MATERIALS;
 
+
     ei[ENERGY].display_name = "Energy";
     ei[ENERGY].base_cost = 15.f;
     ei[ENERGY].research_type = research_info::MATERIALS;
+
 
     ei[OXYGEN].display_name = "Oxygen";
     ei[OXYGEN].base_cost = 5;
