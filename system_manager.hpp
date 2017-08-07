@@ -293,6 +293,8 @@ struct system_manager
 
     system_manager();
 
+    std::vector<std::vector<orbital_system*>> to_draw_pathfinding;
+
     std::vector<orbital_system*> systems;
     orbital_system* currently_viewed = nullptr;
     orbital_system* hovered_system = nullptr;
@@ -305,6 +307,7 @@ struct system_manager
     orbital* get_by_element_orbital(void* ptr);
 
     std::vector<orbital_system*> pathfind(orbital* o, orbital_system* fin);
+    void add_draw_pathfinding(const std::vector<orbital_system*>& path);
 
     std::vector<orbital_system*> get_nearest_n(orbital_system* os, int n);
 

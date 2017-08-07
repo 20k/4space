@@ -1521,15 +1521,6 @@ float heuristic(orbital_system* start, orbital_system* fin)
     return (start->universe_pos - fin->universe_pos).length();
 }
 
-
-
-/*function reconstruct_path(cameFrom, current)
-    total_path := [current]
-    while current in cameFrom.Keys:
-        current := cameFrom[current]
-        total_path.append(current)
-    return total_path*/
-
 std::vector<orbital_system*> reconstruct_path(std::map<orbital_system*, orbital_system*>& came_from, orbital_system* current)
 {
     std::vector<orbital_system*> total_path{current};
@@ -1541,6 +1532,8 @@ std::vector<orbital_system*> reconstruct_path(std::map<orbital_system*, orbital_
         total_path.push_back(current);
     }
 
+    std::reverse(total_path.begin(), total_path.end());
+
     return total_path;
 }
 
@@ -1549,6 +1542,9 @@ std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system
     std::vector<orbital_system*> ret;
 
     if(o->type != orbital_info::FLEET)
+        return ret;
+
+    if(fin == nullptr)
         return ret;
 
     ship_manager* sm = (ship_manager*)o->data;
@@ -1570,12 +1566,10 @@ std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system
     {
         std::vector<std::pair<orbital_system*, float>> sorted;
 
-        for(auto& i : f_score)
+        for(auto& i : open_set)
         {
-            sorted.push_back({i.first, i.second});
+            sorted.push_back({i, f_score[i]});
         }
-
-        //open_set.erase(std::remove(open_set.begin(), open_set.end(), 8), open_set.end());
 
         std::sort(sorted.begin(), sorted.begin(),
                   [](const std::pair<orbital_system*, float>& p1, const std::pair<orbital_system*, float>& p2){return p1.second < p2.second;});
@@ -1585,12 +1579,12 @@ std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system
 
         if(current_sys == fin)
         {
-            ///winner!
-
             return reconstruct_path(came_from, current_sys);
         }
 
-        open_set.erase(std::remove(open_set.begin(), open_set.end(), current_sys), open_set.end());
+        auto it = std::find(open_set.begin(), open_set.end(), current_sys);
+
+        open_set.erase(it);
 
         closed_set.push_back(current_sys);
 
@@ -1599,7 +1593,7 @@ std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system
             if(next_sys == current_sys)
                 continue;
 
-            vec2f dist = next_sys->universe_pos * universe_scale - current_sys->universe_pos * universe_scale;
+            vec2f dist = next_sys->universe_pos - current_sys->universe_pos;
 
             if(dist.length() >= max_distance)
                 continue;
@@ -1628,12 +1622,17 @@ std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system
 
             came_from[next_sys] = current_sys;
 
-            g_score[next_sys] = testing_gscore;
-            f_score[next_sys] = testing_gscore + heuristic(next_sys, fin);
+            g_score[next_sys] = found_gscore;
+            f_score[next_sys] = found_gscore + heuristic(next_sys, fin);
         }
     }
 
     return ret;
+}
+
+void system_manager::add_draw_pathfinding(const std::vector<orbital_system*>& path)
+{
+    to_draw_pathfinding.push_back(path);
 }
 
 std::vector<orbital_system*> system_manager::get_nearest_n(orbital_system* os, int n)
@@ -2195,6 +2194,34 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             screen_offset.y() += draw_offset;
         }
     }
+
+    for(auto& path : to_draw_pathfinding)
+    {
+        std::vector<orbital_system*> next_path = path;
+
+        for(int i=0; i<((int)path.size())-1; i++)
+        {
+            orbital_system* p1 = next_path[i];
+            orbital_system* p2 = next_path[i+1];
+
+            vec2f pos_1 = p1->universe_pos * universe_scale;
+            vec2f pos_2 = p2->universe_pos * universe_scale;
+
+            int width = 32;
+
+            float len = (pos_2 - pos_1).length();
+
+            sf::RectangleShape rect;
+            rect.setSize({len, width});
+            rect.setRotation(r2d((pos_2 - pos_1).angle()));
+            rect.setOrigin({0, width/2});
+            rect.setPosition(pos_1.x(), pos_1.y());
+
+            win.draw(rect);
+        }
+    }
+
+    to_draw_pathfinding.clear();
 }
 
 void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, empire* viewer_empire)

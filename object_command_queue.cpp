@@ -173,7 +173,7 @@ bool object_command_queue::trying_to_warp()
     return command_queue.front().type == object_command_queue_info::WARP;
 }
 
-void object_command_queue::try_warp(orbital_system* fin)
+void object_command_queue::try_warp(orbital_system* fin, bool queue_to_back)
 {
     queue_type next;
 
@@ -181,7 +181,7 @@ void object_command_queue::try_warp(orbital_system* fin)
 
     next.type = object_command_queue_info::WARP;
 
-    add(next);
+    add(next, true, queue_to_back);
 }
 
 void object_command_queue::colonise(orbital* target, ship* colony_ship)
@@ -242,11 +242,11 @@ bool do_colonising(orbital* o, queue_type& type)
     return add({type, data})
 }*/
 
-void object_command_queue::add(const queue_type& type, bool at_back)
+void object_command_queue::add(const queue_type& type, bool at_back, bool queue_to_back)
 {
     sf::Keyboard key;
 
-    if(!key.isKeyPressed(sf::Keyboard::LShift) && at_back)
+    if(!key.isKeyPressed(sf::Keyboard::LShift) && at_back && !queue_to_back)
          cancel();
 
     if(at_back)
@@ -261,6 +261,34 @@ void object_command_queue::tick(orbital* o, float diff_s)
 
     if(command_queue.size() == 0)
         return;
+
+    bool first_warp = true;
+
+    orbital_system* last_warp = nullptr;
+
+    for(int i=0; i<command_queue.size(); i++)
+    {
+        auto& to_test = command_queue.front();
+
+        if(first_warp && to_test.type == object_command_queue_info::WARP)
+        {
+            if(to_test.data.fin == o->parent_system)
+            {
+                to_test.data.should_pop = true;
+            }
+
+            if(to_test.data.fin == last_warp)
+            {
+                to_test.data.should_pop = true;
+
+                last_warp = to_test.data.fin;
+            }
+
+            first_warp = false;
+        }
+    }
+
+    cancel_internal(o);
 
     auto& next = command_queue.front();
     object_command_queue_info::queue_element_type cur = next.type;

@@ -1818,9 +1818,44 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     tooltip::add("Right click to Warp");
                 }
 
+                auto warp_destinations = o->command_queue.get_warp_destinations();
+
+                orbital_system* backup = o->parent_system;
+
+                orbital_system* current = o->parent_system;
+
+                if(warp_destinations.size() > 0)
+                {
+                    current = warp_destinations.back();
+                }
+
+                o->parent_system = current;
+
+                auto path = system_manage.pathfind(o, system_manage.hovered_system);
+
+                o->parent_system = backup;
+
+                /*for(orbital_system* sys : path)
+                {
+                    std::string name = sys->get_base()->name;
+
+                    tooltip::add(name);
+                }*/
+
+                system_manage.add_draw_pathfinding(path);
+
+                if(path.size() > 0)
+                {
+                    path.erase(path.begin());
+                }
+
                 if(rclick && sm->parent_empire == player_empire)
                 {
-                    sm->try_warp(system_manage.hovered_system, o);
+                    if(!key.isKeyPressed(sf::Keyboard::LShift))
+                        o->command_queue.cancel();
+
+                    for(orbital_system* sys : path)
+                        o->command_queue.try_warp(sys, true);
                 }
             }
         }

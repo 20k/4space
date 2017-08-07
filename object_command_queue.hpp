@@ -71,12 +71,12 @@ struct object_command_queue
     bool transferring();
     bool trying_to_warp();
 
-    void try_warp(orbital_system* fin);
+    void try_warp(orbital_system* fin, bool queue_to_back = false);
 
     void colonise(orbital* target, ship* colony_ship);
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
-    void add(const queue_type& type, bool at_back = true);
+    void add(const queue_type& type, bool at_back = true, bool queue_to_back = false);
     void tick(orbital* o, float diff_s);
 
     bool is_front_complete();
