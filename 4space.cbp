@@ -98,6 +98,8 @@
 		<Unit filename="popup.hpp" />
 		<Unit filename="procedural_text_generator.cpp" />
 		<Unit filename="procedural_text_generator.hpp" />
+		<Unit filename="profile.cpp" />
+		<Unit filename="profile.hpp" />
 		<Unit filename="research.cpp" />
 		<Unit filename="research.hpp" />
 		<Unit filename="resource_manager.cpp" />
