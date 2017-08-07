@@ -1678,6 +1678,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
+            ImGui::SameLine();
+
             ImGui::Text("");
 
             bool this_fleet_is_coloniser = false;
