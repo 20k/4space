@@ -253,6 +253,8 @@ struct component_attribute
     void set_tech_level(float level);
     float get_tech_level();
 
+    void upgrade_size(float old_size, float new_size);
+
 private:
     float currently_drained = 0.f;
 };
@@ -272,6 +274,10 @@ struct component
     component_attribute engine_power;
     component_attribute damage;
     component_attribute */
+
+    float current_size = 1;
+
+    void set_size(float new_size);
 
     float scanning_difficulty = randf_s(0.f, 1.f);
 

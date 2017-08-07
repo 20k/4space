@@ -588,6 +588,25 @@ float component_attribute::get_tech_level()
     return tech_level;
 }
 
+void component_attribute::upgrade_size(float old_size, float new_size)
+{
+    float new_ratio = new_size / old_size;
+
+    produced_per_s *= new_ratio;
+    produced_per_use *= new_ratio;
+
+    drained_per_s *= new_ratio;
+    drained_per_use *= new_ratio;
+
+    time_between_uses_s *= new_ratio;
+    max_amount *= new_ratio;
+
+    if(cur_amount > max_amount)
+    {
+        cur_amount = max_amount;
+    }
+}
+
 float component_attribute::consume_from(component_attribute& other, float max_proportion, float step_s)
 {
     if(drained_per_s <= FLOAT_BOUND)
@@ -669,6 +688,21 @@ float component_attribute::consume_from_amount_stored(component_attribute& other
 
     return extra;
 }*/
+
+void component::set_size(float new_size)
+{
+    if(new_size <= 0.f)
+        return;
+
+    for(auto& elem : components)
+    {
+        component_attribute& attr = elem.second;
+
+        attr.upgrade_size(current_size, new_size);
+    }
+
+    current_size = new_size;
+}
 
 bool component::has_element(const ship_component_element& type)
 {
