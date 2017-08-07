@@ -119,11 +119,6 @@ namespace ship_component_elements
         STEALTH,
     };
 
-    /*static std::vector<types> allowed_skip_repair_def
-    {
-        OXYGEN,
-    };*/
-
     extern std::vector<types> allowed_skip_repair_def;
 
     inline
@@ -151,124 +146,16 @@ namespace ship_component_elements
         return ret;
     }
 
-    /*static std::vector<int> repair_in_combat_map = generate_repair_priorities(repair_priorities_in_combat_def);
-    static std::vector<int> repair_out_combat_map = generate_repair_priorities(repair_priorities_out_combat_def);
-    static std::vector<int> allowed_skip_repair = generate_repair_priorities(allowed_skip_repair_def);
-    static std::vector<int> skippable_in_display = generate_repair_priorities(skippable_in_display_def);
-    static std::vector<int> weapons_map = generate_repair_priorities(weapons_map_def);*/
-
     extern std::vector<int> repair_in_combat_map;
     extern std::vector<int> repair_out_combat_map;
     extern std::vector<int> allowed_skip_repair;
     extern std::vector<int> skippable_in_display;
     extern std::vector<int> weapons_map;
 
-    ///we could just take the inverse of cooling_potential when displaying
-    ///might be more friendly for the player
-    /*static std::vector<std::string> display_strings
-    {
-        "Cooling",
-        "Energy",
-        "Oxygen",
-        "Ammo",
-        "Fuel",
-        "Cargo",
-        "Shields",
-        "Armour",
-        "HP",
-        "Engines",
-        "Warp",
-        "Scanning",
-        "Command",
-        "Stealth",
-        "Coloniser",
-        "Railgun",
-        "Torpedo",
-        "Plasmagun",
-        "Coilgun",
-    };*/
-
     extern std::vector<std::string> display_strings;
-
-    /*static std::vector<std::string> short_name
-    {
-        "CL",
-        "EN",
-        "OX",
-        "AM",
-        "FU",
-        "CA",
-        "SH",
-        "AR",
-        "HP",
-        "EG",
-        "WP",
-        "SN",
-        "CM",
-        "ST",
-        "CO",
-        "RP",
-        "WR",
-        "WT",
-        "WP",
-        "WC",
-    };*/
-
-    /*static std::vector<float> base_cost_of_component_with_this_primary_attribute
-    {
-        3.f,
-        15.f,
-        5.f,
-        2.f,
-        1.f,
-        1.f,
-        20.f,
-        4.f,
-        0.5f,
-        10.f,
-        30.f,
-        5.f,
-        2.f,
-        80.f,
-        120.f,
-        50.f,
-        50.f,
-        35.f,
-        30.f
-    };*/
-
     extern std::vector<float> base_cost_of_component_with_this_primary_attribute;
 
     static float construction_cost_mult = 0.1f;
-
-    ///Ok... we might want more research types
-    /*static std::vector<research_info::types> component_element_to_research_type
-    {
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-
-        research_info::PROPULSION,
-        research_info::PROPULSION,
-
-        research_info::SCANNERS,
-
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-        research_info::MATERIALS,
-
-        research_info::WEAPONS,
-        research_info::WEAPONS,
-        research_info::WEAPONS,
-        research_info::WEAPONS,
-    };*/
 
     extern std::vector<research_info::types> component_element_to_research_type;
 
