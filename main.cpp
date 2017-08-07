@@ -1338,7 +1338,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     //ImGui::TextColored(ImVec4(draw_col.x(), draw_col.y(), draw_col.z(), 1), str.c_str());
 
-                    ImGui::ColourHoverText(str, draw_col);
+
+                    if(o->type == orbital_info::FLEET)
+                        ImGui::ColourHoverText(str, draw_col);
+                    else
+                        ImGui::Text(str.c_str());
 
                     if(o->type == orbital_info::FLEET)
                     {
