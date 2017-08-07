@@ -1516,6 +1516,126 @@ orbital* system_manager::get_by_element_orbital(void* ptr)
     return nullptr;
 }
 
+float heuristic(orbital_system* start, orbital_system* fin)
+{
+    return (start->universe_pos - fin->universe_pos).length();
+}
+
+
+
+/*function reconstruct_path(cameFrom, current)
+    total_path := [current]
+    while current in cameFrom.Keys:
+        current := cameFrom[current]
+        total_path.append(current)
+    return total_path*/
+
+std::vector<orbital_system*> reconstruct_path(std::map<orbital_system*, orbital_system*>& came_from, orbital_system* current)
+{
+    std::vector<orbital_system*> total_path{current};
+
+    while(came_from[current] != nullptr)
+    {
+        current = came_from[current];
+
+        total_path.push_back(current);
+    }
+
+    return total_path;
+}
+
+std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system* fin)
+{
+    std::vector<orbital_system*> ret;
+
+    if(o->type != orbital_info::FLEET)
+        return ret;
+
+    ship_manager* sm = (ship_manager*)o->data;
+
+    float max_distance = sm->get_min_warp_distance();
+
+    std::vector<orbital_system*> closed_set;
+    std::vector<orbital_system*> open_set{o->parent_system};
+
+    std::map<orbital_system*, orbital_system*> came_from;
+
+    std::map<orbital_system*, float> g_score;
+    std::map<orbital_system*, float> f_score;
+
+    g_score[o->parent_system] = 0.f;
+    f_score[o->parent_system] = heuristic(o->parent_system, fin);
+
+    while(open_set.size() > 0)
+    {
+        std::vector<std::pair<orbital_system*, float>> sorted;
+
+        for(auto& i : f_score)
+        {
+            sorted.push_back({i.first, i.second});
+        }
+
+        //open_set.erase(std::remove(open_set.begin(), open_set.end(), 8), open_set.end());
+
+        std::sort(sorted.begin(), sorted.begin(),
+                  [](const std::pair<orbital_system*, float>& p1, const std::pair<orbital_system*, float>& p2){return p1.second < p2.second;});
+
+
+        orbital_system* current_sys = sorted[0].first;
+
+        if(current_sys == fin)
+        {
+            ///winner!
+
+            return reconstruct_path(came_from, current_sys);
+        }
+
+        open_set.erase(std::remove(open_set.begin(), open_set.end(), current_sys), open_set.end());
+
+        closed_set.push_back(current_sys);
+
+        for(orbital_system* next_sys : systems)
+        {
+            if(next_sys == current_sys)
+                continue;
+
+            vec2f dist = next_sys->universe_pos * universe_scale - current_sys->universe_pos * universe_scale;
+
+            if(dist.length() >= max_distance)
+                continue;
+
+            if(std::find(closed_set.begin(), closed_set.end(), next_sys) != closed_set.end())
+                continue;
+
+            if(std::find(open_set.begin(), open_set.end(), next_sys) == open_set.end())
+            {
+                open_set.push_back(next_sys);
+            }
+
+            float found_gscore = g_score[current_sys] + heuristic(next_sys, current_sys);
+
+            auto looking_gscore = g_score.find(next_sys);
+
+            float testing_gscore = FLT_MAX;
+
+            if(looking_gscore != g_score.end())
+            {
+                testing_gscore = looking_gscore->second;
+            }
+
+            if(found_gscore >= testing_gscore)
+                continue;
+
+            came_from[next_sys] = current_sys;
+
+            g_score[next_sys] = testing_gscore;
+            f_score[next_sys] = testing_gscore + heuristic(next_sys, fin);
+        }
+    }
+
+    return ret;
+}
+
 std::vector<orbital_system*> system_manager::get_nearest_n(orbital_system* os, int n)
 {
     std::vector<orbital_system*> syst = systems;
