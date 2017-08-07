@@ -1779,6 +1779,20 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 ImGui::Text(decolo_time.c_str());
             }
+
+            if(o->type == orbital_info::FLEET && o->parent_empire == player_empire)
+            {
+                std::vector<orbital_system*> systems{o->parent_system};
+
+                auto warp_dest = o->command_queue.get_warp_destinations();
+
+                for(auto& i : warp_dest)
+                {
+                    systems.push_back(i);
+                }
+
+                system_manage.add_draw_pathfinding(systems);
+            }
         }
 
         ImGui::Unindent();
