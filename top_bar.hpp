@@ -18,6 +18,7 @@ namespace top_bar_info
         BATTLES,
         //SYSTEMS,
         UNIVERSE,
+        SHIP_CUSTOMISER,
         NONE
     };
 
@@ -30,6 +31,7 @@ namespace top_bar_info
         "Battles",
         //"Systems",
         "Universe",
+        "Ship Customisation",
     };
 }
 

@@ -29,7 +29,7 @@
 #include "ui_util.hpp"
 #include "context_menu.hpp"
 #include "profile.hpp"
-
+#include "ship_customiser.hpp"
 
 ///so display this (ish) on mouseover for a component
 std::string get_component_display_string(component& c)
@@ -2422,6 +2422,8 @@ int main()
 
     test_event2->set_faction(derelict_empire);
 
+    ship_customiser ship_customise;
+
     sf::Keyboard key;
     sf::Mouse mouse;
 
@@ -2756,6 +2758,8 @@ int main()
         auto_timer::increment_all();
         auto_timer::dump_imgui();
         auto_timer::reduce();
+
+        ship_customise.tick();
 
         top_bar::display();
         tooltip::set_clear_tooltip();
