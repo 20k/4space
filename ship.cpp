@@ -701,6 +701,13 @@ void component::set_size(float new_size)
         attr.upgrade_size(current_size, new_size);
     }
 
+    if(has_tag(component_tag::DAMAGE))
+    {
+        float dam = get_tag(component_tag::DAMAGE) * (new_size / current_size);
+
+        set_tag(component_tag::DAMAGE, dam);
+    }
+
     current_size = new_size;
 }
 
