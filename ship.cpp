@@ -3269,7 +3269,7 @@ float default_scanning_power_curve(float scanner_modified_power)
 
 float get_default_scanning_power(ship* s)
 {
-    float scanner_modified_power = -1.f;
+    float scanner_modified_power = 0.f;
 
     for(component& c : s->entity_list)
     {
@@ -3283,7 +3283,8 @@ float get_default_scanning_power(ship* s)
         float tech_level = c.get_tech_level_of_primary() + 0.5f;
 
         tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
-        scanner_modified_power = std::max(scanner_modified_power, tech_level);
+        //scanner_modified_power = std::max(scanner_modified_power, tech_level);
+        scanner_modified_power += tech_level;
     }
 
     return scanner_modified_power;
