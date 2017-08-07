@@ -1048,7 +1048,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
         vec3f col = player_empire->get_relations_colour(pop.hidden ? nullptr : current_empire);
 
-        ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), empire_name.c_str());
+        ImGui::ColourNoHoverText(empire_name, col);
 
         if(orbitals_grouped_by_empire.size() > 1)
         {
