@@ -2192,6 +2192,8 @@ void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 
 int main()
 {
+    ship_component_elements::generate_element_infos();
+
     randf_s();
     randf_s();
 

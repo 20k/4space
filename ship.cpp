@@ -13,6 +13,167 @@ int ship_manager::gid;
 
 uint32_t ship::gid;
 
+std::vector<ship_component_elements::component_element_info> ship_component_elements::element_infos;
+std::vector<ship_component_elements::types> ship_component_elements::allowed_skip_repair_def;
+
+std::vector<int> ship_component_elements::repair_in_combat_map;
+std::vector<int> ship_component_elements::repair_out_combat_map;
+std::vector<int> ship_component_elements::allowed_skip_repair;
+std::vector<int> ship_component_elements::skippable_in_display;
+std::vector<int> ship_component_elements::weapons_map;
+
+std::vector<std::string> ship_component_elements::display_strings;
+std::vector<float> ship_component_elements::base_cost_of_component_with_this_primary_attribute;
+std::vector<research_info::types> ship_component_elements::component_element_to_research_type;
+
+
+using component_info_t = ship_component_elements::component_element_info;
+
+void ship_component_elements::generate_element_infos()
+{
+    /*COOLING_POTENTIAL,
+    ENERGY,
+    OXYGEN,
+    AMMO,
+    FUEL,
+    CARGO,
+    SHIELD_POWER,
+    ARMOUR,
+    HP,
+    ENGINE_POWER,
+    WARP_POWER,
+    SCANNING_POWER,
+    COMMAND,
+    STEALTH,
+    COLONISER,
+    RAILGUN,
+    TORPEDO,
+    PLASMAGUN,
+    COILGUN,*/
+
+    using namespace ship_component_elements;
+
+    element_infos.resize(NONE);
+
+    std::vector<component_element_info>& ei = element_infos;
+
+    ei[COOLING_POTENTIAL].display_name = "Cooling";
+    ei[COOLING_POTENTIAL].base_cost = 3.f;
+    ei[COOLING_POTENTIAL].research_type = research_info::MATERIALS;
+
+    ei[ENERGY].display_name = "Energy";
+    ei[ENERGY].base_cost = 15.f;
+    ei[ENERGY].research_type = research_info::MATERIALS;
+
+    ei[OXYGEN].display_name = "Oxygen";
+    ei[OXYGEN].base_cost = 5;
+    ei[OXYGEN].research_type = research_info::MATERIALS;
+    ei[OXYGEN].allowed_skip_in_repair = true;
+
+
+    ei[AMMO].display_name = "Ammo";
+    ei[AMMO].base_cost = 2;
+    ei[AMMO].research_type = research_info::MATERIALS;
+
+
+    ei[FUEL].display_name = "Fuel";
+    ei[FUEL].base_cost = 1;
+    ei[FUEL].research_type = research_info::MATERIALS;
+
+
+    ei[CARGO].display_name = "Cargo";
+    ei[CARGO].base_cost = 1;
+    ei[CARGO].research_type = research_info::MATERIALS;
+
+
+    ei[SHIELD_POWER].display_name = "Shields";
+    ei[SHIELD_POWER].base_cost = 20;
+    ei[SHIELD_POWER].research_type = research_info::MATERIALS;
+
+
+    ei[ARMOUR].display_name = "Armour";
+    ei[ARMOUR].base_cost = 4;
+    ei[ARMOUR].research_type = research_info::MATERIALS;
+
+
+    ei[HP].display_name = "HP";
+    ei[HP].base_cost = 0.5;
+    ei[HP].research_type = research_info::MATERIALS;
+
+
+    ei[ENGINE_POWER].display_name = "Engines";
+    ei[ENGINE_POWER].base_cost = 10;
+    ei[ENGINE_POWER].research_type = research_info::PROPULSION;
+
+
+    ei[WARP_POWER].display_name = "Warp";
+    ei[WARP_POWER].base_cost = 30;
+    ei[WARP_POWER].research_type = research_info::PROPULSION;
+
+
+    ei[SCANNING_POWER].display_name = "Scanning";
+    ei[SCANNING_POWER].base_cost = 5;
+    ei[SCANNING_POWER].research_type = research_info::SCANNERS;
+
+
+    ei[COMMAND].display_name = "Command";
+    ei[COMMAND].base_cost = 2;
+    ei[COMMAND].research_type = research_info::MATERIALS;
+
+
+    ei[STEALTH].display_name = "Stealth";
+    ei[STEALTH].base_cost = 80;
+    ei[STEALTH].research_type = research_info::MATERIALS;
+
+
+    ei[COLONISER].display_name = "Coloniser";
+    ei[COLONISER].base_cost = 120;
+    ei[COLONISER].research_type = research_info::MATERIALS;
+
+
+    ei[RAILGUN].display_name = "Railgun";
+    ei[RAILGUN].base_cost = 50;
+    ei[RAILGUN].research_type = research_info::WEAPONS;
+
+
+    ei[TORPEDO].display_name = "Torpedo";
+    ei[TORPEDO].base_cost = 50;
+    ei[TORPEDO].research_type = research_info::WEAPONS;
+
+
+    ei[PLASMAGUN].display_name = "Plasmagun";
+    ei[PLASMAGUN].base_cost = 35;
+    ei[PLASMAGUN].research_type = research_info::WEAPONS;
+
+
+    ei[COILGUN].display_name = "Coilgun";
+    ei[COILGUN].base_cost = 30;
+    ei[COILGUN].research_type = research_info::WEAPONS;
+
+
+    int num = 0;
+
+    for(component_element_info& i : ei)
+    {
+        if(i.allowed_skip_in_repair)
+        {
+            allowed_skip_repair_def.push_back((types)num);
+        }
+
+        display_strings.push_back(i.display_name);
+        base_cost_of_component_with_this_primary_attribute.push_back(i.base_cost);
+        component_element_to_research_type.push_back(i.research_type);
+
+        num++;
+    }
+
+    repair_in_combat_map = generate_repair_priorities(repair_priorities_in_combat_def);
+    repair_out_combat_map = generate_repair_priorities(repair_priorities_out_combat_def);
+    allowed_skip_repair = generate_repair_priorities(allowed_skip_repair_def);
+    skippable_in_display = generate_repair_priorities(skippable_in_display_def);
+    weapons_map = generate_repair_priorities(weapons_map_def);
+}
+
 std::map<resource::types, float> ship_component_elements::component_storage_to_resources(const types& type)
 {
     std::map<resource::types, float> ret;

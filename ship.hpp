@@ -32,6 +32,8 @@ struct component_attribute;
 ///we need a tag system, for eg RECOIL or DAMAGE or ARC_OF_FIRE, ie isolated attributes
 namespace ship_component_elements
 {
+    void generate_element_infos();
+
     enum types
     {
         COOLING_POTENTIAL, ///active heat management, but we'll also lose heat into space proportionally to the temperature difference
@@ -57,6 +59,23 @@ namespace ship_component_elements
         COILGUN,
         NONE,
     };
+
+    struct component_element_info
+    {
+        bool is_weapon = false;
+        bool skippable_in_display_defence = false;
+        bool allowed_skip_in_repair = false;
+
+        std::string display_name;
+
+        float base_cost = 1.f;
+
+        research_info::types research_type = research_info::COUNT;
+
+        std::map<resource::types, float> construction_cost_ratio;
+    };
+
+    extern std::vector<component_element_info> element_infos;
 
     static std::vector<types> weapons_map_def
     {
@@ -100,10 +119,12 @@ namespace ship_component_elements
         STEALTH,
     };
 
-    static std::vector<types> allowed_skip_repair_def
+    /*static std::vector<types> allowed_skip_repair_def
     {
         OXYGEN,
-    };
+    };*/
+
+    extern std::vector<types> allowed_skip_repair_def;
 
     inline
     std::vector<int> generate_repair_priorities(const std::vector<types>& vec)
@@ -130,15 +151,21 @@ namespace ship_component_elements
         return ret;
     }
 
-    static std::vector<int> repair_in_combat_map = generate_repair_priorities(repair_priorities_in_combat_def);
+    /*static std::vector<int> repair_in_combat_map = generate_repair_priorities(repair_priorities_in_combat_def);
     static std::vector<int> repair_out_combat_map = generate_repair_priorities(repair_priorities_out_combat_def);
     static std::vector<int> allowed_skip_repair = generate_repair_priorities(allowed_skip_repair_def);
     static std::vector<int> skippable_in_display = generate_repair_priorities(skippable_in_display_def);
-    static std::vector<int> weapons_map = generate_repair_priorities(weapons_map_def);
+    static std::vector<int> weapons_map = generate_repair_priorities(weapons_map_def);*/
+
+    extern std::vector<int> repair_in_combat_map;
+    extern std::vector<int> repair_out_combat_map;
+    extern std::vector<int> allowed_skip_repair;
+    extern std::vector<int> skippable_in_display;
+    extern std::vector<int> weapons_map;
 
     ///we could just take the inverse of cooling_potential when displaying
     ///might be more friendly for the player
-    static std::vector<std::string> display_strings
+    /*static std::vector<std::string> display_strings
     {
         "Cooling",
         "Energy",
@@ -159,9 +186,11 @@ namespace ship_component_elements
         "Torpedo",
         "Plasmagun",
         "Coilgun",
-    };
+    };*/
 
-    static std::vector<std::string> short_name
+    extern std::vector<std::string> display_strings;
+
+    /*static std::vector<std::string> short_name
     {
         "CL",
         "EN",
@@ -183,9 +212,9 @@ namespace ship_component_elements
         "WT",
         "WP",
         "WC",
-    };
+    };*/
 
-    static std::vector<float> base_cost_of_component_with_this_primary_attribute
+    /*static std::vector<float> base_cost_of_component_with_this_primary_attribute
     {
         3.f,
         15.f,
@@ -206,12 +235,14 @@ namespace ship_component_elements
         50.f,
         35.f,
         30.f
-    };
+    };*/
+
+    extern std::vector<float> base_cost_of_component_with_this_primary_attribute;
 
     static float construction_cost_mult = 0.1f;
 
     ///Ok... we might want more research types
-    static std::vector<research_info::types> component_element_to_research_type
+    /*static std::vector<research_info::types> component_element_to_research_type
     {
         research_info::MATERIALS,
         research_info::MATERIALS,
@@ -237,7 +268,9 @@ namespace ship_component_elements
         research_info::WEAPONS,
         research_info::WEAPONS,
         research_info::WEAPONS,
-    };
+    };*/
+
+    extern std::vector<research_info::types> component_element_to_research_type;
 
     std::map<resource::types, float> component_storage_to_resources(const types& type);
 
