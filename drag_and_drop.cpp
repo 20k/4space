@@ -22,7 +22,7 @@ void drag_and_drop::tick_locking_window()
 
 void drag_and_drop::begin_dragging(void* _data, drag_and_drop_info::type type, const std::string& _tooltip_str)
 {
-    frames_to_drop = 2;
+    frames_to_drop = 3;
 
     window_info& inf = window_map[current_tag];
 
@@ -56,7 +56,7 @@ bool drag_and_drop::let_go_on_item()
     if(!dragging)
         return false;
 
-    window_info& inf = window_map[current_tag];
+    //window_info& inf = window_map[current_tag];
 
     sf::Mouse mouse;
 
@@ -75,12 +75,36 @@ bool drag_and_drop::let_go_on_item()
     return false;
 }
 
+bool drag_and_drop::let_go_on_window()
+{
+    if(!dragging)
+        return false;
+
+    //window_info& inf = window_map[current_tag];
+
+    sf::Mouse mouse;
+
+    bool lclick = mouse.isButtonPressed(sf::Mouse::Left);
+
+    if(ImGui::IsWindowHovered() && !lclick && dragging)
+    {
+        finish_dragging();
+
+        if(adequate_drag_distance())
+            return true;
+        else
+            return false;
+    }
+
+    return false;
+}
+
 bool drag_and_drop::let_go_outside_window()
 {
     if(!dragging)
         return false;
 
-    window_info& inf = window_map[current_tag];
+    //window_info& inf = window_map[current_tag];
 
     sf::Mouse mouse;
 

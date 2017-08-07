@@ -708,6 +708,13 @@ void component::set_size(float new_size)
         set_tag(component_tag::DAMAGE, dam);
     }
 
+    if(has_tag(component_tag::WARP_DISTANCE))
+    {
+        float wrp = get_tag(component_tag::WARP_DISTANCE) * (new_size / current_size);
+
+        set_tag(component_tag::WARP_DISTANCE, wrp);
+    }
+
     current_size = new_size;
 }
 

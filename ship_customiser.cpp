@@ -16,7 +16,9 @@ void ship_customiser::tick()
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
 
-    ImGui::Begin("Ship Customisation", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS);
+    global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
+
+    ImGui::Begin("Ship Customisation", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     auto produced = current.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = current.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -50,6 +52,12 @@ void ship_customiser::tick()
     std::vector<std::string> cons_list;
     std::vector<std::string> net_list;
     std::vector<std::string> store_max_list;
+
+    if(elements.size() == 0)
+    {
+        ImGui::Text("Empty Ship");
+        ImGui::NewLine();
+    }
 
     for(const ship_component_element& id : elements)
     {
@@ -155,7 +163,16 @@ void ship_customiser::tick()
         c_id++;
     }
 
+    if(global_drag_and_drop.currently_dragging == drag_and_drop_info::COMPONENT && global_drag_and_drop.let_go_on_window())
+    {
+        component& c = *(component*)global_drag_and_drop.data;
+
+        current.add(c);
+    }
+
     ImGui::End();
+
+    global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_2");
 
     ImGui::Begin("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -172,9 +189,14 @@ void ship_customiser::tick()
 
         ImGui::Text((pad + c.name + pad).c_str());
 
-        if(ImGui::IsItemClicked_Registered())
+        if(ImGui::IsItemClicked_DragCompatible())
         {
             component_open[i] = !component_open[i];
+        }
+
+        if(ImGui::IsItemClicked_UnRegistered())
+        {
+            global_drag_and_drop.begin_dragging(&c, drag_and_drop_info::COMPONENT, c.name);
         }
 
         if(!component_open[i])

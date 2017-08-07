@@ -25,7 +25,7 @@ struct window_info
 
 struct drag_and_drop
 {
-    int frames_to_drop = 2;
+    int frames_to_drop = 3;
 
     bool dragging = false;
     void* data = nullptr;
@@ -51,6 +51,7 @@ struct drag_and_drop
     void finish_dragging();
 
     bool let_go_on_item();
+    bool let_go_on_window();
     bool let_go_outside_window();
 
     void tick();
