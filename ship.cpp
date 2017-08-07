@@ -3291,7 +3291,7 @@ float get_default_scanning_power(ship* s)
 
 float get_stealth_power(ship* s)
 {
-    float max_tech_stealth_system_modified = 0.f;
+    float accum_tech_stealth_system_modified = 0.f;
 
     for(int i=0; i<s->entity_list.size(); i++)
     {
@@ -3304,10 +3304,12 @@ float get_stealth_power(ship* s)
 
         tech_level = tech_level * c.components[c.primary_attribute].cur_efficiency;
 
-        max_tech_stealth_system_modified = std::max(max_tech_stealth_system_modified, tech_level);
+        //max_tech_stealth_system_modified = std::max(max_tech_stealth_system_modified, tech_level);
+
+        accum_tech_stealth_system_modified += tech_level;
     }
 
-    return max_tech_stealth_system_modified;
+    return accum_tech_stealth_system_modified;
 }
 
 float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
