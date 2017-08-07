@@ -68,13 +68,11 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     current_resupply_frame++;
 
-
     ///split fleets up after we finish basic ai
     if(ship_manage->any_derelict())
     {
         return;
     }
-
 
     ///fly around?
     if(!ship_manage->can_engage())
