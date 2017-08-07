@@ -1757,7 +1757,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 {
                     bool skip = false;
 
-                    if(!key.isKeyPressed(sf::Keyboard::LShift))
+                    if(!key.isKeyPressed(sf::Keyboard::LShift) && !system_manage.in_system_view())
                     {
                         o->command_queue.cancel();
 
