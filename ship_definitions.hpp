@@ -131,7 +131,7 @@ inline component make_default_power_core(float effectiveness = 1.f)
     component_attribute fuel;
     fuel.max_amount = 1.f;
     fuel.cur_amount = 1.f;
-    fuel.drained_per_s = effectiveness * fuel.max_amount / 1000;
+    fuel.drained_per_s = effectiveness * fuel.max_amount / 100;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;
@@ -153,7 +153,7 @@ inline component make_default_power_core(float effectiveness = 1.f)
 
 inline component make_default_engines()
 {
-    float max_bad_engine_lifetime_s = 1000;
+    float max_bad_engine_lifetime_s = 2000;
 
     component_attribute fuel;
     fuel.max_amount = 10.f;

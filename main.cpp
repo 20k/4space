@@ -1938,7 +1938,7 @@ struct construction_window_state
 };
 
 ///returns whether or not we've modified our system
-bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fleet_manage, construction_window_state& window_state)
+bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fleet_manage, construction_window_state& window_state, ship_customiser& ship_customise)
 {
     if(!o->construction_ui_open)
         return false;
@@ -1994,7 +1994,8 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
     {
         make_default(),
         make_scout(),
-        make_colony_ship()
+        make_colony_ship(),
+        ship_customise.current,
     };
 
     for(auto& test_ship : ships)
@@ -2545,7 +2546,7 @@ int main()
                 if(o->parent_empire != player_empire)
                     continue;
 
-                bool built = do_construction_window(o, player_empire, fleet_manage, window_state);
+                bool built = do_construction_window(o, player_empire, fleet_manage, window_state, ship_customise);
 
                 //if(built)
                 //    break;

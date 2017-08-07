@@ -13,6 +13,8 @@ std::map<int, bool> component_open;
 
 void ship_customiser::tick()
 {
+    current.name = "Customised";
+
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
 
