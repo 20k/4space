@@ -468,6 +468,7 @@ struct ship : positional
     ship_manager* owned_by = nullptr;
 
     bool display_ui = false;
+    bool display_popout = false;
 
     ///fallback on nullptr emp is to force resupply
     void resupply_elements(empire* emp, const std::vector<ship_component_element>& to_resupply, int num = 1);

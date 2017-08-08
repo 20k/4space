@@ -181,11 +181,15 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         //ImGui::Text(res.c_str());
     }
 
+    auto initial_pos = ImGui::GetCursorScreenPos();
+
+    std::string display_str;
+
     for(int i=0; i<headers.size(); i++)
     {
         std::string header_formatted = format(headers[i], headers);
-        std::string prod_formatted = format(prod_list[i], prod_list);
-        std::string cons_formatted = format(cons_list[i], cons_list);
+        //std::string prod_formatted = format(prod_list[i], prod_list);
+        //std::string cons_formatted = format(cons_list[i], cons_list);
         std::string net_formatted = format(net_list[i], net_list);
         std::string store_max_formatted = format(store_max_list[i], store_max_list);
 
@@ -209,70 +213,26 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         ImGui::SameLine(0.f, 0.f);
 
         ImGui::Text((" | " + store_max_formatted).c_str());
+
+        std::string displayed = header_formatted + "   " + net_formatted + "   " + store_max_formatted;
+
+        if(displayed.length() > display_str.length())
+        {
+            display_str = displayed;
+        }
     }
+
+    /*auto saved_pos = ImGui::GetCursorScreenPos();
+
+    auto text_size = ImGui::CalcTextSize(display_str.c_str());
+
+    ImGui::SetCursorScreenPos(ImVec2(initial_pos.x + text_size.x, initial_pos.y));
+
+    ImGui::Button("Hello");
+
+    ImGui::SetCursorScreenPos(saved_pos);*/
 
     //static std::map<int, std::map<int, bool>> ui_click_state;
-
-    ///ships need ids so the ui can work
-    int c_id = 0;
-
-    for(component& c : s.entity_list)
-    {
-        float hp = 1.f;
-
-        if(c.has_element(ship_component_element::HP))
-            hp = c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP];
-
-        vec3f max_col = {1.f, 1.f, 1.f};
-        vec3f min_col = {1.f, 0.f, 0.f};
-
-        vec3f ccol = max_col * hp + min_col * (1.f - hp);
-
-        std::string name = c.name;
-
-        if(c.clicked)
-        {
-            name = "-" + name;
-        }
-        else
-        {
-            name = "+" + name;
-        }
-
-        bool knows = known_information >= c.scanning_difficulty;
-
-        if(s.owned_by->parent_empire->is_allied(player_empire))
-        {
-            knows = true;
-        }
-
-        name = obfuscate(name, !knows);
-
-        ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
-
-        if(ImGui::IsItemClicked_Registered())
-        {
-            c.clicked = !c.clicked;
-        }
-
-
-        if(c.clicked)
-        {
-            ImGui::Indent();
-
-            std::string str = get_component_display_string(c);
-
-            ImGui::Text(obfuscate(str, !knows).c_str());
-            ImGui::Unindent();
-        }
-
-        /*if(ImGui::CollapsingHeader(name.c_str()))
-        {
-            ImGui::Text(get_component_display_string(c).c_str());
-        }*/
-
-        c_id++;
-    }
 
     float scanning_power = player_empire->available_scanning_power_on(&s, system_manage);
 
@@ -505,7 +465,102 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
 
+    auto win_size = ImGui::GetWindowSize();
+    auto win_pos = ImGui::GetWindowPos();
+
     ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + title_bar_height + ImGui::GetStyle().FramePadding.y*4));
+
+    ImGui::Begin(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+
+    if(!s.display_popout)
+    {
+        ImGui::NeutralText(">\n>\n>\n>\n>\n>\n>\n>");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            s.display_popout = !s.display_popout;
+        }
+    }
+
+    if(s.display_popout)
+    {
+        ///ships need ids so the ui can work
+        int c_id = 0;
+
+        for(component& c : s.entity_list)
+        {
+            float hp = 1.f;
+
+            if(c.has_element(ship_component_element::HP))
+                hp = c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP];
+
+            vec3f max_col = {1.f, 1.f, 1.f};
+            vec3f min_col = {1.f, 0.f, 0.f};
+
+            vec3f ccol = max_col * hp + min_col * (1.f - hp);
+
+            std::string name = c.name;
+
+            if(c.clicked)
+            {
+                name = "-" + name;
+            }
+            else
+            {
+                name = "+" + name;
+            }
+
+            bool knows = known_information >= c.scanning_difficulty;
+
+            if(s.owned_by->parent_empire->is_allied(player_empire))
+            {
+                knows = true;
+            }
+
+            name = obfuscate(name, !knows);
+
+            ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                c.clicked = !c.clicked;
+            }
+
+            if(c.clicked)
+            {
+                ImGui::Indent();
+
+                std::string str = get_component_display_string(c);
+
+                ImGui::Text(obfuscate(str, !knows).c_str());
+                ImGui::Unindent();
+            }
+
+            c_id++;
+        }
+
+        win_size = ImGui::GetWindowSize();
+        win_pos = ImGui::GetWindowPos();
+    }
+
+    ImGui::End();
+
+    if(s.display_popout)
+    {
+        popout_button button;
+        button.start(win_pos, win_size, false, "###POP2" + s.name + std::to_string(s.id));
+
+        ImGui::NeutralText("<\n<\n<\n<\n<\n<\n<\n<");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            s.display_popout = !s.display_popout;
+        }
+
+        button.finish();
+    }
 }
 
 void display_ship_info_old(ship& s, float step_s)

@@ -20,8 +20,6 @@ void ship_customiser::tick(float scrollwheel)
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
 
-    const float title_bar_height = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2.0f;
-
     ImGui::Begin("Ship##SHIPPITYSHIPSHAPE", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> names;
@@ -144,6 +142,7 @@ void ship_customiser::tick(float scrollwheel)
 
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
 
+
     ImGui::Begin("Stats", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
     auto produced = current.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
@@ -172,7 +171,6 @@ void ship_customiser::tick(float scrollwheel)
     {
         elements.insert(i.first);
     }
-
 
 
     std::vector<std::string> headers;

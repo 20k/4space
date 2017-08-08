@@ -22,6 +22,8 @@
                      ImGuiWindowFlags_NoResize | \
                      ImGuiWindowFlags_NoTitleBar
 
+static float title_bar_height = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2.0f;
+
 inline
 void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
 {
@@ -176,5 +178,31 @@ namespace ImGui
         return OutlineHoverText(txt, text_col/2.f, text_col, hover);
     }
 }
+
+struct popout_button
+{
+    void start(ImVec2 pos, ImVec2 dim, bool offset = true, std::string name = "dfsdf")
+    {
+        float ypad = title_bar_height + ImGui::GetStyle().FramePadding.y*4;
+
+        if(!offset)
+        {
+            ypad = 0;
+        }
+
+        ImGui::SetNextWindowPos(ImVec2(pos.x + dim.x - ImGui::GetStyle().FramePadding.x, pos.y + ypad));
+
+        ImGui::Begin(name.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+
+        //ImGui::Button(">\n>\n>\n>\n>\n>\n>\n>");
+
+        //ImGui::End();
+    }
+
+    void finish()
+    {
+        ImGui::End();
+    }
+};
 
 #endif // UI_UTIL_HPP_INCLUDED
