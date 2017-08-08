@@ -173,11 +173,14 @@ void ship_customiser::tick(float scrollwheel)
         elements.insert(i.first);
     }
 
+
+
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
     std::vector<std::string> cons_list;
     std::vector<std::string> net_list;
     std::vector<std::string> store_max_list;
+    std::vector<ship_component_element> found_elements;
 
     if(elements.size() == 0)
     {
@@ -217,6 +220,7 @@ void ship_customiser::tick(float scrollwheel)
         cons_list.push_back(cons_str);
         net_list.push_back(net_str);
         store_max_list.push_back(store_max_str);
+        found_elements.push_back(id);
     }
 
     for(int i=0; i<headers.size(); i++)
@@ -231,7 +235,16 @@ void ship_customiser::tick(float scrollwheel)
 
         ImGui::SameLine(0.f, 0.f);
 
-        ImGui::Text((net_formatted).c_str());
+        vec3f col = {1,1,1};
+
+        ship_component_element& id = found_elements[i];
+
+        if(produced[id] - consumed[id] <= 0 && ship_component_elements::element_infos[(int)id].negative_is_bad)
+        {
+            col = popup_colour_info::bad_ui_colour;
+        }
+
+        ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), net_formatted.c_str());
 
         if(ImGui::IsItemHovered())
         {

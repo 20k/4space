@@ -34,6 +34,8 @@ namespace ship_component_elements
 {
     void generate_element_infos();
 
+    ///hmm. This should really be reordered, its a shame I did this wrong initially
+    ///as I'm not 100% sure its kosher to change htis
     enum types
     {
         COOLING_POTENTIAL, ///active heat management, but we'll also lose heat into space proportionally to the temperature difference
@@ -62,6 +64,7 @@ namespace ship_component_elements
 
     struct component_element_info
     {
+        bool negative_is_bad = false;
         bool is_weapon = false;
         bool skippable_in_display_defence = false;
         bool allowed_skip_in_repair = false;

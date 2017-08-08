@@ -60,17 +60,22 @@ void ship_component_elements::generate_element_infos()
     ei[COOLING_POTENTIAL].display_name = "Cooling";
     ei[COOLING_POTENTIAL].base_cost = 3.f;
     ei[COOLING_POTENTIAL].research_type = research_info::MATERIALS;
+    ei[COOLING_POTENTIAL].negative_is_bad = true;
 
 
     ei[ENERGY].display_name = "Energy";
     ei[ENERGY].base_cost = 15.f;
     ei[ENERGY].research_type = research_info::MATERIALS;
+    ei[ENERGY].negative_is_bad = true;
+
 
 
     ei[OXYGEN].display_name = "Oxygen";
     ei[OXYGEN].base_cost = 5;
     ei[OXYGEN].research_type = research_info::MATERIALS;
     ei[OXYGEN].allowed_skip_in_repair = true;
+    ei[OXYGEN].negative_is_bad = true;
+
 
 
     ei[AMMO].display_name = "Ammo";
@@ -101,6 +106,8 @@ void ship_component_elements::generate_element_infos()
     ei[HP].display_name = "HP";
     ei[HP].base_cost = 0.5;
     ei[HP].research_type = research_info::MATERIALS;
+    ei[HP].negative_is_bad = true;
+
 
 
     ei[ENGINE_POWER].display_name = "Engines";
@@ -121,6 +128,8 @@ void ship_component_elements::generate_element_infos()
     ei[COMMAND].display_name = "Command";
     ei[COMMAND].base_cost = 2;
     ei[COMMAND].research_type = research_info::MATERIALS;
+    ei[COMMAND].negative_is_bad = true;
+
 
 
     ei[STEALTH].display_name = "Stealth";
