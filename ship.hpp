@@ -552,6 +552,9 @@ struct ship : positional
     bool can_colonise();
     bool is_military();
 
+    float get_total_storage_of_components_with_this_primary(ship_component_element primary, ship_component_element resource_to_get);
+    float get_max_storage_of_components_with_this_primary(ship_component_element primary, ship_component_element resource_to_get);
+
     static sf::RenderTexture* intermediate;
 
     //sf::RenderTexture* intermediate_texture = nullptr;

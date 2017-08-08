@@ -3458,6 +3458,42 @@ bool ship::is_military()
     return false;
 }
 
+float ship::get_total_storage_of_components_with_this_primary(ship_component_element primary, ship_component_element resource_to_get)
+{
+    float amount = 0.f;
+
+    for(component& c : entity_list)
+    {
+        if(c.primary_attribute != primary)
+            continue;
+
+        if(!c.has_element(resource_to_get))
+            continue;
+
+        amount += c.get_element(resource_to_get).cur_amount;
+    }
+
+    return amount;
+}
+
+float ship::get_max_storage_of_components_with_this_primary(ship_component_element primary, ship_component_element resource_to_get)
+{
+    float amount = 0.f;
+
+    for(component& c : entity_list)
+    {
+        if(c.primary_attribute != primary)
+            continue;
+
+        if(!c.has_element(resource_to_get))
+            continue;
+
+        amount += c.get_element(resource_to_get).max_amount;
+    }
+
+    return amount;
+}
+
 /*ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;
