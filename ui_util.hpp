@@ -14,6 +14,14 @@
                      ImGuiWindowFlags_NoResize | \
                      ImGuiWindowFlags_NoTitleBar
 
+#define IMGUI_JUST_TEXT_WINDOW_INPUTS ImGuiWindowFlags_AlwaysAutoResize | \
+                     ImGuiWindowFlags_NoBringToFrontOnFocus| \
+                     ImGuiWindowFlags_NoCollapse| \
+                     ImGuiWindowFlags_NoFocusOnAppearing | \
+                     ImGuiWindowFlags_NoMove | \
+                     ImGuiWindowFlags_NoResize | \
+                     ImGuiWindowFlags_NoTitleBar
+
 inline
 void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
 {

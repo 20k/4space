@@ -18,121 +18,12 @@ void ship_customiser::tick(float scrollwheel)
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
 
-    global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
-
-    ImGui::Begin("Ship Customisation", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
-
-    auto produced = current.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
-    auto consumed = current.get_needed_resources(1.f); ///not actually consumed, but requested
-    auto stored = current.get_stored_resources();
-    auto max_res = current.get_max_resources();
-
-    std::set<ship_component_element> elements;
-
-    for(auto& i : produced)
-    {
-        elements.insert(i.first);
-    }
-
-    for(auto& i : consumed)
-    {
-        elements.insert(i.first);
-    }
-
-    for(auto& i : stored)
-    {
-        elements.insert(i.first);
-    }
-
-    for(auto& i : max_res)
-    {
-        elements.insert(i.first);
-    }
-
-    std::vector<std::string> headers;
-    std::vector<std::string> prod_list;
-    std::vector<std::string> cons_list;
-    std::vector<std::string> net_list;
-    std::vector<std::string> store_max_list;
-
-    if(elements.size() == 0)
-    {
-        ImGui::Text("Empty Ship");
-        ImGui::NewLine();
-    }
-
-    for(const ship_component_element& id : elements)
-    {
-        float prod = produced[id];
-        float cons = consumed[id];
-        float store = stored[id];
-        float maximum = max_res[id];
-
-        std::string prod_str = "+" + to_string_with_enforced_variable_dp(prod, 1);
-        std::string cons_str = "-" + to_string_with_enforced_variable_dp(cons, 1);
-
-        std::string store_max_str;
-
-        if(maximum > 0)
-            store_max_str += to_string_with_variable_prec(maximum);
-
-        std::string header_str = ship_component_elements::display_strings[id];
-
-        std::string net_str = to_string_with_enforced_variable_dp(prod - cons, 1);
-
-        if(prod - cons >= 0)
-        {
-            net_str = "+" + net_str;
-        }
-
-        if(ship_component_elements::skippable_in_display[id] != -1)
-            continue;
-
-        headers.push_back(header_str);
-        prod_list.push_back(prod_str);
-        cons_list.push_back(cons_str);
-        net_list.push_back(net_str);
-        store_max_list.push_back(store_max_str);
-    }
-
-    for(int i=0; i<headers.size(); i++)
-    {
-        std::string header_formatted = format(headers[i], headers);
-        std::string prod_formatted = format(prod_list[i], prod_list);
-        std::string cons_formatted = format(cons_list[i], cons_list);
-        std::string net_formatted = format(net_list[i], net_list);
-        std::string store_max_formatted = format(store_max_list[i], store_max_list);
-
-        ImGui::Text((header_formatted + " : ").c_str());
-
-        ImGui::SameLine(0.f, 0.f);
-
-        ImGui::Text((net_formatted).c_str());
-
-        if(ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip((prod_list[i] + " | " + cons_list[i]).c_str());
-        }
-
-        ImGui::SameLine(0.f, 0.f);
-
-        ImGui::Text((" | " + store_max_formatted).c_str());
-    }
-
-    if(global_drag_and_drop.currently_dragging == drag_and_drop_info::COMPONENT && global_drag_and_drop.let_go_on_window())
-    {
-        component& c = *(component*)global_drag_and_drop.data;
-
-        current.add(c);
-    }
-
-    auto win_pos = ImGui::GetWindowPos();
-
-    ImGui::End();
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
 
-    ImGui::Begin("Ship Customisation 2", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    const float title_bar_height = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2.0f;
+
+    ImGui::Begin("Ship##SHIPPITYSHIPSHAPE", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> names;
     std::vector<std::string> sizes;
@@ -240,7 +131,125 @@ void ship_customiser::tick(float scrollwheel)
 
     auto dim = ImGui::GetWindowSize();
 
-    ImGui::SetWindowPos(ImVec2(win_pos.x - dim.x, win_pos.y));
+    //ImGui::SetWindowPos(ImVec2(win_pos.x - dim.x, win_pos.y + titleBarHeight));
+
+
+    auto win_pos = ImGui::GetWindowPos();
+    auto win_size = ImGui::GetWindowSize();
+
+
+    ImGui::End();
+
+
+    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + title_bar_height));
+
+    global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
+
+    ImGui::Begin("Stats", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
+
+    auto produced = current.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
+    auto consumed = current.get_needed_resources(1.f); ///not actually consumed, but requested
+    auto stored = current.get_stored_resources();
+    auto max_res = current.get_max_resources();
+
+    std::set<ship_component_element> elements;
+
+    for(auto& i : produced)
+    {
+        elements.insert(i.first);
+    }
+
+    for(auto& i : consumed)
+    {
+        elements.insert(i.first);
+    }
+
+    for(auto& i : stored)
+    {
+        elements.insert(i.first);
+    }
+
+    for(auto& i : max_res)
+    {
+        elements.insert(i.first);
+    }
+
+    std::vector<std::string> headers;
+    std::vector<std::string> prod_list;
+    std::vector<std::string> cons_list;
+    std::vector<std::string> net_list;
+    std::vector<std::string> store_max_list;
+
+    if(elements.size() == 0)
+    {
+        ImGui::Text("Empty Ship");
+        ImGui::NewLine();
+    }
+
+    for(const ship_component_element& id : elements)
+    {
+        float prod = produced[id];
+        float cons = consumed[id];
+        float store = stored[id];
+        float maximum = max_res[id];
+
+        std::string prod_str = "+" + to_string_with_enforced_variable_dp(prod, 1);
+        std::string cons_str = "-" + to_string_with_enforced_variable_dp(cons, 1);
+
+        std::string store_max_str;
+
+        if(maximum > 0)
+            store_max_str += to_string_with_variable_prec(maximum);
+
+        std::string header_str = ship_component_elements::display_strings[id];
+
+        std::string net_str = to_string_with_enforced_variable_dp(prod - cons, 1);
+
+        if(prod - cons >= 0)
+        {
+            net_str = "+" + net_str;
+        }
+
+        if(ship_component_elements::skippable_in_display[id] != -1)
+            continue;
+
+        headers.push_back(header_str);
+        prod_list.push_back(prod_str);
+        cons_list.push_back(cons_str);
+        net_list.push_back(net_str);
+        store_max_list.push_back(store_max_str);
+    }
+
+    for(int i=0; i<headers.size(); i++)
+    {
+        std::string header_formatted = format(headers[i], headers);
+        std::string prod_formatted = format(prod_list[i], prod_list);
+        std::string cons_formatted = format(cons_list[i], cons_list);
+        std::string net_formatted = format(net_list[i], net_list);
+        std::string store_max_formatted = format(store_max_list[i], store_max_list);
+
+        ImGui::Text((header_formatted + " : ").c_str());
+
+        ImGui::SameLine(0.f, 0.f);
+
+        ImGui::Text((net_formatted).c_str());
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip((prod_list[i] + " | " + cons_list[i]).c_str());
+        }
+
+        ImGui::SameLine(0.f, 0.f);
+
+        ImGui::Text((" | " + store_max_formatted).c_str());
+    }
+
+    if(global_drag_and_drop.currently_dragging == drag_and_drop_info::COMPONENT && global_drag_and_drop.let_go_on_window())
+    {
+        component& c = *(component*)global_drag_and_drop.data;
+
+        current.add(c);
+    }
 
     ImGui::End();
 
