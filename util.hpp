@@ -33,11 +33,17 @@ std::string to_string_with_variable_prec(const T a_value)
 
 template<typename T>
 inline
-std::string to_string_with_enforced_variable_dp(const T a_value, int forced_dp = 1)
+std::string to_string_with_enforced_variable_dp(T a_value, int forced_dp = 1)
 {
     /*std::ostringstream out;
     out << std::setprecision(n) << a_value;
     std::string fstr = out.str();*/
+
+    a_value = a_value * pow(10, forced_dp);
+
+    a_value = round(a_value);
+
+    a_value = a_value * pow(10, -forced_dp);
 
     std::string fstr = std::to_string(a_value);
 

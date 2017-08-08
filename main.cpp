@@ -222,6 +222,14 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
+    for(component& c : s.entity_list)
+    {
+        if(c.is_weapon())
+        {
+            ImGui::Text(c.name.c_str());
+        }
+    }
+
     /*auto saved_pos = ImGui::GetCursorScreenPos();
 
     auto text_size = ImGui::CalcTextSize(display_str.c_str());
