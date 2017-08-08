@@ -18,7 +18,6 @@ void ship_customiser::tick(float scrollwheel)
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
 
-
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
 
     const float title_bar_height = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2.0f;
