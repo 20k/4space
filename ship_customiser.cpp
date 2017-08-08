@@ -16,8 +16,15 @@ ship_customiser::ship_customiser()
     //last_selected = current.id;
 }
 
-void ship_customiser::tick(float scrollwheel)
+void ship_customiser::tick(float scrollwheel, bool lclick)
 {
+    text_input_going = false;
+
+    if(lclick)
+    {
+        renaming_id = -1;
+    }
+
     if(current.name == "")
         current.name = "New Ship";
 
@@ -416,16 +423,23 @@ void ship_customiser::do_save_window()
         {
             ship_name_buffer.resize(100);
 
+            text_input_going = true;
+
             if(ImGui::InputText("###Input_savewindow", &ship_name_buffer[0], ship_name_buffer.size() - 1, ImGuiInputTextFlags_EnterReturnsTrue))
             {
                 renaming_id = -1;
+            }
 
-                ///we don't want nulls
-                int c_style_length = strlen(ship_name_buffer.c_str());
+            ///we don't want nulls
+            int c_style_length = strlen(ship_name_buffer.c_str());
 
-                s.name = ship_name_buffer;
+            s.name = ship_name_buffer;
 
-                s.name.resize(c_style_length);
+            s.name.resize(c_style_length);
+
+            if(current.id == s.id)
+            {
+                current.name = s.name;
             }
         }
     }

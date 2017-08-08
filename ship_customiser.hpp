@@ -135,6 +135,8 @@ std::vector<std::string> get_components_display_string(ship& s)
 
 struct ship_customiser
 {
+    bool text_input_going = false;
+
     std::vector<ship> saved;
 
     ship current;
@@ -142,7 +144,7 @@ struct ship_customiser
 
     ship_customiser();
 
-    void tick(float scrollwheel);
+    void tick(float scrollwheel, bool lclick);
 
 private:
     void save();

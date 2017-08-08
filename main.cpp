@@ -2531,6 +2531,9 @@ int main()
         if(key.isKeyPressed(sf::Keyboard::LShift))
             cdir = cdir * 5.f;
 
+        if(ship_customise.text_input_going)
+            cdir = 0.f;
+
         if(!focused)
             cdir = 0.f;
 
@@ -2756,7 +2759,7 @@ int main()
         auto_timer::dump_imgui();
         auto_timer::reduce();
 
-        ship_customise.tick(scrollwheel_delta);
+        ship_customise.tick(scrollwheel_delta, lclick);
 
         top_bar::display();
         tooltip::set_clear_tooltip();
