@@ -222,12 +222,49 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
+    int num_weapons = 0;
+
     for(component& c : s.entity_list)
     {
         if(c.is_weapon())
         {
+            num_weapons++;
+        }
+    }
+
+    if(num_weapons > 0)
+    {
+        std::string pad = "+";
+
+        if(s.display_weapon)
+        {
+            pad = "-";
+        }
+
+        ImGui::Text((pad + "Weapons").c_str());
+
+        if(ImGui::IsItemClicked())
+        {
+            s.display_weapon = !s.display_weapon;
+        }
+    }
+
+    if(s.display_weapon)
+    {
+        ImGui::Indent();
+    }
+
+    for(component& c : s.entity_list)
+    {
+        if(c.is_weapon() && s.display_weapon)
+        {
             ImGui::Text(c.name.c_str());
         }
+    }
+
+    if(s.display_weapon)
+    {
+        ImGui::Unindent();
     }
 
     /*auto saved_pos = ImGui::GetCursorScreenPos();

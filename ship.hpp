@@ -469,6 +469,7 @@ struct ship : positional
 
     bool display_ui = false;
     bool display_popout = false;
+    bool display_weapon = false;
 
     ///fallback on nullptr emp is to force resupply
     void resupply_elements(empire* emp, const std::vector<ship_component_element>& to_resupply, int num = 1);

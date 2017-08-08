@@ -39,6 +39,9 @@ std::string to_string_with_enforced_variable_dp(T a_value, int forced_dp = 1)
     out << std::setprecision(n) << a_value;
     std::string fstr = out.str();*/
 
+    if(fabs(a_value) <= 0.0999999 && fabs(a_value) >= 0.0001)
+        forced_dp++;
+
     a_value = a_value * pow(10, forced_dp);
 
     a_value = round(a_value);
@@ -53,9 +56,6 @@ std::string to_string_with_enforced_variable_dp(T a_value, int forced_dp = 1)
     {
         return fstr + ".0";
     }
-
-    if(fabs(a_value) <= 0.0999999 && fabs(a_value) >= 0.0001)
-        forced_dp++;
 
     found += forced_dp + 1;
 
