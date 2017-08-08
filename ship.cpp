@@ -58,7 +58,7 @@ void ship_component_elements::generate_element_infos()
     std::vector<component_element_info>& ei = element_infos;
 
     ei[COOLING_POTENTIAL].display_name = "Cooling";
-    ei[COOLING_POTENTIAL].base_cost = 3.f;
+    ei[COOLING_POTENTIAL].base_cost = 6.f;
     ei[COOLING_POTENTIAL].research_type = research_info::MATERIALS;
     ei[COOLING_POTENTIAL].negative_is_bad = true;
 
