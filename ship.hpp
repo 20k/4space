@@ -38,27 +38,27 @@ namespace ship_component_elements
     ///as I'm not 100% sure its kosher to change htis
     enum types
     {
-        COOLING_POTENTIAL, ///active heat management, but we'll also lose heat into space proportionally to the temperature difference
-        ENERGY,
+        HP, ///last layer, raw health for components
+        ARMOUR, ///second layer
+        SHIELD_POWER, ///ie a system can produce shield power, or scanning power
+        COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
         OXYGEN,
+        ENERGY,
+        COOLING_POTENTIAL, ///active heat management, but we'll also lose heat into space proportionally to the temperature difference
+        ENGINE_POWER,
         AMMO,
         FUEL,
         CARGO,
-        SHIELD_POWER, ///ie a system can produce shield power, or scanning power
-        ARMOUR, ///second layer
-        HP, ///last layer, raw health for components
-        ENGINE_POWER,
         WARP_POWER,
         SCANNING_POWER,
         //PROJECTILE, ///outputting damage. Have a receive damage as well component? Integrity AND hp?
-        COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
         STEALTH,
         //REPAIR, ///this is dumb, just make crew produce hp
-        COLONISER,
         RAILGUN,
         TORPEDO,
         PLASMAGUN,
         COILGUN,
+        COLONISER,
         NONE,
     };
 
