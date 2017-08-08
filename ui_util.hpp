@@ -15,7 +15,6 @@
                      ImGuiWindowFlags_NoTitleBar
 
 #define IMGUI_JUST_TEXT_WINDOW_INPUTS ImGuiWindowFlags_AlwaysAutoResize | \
-                     ImGuiWindowFlags_NoBringToFrontOnFocus| \
                      ImGuiWindowFlags_NoCollapse| \
                      ImGuiWindowFlags_NoFocusOnAppearing | \
                      ImGuiWindowFlags_NoMove | \
