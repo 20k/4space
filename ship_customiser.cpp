@@ -119,6 +119,21 @@ void ship_customiser::tick(float scrollwheel)
         ImGui::Text((" | " + store_max_formatted).c_str());
     }
 
+    if(global_drag_and_drop.currently_dragging == drag_and_drop_info::COMPONENT && global_drag_and_drop.let_go_on_window())
+    {
+        component& c = *(component*)global_drag_and_drop.data;
+
+        current.add(c);
+    }
+
+    auto win_pos = ImGui::GetWindowPos();
+
+    ImGui::End();
+
+    global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
+
+    ImGui::Begin("Ship Customisation 2", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+
     std::vector<std::string> names;
     std::vector<std::string> sizes;
 
@@ -146,6 +161,11 @@ void ship_customiser::tick(float scrollwheel)
         //name = name + " " + cstr;
 
         sizes.push_back(cstr);
+    }
+
+    if(current.entity_list.size() == 0)
+    {
+        ImGui::Text("No systems");
     }
 
     int c_id = 0;
@@ -217,6 +237,10 @@ void ship_customiser::tick(float scrollwheel)
 
         current.add(c);
     }
+
+    auto dim = ImGui::GetWindowSize();
+
+    ImGui::SetWindowPos(ImVec2(win_pos.x - dim.x, win_pos.y));
 
     ImGui::End();
 
