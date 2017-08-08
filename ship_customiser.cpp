@@ -138,7 +138,7 @@ void ship_customiser::tick(float scrollwheel)
     ImGui::End();
 
 
-    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + title_bar_height));
+    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
 
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
 

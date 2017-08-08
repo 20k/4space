@@ -22,7 +22,11 @@
                      ImGuiWindowFlags_NoResize | \
                      ImGuiWindowFlags_NoTitleBar
 
-static float title_bar_height = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2.0f;
+inline
+float get_title_bar_height()
+{
+    return ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2.0f;
+}
 
 inline
 void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
@@ -186,7 +190,7 @@ struct popout_button
 {
     void start(ImVec2 pos, ImVec2 dim, bool offset = true, std::string name = "dfsdf")
     {
-        float ypad = title_bar_height + ImGui::GetStyle().FramePadding.y*4;
+        float ypad = get_title_bar_height() + ImGui::GetStyle().FramePadding.y*4;
 
         if(!offset)
         {
