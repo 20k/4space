@@ -119,8 +119,10 @@ void ship_customiser::tick(float scrollwheel)
         ImGui::Text((" | " + store_max_formatted).c_str());
     }
 
+    std::vector<std::string> names;
+    std::vector<std::string> sizes;
+
     ///ships need ids so the ui can work
-    int c_id = 0;
 
     int to_erase = -1;
 
@@ -137,9 +139,23 @@ void ship_customiser::tick(float scrollwheel)
             name = "+" + name;
         }
 
+        names.push_back(name);
+
         auto cstr = to_string_with_enforced_variable_dp(c.current_size, 2);
 
-        name = name + " " + cstr;
+        //name = name + " " + cstr;
+
+        sizes.push_back(cstr);
+    }
+
+    int c_id = 0;
+
+    for(component& c : current.entity_list)
+    {
+        std::string cname = format(names[c_id], names);
+        std::string sname = format(sizes[c_id], sizes);
+
+        std::string name = cname + "   " + sname;
 
         ImGui::TextColored({1,1,1, 1.f}, name.c_str());
 
