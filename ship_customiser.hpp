@@ -139,7 +139,7 @@ struct ship_customiser
 
     ship current;
 
-    void tick();
+    void tick(float scrollwheel);
 };
 
 #endif // SHIP_CUSTOMISER_HPP_INCLUDED

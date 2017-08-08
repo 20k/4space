@@ -11,7 +11,7 @@
 
 std::map<int, bool> component_open;
 
-void ship_customiser::tick()
+void ship_customiser::tick(float scrollwheel)
 {
     current.name = "Customised";
 
@@ -151,6 +151,36 @@ void ship_customiser::tick()
         {
             c.clicked = !c.clicked;
         }
+
+        if(ImGui::IsItemHovered() && scrollwheel != 0)
+        {
+            float size_change = 0.f;
+
+            if(scrollwheel > 0)
+            {
+                size_change = 0.25f;
+            }
+            else
+            {
+                size_change = -0.25f;
+            }
+
+            float csize = c.current_size;
+
+            csize += size_change;
+
+            csize = clamp(csize, 0.25f, 4.f);
+
+            c.set_size(csize);
+
+            current.repair(nullptr, 1);
+        }
+
+        auto cstr = to_string_with_enforced_variable_dp(c.current_size, 2);
+
+        ImGui::SameLine();
+
+        ImGui::Text(cstr.c_str());
 
         if(c.clicked)
         {

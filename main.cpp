@@ -2642,7 +2642,7 @@ int main()
         auto_timer::dump_imgui();
         auto_timer::reduce();
 
-        ship_customise.tick();
+        ship_customise.tick(scrollwheel_delta);
 
         top_bar::display();
         tooltip::set_clear_tooltip();
