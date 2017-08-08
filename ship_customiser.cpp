@@ -19,7 +19,7 @@ ship_customiser::ship_customiser()
 void ship_customiser::tick(float scrollwheel)
 {
     if(current.name == "")
-        current.name = "Customised";
+        current.name = "New Ship";
 
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
@@ -429,24 +429,37 @@ void ship_customiser::do_save_window()
             }
         }
     }
+
     if(last_selected != -1)
     {
         ImGui::NeutralText("(Delete current design)");
 
         if(ImGui::IsItemClicked())
         {
-            current = ship();
+            //current = ship();
 
-            for(int i=0; i<saved.size(); i++)
+            int i = 0;
+
+            for(i=0; i<saved.size(); i++)
             {
                 if(last_selected == saved[i].id)
                 {
                     saved.erase(saved.begin() + i);
                     i--;
-                    last_selected = current.id;
-                    continue;
+                    break;
                 }
             }
+
+            if(i >= 0 && i < saved.size())
+            {
+                current = saved[i];
+            }
+            else
+            {
+                current = ship();
+            }
+
+            last_selected = current.id;
         }
 
         ImGui::NeutralText("(Duplicate)");
@@ -456,7 +469,7 @@ void ship_customiser::do_save_window()
             ///this is wrong a s it duplicates ids
             saved.push_back(current.duplicate());
 
-            current = ship();
+            //current = ship();
             last_selected = current.id;
         }
 
