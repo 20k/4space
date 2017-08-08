@@ -698,6 +698,18 @@ float component_attribute::consume_from_amount_stored(component_attribute& other
     return extra;
 }*/
 
+float component::get_hp_frac()
+{
+    if(!has_element(ship_component_element::HP))
+    {
+        return 1.f;
+    }
+
+    float frac = get_stored()[ship_component_element::HP] / get_stored_max()[ship_component_element::HP];
+
+    return frac;
+}
+
 void component::set_size(float new_size)
 {
     if(new_size <= 0.f)

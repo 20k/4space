@@ -205,10 +205,14 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         ImGui::TextColored(header_formatted + " : ", hp_frac_col);
 
+        if(ImGui::IsItemHovered() && max_hp > FLOAT_BOUND)
+        {
+            tooltip::add(to_string_with_enforced_variable_dp(cur_hp) + "/" + to_string_with_enforced_variable_dp(max_hp) + " HP in these systems");
+        }
+
         ImGui::SameLine(0.f, 0.f);
 
         vec3f col = {1,1,1};
-
 
         if(produced[id] - consumed[id] <= 0 && ship_component_elements::element_infos[(int)id].negative_is_bad)
         {
@@ -272,7 +276,17 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     {
         if(c.is_weapon() && s.display_weapon)
         {
-            ImGui::Text(obfuscate(c.name, primary_obfuscated[c.primary_attribute]).c_str());
+            vec3f col = hp_frac_to_col(c.get_hp_frac());
+
+            ImGui::TextColored(obfuscate(c.name, primary_obfuscated[c.primary_attribute]), col);
+
+            if(ImGui::IsItemHovered())
+            {
+                float cur_hp = c.get_stored()[ship_component_element::HP];
+                float max_hp = c.get_stored_max()[ship_component_element::HP];
+
+                tooltip::add(to_string_with_enforced_variable_dp(cur_hp) + "/" + to_string_with_enforced_variable_dp(max_hp) + " HP");
+            }
         }
     }
 

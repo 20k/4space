@@ -278,6 +278,8 @@ struct component
     component_attribute damage;
     component_attribute */
 
+    float get_hp_frac();
+
     float current_size = 1;
 
     void set_size(float new_size);
