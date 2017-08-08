@@ -271,14 +271,14 @@ void ship_customiser::tick(float scrollwheel)
     {
         component& c = full_component_list[i];
 
-        std::string pad = "-";
+        std::string pad = "+";
 
         if(component_open[i])
         {
-            pad = "+";
+            pad = "-";
         }
 
-        ImGui::Text((pad + c.name + pad).c_str());
+        ImGui::Text((pad + c.name).c_str());
 
         if(ImGui::IsItemClicked_DragCompatible())
         {
