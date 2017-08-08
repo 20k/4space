@@ -74,7 +74,7 @@ void ship_customiser::tick(float scrollwheel)
         std::string store_max_str;
 
         if(maximum > 0)
-            store_max_str += "(" + to_string_with_variable_prec(maximum) + ")";
+            store_max_str += to_string_with_variable_prec(maximum);
 
         std::string header_str = ship_component_elements::display_strings[id];
 
@@ -126,16 +126,6 @@ void ship_customiser::tick(float scrollwheel)
 
     for(component& c : current.entity_list)
     {
-        float hp = 1.f;
-
-        if(c.has_element(ship_component_element::HP))
-            hp = c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP];
-
-        vec3f max_col = {1.f, 1.f, 1.f};
-        vec3f min_col = {1.f, 0.f, 0.f};
-
-        vec3f ccol = max_col * hp + min_col * (1.f - hp);
-
         std::string name = c.name;
 
         if(c.clicked)
@@ -147,7 +137,11 @@ void ship_customiser::tick(float scrollwheel)
             name = "+" + name;
         }
 
-        ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
+        auto cstr = to_string_with_enforced_variable_dp(c.current_size, 2);
+
+        name = name + " " + cstr;
+
+        ImGui::TextColored({1,1,1, 1.f}, name.c_str());
 
         if(ImGui::IsItemClicked_Registered())
         {
@@ -182,12 +176,6 @@ void ship_customiser::tick(float scrollwheel)
 
             current.repair(nullptr, 1);
         }
-
-        auto cstr = to_string_with_enforced_variable_dp(c.current_size, 2);
-
-        ImGui::SameLine();
-
-        ImGui::Text(cstr.c_str());
 
         if(c.clicked)
         {
