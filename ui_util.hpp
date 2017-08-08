@@ -28,6 +28,15 @@ float get_title_bar_height()
 }
 
 inline
+vec3f hp_frac_to_col(float hp_frac)
+{
+    vec3f max_col = {1.f, 1.f, 1.f};
+    vec3f min_col = {1.f, 0.f, 0.f};
+
+    return mix(min_col, max_col, hp_frac);
+}
+
+inline
 void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
 {
     constexpr int num_divisions = 100;
@@ -182,6 +191,12 @@ namespace ImGui
     void OutlineHoverTextAuto(const std::string& txt, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0})
     {
         return OutlineHoverText(txt, text_col/2.f, text_col, hover, dim_extra);
+    }
+
+    inline
+    void TextColored(const std::string& str, vec3f col)
+    {
+        TextColored(ImVec4(col.x(), col.y(), col.z(), 1), str.c_str());
     }
 }
 

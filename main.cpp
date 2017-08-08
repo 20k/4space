@@ -191,13 +191,24 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         std::string net_formatted = format(net_list[i], net_list);
         std::string store_max_formatted = format(store_max_list[i], store_max_list);
 
-        ImGui::Text((header_formatted + " : ").c_str());
+        ship_component_element& id = found_elements[i];
+
+        float max_hp = s.get_max_storage_of_components_with_this_primary(id, ship_component_element::HP);
+        float cur_hp = s.get_total_storage_of_components_with_this_primary(id, ship_component_element::HP);
+
+        vec3f hp_frac_col = {1,1,1};
+
+        if(max_hp > FLOAT_BOUND)
+        {
+            hp_frac_col = hp_frac_to_col(cur_hp / max_hp);
+        }
+
+        ImGui::TextColored(header_formatted + " : ", hp_frac_col);
 
         ImGui::SameLine(0.f, 0.f);
 
         vec3f col = {1,1,1};
 
-        ship_component_element& id = found_elements[i];
 
         if(produced[id] - consumed[id] <= 0 && ship_component_elements::element_infos[(int)id].negative_is_bad)
         {
@@ -533,10 +544,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             if(c.has_element(ship_component_element::HP))
                 hp = c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP];
 
-            vec3f max_col = {1.f, 1.f, 1.f};
-            vec3f min_col = {1.f, 0.f, 0.f};
-
-            vec3f ccol = max_col * hp + min_col * (1.f - hp);
+            vec3f ccol = hp_frac_to_col(hp);
 
             std::string name = c.name;
 
@@ -1409,13 +1417,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     }
 
                     ship* cur_ship = nullptr;
-
-                    float hp_frac = 1.f;
-
-                    vec3f full_col = {1,1,1};
-                    vec3f damaged_col = {1, 0.1, 0.1};
-
-                    vec3f draw_col = full_col;
+                    vec3f draw_col = {1,1,1};
 
                     if(o->type == orbital_info::FLEET)
                     {
@@ -1423,13 +1425,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                         auto fully_merged = cur_ship->get_fully_merged(1.f);
 
-                        hp_frac = fully_merged[ship_component_elements::HP].cur_amount / fully_merged[ship_component_elements::HP].max_amount;
+                        float hp_frac = fully_merged[ship_component_elements::HP].cur_amount / fully_merged[ship_component_elements::HP].max_amount;
 
-                        draw_col = mix(damaged_col, full_col, hp_frac*hp_frac);
+                        draw_col = hp_frac_to_col(hp_frac);
                     }
-
-                    //ImGui::TextColored(ImVec4(draw_col.x(), draw_col.y(), draw_col.z(), 1), str.c_str());
-
 
                     if(o->type == orbital_info::FLEET)
                         ImGui::ColourHoverText(str, draw_col);
