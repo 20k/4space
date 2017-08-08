@@ -13,14 +13,20 @@ std::map<int, bool> component_open;
 
 ship_customiser::ship_customiser()
 {
-    last_selected = current.id;
+    //last_selected = current.id;
 }
 
 void ship_customiser::tick(float scrollwheel)
 {
-    current.name = "Customised";
+    if(current.name == "")
+        current.name = "Customised";
 
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
+        return;
+
+    do_save_window();
+
+    if(last_selected == -1)
         return;
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
@@ -357,7 +363,27 @@ void ship_customiser::tick(float scrollwheel)
 
     ImGui::End();
 
-    do_save_window();
+    save();
+}
+
+void ship_customiser::save()
+{
+    bool found = false;
+
+    for(ship& s : saved)
+    {
+        if(s.id == last_selected)
+        {
+            found = true;
+            s = current;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        saved.push_back(current);
+    }
 }
 
 void ship_customiser::do_save_window()
@@ -370,55 +396,75 @@ void ship_customiser::do_save_window()
 
         std::string name = s.name;
 
-        ImGui::NeutralText(name);
+        if(renaming_id != s.id)
+        {
+            ImGui::NeutralText(name);
+
+            if(ImGui::IsItemClicked() && last_selected != s.id)
+            {
+                current = s;
+                last_selected = current.id;
+            }
+
+            if(ImGui::IsItemClicked() && ImGui::IsMouseDoubleClicked(0))
+            {
+                ship_name_buffer = s.name;
+                renaming_id = last_selected;
+            }
+        }
+        else
+        {
+            ship_name_buffer.resize(100);
+
+            if(ImGui::InputText("###Input_savewindow", &ship_name_buffer[0], ship_name_buffer.size() - 1, ImGuiInputTextFlags_EnterReturnsTrue))
+            {
+                renaming_id = -1;
+
+                ///we don't want nulls
+                int c_style_length = strlen(ship_name_buffer.c_str());
+
+                s.name = ship_name_buffer;
+
+                s.name.resize(c_style_length);
+            }
+        }
+    }
+    if(last_selected != -1)
+    {
+        ImGui::NeutralText("(Delete current design)");
 
         if(ImGui::IsItemClicked())
         {
-            current = s;
+            current = ship();
+
+            for(int i=0; i<saved.size(); i++)
+            {
+                if(last_selected == saved[i].id)
+                {
+                    saved.erase(saved.begin() + i);
+                    i--;
+                    last_selected = current.id;
+                    continue;
+                }
+            }
+        }
+
+        ImGui::NeutralText("(Duplicate)");
+
+        if(ImGui::IsItemClicked())
+        {
+            ///this is wrong a s it duplicates ids
+            saved.push_back(current.duplicate());
+
+            current = ship();
             last_selected = current.id;
         }
-    }
 
-    ImGui::NeutralText("(Delete current design)");
+        ImGui::NeutralText("(Save)");
 
-    if(ImGui::IsItemClicked())
-    {
-        current = ship();
-
-        for(int i=0; i<saved.size(); i++)
+        if(ImGui::IsItemClicked())
         {
-            if(last_selected == saved[i].id)
-            {
-                saved.erase(saved.begin() + i);
-                i--;
-                last_selected = current.id;
-                continue;
-            }
-        }
-    }
-
-    ImGui::NeutralText("(Save as new design)");
-
-    if(ImGui::IsItemClicked())
-    {
-        ///this is wrong a s it duplicates ids
-        saved.push_back(current.duplicate());
-
-        current = ship();
-        last_selected = current.id;
-    }
-
-    ImGui::NeutralText("(Save)");
-
-    if(ImGui::IsItemClicked())
-    {
-        for(ship& s : saved)
-        {
-            if(s.id == last_selected)
-            {
-                s = current;
-                break;
-            }
+            save();
         }
     }
 

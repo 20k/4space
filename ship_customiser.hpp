@@ -145,7 +145,10 @@ struct ship_customiser
     void tick(float scrollwheel);
 
 private:
+    void save();
     void do_save_window();
+    int64_t renaming_id = -1;
+    std::string ship_name_buffer;
 };
 
 #endif // SHIP_CUSTOMISER_HPP_INCLUDED
