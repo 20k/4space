@@ -56,9 +56,9 @@ namespace ImGui
     }
 
     inline
-    bool IsItemClicked_Registered()
+    bool IsItemClicked_Registered(int num = 0)
     {
-        if(ImGui::IsItemClicked())
+        if(ImGui::IsItemClicked(num))
         {
             suppress_clicks = true;
             return true;

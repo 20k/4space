@@ -122,6 +122,8 @@ void ship_customiser::tick(float scrollwheel)
     ///ships need ids so the ui can work
     int c_id = 0;
 
+    int to_erase = -1;
+
     for(component& c : current.entity_list)
     {
         float hp = 1.f;
@@ -150,6 +152,11 @@ void ship_customiser::tick(float scrollwheel)
         if(ImGui::IsItemClicked_Registered())
         {
             c.clicked = !c.clicked;
+        }
+
+        if(ImGui::IsItemClicked_Registered(1))
+        {
+            to_erase = c_id;
         }
 
         if(ImGui::IsItemHovered() && scrollwheel != 0)
@@ -193,6 +200,11 @@ void ship_customiser::tick(float scrollwheel)
         }
 
         c_id++;
+    }
+
+    if(to_erase != -1)
+    {
+        current.entity_list.erase(current.entity_list.begin() + to_erase);
     }
 
     if(global_drag_and_drop.currently_dragging == drag_and_drop_info::COMPONENT && global_drag_and_drop.let_go_on_window())
