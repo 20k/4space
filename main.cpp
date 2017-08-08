@@ -2107,6 +2107,11 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
         ship_customise.current,
     };
 
+    for(ship& s : ship_customise.saved)
+    {
+        ships.push_back(s);
+    }
+
     for(auto& test_ship : ships)
     {
         test_ship.set_tech_level_from_research(window_state.picked_research_levels);

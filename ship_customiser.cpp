@@ -11,6 +11,11 @@
 
 std::map<int, bool> component_open;
 
+ship_customiser::ship_customiser()
+{
+    last_selected = current.id;
+}
+
 void ship_customiser::tick(float scrollwheel)
 {
     current.name = "Customised";
@@ -348,6 +353,84 @@ void ship_customiser::tick(float scrollwheel)
         }
 
         ImGui::Unindent();
+    }
+
+    ImGui::End();
+
+    do_save_window();
+}
+
+void ship_customiser::do_save_window()
+{
+    ImGui::Begin("Ship Design Manager", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+
+    for(int i=0; i<saved.size(); i++)
+    {
+        ship& s = saved[i];
+
+        std::string name = s.name;
+
+        ImGui::NeutralText(name);
+
+        if(ImGui::IsItemClicked())
+        {
+            current = s;
+            last_selected = current.id;
+        }
+    }
+
+    ImGui::NeutralText("(Delete current design)");
+
+    if(ImGui::IsItemClicked())
+    {
+        current = ship();
+
+        for(int i=0; i<saved.size(); i++)
+        {
+            if(last_selected == saved[i].id)
+            {
+                saved.erase(saved.begin() + i);
+                i--;
+                last_selected = current.id;
+                continue;
+            }
+        }
+    }
+
+    ImGui::NeutralText("(Save as new design)");
+
+    if(ImGui::IsItemClicked())
+    {
+        ///this is wrong a s it duplicates ids
+        saved.push_back(current.duplicate());
+
+        current = ship();
+        last_selected = current.id;
+    }
+
+    ImGui::NeutralText("(Save)");
+
+    if(ImGui::IsItemClicked())
+    {
+        for(ship& s : saved)
+        {
+            if(s.id == last_selected)
+            {
+                s = current;
+                break;
+            }
+        }
+    }
+
+    ImGui::NeutralText("(New Design)");
+
+    if(ImGui::IsItemClicked())
+    {
+        current = ship();
+
+        current.name = "New Design";
+        saved.push_back(current);
+        last_selected = current.id;
     }
 
     ImGui::End();

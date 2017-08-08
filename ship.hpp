@@ -399,6 +399,13 @@ struct ship : positional
     uint32_t id = gid++;
     static uint32_t gid;
 
+    static uint32_t get_new_id()
+    {
+        return gid++;
+    }
+
+    ship duplicate();
+
     int team = 0;
 
     std::map<ship_component_element, std::vector<int>> type_to_component_offsets;

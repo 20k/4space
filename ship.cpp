@@ -1369,6 +1369,14 @@ float component::safe_hp_frac_modify(float in)
     return in * (cur_val / max_val);
 }
 
+ship ship::duplicate()
+{
+    ship s = *this;
+    s.id = ship::get_new_id();
+
+    return s;
+}
+
 void ship::tick_all_components(float step_s)
 {
     auto timer = MAKE_AUTO_TIMER();

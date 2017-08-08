@@ -138,8 +138,14 @@ struct ship_customiser
     std::vector<ship> saved;
 
     ship current;
+    int64_t last_selected = -1;
+
+    ship_customiser();
 
     void tick(float scrollwheel);
+
+private:
+    void do_save_window();
 };
 
 #endif // SHIP_CUSTOMISER_HPP_INCLUDED
