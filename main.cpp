@@ -126,7 +126,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         std::string store_max_str;
 
         if(maximum > 0)
-            store_max_str += "(" + to_string_with_enforced_variable_dp(store) + "/" + to_string_with_variable_prec(maximum) + ")";
+            store_max_str += to_string_with_enforced_variable_dp(store) + "/" + to_string_with_variable_prec(maximum);
 
         std::string header_str = ship_component_elements::display_strings[id];
 
