@@ -107,7 +107,7 @@ namespace ImGui
     }
 
     inline
-    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col, bool hover = true)
+    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0})
     {
         ImGui::BeginGroup();
 
@@ -117,6 +117,9 @@ namespace ImGui
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(text_col.x(), text_col.y(), text_col.z(), 1));
 
         auto dim = ImGui::CalcTextSize(txt.c_str());
+
+        dim.x += dim_extra.x();
+        dim.y += dim_extra.y();
 
         dim.y += 2;
         dim.x += 1;
@@ -148,7 +151,7 @@ namespace ImGui
             if(!ImGui::IsMouseDown(0))
                 ImGui::Button("", dim);
 
-            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x, screen_pos.y));
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x + dim_extra.x()/2.f, screen_pos.y + dim_extra.y()/2.f));
 
             ImGui::Text(txt.c_str());
         }
@@ -162,7 +165,7 @@ namespace ImGui
 
             ImGui::Button("", ImVec2(dim.x + thickness*2, dim.y + thickness*2));
 
-            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x, screen_pos.y));
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x + dim_extra.x()/2.f, screen_pos.y + dim_extra.y()/2.f));
 
             ImGui::Text(txt.c_str());
         }
@@ -173,9 +176,9 @@ namespace ImGui
     }
 
     inline
-    void OutlineHoverTextAuto(const std::string& txt, vec3f text_col, bool hover = true)
+    void OutlineHoverTextAuto(const std::string& txt, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0})
     {
-        return OutlineHoverText(txt, text_col/2.f, text_col, hover);
+        return OutlineHoverText(txt, text_col/2.f, text_col, hover, dim_extra);
     }
 }
 

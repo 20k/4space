@@ -476,7 +476,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(!s.display_popout)
     {
-        ImGui::NeutralText(">\n>\n>\n>\n>\n>\n>\n>");
+        ImGui::NeutralText(">\n>\n>\n>\n>\n>\n>\n>", {4, 4});
 
         if(ImGui::IsItemClicked_Registered())
         {
@@ -552,7 +552,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         popout_button button;
         button.start(win_pos, win_size, false, "###POP2" + s.name + std::to_string(s.id));
 
-        ImGui::NeutralText("<\n<\n<\n<\n<\n<\n<\n<");
+        ImGui::NeutralText("<\n<\n<\n<\n<\n<\n<\n<", {4, 4});
 
         if(ImGui::IsItemClicked_Registered())
         {

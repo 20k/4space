@@ -66,11 +66,11 @@ namespace ImGui
     }
 
     inline
-    void NeutralText(const std::string& str)
+    void NeutralText(const std::string& str, vec2f dim_extra = {0,0})
     {
         //ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), str.c_str());
 
-        ImGui::OutlineHoverTextAuto(str, {1,1,1});
+        ImGui::OutlineHoverTextAuto(str, {1,1,1}, true, dim_extra);
     }
 
     inline
