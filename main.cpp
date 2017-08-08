@@ -203,12 +203,16 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             hp_frac_col = hp_frac_to_col(cur_hp / max_hp);
         }
 
-        ImGui::TextColored(header_formatted + " : ", hp_frac_col);
+        ImGui::TextColored(header_formatted, hp_frac_col);
 
         if(ImGui::IsItemHovered() && max_hp > FLOAT_BOUND)
         {
             tooltip::add(to_string_with_enforced_variable_dp(cur_hp) + "/" + to_string_with_enforced_variable_dp(max_hp) + " HP in these systems");
         }
+
+        ImGui::SameLine(0, 0);
+
+        ImGui::Text(" : ");
 
         ImGui::SameLine(0.f, 0.f);
 

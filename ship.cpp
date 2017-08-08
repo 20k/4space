@@ -607,7 +607,7 @@ void component_attribute::upgrade_size(float old_size, float new_size)
     drained_per_s *= new_ratio;
     drained_per_use *= new_ratio;
 
-    time_between_uses_s *= new_ratio;
+    //time_between_uses_s *= new_ratio;
     max_amount *= new_ratio;
 
     if(cur_amount > max_amount)
