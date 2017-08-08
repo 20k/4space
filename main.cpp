@@ -108,6 +108,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     std::vector<std::string> cons_list;
     std::vector<std::string> net_list;
     std::vector<std::string> store_max_list;
+    std::vector<ship_component_element> found_elements;
 
     for(const ship_component_element& id : elements)
     {
@@ -177,8 +178,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         cons_list.push_back(cons_str);
         net_list.push_back(net_str);
         store_max_list.push_back(store_max_str);
-
-        //ImGui::Text(res.c_str());
+        found_elements.push_back(id);
     }
 
     auto initial_pos = ImGui::GetCursorScreenPos();
@@ -188,22 +188,23 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     for(int i=0; i<headers.size(); i++)
     {
         std::string header_formatted = format(headers[i], headers);
-        //std::string prod_formatted = format(prod_list[i], prod_list);
-        //std::string cons_formatted = format(cons_list[i], cons_list);
         std::string net_formatted = format(net_list[i], net_list);
         std::string store_max_formatted = format(store_max_list[i], store_max_list);
-
-        //std::string display = header_formatted + ": " + prod_formatted + " | " + cons_formatted + " | " + store_max_formatted;
-
-        //std::string display = header_formatted + " : " + net_formatted + " | " + store_max_formatted;
-
-        //ImGui::Text(display.c_str());
 
         ImGui::Text((header_formatted + " : ").c_str());
 
         ImGui::SameLine(0.f, 0.f);
 
-        ImGui::Text((net_formatted).c_str());
+        vec3f col = {1,1,1};
+
+        ship_component_element& id = found_elements[i];
+
+        if(produced[id] - consumed[id] <= 0 && ship_component_elements::element_infos[(int)id].negative_is_bad)
+        {
+            col = popup_colour_info::bad_ui_colour;
+        }
+
+        ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), net_formatted.c_str());
 
         if(ImGui::IsItemHovered())
         {
@@ -241,7 +242,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             pad = "-";
         }
 
-        ImGui::Text((pad + "Weapons").c_str());
+        bool total_obfuscate = known_information <= ship_info::accessory_information_obfuscation_level;
+
+        ImGui::Text(obfuscate(pad + "Weapons", total_obfuscate).c_str());
 
         if(ImGui::IsItemClicked())
         {
@@ -258,7 +261,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     {
         if(c.is_weapon() && s.display_weapon)
         {
-            ImGui::Text(c.name.c_str());
+            ImGui::Text(obfuscate(c.name, primary_obfuscated[c.primary_attribute]).c_str());
         }
     }
 
@@ -267,17 +270,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         ImGui::Unindent();
     }
 
-    /*auto saved_pos = ImGui::GetCursorScreenPos();
-
-    auto text_size = ImGui::CalcTextSize(display_str.c_str());
-
-    ImGui::SetCursorScreenPos(ImVec2(initial_pos.x + text_size.x, initial_pos.y));
-
-    ImGui::Button("Hello");
-
-    ImGui::SetCursorScreenPos(saved_pos);*/
-
-    //static std::map<int, std::map<int, bool>> ui_click_state;
 
     float scanning_power = player_empire->available_scanning_power_on(&s, system_manage);
 
