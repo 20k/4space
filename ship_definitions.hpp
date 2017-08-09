@@ -541,7 +541,7 @@ inline ship make_scout()
     test_ship.add(make_default_life_support());
     test_ship.add(make_default_ammo_store());
     test_ship.add(make_default_shields(0.25f));
-    test_ship.add(make_default_power_core(0.8f));
+    test_ship.add(make_default_power_core());
     test_ship.add(make_default_engines());
     test_ship.add(make_default_warp_drive(1.25f));
     test_ship.add(make_default_scanner(1.5f));

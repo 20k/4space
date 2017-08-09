@@ -2099,13 +2099,15 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     ImGui::NewLine();
 
-    std::vector<ship> ships
+    /*std::vector<ship> ships
     {
         make_default(),
         make_scout(),
         make_colony_ship(),
         //ship_customise.current,
-    };
+    };*/
+
+    std::vector<ship> ships;
 
     for(ship& s : ship_customise.saved)
     {
@@ -2432,6 +2434,9 @@ int main()
 
     bool fullscreen = false;
 
+    vec2f mouse_last = {0,0};
+    vec2f mpos = {0,0};
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
@@ -2441,7 +2446,9 @@ int main()
             playing_music.tg.make_cell_random();
         }*/
 
-        vec2f mpos = {mouse.getPosition(window).x, mouse.getPosition(window).y};
+        mouse_last = mpos;
+        mpos = {mouse.getPosition(window).x, mouse.getPosition(window).y};
+
 
         sf::Event event;
 
@@ -2759,7 +2766,7 @@ int main()
         auto_timer::dump_imgui();
         auto_timer::reduce();
 
-        ship_customise.tick(scrollwheel_delta, lclick);
+        ship_customise.tick(scrollwheel_delta, lclick, mpos - mouse_last);
 
         top_bar::display();
         tooltip::set_clear_tooltip();

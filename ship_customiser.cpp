@@ -17,7 +17,7 @@ ship_customiser::ship_customiser()
     //last_selected = current.id;
 }
 
-void ship_customiser::tick(float scrollwheel, bool lclick)
+void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 {
     text_input_going = false;
 
@@ -39,167 +39,10 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
     if(last_selected == -1)
         return;
 
-    global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
-
-    ImGui::Begin((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
-
-    std::vector<std::string> names;
-    std::vector<std::string> sizes;
-
-    ///ships need ids so the ui can work
-
-    int to_erase = -1;
-
-    for(component& c : current.entity_list)
-    {
-        std::string name = c.name;
-
-        if(c.clicked)
-        {
-            name = "-" + name;
-        }
-        else
-        {
-            name = "+" + name;
-        }
-
-        names.push_back(name);
-
-        auto cstr = to_string_with_enforced_variable_dp(c.current_size, 2);
-
-        //name = name + " " + cstr;
-
-        sizes.push_back(cstr);
-    }
-
-    if(current.entity_list.size() == 0)
-    {
-        ImGui::Text("No systems");
-    }
-
-    int c_id = 0;
-
-    for(component& c : current.entity_list)
-    {
-        std::string cname = format(names[c_id], names);
-        std::string sname = format(sizes[c_id], sizes);
-
-        std::string name = cname + "   " + sname;
-
-        vec3f col = {1,1,1};
-
-        bool component_cant_be_used = false;
-
-        if(c.test_if_can_use_in_ship_customisation)
-        {
-            if(!current.can_use(c))
-            {
-                col = popup_colour_info::bad_ui_colour;
-
-                component_cant_be_used = true;
-            }
-        }
-
-        ImGui::TextColored(name, col);
-
-        if(ImGui::IsItemClicked_Registered())
-        {
-            c.clicked = !c.clicked;
-        }
-
-        if(ImGui::IsItemClicked_Registered(1))
-        {
-            to_erase = c_id;
-        }
-
-        if(ImGui::IsItemHovered() && scrollwheel != 0)
-        {
-            float size_change = 0.f;
-
-            if(scrollwheel > 0)
-            {
-                size_change = 0.25f;
-            }
-            else
-            {
-                size_change = -0.25f;
-            }
-
-            float csize = c.current_size;
-
-            csize += size_change;
-
-            csize = clamp(csize, 0.25f, 4.f);
-
-            c.set_size(csize);
-
-            current.repair(nullptr, 1);
-        }
-
-        if(ImGui::IsItemHovered() && component_cant_be_used)
-        {
-            tooltip::add("Cannot be used due to insufficient:");
-
-            auto fully_merged = current.get_fully_merged(1.f);
-
-            for(auto& item : c.components)
-            {
-                component_attribute& attr = item.second;
-
-                float diff = attr.produced_per_use - attr.drained_per_use;
-
-                auto type = item.first;
-
-                if(-diff > fully_merged[type].max_amount)
-                {
-                    tooltip::add(ship_component_elements::display_strings[(int)type]);
-                }
-            }
-
-        }
-
-        if(c.clicked)
-        {
-            ImGui::Indent();
-
-            std::string str = get_component_display_string(c);
-
-            ImGui::Text(str.c_str());
-            ImGui::Unindent();
-        }
-
-        c_id++;
-    }
-
-    if(to_erase != -1)
-    {
-        current.entity_list.erase(current.entity_list.begin() + to_erase);
-    }
-
-    if(global_drag_and_drop.currently_dragging == drag_and_drop_info::COMPONENT && global_drag_and_drop.let_go_on_window())
-    {
-        component& c = *(component*)global_drag_and_drop.data;
-
-        current.add(c);
-    }
-
-    auto dim = ImGui::GetWindowSize();
-
-    //ImGui::SetWindowPos(ImVec2(win_pos.x - dim.x, win_pos.y + titleBarHeight));
-
-
-    auto win_pos = ImGui::GetWindowPos();
-    auto win_size = ImGui::GetWindowSize();
-
-
-    ImGui::End();
-
-    ImGui::SetNextWindowPos(ImVec2(win_pos.x - last_stats_dim.x, win_pos.y + get_title_bar_height()));
-    //ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
 
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
 
-    ImGui::Begin("Stats", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
+    ImGui::Begin((current.name + "###SHIPSTATSCUSTOMISE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     auto produced = current.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = current.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -317,7 +160,160 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
         current.add(c);
     }
 
-    last_stats_dim = ImGui::GetWindowSize();
+    auto win_pos = ImGui::GetWindowPos();
+    auto win_size = ImGui::GetWindowSize();
+
+    ImGui::End();
+
+
+    //ImGui::SetNextWindowSize(saved_size);
+    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
+
+    global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
+
+    ImGui::Begin((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
+    //ImGui::Begin((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+
+    std::vector<std::string> names;
+    std::vector<std::string> sizes;
+
+    ///ships need ids so the ui can work
+
+    int to_erase = -1;
+
+    for(component& c : current.entity_list)
+    {
+        std::string name = c.name;
+
+        if(c.clicked)
+        {
+            name = "-" + name;
+        }
+        else
+        {
+            name = "+" + name;
+        }
+
+        names.push_back(name);
+
+        auto cstr = to_string_with_enforced_variable_dp(c.current_size, 2);
+
+        //name = name + " " + cstr;
+
+        sizes.push_back(cstr);
+    }
+
+    if(current.entity_list.size() == 0)
+    {
+        ImGui::Text("No systems");
+    }
+
+    int c_id = 0;
+
+    for(component& c : current.entity_list)
+    {
+        std::string cname = format(names[c_id], names);
+        std::string sname = format(sizes[c_id], sizes);
+
+        std::string name = cname + "   " + sname;
+
+        vec3f col = {1,1,1};
+
+        bool component_cant_be_used = false;
+
+        if(c.test_if_can_use_in_ship_customisation)
+        {
+            if(!current.can_use(c))
+            {
+                col = popup_colour_info::bad_ui_colour;
+
+                component_cant_be_used = true;
+            }
+        }
+
+        ImGui::TextColored(name, col);
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            c.clicked = !c.clicked;
+        }
+
+        if(ImGui::IsItemClicked_Registered(1))
+        {
+            to_erase = c_id;
+        }
+
+        if(ImGui::IsItemHovered() && scrollwheel != 0)
+        {
+            float size_change = 0.f;
+
+            if(scrollwheel > 0)
+            {
+                size_change = 0.25f;
+            }
+            else
+            {
+                size_change = -0.25f;
+            }
+
+            float csize = c.current_size;
+
+            csize += size_change;
+
+            csize = clamp(csize, 0.25f, 4.f);
+
+            c.set_size(csize);
+
+            current.repair(nullptr, 1);
+        }
+
+        if(ImGui::IsItemHovered() && component_cant_be_used)
+        {
+            tooltip::add("Cannot be used due to insufficient:");
+
+            auto fully_merged = current.get_fully_merged(1.f);
+
+            for(auto& item : c.components)
+            {
+                component_attribute& attr = item.second;
+
+                float diff = attr.produced_per_use - attr.drained_per_use;
+
+                auto type = item.first;
+
+                if(-diff > fully_merged[type].max_amount)
+                {
+                    tooltip::add(ship_component_elements::display_strings[(int)type]);
+                }
+            }
+        }
+
+        if(c.clicked)
+        {
+            ImGui::Indent();
+
+            std::string str = get_component_display_string(c);
+
+            ImGui::Text(str.c_str());
+            ImGui::Unindent();
+        }
+
+        c_id++;
+    }
+
+    if(to_erase != -1)
+    {
+        current.entity_list.erase(current.entity_list.begin() + to_erase);
+    }
+
+    if(global_drag_and_drop.currently_dragging == drag_and_drop_info::COMPONENT && global_drag_and_drop.let_go_on_window())
+    {
+        component& c = *(component*)global_drag_and_drop.data;
+
+        current.add(c);
+    }
+
+    //ImGui::SetWindowPos(ImVec2(win_pos.x - dim.x, win_pos.y + titleBarHeight));
 
     ImGui::End();
 
