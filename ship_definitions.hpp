@@ -489,8 +489,37 @@ inline component make_default_repair_systems()
     repair.cost_mult = 10.f;
 
     repair.extra_resources_ratio[resource::URANIUM] = 1;
+    repair.extra_resources_ratio[resource::COPPER] = 0.2;
 
     return repair;
+}
+
+inline component make_default_ram_scoop()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp / 2.f;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute power;
+    power.drained_per_s = 1.f;
+
+    component_attribute fuel;
+    fuel.produced_per_s = power_core_drain_rate / 5.f;
+
+    component ram;
+    ram.add(ship_component_element::HP, hp);
+    ram.add(ship_component_element::ENERGY, power);
+    ram.add(ship_component_element::FUEL, fuel);
+
+    ram.name = "Ram Scoop";
+    ram.primary_attribute = ship_component_elements::FUEL;
+    ram.cost_mult = 2.f;
+
+    ram.extra_resources_ratio[resource::URANIUM] = 1;
+    ram.extra_resources_ratio[resource::TITANIUM] = 1;
+    ram.extra_resources_ratio[resource::COPPER] = 1;
+
+    return ram;
 }
 
 static std::vector<component> full_component_list =
@@ -510,6 +539,7 @@ static std::vector<component> full_component_list =
     make_default_stealth(),
     make_default_coloniser(),
     make_default_repair_systems(),
+    make_default_ram_scoop(),
 };
 
 inline ship make_default()
