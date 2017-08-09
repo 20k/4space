@@ -2853,7 +2853,8 @@ void ship::test_set_disabled()
     float avg_efficiency = 0.f;
     int num_components = 0;
 
-    bool all_crew_dying = true;
+    int num_crew = 0;
+    int num_crew_dying = 0;
 
     for(component& c : entity_list)
     {
@@ -2886,24 +2887,20 @@ void ship::test_set_disabled()
         if(c.has_tag(component_tag::OXYGEN_STARVATION))
         {
             oxygen_starvation_level = c.get_tag(component_tag::OXYGEN_STARVATION);
-        }
 
-        if(oxygen_starvation_level > 0.99f && oxygen_starvation_level < 1.01f)
-        {
-            if(c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP] >= 0.2f)
+            if(oxygen_starvation_level > 0.99f && oxygen_starvation_level < 1.01f)
             {
-                //full_disabled = true;
-
-                all_crew_dying = false;
+                if(c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP] < 0.2f)
+                {
+                    num_crew_dying++;
+                }
             }
-        }
-        else
-        {
-            all_crew_dying = false;
+
+            num_crew++;
         }
     }
 
-    if(all_crew_dying)
+    if(num_crew != 0 && num_crew == num_crew_dying)
     {
         full_disabled = true;
     }
