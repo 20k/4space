@@ -308,6 +308,11 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
             global_drag_and_drop.begin_dragging(&c, drag_and_drop_info::COMPONENT, c.name);
         }
 
+        if(ImGui::IsItemClicked_Registered(1))
+        {
+            current.add(c);
+        }
+
         if(!component_open[i])
             continue;
 
