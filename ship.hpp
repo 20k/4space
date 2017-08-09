@@ -61,6 +61,7 @@ namespace ship_component_elements
         COILGUN,
         COLONISER,
         RESOURCE_PRODUCTION,
+        RESOURCE_STORAGE,
         NONE,
     };
 
@@ -262,6 +263,9 @@ struct component_attribute
     void upgrade_size(float old_size, float new_size);
 
     std::map<resource::types, float> resources_ratio_produced;
+
+    std::map<resource::types, float> resources_ratio_stored;
+    std::map<resource::types, float> resources_cur_stored;
 
 private:
     float currently_drained = 0.f;

@@ -210,7 +210,7 @@ struct orbital
     bool can_colonise();
 
     ///busy as in in combat or otherwise indisposed
-    bool in_friendly_territory_and_not_busy(empire* player_empire);
+    bool in_friendly_territory_and_not_busy();
 
     //virtual void process_context_ui() override;
 

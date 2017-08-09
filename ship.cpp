@@ -167,6 +167,11 @@ void ship_component_elements::generate_element_infos()
     ei[RESOURCE_PRODUCTION].research_type = research_info::MATERIALS;
 
 
+    ei[RESOURCE_STORAGE].display_name = "Storage";
+    ei[RESOURCE_STORAGE].base_cost = 5;
+    ei[RESOURCE_STORAGE].research_type = research_info::MATERIALS;
+
+
     int num = 0;
 
     for(component_element_info& i : ei)
@@ -350,6 +355,11 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
         ret[resource::TITANIUM] = 1;
         ret[resource::COPPER] = 1;
         ret[resource::URANIUM] = 0.1;
+    }
+
+    if(type == RESOURCE_STORAGE)
+    {
+        ret[resource::IRON] = 1;
     }
 
     for(auto& i : c.extra_resources_ratio)
@@ -1838,6 +1848,23 @@ void ship::tick_all_components(float step_s)
                 owned_by->parent_empire->add_resource(i.first, i.second * produced);
             }
         }
+    }
+
+    for(component& c : entity_list)
+    {
+        if(!c.has_element(ship_component_element::RESOURCE_STORAGE))
+            continue;
+
+        component_attribute attr = c.get_element(ship_component_element::RESOURCE_STORAGE);
+
+        float summed_res = 0.f;
+
+        for(auto& res : attr.resources_cur_stored)
+        {
+            summed_res += res.second;
+        }
+
+        c.components[ship_component_element::RESOURCE_STORAGE].cur_amount = summed_res;
     }
 
     timer.finish();

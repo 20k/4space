@@ -572,6 +572,36 @@ inline component make_default_research_factory()
     return research;
 }
 
+inline component make_default_resource_storage()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp / 10.f;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute resource_store;
+    resource_store.max_amount = 50.f;
+    //resource_store.resources_ratio_produced[resource::RESEARCH] = 1;
+    //resource_store.produced_per_s = 0.25f;
+
+    for(int i=0; i<resource::COUNT; i++)
+    {
+        if(i == (int)resource::RESEARCH)
+            continue;
+
+        resource_store.resources_ratio_stored[(resource::types)i] = 1;
+    }
+
+    component research;
+    research.add(ship_component_element::HP, hp);
+    research.add(ship_component_element::RESOURCE_STORAGE, resource_store);
+
+    research.name = "Cargo";
+    research.primary_attribute = ship_component_element::RESOURCE_STORAGE;
+    research.cost_mult = 5.f;
+
+    return research;
+}
+
 static std::vector<component> full_component_list =
 {
     make_default_crew(),
@@ -592,6 +622,7 @@ static std::vector<component> full_component_list =
     make_default_repair_systems(),
     make_default_ram_scoop(),
     make_default_research_factory(),
+    make_default_resource_storage(),
 };
 
 inline ship make_default()
