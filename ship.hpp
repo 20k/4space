@@ -97,6 +97,7 @@ namespace ship_component_elements
         TORPEDO,
         PLASMAGUN,
         COILGUN,
+        RESOURCE_PRODUCTION,
     };
 
     static std::vector<types> repair_priorities_in_combat_def
@@ -259,6 +260,8 @@ struct component_attribute
     float get_tech_level();
 
     void upgrade_size(float old_size, float new_size);
+
+    std::map<resource::types, float> resources_ratio_produced;
 
 private:
     float currently_drained = 0.f;

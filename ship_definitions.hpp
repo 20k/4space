@@ -547,6 +547,31 @@ inline component make_default_ram_scoop()
     return ram;
 }
 
+inline component make_default_research_factory()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp / 10.f;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute power;
+    power.drained_per_s = 40.f;
+
+    component_attribute research_produces;
+    research_produces.resources_ratio_produced[resource::RESEARCH] = 1;
+    research_produces.produced_per_s = 100.f;
+
+    component research;
+    research.add(ship_component_element::HP, hp);
+    research.add(ship_component_element::ENERGY, power);
+    research.add(ship_component_element::RESOURCE_PRODUCTION, research_produces);
+
+    research.name = "Research Factory";
+    research.primary_attribute = ship_component_element::RESOURCE_PRODUCTION;
+    research.cost_mult = 10.f;
+
+    return research;
+}
+
 static std::vector<component> full_component_list =
 {
     make_default_crew(),
@@ -566,6 +591,7 @@ static std::vector<component> full_component_list =
     make_default_coloniser(),
     make_default_repair_systems(),
     make_default_ram_scoop(),
+    make_default_research_factory(),
 };
 
 inline ship make_default()
