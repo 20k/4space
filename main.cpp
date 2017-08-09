@@ -2104,7 +2104,7 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
         make_default(),
         make_scout(),
         make_colony_ship(),
-        ship_customise.current,
+        //ship_customise.current,
     };
 
     for(ship& s : ship_customise.saved)

@@ -8,6 +8,7 @@
 #include "popup.hpp"
 #include "drag_and_drop.hpp"
 #include "ship_definitions.hpp"
+#include "tooltip_handler.hpp"
 
 std::map<int, bool> component_open;
 
@@ -27,6 +28,8 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
 
     if(current.name == "")
         current.name = "New Ship";
+
+    current.refill_all_components();
 
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
@@ -83,7 +86,21 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
 
         std::string name = cname + "   " + sname;
 
-        ImGui::TextColored({1,1,1, 1.f}, name.c_str());
+        vec3f col = {1,1,1};
+
+        bool component_cant_be_used = false;
+
+        if(c.test_if_can_use_in_ship_customisation)
+        {
+            if(!current.can_use(c))
+            {
+                col = popup_colour_info::bad_ui_colour;
+
+                component_cant_be_used = true;
+            }
+        }
+
+        ImGui::TextColored(name, col);
 
         if(ImGui::IsItemClicked_Registered())
         {
@@ -117,6 +134,11 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
             c.set_size(csize);
 
             current.repair(nullptr, 1);
+        }
+
+        if(ImGui::IsItemHovered() && component_cant_be_used)
+        {
+            tooltip::add("Can't be used due to resource storage limitations");
         }
 
         if(c.clicked)

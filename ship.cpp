@@ -2074,6 +2074,21 @@ std::map<ship_component_element, float> ship::get_max_resources()
     auto produced = get_produced_resources();
 }*/
 
+void ship::refill_all_components()
+{
+    for(component& c : entity_list)
+    {
+        for(auto& item : c.components)
+        {
+            component_attribute& attr = item.second;
+
+            attr.cur_amount = attr.max_amount;
+            attr.time_last_used_s = 0.f;
+            attr.current_time_s = attr.time_last_used_s + attr.time_between_uses_s + 1.f;
+        }
+    }
+}
+
 std::map<ship_component_element, float> ship::get_use_frac(component& c)
 {
     std::map<ship_component_element, float> use_diff = c.get_use_diff();

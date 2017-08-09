@@ -372,6 +372,8 @@ struct component
     float safe_hp_frac_modify(float in);
 
     float cost_mult = 1.f;
+
+    bool test_if_can_use_in_ship_customisation = false;
 };
 
 struct projectile;
@@ -441,6 +443,9 @@ struct ship : positional
 
     void distribute_resources(std::map<ship_component_element, float> res);
     void add_negative_resources(std::map<ship_component_element, float> res);
+
+    ///for ship customisation
+    void refill_all_components();
 
     std::map<ship_component_element, float> get_use_frac(component& c);
     float get_min_use_frac(component& c);
