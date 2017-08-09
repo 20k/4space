@@ -213,7 +213,7 @@ std::map<resource::types, float> ship_component_elements::component_storage_to_r
     return ret;
 }
 
-std::map<resource::types, float> ship_component_elements::component_base_construction_ratio(const types& type)
+std::map<resource::types, float> ship_component_elements::component_base_construction_ratio(const types& type, component& c)
 {
     std::map<resource::types, float> ret;
 
@@ -337,6 +337,11 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
         ret[resource::IRON] = 1;
         ret[resource::TITANIUM] = 0.25f;
         ret[resource::COPPER] = 0.2f;
+    }
+
+    for(auto& i : c.extra_resources_ratio)
+    {
+        ret[i.first] += i.second;
     }
 
     return ret;
@@ -1264,7 +1269,7 @@ std::map<resource::types, float> component::resources_cost()
     if(hp_elem.max_amount < 0.001f)
         return res;
 
-    res = ship_component_elements::component_base_construction_ratio(primary_attribute);
+    res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
 
     for(auto& i : res)
     {
@@ -1286,7 +1291,7 @@ std::map<resource::types, float> component::resources_received_when_scrapped()
     if(hp_elem.max_amount < 0.001f)
         return res;
 
-    res = ship_component_elements::component_base_construction_ratio(primary_attribute);
+    res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
 
     for(auto& i : res)
     {
@@ -1309,7 +1314,7 @@ std::map<resource::types, float> component::resources_needed_to_repair()
     if(hp_elem.max_amount < 0.001f)
         return res;
 
-    res = ship_component_elements::component_base_construction_ratio(primary_attribute);
+    res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
 
     for(auto& i : res)
     {

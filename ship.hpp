@@ -27,6 +27,7 @@ struct positional
 };
 
 struct component_attribute;
+struct component;
 
 ///we need components to require other components to function
 ///we need a tag system, for eg RECOIL or DAMAGE or ARC_OF_FIRE, ie isolated attributes
@@ -165,7 +166,7 @@ namespace ship_component_elements
     std::map<resource::types, float> component_storage_to_resources(const types& type);
 
     ///not cost, but if we multiply by cost we get the end cost
-    std::map<resource::types, float> component_base_construction_ratio(const types& type);
+    std::map<resource::types, float> component_base_construction_ratio(const types& type, component& c);
 
     static float tech_upgrade_effectiveness = 1.2f;
     static float tech_cooldown_upgrade_effectiveness = 1.1f;
@@ -355,6 +356,8 @@ struct component
     ///ie how much they're worth
     std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_needed_to_repair();
+
+    std::map<resource::types, float> extra_resources_ratio;
 
     ///how much research would empire emp get if they could
     research_category get_research_base_for_empire(empire* owner, empire* claiming_empire);

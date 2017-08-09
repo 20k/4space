@@ -2,6 +2,7 @@
 #define SHIP_DEFINITIONS_HPP_INCLUDED
 
 #define default_room_hp 10.f
+#include "resource_manager.hpp"
 
 static float efficiency_cost_exponent = 1.5f;
 
@@ -476,14 +477,17 @@ inline component make_default_repair_systems()
     component_attribute power;
     power.drained_per_s = 20.f;
 
-    component tank;
-    tank.add(ship_component_element::HP, hp);
-    tank.add(ship_component_element::ENERGY, power);
+    component repair;
+    repair.add(ship_component_element::HP, hp);
+    repair.add(ship_component_element::ENERGY, power);
 
-    tank.name = "Repair Systems";
-    tank.primary_attribute = ship_component_elements::HP;
+    repair.name = "Repair Systems";
+    repair.primary_attribute = ship_component_elements::HP;
+    repair.cost_mult = 10.f;
 
-    return tank;
+    repair.extra_resources_ratio[resource::URANIUM] = 1;
+
+    return repair;
 }
 
 static std::vector<component> full_component_list =
