@@ -154,11 +154,12 @@ inline component make_default_power_core(float effectiveness = 1.f)
 inline component make_default_engines()
 {
     float max_bad_engine_lifetime_s = 2000;
+    float drain_rate = 10.f / max_bad_engine_lifetime_s;
 
     component_attribute fuel;
-    fuel.max_amount = 10.f;
-    fuel.cur_amount = 4.f;
-    fuel.drained_per_s = fuel.max_amount/max_bad_engine_lifetime_s;
+    fuel.max_amount = 0.5f;
+    fuel.cur_amount = 0.5f;
+    fuel.drained_per_s = drain_rate;
 
     component_attribute power;
     power.drained_per_s = 10.f;
@@ -445,11 +446,32 @@ inline component make_default_torpedo()
     return torp;
 }
 
+inline component make_default_fuel_tank()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp / 2.f;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute fuel;
+    fuel.max_amount = 10.f;
+    fuel.cur_amount = fuel.max_amount;
+
+    component tank;
+    tank.add(ship_component_element::HP, hp);
+    tank.add(ship_component_element::FUEL, fuel);
+
+    tank.name = "Fuel Tank";
+    tank.primary_attribute = ship_component_elements::FUEL;
+
+    return tank;
+}
+
 static std::vector<component> full_component_list =
 {
     make_default_crew(),
     make_default_life_support(),
     make_default_ammo_store(),
+    make_default_fuel_tank(),
     make_default_shields(),
     make_default_power_core(),
     make_default_engines(),
@@ -510,6 +532,7 @@ inline ship make_default()
     test_ship.add(make_default_railgun());
     test_ship.add(make_default_torpedo());
     test_ship.add(make_default_stealth());
+    test_ship.add(make_default_fuel_tank());
 
     test_ship.name = "Military Default";
 
@@ -528,6 +551,7 @@ inline ship make_civilian()
     test_ship.add(make_default_warp_drive());
     test_ship.add(make_default_scanner());
     test_ship.add(make_default_heatsink());
+    test_ship.add(make_default_fuel_tank());
 
     test_ship.name = "Civilian Default";
 
@@ -548,6 +572,7 @@ inline ship make_scout()
     test_ship.add(make_default_heatsink(0.75f));
     test_ship.add(make_default_torpedo());
     test_ship.add(make_default_stealth(1.5f));
+    test_ship.add(make_default_fuel_tank());
 
     test_ship.name = "Scout Default";
 
@@ -565,6 +590,7 @@ inline ship make_colony_ship()
     test_ship.add(make_default_scanner(0.5));
     test_ship.add(make_default_heatsink(1.8f));
     test_ship.add(make_default_coloniser());
+    test_ship.add(make_default_fuel_tank());
 
     test_ship.name = "Colony Default";
 

@@ -165,8 +165,6 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     ImGui::End();
 
-
-    //ImGui::SetNextWindowSize(saved_size);
     ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
@@ -312,8 +310,6 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
         current.add(c);
     }
-
-    //ImGui::SetWindowPos(ImVec2(win_pos.x - dim.x, win_pos.y + titleBarHeight));
 
     ImGui::End();
 
