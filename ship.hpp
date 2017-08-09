@@ -552,6 +552,9 @@ struct ship : positional
     std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_cost();
 
+    bool can_fully_dispense(std::map<resource::types, float> resources);
+    void fully_dispense(std::map<resource::types, float> resources);
+
     void empty_resources();
 
     ///requires raw research, not tech currency

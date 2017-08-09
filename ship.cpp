@@ -3234,6 +3234,50 @@ std::map<resource::types, float> ship::resources_cost()
     return ret;
 }
 
+bool ship::can_fully_dispense(std::map<resource::types, float> resources)
+{
+    auto res = get_fully_merged(1.f);
+
+    for(int i=0; i<(int)ship_component_elements::NONE; i++)
+    {
+        component_attribute& attr = res[i];
+
+        resource::types type = ship_component_elements::element_infos[i].resource_type;
+
+        if(type == resource::COUNT)
+            continue;
+
+        if(attr.cur_amount < resources[type])
+            return false;
+    }
+
+    return true;
+}
+
+
+void ship::fully_dispense(std::map<resource::types, float> resources)
+{
+    auto res = get_fully_merged(1.f);
+
+    for(int i=0; i<(int)ship_component_elements::NONE; i++)
+    {
+        component_attribute& attr = res[i];
+
+        resource::types type = ship_component_elements::element_infos[i].resource_type;
+
+        if(type == resource::COUNT)
+            continue;
+
+        if(attr.cur_amount >= resources[type])
+        {
+            std::map<ship_component_element, float> vals;
+            vals[(ship_component_elements::types)i] = -resources[type];
+
+            add_negative_resources(vals);
+        }
+    }
+}
+
 void ship::empty_resources()
 {
     for(component& c : entity_list)
