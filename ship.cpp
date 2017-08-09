@@ -2830,7 +2830,7 @@ void ship::refill_resources(empire* emp, int num)
 
         if(comp.resource_type != resource::COUNT)
         {
-            return resupply_elements(emp, {(ship_component_elements::types)i}, num);
+            resupply_elements(emp, {(ship_component_elements::types)i}, num);
         }
     }
 }
@@ -3841,7 +3841,7 @@ void ship_manager::refill_resources(empire* from)
             continue;
         }
 
-        s->resupply(from, num);
+        s->refill_resources(from, num);
 
         num--;
     }
