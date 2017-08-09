@@ -466,6 +466,26 @@ inline component make_default_fuel_tank()
     return tank;
 }
 
+inline component make_default_repair_systems()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp / 2.f;
+    hp.cur_amount = hp.max_amount;
+    hp.produced_per_s = 0.2f;
+
+    component_attribute power;
+    power.drained_per_s = 20.f;
+
+    component tank;
+    tank.add(ship_component_element::HP, hp);
+    tank.add(ship_component_element::ENERGY, power);
+
+    tank.name = "Repair Systems";
+    tank.primary_attribute = ship_component_elements::HP;
+
+    return tank;
+}
+
 static std::vector<component> full_component_list =
 {
     make_default_crew(),
@@ -482,6 +502,7 @@ static std::vector<component> full_component_list =
     make_default_torpedo(),
     make_default_stealth(),
     make_default_coloniser(),
+    make_default_repair_systems(),
 };
 
 inline ship make_default()
@@ -531,8 +552,9 @@ inline ship make_default()
     test_ship.add(make_default_heatsink());
     test_ship.add(make_default_railgun());
     test_ship.add(make_default_torpedo());
-    test_ship.add(make_default_stealth());
     test_ship.add(make_default_fuel_tank());
+    test_ship.add(make_default_stealth());
+    //test_ship.add(make_default_repair_systems());
 
     test_ship.name = "Military Default";
 
