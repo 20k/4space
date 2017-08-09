@@ -1819,6 +1819,27 @@ void ship::tick_all_components(float step_s)
         c.propagate_total_efficiency(step_s);
     }
 
+    ///and in friendly territory?
+    if(owned_by != nullptr && owned_by->parent_empire != nullptr)
+    {
+        for(component& c : entity_list)
+        {
+            if(!c.has_element(ship_component_element::RESOURCE_PRODUCTION))
+                continue;
+
+            component_attribute attr = c.get_element(ship_component_element::RESOURCE_PRODUCTION);
+
+            float produced = attr.get_produced_amount(step_s);
+
+            auto resources = attr.resources_ratio_produced;
+
+            for(auto& i : resources)
+            {
+                owned_by->parent_empire->add_resource(i.first, i.second * produced);
+            }
+        }
+    }
+
     timer.finish();
 
     ///so amount left over is total_to_apply - available_capacities

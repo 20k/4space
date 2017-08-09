@@ -558,7 +558,7 @@ inline component make_default_research_factory()
 
     component_attribute research_produces;
     research_produces.resources_ratio_produced[resource::RESEARCH] = 1;
-    research_produces.produced_per_s = 100.f;
+    research_produces.produced_per_s = 0.25f;
 
     component research;
     research.add(ship_component_element::HP, hp);
@@ -567,7 +567,7 @@ inline component make_default_research_factory()
 
     research.name = "Research Factory";
     research.primary_attribute = ship_component_element::RESOURCE_PRODUCTION;
-    research.cost_mult = 10.f;
+    research.cost_mult = 5.f;
 
     return research;
 }
