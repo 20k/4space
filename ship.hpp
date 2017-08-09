@@ -508,6 +508,7 @@ struct ship : positional
 
     ///fallback on nullptr emp is to force resupply
     void resupply_elements(empire* emp, const std::vector<ship_component_element>& to_resupply, int num = 1);
+    void refill_resources(empire* emp, int num = 1);
     void resupply(empire* emp, int num = 1);
     void repair(empire* emp, int num = 1);
 
@@ -550,6 +551,8 @@ struct ship : positional
     ///calculate research separately as it needs empire, both sides
     std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_cost();
+
+    void empty_resources();
 
     ///requires raw research, not tech currency
     research get_research_base_for_empire(empire* owner, empire* claiming);
@@ -633,6 +636,7 @@ struct ship_manager
 
     empire* parent_empire = nullptr;
 
+    void refill_resources(empire* from);
     void resupply(empire* from, bool can_resupply_derelicts = true);
     void resupply_from_nobody();
     void repair(empire* from);
@@ -662,6 +666,8 @@ struct ship_manager
     float get_min_warp_distance(); ///ignores practicalities, purely base distance
     bool can_use_warp_drives();
     float get_overall_warp_drive_use_frac();
+
+    bool any_with_element(ship_component_element elem);
 
     void leave_combat();
     void enter_combat();

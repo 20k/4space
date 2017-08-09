@@ -648,7 +648,7 @@ inline component make_default_resource_storage()
         if(ship_component_elements::element_infos[i].resource_type == resource::COUNT)
             continue;
 
-        resource_store.max_amount = 50.f;
+        resource_store.max_amount = 10.f;
         research.add((ship_component_elements::types)i, resource_store);
     }
 

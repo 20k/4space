@@ -1572,6 +1572,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     }
                 }
 
+                if(can_resupply && sm->any_with_element(ship_component_elements::RESOURCE_STORAGE))
+                {
+                    ImGui::GoodText("(Refill Cargo)");
+
+                    ImGui::SameLine();
+
+                    if(ImGui::IsItemClicked_Registered())
+                    {
+                        sm->refill_resources(player_empire);
+                    }
+                }
+
                 ///disabling merging here and resupply invalides all fleet actions except moving atm
                 ///unexpected fix to fleet merging problem
                 ///disable resupply if in combat
@@ -2117,6 +2129,7 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
     for(auto& test_ship : ships)
     {
         test_ship.set_tech_level_from_research(window_state.picked_research_levels);
+        test_ship.empty_resources();
 
         auto cost = test_ship.resources_cost();
 
@@ -2149,7 +2162,7 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
                 ship_manager* new_fleet = fleet_manage.make_new();
 
-                ship* new_ship = new_fleet->make_new_from(player_empire, test_ship);
+                ship* new_ship = new_fleet->make_new_from(player_empire, test_ship.duplicate());
                 //new_ship->name = "SS Toimplement name generation";
 
                 orbital* onew_fleet = os->make_new(orbital_info::FLEET, 5.f);

@@ -237,6 +237,11 @@ std::map<resource::types, float> ship_component_elements::component_storage_to_r
         ret[resource::IRON] = 1;
     }
 
+    if(element_infos[(int)type].resource_type != resource::COUNT)
+    {
+        ret[element_infos[(int)type].resource_type] = 1;
+    }
+
     return ret;
 }
 
@@ -2816,6 +2821,20 @@ void ship::resupply_elements(empire* emp, const std::vector<ship_component_eleme
     }
 }
 
+void ship::refill_resources(empire* emp, int num)
+{
+    //for(auto& i : ship_component_elements::element_infos)
+    for(int i=0; i<ship_component_elements::element_infos.size(); i++)
+    {
+        auto& comp = ship_component_elements::element_infos[i];
+
+        if(comp.resource_type != resource::COUNT)
+        {
+            return resupply_elements(emp, {(ship_component_elements::types)i}, num);
+        }
+    }
+}
+
 void ship::resupply(empire* emp, int num)
 {
     return resupply_elements(emp, {ship_component_elements::FUEL, ship_component_elements::AMMO}, num);
@@ -3214,6 +3233,20 @@ std::map<resource::types, float> ship::resources_cost()
     }
 
     return ret;
+}
+
+void ship::empty_resources()
+{
+    for(component& c : entity_list)
+    {
+        for(auto& item : c.components)
+        {
+            if(ship_component_elements::element_infos[(int)item.first].resource_type != resource::COUNT)
+            {
+                item.second.cur_amount = 0;
+            }
+        }
+    }
 }
 
 research ship::get_research_base_for_empire(empire* owner, empire* claiming)
@@ -3788,6 +3821,32 @@ void ship_manager::steal(ship* const s)
     ships.push_back(s);
 }
 
+void ship_manager::refill_resources(empire* from)
+{
+    if(parent_empire == nullptr)
+        return;
+
+    if(from == nullptr)
+    {
+        from = parent_empire;
+    }
+
+    int num = ships.size();
+
+    for(ship* s : ships)
+    {
+        if(s->fully_disabled())
+        {
+            num--;
+            continue;
+        }
+
+        s->resupply(from, num);
+
+        num--;
+    }
+}
+
 void ship_manager::resupply(empire* from, bool can_resupply_derelicts)
 {
     if(parent_empire == nullptr)
@@ -4246,6 +4305,20 @@ float ship_manager::get_overall_warp_drive_use_frac()
         accum = 0.f;
 
     return accum;
+}
+
+bool ship_manager::any_with_element(ship_component_element elem)
+{
+    for(ship* s : ships)
+    {
+        for(component& c : s->entity_list)
+        {
+            if(c.has_element(elem))
+                return true;
+        }
+    }
+
+    return false;
 }
 
 void ship_manager::enter_combat()
