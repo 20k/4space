@@ -43,7 +43,6 @@ namespace ship_component_elements
         ARMOUR, ///second layer
         SHIELD_POWER, ///ie a system can produce shield power, or scanning power
         COMMAND, ///ie the ability for the ship to control itself, limiter on the complexity of stuff in it
-        OXYGEN,
         ENERGY,
         COOLING_POTENTIAL, ///active heat management, but we'll also lose heat into space proportionally to the temperature difference
         ENGINE_POWER,
@@ -62,11 +61,21 @@ namespace ship_component_elements
         COLONISER,
         RESOURCE_PRODUCTION,
         RESOURCE_STORAGE,
+
+        ///RESOURCES SHOULD BE ENTIRELY MIGRATED TO SHIP COMPONENT ELEMENTS
+        OXYGEN,
+        COPPER,
+        HYDROGEN,
+        IRON,
+        TITANIUM,
+        URANIUM,
+        RESEARCH,
         NONE,
     };
 
     struct component_element_info
     {
+        resource::types resource_type = resource::COUNT;
         bool negative_is_bad = false;
         bool is_weapon = false;
         bool skippable_in_display_defence = false;
@@ -99,6 +108,7 @@ namespace ship_component_elements
         PLASMAGUN,
         COILGUN,
         RESOURCE_PRODUCTION,
+        RESOURCE_STORAGE,
     };
 
     static std::vector<types> repair_priorities_in_combat_def
@@ -262,10 +272,10 @@ struct component_attribute
 
     void upgrade_size(float old_size, float new_size);
 
-    std::map<resource::types, float> resources_ratio_produced;
+    /*std::map<resource::types, float> resources_ratio_produced;
 
     std::map<resource::types, float> resources_ratio_stored;
-    std::map<resource::types, float> resources_cur_stored;
+    std::map<resource::types, float> resources_cur_stored;*/
 
 private:
     float currently_drained = 0.f;

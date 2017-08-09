@@ -108,6 +108,7 @@
 		<Unit filename="ship.hpp" />
 		<Unit filename="ship_customiser.cpp" />
 		<Unit filename="ship_customiser.hpp" />
+		<Unit filename="ship_definitions.cpp" />
 		<Unit filename="ship_definitions.hpp" />
 		<Unit filename="system_manager.cpp" />
 		<Unit filename="system_manager.hpp" />

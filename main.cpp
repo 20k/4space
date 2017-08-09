@@ -2192,6 +2192,8 @@ int main()
 {
     ship_component_elements::generate_element_infos();
 
+    full_component_list = get_component_list();
+
     randf_s();
     randf_s();
 

@@ -3,6 +3,8 @@
 
 #define default_room_hp 10.f
 #include "resource_manager.hpp"
+#include <math.h>
+#include "ship.hpp"
 
 static float efficiency_cost_exponent = 1.5f;
 
@@ -547,7 +549,7 @@ inline component make_default_ram_scoop()
     return ram;
 }
 
-inline component make_default_research_factory()
+/*inline component make_default_research_factory()
 {
     component_attribute hp;
     hp.max_amount = default_room_hp / 10.f;
@@ -570,9 +572,35 @@ inline component make_default_research_factory()
     research.cost_mult = 5.f;
 
     return research;
+}*/
+
+inline component make_default_research_factory()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp / 1.f;
+    hp.cur_amount = hp.max_amount;
+
+    component_attribute power;
+    power.drained_per_s = 40.f;
+
+    component_attribute research_produces;
+    research_produces.produced_per_s = 0.25f;
+
+    component research;
+    research.add(ship_component_element::HP, hp);
+    research.add(ship_component_element::ENERGY, power);
+    research.add(ship_component_element::RESEARCH, research_produces);
+    research.add(ship_component_element::RESOURCE_PRODUCTION, component_attribute());
+
+
+    research.name = "Research Factory";
+    research.primary_attribute = ship_component_element::RESOURCE_PRODUCTION;
+    research.cost_mult = 5.f;
+
+    return research;
 }
 
-inline component make_default_resource_storage()
+/*inline component make_default_resource_storage()
 {
     component_attribute hp;
     hp.max_amount = default_room_hp / 10.f;
@@ -600,31 +628,73 @@ inline component make_default_resource_storage()
     research.cost_mult = 5.f;
 
     return research;
+}*/
+
+inline component make_default_resource_storage()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp / 10.f;
+    hp.cur_amount = hp.max_amount;
+
+    component research;
+
+    component_attribute resource_store;
+
+    for(int i=0; i<ship_component_element::NONE; i++)
+    {
+        if(i == (int)ship_component_element::RESEARCH)
+            continue;
+
+        if(ship_component_elements::element_infos[i].resource_type == resource::COUNT)
+            continue;
+
+        resource_store.max_amount = 50.f;
+        research.add((ship_component_elements::types)i, resource_store);
+    }
+
+    research.add(ship_component_element::HP, hp);
+    research.add(ship_component_element::RESOURCE_STORAGE, component_attribute());
+
+    research.name = "Cargo";
+    research.primary_attribute = ship_component_element::RESOURCE_STORAGE;
+    research.cost_mult = 5.f;
+
+    return research;
 }
 
-static std::vector<component> full_component_list =
+///seriously fuck static initialisation
+inline
+std::vector<component> get_component_list()
 {
-    make_default_crew(),
-    make_default_life_support(),
-    make_default_ammo_store(),
-    make_default_fuel_tank(),
-    make_default_shields(),
-    make_default_power_core(),
-    make_default_solar_panel(),
-    make_default_engines(),
-    make_default_warp_drive(),
-    make_default_scanner(),
-    make_default_heatsink(),
-    make_default_railgun(),
-    make_default_torpedo(),
-    make_default_stealth(),
-    make_default_coloniser(),
-    make_default_repair_systems(),
-    make_default_ram_scoop(),
-    make_default_research_factory(),
-    make_default_resource_storage(),
-};
+    std::vector<component> full_component_list =
+    {
+        make_default_crew(),
+        make_default_life_support(),
+        make_default_ammo_store(),
+        make_default_fuel_tank(),
+        make_default_shields(),
+        make_default_power_core(),
+        make_default_solar_panel(),
+        make_default_engines(),
+        make_default_warp_drive(),
+        make_default_scanner(),
+        make_default_heatsink(),
+        make_default_railgun(),
+        make_default_torpedo(),
+        make_default_stealth(),
+        make_default_coloniser(),
+        make_default_repair_systems(),
+        make_default_ram_scoop(),
+        make_default_research_factory(),
+        make_default_resource_storage(),
+    };
 
+    return full_component_list;
+}
+
+extern std::vector<component> full_component_list;
+
+static
 inline ship make_default()
 {
     /*ship test_ship;

@@ -75,6 +75,7 @@ void ship_component_elements::generate_element_infos()
     ei[OXYGEN].research_type = research_info::MATERIALS;
     ei[OXYGEN].allowed_skip_in_repair = true;
     ei[OXYGEN].negative_is_bad = true;
+    ei[OXYGEN].resource_type = resource::OXYGEN;
 
 
 
@@ -171,11 +172,27 @@ void ship_component_elements::generate_element_infos()
     ei[RESOURCE_STORAGE].base_cost = 5;
     ei[RESOURCE_STORAGE].research_type = research_info::MATERIALS;
 
+    #define DEFINE_RESOURCE(name) ei[name].display_name = #name; ei[name].base_cost = 5; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
+
+    DEFINE_RESOURCE(COPPER);
+    DEFINE_RESOURCE(HYDROGEN);
+    DEFINE_RESOURCE(IRON);
+    DEFINE_RESOURCE(TITANIUM);
+    DEFINE_RESOURCE(URANIUM);
+    DEFINE_RESOURCE(RESEARCH);
 
     int num = 0;
 
     for(component_element_info& i : ei)
     {
+        if(i.resource_type != resource::COUNT)
+        {
+            for(int kk=1; kk < i.display_name.size(); kk++)
+            {
+                i.display_name[kk] = tolower(i.display_name[kk]);
+            }
+        }
+
         if(i.allowed_skip_in_repair)
         {
             allowed_skip_repair_def.push_back((types)num);
@@ -226,6 +243,8 @@ std::map<resource::types, float> ship_component_elements::component_storage_to_r
 std::map<resource::types, float> ship_component_elements::component_base_construction_ratio(const types& type, component& c)
 {
     std::map<resource::types, float> ret;
+
+    ret[resource::IRON] = 1;
 
     if(type == COOLING_POTENTIAL)
     {
@@ -1837,7 +1856,7 @@ void ship::tick_all_components(float step_s)
             if(!c.has_element(ship_component_element::RESOURCE_PRODUCTION))
                 continue;
 
-            component_attribute attr = c.get_element(ship_component_element::RESOURCE_PRODUCTION);
+            /*component_attribute attr = c.get_element(ship_component_element::RESOURCE_PRODUCTION);
 
             float produced = attr.get_produced_amount(step_s);
 
@@ -1846,11 +1865,23 @@ void ship::tick_all_components(float step_s)
             for(auto& i : resources)
             {
                 owned_by->parent_empire->add_resource(i.first, i.second * produced);
+            }*/
+
+            for(auto& item : c.components)
+            {
+                if(ship_component_elements::element_infos[(int)item.first].resource_type != resource::COUNT)
+                {
+                    component_attribute& attr = item.second;
+
+                    float produced = attr.get_produced_amount(step_s);
+
+                    owned_by->parent_empire->add_resource(ship_component_elements::element_infos[(int)item.first].resource_type, produced);
+                }
             }
         }
     }
 
-    for(component& c : entity_list)
+    /*for(component& c : entity_list)
     {
         if(!c.has_element(ship_component_element::RESOURCE_STORAGE))
             continue;
@@ -1865,7 +1896,7 @@ void ship::tick_all_components(float step_s)
         }
 
         c.components[ship_component_element::RESOURCE_STORAGE].cur_amount = summed_res;
-    }
+    }*/
 
     timer.finish();
 
