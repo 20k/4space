@@ -156,7 +156,6 @@ inline component make_default_power_core(float effectiveness = 1.f)
     return core;
 }
 
-
 inline component make_default_solar_panel()
 {
     component_attribute power;

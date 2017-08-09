@@ -60,6 +60,7 @@ namespace ship_component_elements
         PLASMAGUN,
         COILGUN,
         COLONISER,
+        RESOURCE_PRODUCTION,
         NONE,
     };
 

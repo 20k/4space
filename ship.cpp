@@ -162,6 +162,11 @@ void ship_component_elements::generate_element_infos()
     ei[COILGUN].research_type = research_info::WEAPONS;
 
 
+    ei[RESOURCE_PRODUCTION].display_name = "Resource Producer";
+    ei[RESOURCE_PRODUCTION].base_cost = 200;
+    ei[RESOURCE_PRODUCTION].research_type = research_info::MATERIALS;
+
+
     int num = 0;
 
     for(component_element_info& i : ei)
@@ -337,6 +342,14 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
         ret[resource::IRON] = 1;
         ret[resource::TITANIUM] = 0.25f;
         ret[resource::COPPER] = 0.2f;
+    }
+
+    if(type == RESOURCE_PRODUCTION)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
+        ret[resource::URANIUM] = 0.1;
     }
 
     for(auto& i : c.extra_resources_ratio)
