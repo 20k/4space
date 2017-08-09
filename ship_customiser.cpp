@@ -138,7 +138,24 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
 
         if(ImGui::IsItemHovered() && component_cant_be_used)
         {
-            tooltip::add("Can't be used due to resource storage limitations");
+            tooltip::add("Cannot be used due to insufficient:");
+
+            auto fully_merged = current.get_fully_merged(1.f);
+
+            for(auto& item : c.components)
+            {
+                component_attribute& attr = item.second;
+
+                float diff = attr.produced_per_use - attr.drained_per_use;
+
+                auto type = item.first;
+
+                if(-diff > fully_merged[type].max_amount)
+                {
+                    tooltip::add(ship_component_elements::display_strings[(int)type]);
+                }
+            }
+
         }
 
         if(c.clicked)
