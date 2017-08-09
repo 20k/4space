@@ -125,11 +125,12 @@ inline component make_default_shields(float effectiveness = 1.f)
 
 static float power_core_drain_rate = 1.f / 100.f;
 static float engine_drain_rate = 10.f / 2000.f;
+static float power_plant_produced = 80.f;
 
 inline component make_default_power_core(float effectiveness = 1.f)
 {
     component_attribute power;
-    power.produced_per_s = 80.f * effectiveness;
+    power.produced_per_s = power_plant_produced * effectiveness;
     power.max_amount = 80.f * effectiveness;
 
     component_attribute fuel;
@@ -151,6 +152,29 @@ inline component make_default_power_core(float effectiveness = 1.f)
     core.primary_attribute = ship_component_elements::ENERGY;
     core.repair_this_when_recrewing = true;
     core.cost_mult = get_cost_mod(effectiveness);
+
+    return core;
+}
+
+
+inline component make_default_solar_panel()
+{
+    component_attribute power;
+    power.produced_per_s = power_plant_produced / 5.f;
+    power.max_amount = 80.f / 5.f;
+
+    component_attribute hp;
+    hp.max_amount = default_room_hp/4;
+    hp.cur_amount = hp.max_amount;
+
+    component core;
+    core.add(ship_component_element::ENERGY, power);
+    core.add(ship_component_element::HP, hp);
+
+    core.name = "Solar Panel";
+    core.primary_attribute = ship_component_elements::ENERGY;
+    core.repair_this_when_recrewing = true;
+    core.cost_mult = 0.5f;
 
     return core;
 }
@@ -466,6 +490,7 @@ inline component make_default_fuel_tank()
 
     tank.name = "Fuel Tank";
     tank.primary_attribute = ship_component_elements::FUEL;
+    tank.repair_this_when_recrewing = true;
 
     return tank;
 }
@@ -518,6 +543,7 @@ inline component make_default_ram_scoop()
     ram.extra_resources_ratio[resource::URANIUM] = 1;
     ram.extra_resources_ratio[resource::TITANIUM] = 1;
     ram.extra_resources_ratio[resource::COPPER] = 1;
+    ram.repair_this_when_recrewing = true;
 
     return ram;
 }
@@ -530,6 +556,7 @@ static std::vector<component> full_component_list =
     make_default_fuel_tank(),
     make_default_shields(),
     make_default_power_core(),
+    make_default_solar_panel(),
     make_default_engines(),
     make_default_warp_drive(),
     make_default_scanner(),
