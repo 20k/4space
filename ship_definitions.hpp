@@ -123,6 +123,9 @@ inline component make_default_shields(float effectiveness = 1.f)
     return shields;
 }
 
+static float power_core_drain_rate = 1.f / 100.f;
+static float engine_drain_rate = 10.f / 2000.f;
+
 inline component make_default_power_core(float effectiveness = 1.f)
 {
     component_attribute power;
@@ -132,7 +135,7 @@ inline component make_default_power_core(float effectiveness = 1.f)
     component_attribute fuel;
     fuel.max_amount = 1.f;
     fuel.cur_amount = 1.f;
-    fuel.drained_per_s = effectiveness * fuel.max_amount / 100;
+    fuel.drained_per_s = effectiveness * power_core_drain_rate;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;
@@ -160,7 +163,7 @@ inline component make_default_engines()
     component_attribute fuel;
     fuel.max_amount = 0.5f;
     fuel.cur_amount = 0.5f;
-    fuel.drained_per_s = drain_rate;
+    fuel.drained_per_s = engine_drain_rate;
 
     component_attribute power;
     power.drained_per_s = 10.f;
