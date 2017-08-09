@@ -2553,7 +2553,7 @@ int main()
 
         handle_camera(window, system_manage);
 
-        if(ONCE_MACRO(sf::Keyboard::M) && focused)
+        if(ONCE_MACRO(sf::Keyboard::M) && focused && !ship_customise.text_input_going)
         {
             system_manage.enter_universe_view();
         }

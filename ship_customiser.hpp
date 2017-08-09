@@ -146,7 +146,9 @@ struct ship_customiser
 
     void tick(float scrollwheel, bool lclick);
 
+
 private:
+    ImVec2 last_stats_dim = ImVec2(0, 0);
     void save();
     void do_save_window();
     int64_t renaming_id = -1;

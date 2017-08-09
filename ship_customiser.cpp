@@ -38,7 +38,7 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
 
-    ImGui::Begin("Ship##SHIPPITYSHIPSHAPE", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> names;
     std::vector<std::string> sizes;
@@ -155,11 +155,10 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
 
     ImGui::End();
 
-
-    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
+    ImGui::SetNextWindowPos(ImVec2(win_pos.x - last_stats_dim.x, win_pos.y + get_title_bar_height()));
+    //ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
 
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
-
 
     ImGui::Begin("Stats", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
@@ -278,6 +277,8 @@ void ship_customiser::tick(float scrollwheel, bool lclick)
 
         current.add(c);
     }
+
+    last_stats_dim = ImGui::GetWindowSize();
 
     ImGui::End();
 
