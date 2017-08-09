@@ -4477,6 +4477,29 @@ bool ship_manager::any_damaged()
     return false;
 }
 
+bool ship_manager::can_fully_dispense(std::map<resource::types, float> resources)
+{
+    for(ship* s : ships)
+    {
+        if(s->can_fully_dispense(resources))
+            return true;
+    }
+
+    return false;
+}
+
+void ship_manager::fully_dispense(std::map<resource::types, float> resources)
+{
+    for(ship* s : ships)
+    {
+        if(s->can_fully_dispense(resources))
+        {
+            s->fully_dispense(resources);
+            return;
+        }
+    }
+}
+
 std::string ship_manager::get_engage_str()
 {
     if(can_engage())

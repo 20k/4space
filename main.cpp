@@ -2133,6 +2133,15 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         auto cost = test_ship.resources_cost();
 
+        bool can_dispense = player_empire->can_fully_dispense(cost);
+
+        if(o->type == orbital_info::FLEET)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            can_dispense = sm->can_fully_dispense(cost);
+        }
+
         resource_manager rm;
         rm.add(cost);
 
@@ -2142,7 +2151,7 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         std::string make_ship_full_name = ("(Make " + str + " Ship)");
 
-        if(player_empire->can_fully_dispense(cost))
+        if(can_dispense)
             ImGui::NeutralText(make_ship_full_name.c_str());
         else
             ImGui::BadText(make_ship_full_name.c_str());
@@ -2154,9 +2163,17 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         if(clicked)
         {
-            if(player_empire->can_fully_dispense(cost))
+            if(can_dispense)
             {
-                player_empire->dispense_resources(cost);
+                if(o->type == orbital_info::FLEET)
+                {
+                    ship_manager* sm = (ship_manager*)o->data;
+                    sm->fully_dispense(cost);
+                }
+                else
+                {
+                    player_empire->dispense_resources(cost);
+                }
 
                 orbital_system* os = o->parent_system;
 

@@ -695,6 +695,9 @@ struct ship_manager
 
     bool any_damaged();
 
+    bool can_fully_dispense(std::map<resource::types, float> resources);
+    void fully_dispense(std::map<resource::types, float> resources);
+
     float accumulated_dt = 0;
 
     ///for stealth
