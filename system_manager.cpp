@@ -798,6 +798,21 @@ bool orbital::in_friendly_territory_and_not_busy()
         }
     }
 
+    for(orbital* o : parent_system->orbitals)
+    {
+        if(o->parent_empire == nullptr)
+            continue;
+
+        if(o->parent_empire == parent_empire)
+            continue;
+
+        if(o->parent_empire->is_hostile(parent_empire))
+        {
+            fleet_is_in_good_state = false;
+            break;
+        }
+    }
+
     empire* owning_system_empire = parent_system->get_base()->parent_empire;
 
     return (owning_system_empire == parent_empire || owning_system_empire->is_allied(parent_empire)) && fleet_is_in_good_state;
