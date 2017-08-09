@@ -61,6 +61,7 @@ namespace ship_component_elements
         COLONISER,
         RESOURCE_PRODUCTION,
         RESOURCE_STORAGE,
+        SHIPYARD,
 
         ///RESOURCES SHOULD BE ENTIRELY MIGRATED TO SHIP COMPONENT ELEMENTS
         OXYGEN,
@@ -109,6 +110,7 @@ namespace ship_component_elements
         COILGUN,
         RESOURCE_PRODUCTION,
         RESOURCE_STORAGE,
+        SHIPYARD,
     };
 
     static std::vector<types> repair_priorities_in_combat_def

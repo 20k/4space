@@ -662,6 +662,24 @@ inline component make_default_resource_storage()
     return research;
 }
 
+inline component make_default_shipyard()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
+    component shipyard;
+
+    shipyard.add(ship_component_element::HP, hp);
+    shipyard.add(ship_component_element::SHIPYARD, component_attribute());
+
+    shipyard.name = "Shipyard";
+    shipyard.primary_attribute = ship_component_element::SHIPYARD;
+    shipyard.cost_mult = 5.f;
+
+    return shipyard;
+}
+
 ///seriously fuck static initialisation
 inline
 std::vector<component> get_component_list()
@@ -687,6 +705,7 @@ std::vector<component> get_component_list()
         make_default_ram_scoop(),
         make_default_research_factory(),
         make_default_resource_storage(),
+        make_default_shipyard(),
     };
 
     return full_component_list;

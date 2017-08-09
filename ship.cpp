@@ -172,6 +172,12 @@ void ship_component_elements::generate_element_infos()
     ei[RESOURCE_STORAGE].base_cost = 5;
     ei[RESOURCE_STORAGE].research_type = research_info::MATERIALS;
 
+
+    ei[SHIPYARD].display_name = "Shipyard";
+    ei[SHIPYARD].base_cost = 5;
+    ei[SHIPYARD].research_type = research_info::MATERIALS;
+
+
     #define DEFINE_RESOURCE(name) ei[name].display_name = #name; ei[name].base_cost = 5; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
 
     DEFINE_RESOURCE(COPPER);
@@ -384,6 +390,13 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
     if(type == RESOURCE_STORAGE)
     {
         ret[resource::IRON] = 1;
+    }
+
+    if(type == SHIPYARD)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
     }
 
     for(auto& i : c.extra_resources_ratio)

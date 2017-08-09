@@ -1777,6 +1777,26 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
+            if(o->type == orbital_info::FLEET && o->can_construct_ships && o->parent_empire == player_empire)
+            {
+                if(sm->any_with_element(ship_component_elements::SHIPYARD))
+                {
+                    if(o->construction_ui_open)
+                        ImGui::NeutralText("(Hide Construction Window)");
+                    else
+                        ImGui::NeutralText("(Show Construction Window)");
+
+                    if(ImGui::IsItemClicked_Registered())
+                    {
+                        o->construction_ui_open = !o->construction_ui_open;
+                    }
+                }
+                else
+                {
+                    o->construction_ui_open = false;
+                }
+            }
+
             if(o->type == orbital_info::PLANET && o->decolonise_timer_s > 0.0001f)
             {
                 std::string decolo_time = "Time until decolonised " + to_string_with_enforced_variable_dp(orbital_info::decolonise_time_s - o->decolonise_timer_s);
