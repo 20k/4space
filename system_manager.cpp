@@ -781,6 +781,28 @@ bool orbital::can_colonise()
     return type == orbital_info::PLANET && parent_empire == nullptr;
 }
 
+bool orbital::in_friendly_territory_and_not_busy()
+{
+    if(parent_empire == nullptr)
+        return false;
+
+    bool fleet_is_in_good_state = true;
+
+    if(type == orbital_info::FLEET)
+    {
+        ship_manager* sm = (ship_manager*)data;
+
+        if(sm->any_derelict() || sm->any_in_combat())
+        {
+            fleet_is_in_good_state = false;
+        }
+    }
+
+    empire* owning_system_empire = parent_system->get_base()->parent_empire;
+
+    return (owning_system_empire == parent_empire || owning_system_empire->is_allied(parent_empire)) && fleet_is_in_good_state;
+}
+
 /*void orbital::process_context_ui()
 {
     if(type == orbital_info::FLEET)

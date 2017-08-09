@@ -209,6 +209,9 @@ struct orbital
     bool is_colonised();
     bool can_colonise();
 
+    ///busy as in in combat or otherwise indisposed
+    bool in_friendly_territory_and_not_busy(empire* player_empire);
+
     //virtual void process_context_ui() override;
 
     ///if > than amount, remove parent empire
