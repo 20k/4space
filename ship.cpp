@@ -2823,7 +2823,6 @@ void ship::resupply_elements(empire* emp, const std::vector<ship_component_eleme
 
 void ship::refill_resources(empire* emp, int num)
 {
-    //for(auto& i : ship_component_elements::element_infos)
     for(int i=0; i<ship_component_elements::element_infos.size(); i++)
     {
         auto& comp = ship_component_elements::element_infos[i];
