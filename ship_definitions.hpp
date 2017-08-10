@@ -705,7 +705,7 @@ inline component make_default_mining_system()
     }
 
     mining.name = "Ore Extractor";
-    mining.primary_attribute = ship_component_element::SHIPYARD;
+    mining.primary_attribute = ship_component_element::ORE_HARVESTER;
     mining.cost_mult = 5.f;
 
     return mining;
