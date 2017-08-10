@@ -172,6 +172,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         if(ship_component_elements::skippable_in_display[id] != -1)
             continue;
 
+        if(prod - cons == 0.f && maximum == 0.f && ship_component_elements::element_infos[(int)id].resource_type != resource::COUNT)
+            continue;
+
 
         headers.push_back(header_str);
         prod_list.push_back(prod_str);
