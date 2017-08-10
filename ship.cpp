@@ -1943,28 +1943,13 @@ void ship::tick_all_components(float step_s)
     ///atm this is going to double produce if we have storage for this resource
     if(owned_by != nullptr && owned_by->parent_empire != nullptr)
     {
-        //for(component& c : entity_list)
         for(int i=0; i < left_after_storage.size(); i++)
         {
-            //if(!c.has_element(ship_component_element::RESOURCE_PRODUCTION))
-            //    continue;
-
-            //for(auto& item : c.components)
+            if(ship_component_elements::element_infos[i].resource_type != resource::COUNT)
             {
-                if(ship_component_elements::element_infos[i].resource_type != resource::COUNT)
-                {
-                    //component_attribute& attr = item.second;
+                float produced = left_after_storage[i].produced_per_s;
 
-                    float produced = left_after_storage[i].produced_per_s;
-
-                    owned_by->parent_empire->add_resource(ship_component_elements::element_infos[i].resource_type, produced);
-
-                    /*if(c.primary_attribute == ship_component_elements::ORE_HARVESTER)
-                    {
-                        attr.produced_per_s = 0.f;
-                        attr.available_for_consumption = 0.f;
-                    }*/
-                }
+                owned_by->parent_empire->add_resource(ship_component_elements::element_infos[i].resource_type, produced);
             }
         }
     }
