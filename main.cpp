@@ -1575,7 +1575,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(can_resupply)
                 {
-                    ImGui::GoodText("(Resupply)");
+                    //ImGui::GoodText("(Resupply)");
+
+                    ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, sm->auto_resupply);
 
                     ImGui::SameLine();
 
@@ -1584,6 +1586,19 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         ship_manager* sm = (ship_manager*)o->data;
 
                         sm->resupply(player_empire, false);
+                    }
+
+                    if(ImGui::IsItemClicked_Registered(1))
+                    {
+                        sm->auto_resupply = !sm->auto_resupply;
+                    }
+
+                    if(ImGui::IsItemHovered())
+                    {
+                        if(sm->auto_resupply)
+                            tooltip::add("Right click to disable auto resupply");
+                        else
+                            tooltip::add("Right click to enable auto resupply");
                     }
                 }
 

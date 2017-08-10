@@ -119,7 +119,7 @@ namespace ImGui
     }
 
     inline
-    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0})
+    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0}, int thickness = 1, bool force_hover = false)
     {
         ImGui::BeginGroup();
 
@@ -140,10 +140,15 @@ namespace ImGui
         p2.x += dim.x;
         p2.y += dim.y;
 
-        int thickness = 1;
+        bool currently_hovered = ImGui::IsWindowHovered() && ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2) && hover;
 
-        if(ImGui::IsWindowHovered() && ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2) && hover)
+        if(currently_hovered || force_hover)
         {
+            if(force_hover && !currently_hovered)
+            {
+                thickness = 0;
+            }
+
             ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
 
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(col.x(), col.y(), col.z(), 1));
@@ -188,9 +193,9 @@ namespace ImGui
     }
 
     inline
-    void OutlineHoverTextAuto(const std::string& txt, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0})
+    void OutlineHoverTextAuto(const std::string& txt, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0}, int thickness = 1, bool force_hover = false)
     {
-        return OutlineHoverText(txt, text_col/2.f, text_col, hover, dim_extra);
+        return OutlineHoverText(txt, text_col/2.f, text_col, hover, dim_extra, thickness, force_hover);
     }
 
     inline
