@@ -4088,6 +4088,11 @@ void ship_manager::tick_all(float step_s)
         s->tick_all_components(step_s);
         s->tick_other_systems(step_s);
 
+        if(!s->display_ui)
+        {
+            s->confirming_scrap = false;
+        }
+
         if(s->is_alien)
         {
             research r = s->tick_drain_research_from_crew(step_s);

@@ -507,6 +507,7 @@ struct ship : positional
 
     ship_manager* owned_by = nullptr;
 
+    bool confirming_scrap = false;
     bool display_ui = false;
     bool display_popout = false;
     bool display_weapon = false;

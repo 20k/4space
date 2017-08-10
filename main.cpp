@@ -326,7 +326,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }
     ///have a recovery cost display?
 
-    if(s.owned_by->parent_empire == player_empire && !s.owned_by->any_in_combat())
+    orbital* o = system_manage.get_by_element_orbital(s.owned_by);
+
+    if(s.owned_by->parent_empire == player_empire && !s.owned_by->any_in_combat() && o != nullptr && o->in_friendly_territory_and_not_busy())
     {
         ImGui::NeutralText("(Upgrade to latest Tech)");
 
@@ -498,11 +500,36 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             }
 
             s.cleanup = true;
-
-            popup.going = false;
-            popup.elements.clear();
         }
     }
+
+    if(s.owned_by != nullptr && s.owned_by->parent_empire == player_empire && o != nullptr && o->in_friendly_territory_and_not_busy())
+    {
+        ImGui::BadText("(Scrap Ship)");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            s.confirming_scrap = true;
+        }
+
+        if(s.confirming_scrap)
+        {
+            ImGui::BadText("(Are you sure?)");
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                auto res = s.resources_received_when_scrapped();
+
+                for(auto& i : res)
+                {
+                    claiming_empire->add_resource(i.first, i.second);
+                }
+
+                s.cleanup = true;
+            }
+        }
+    }
+
 
     if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr)
     {
@@ -526,6 +553,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             }
         }
     }
+
 
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
