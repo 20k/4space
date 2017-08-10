@@ -177,6 +177,14 @@ void ship_component_elements::generate_element_infos()
     ei[SHIPYARD].base_cost = 5;
     ei[SHIPYARD].research_type = research_info::MATERIALS;
 
+    ei[MASS_ANCHOR].display_name = "Mass Anchor";
+    ei[MASS_ANCHOR].base_cost = 5;
+    ei[MASS_ANCHOR].research_type = research_info::MATERIALS;
+
+    ei[ORE_HARVESTER].display_name = "Ore Harvester";
+    ei[ORE_HARVESTER].base_cost = 5;
+    ei[ORE_HARVESTER].research_type = research_info::MATERIALS;
+
 
     #define DEFINE_RESOURCE(name) ei[name].display_name = #name; ei[name].base_cost = 5; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
 
@@ -251,6 +259,7 @@ std::map<resource::types, float> ship_component_elements::component_storage_to_r
     return ret;
 }
 
+///this will all be obsolete soon
 std::map<resource::types, float> ship_component_elements::component_base_construction_ratio(const types& type, component& c)
 {
     std::map<resource::types, float> ret;
@@ -393,6 +402,13 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
     }
 
     if(type == SHIPYARD)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+        ret[resource::COPPER] = 1;
+    }
+
+    if(type == ORE_HARVESTER)
     {
         ret[resource::IRON] = 1;
         ret[resource::TITANIUM] = 1;
@@ -1867,6 +1883,7 @@ void ship::tick_all_components(float step_s)
     }
 
     ///and in friendly territory?
+    ///atm this is going to double produce if we have storage for this resource
     if(owned_by != nullptr && owned_by->parent_empire != nullptr)
     {
         for(component& c : entity_list)

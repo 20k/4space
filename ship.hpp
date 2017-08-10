@@ -62,6 +62,8 @@ namespace ship_component_elements
         RESOURCE_PRODUCTION,
         RESOURCE_STORAGE,
         SHIPYARD,
+        MASS_ANCHOR, ///can be tied to a planetary body, sun, or asteroid etc
+        ORE_HARVESTER, ///does not actually harvest ore, simply stores information about it. Do this through resource production
 
         ///RESOURCES SHOULD BE ENTIRELY MIGRATED TO SHIP COMPONENT ELEMENTS
         OXYGEN,
@@ -111,6 +113,7 @@ namespace ship_component_elements
         RESOURCE_PRODUCTION,
         RESOURCE_STORAGE,
         SHIPYARD,
+        MASS_ANCHOR,
     };
 
     static std::vector<types> repair_priorities_in_combat_def

@@ -680,6 +680,37 @@ inline component make_default_shipyard()
     return shipyard;
 }
 
+inline component make_default_mining_system()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
+    component mining;
+
+    mining.add(ship_component_element::HP, hp);
+    mining.add(ship_component_element::MASS_ANCHOR, component_attribute());
+    mining.add(ship_component_element::ORE_HARVESTER, component_attribute());
+    mining.add(ship_component_element::RESOURCE_PRODUCTION, component_attribute());
+
+    for(int i=0; i<ship_component_element::NONE; i++)
+    {
+        if(i == (int)ship_component_element::RESEARCH)
+            continue;
+
+        if(ship_component_elements::element_infos[i].resource_type == resource::COUNT)
+            continue;
+
+        mining.add((ship_component_elements::types)i, component_attribute());
+    }
+
+    mining.name = "Ore Extractor";
+    mining.primary_attribute = ship_component_element::SHIPYARD;
+    mining.cost_mult = 5.f;
+
+    return mining;
+}
+
 ///seriously fuck static initialisation
 inline
 std::vector<component> get_component_list()
