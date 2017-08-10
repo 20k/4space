@@ -207,6 +207,8 @@ namespace ship_component_elements
     void upgrade_component(component_attribute& in, int type, float old_tech, float new_tech);
 
     float upgrade_value(float value, float old_tech, float new_tech);
+
+    static float max_components_total_size = 9.f;
 }
 
 namespace combat_variables
@@ -621,6 +623,9 @@ struct ship : positional
 
     float get_total_storage_of_components_with_this_primary(ship_component_element primary, ship_component_element resource_to_get);
     float get_max_storage_of_components_with_this_primary(ship_component_element primary, ship_component_element resource_to_get);
+
+    float get_total_components_size();
+    bool is_ship_design_valid();
 
     static sf::RenderTexture* intermediate;
 

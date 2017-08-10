@@ -302,6 +302,15 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
         c_id++;
     }
 
+    vec3f space_colour = popup_colour_info::good_ui_colour;
+
+    if(!current.is_ship_design_valid())
+    {
+        space_colour = popup_colour_info::bad_ui_colour;
+    }
+
+    ImGui::ColourNoHoverText("Space: " + to_string_with_enforced_variable_dp(current.get_total_components_size()) + "/" + to_string_with_enforced_variable_dp(ship_component_elements::max_components_total_size), space_colour);
+
     if(to_erase != -1)
     {
         current.entity_list.erase(current.entity_list.begin() + to_erase);
@@ -445,7 +454,10 @@ void ship_customiser::do_save_window()
 
         if(renaming_id != s.id)
         {
-            ImGui::NeutralText(name);
+            if(s.is_ship_design_valid())
+                ImGui::NeutralText(name);
+            else
+                ImGui::BadText(name);
 
             if(ImGui::IsItemClicked() && last_selected != s.id)
             {

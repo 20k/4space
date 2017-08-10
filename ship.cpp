@@ -3769,6 +3769,27 @@ float ship::get_max_storage_of_components_with_this_primary(ship_component_eleme
     return amount;
 }
 
+float ship::get_total_components_size()
+{
+    float accum = 0.f;
+
+    for(component& c : entity_list)
+    {
+        accum += c.current_size;
+    }
+
+    return accum;
+}
+
+bool ship::is_ship_design_valid()
+{
+    float max_space = ship_component_elements::max_components_total_size;
+
+
+
+    return get_total_components_size() <= max_space + FLOAT_BOUND;
+}
+
 /*ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;

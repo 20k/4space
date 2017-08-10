@@ -2198,6 +2198,9 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     for(ship& s : ship_customise.saved)
     {
+        if(!s.is_ship_design_valid())
+            continue;
+
         ships.push_back(s);
     }
 
