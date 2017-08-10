@@ -150,12 +150,16 @@ struct popup_info
         }
     }
 
+    void cleanup(void* element);
+
     void rem(void* element)
     {
         for(int i=0; i<elements.size(); i++)
         {
             if(elements[i].element == element)
             {
+                cleanup(element);
+
                 elements.erase(elements.begin() + i);
                 return;
             }
@@ -168,6 +172,8 @@ struct popup_info
         {
             if(elements[i].element != element)
             {
+                cleanup(elements[i].element);
+
                 elements.erase(elements.begin() + i);
                 i--;
                 continue;
@@ -181,6 +187,8 @@ struct popup_info
         {
             if(elements[i].schedule_erase)
             {
+                cleanup(elements[i].element);
+
                 elements.erase(elements.begin() + i);
                 i--;
                 continue;

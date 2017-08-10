@@ -4,6 +4,16 @@
 
 int popup_element::gid;
 
+void popup_info::cleanup(void* element)
+{
+    orbital* o = (orbital*)element;
+
+    if(o->type != orbital_info::FLEET)
+        return;
+
+    o->command_queue.remove_any_of(object_command_queue_info::ANCHOR_UI);
+}
+
 void popup_info::clear()
 {
     for(popup_element& pe : elements)
