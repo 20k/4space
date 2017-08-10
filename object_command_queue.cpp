@@ -309,7 +309,11 @@ bool do_anchor_ui(orbital* o, queue_type& type)
 
         ImGui::Text(test_orbital->name.c_str());
 
-        if(ImGui::IsItemClicked_Registered())
+        auto info = test_orbital->produced_resources_ps.get_formatted_str();
+
+        ImGui::Text(info.c_str());
+
+        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
         {
             success = true;
             o->command_queue.anchor(test_orbital);
