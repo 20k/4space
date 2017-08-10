@@ -268,6 +268,16 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
             current.repair(nullptr, 1);
         }
 
+        if(ImGui::IsItemHovered())
+        {
+            auto res = c.resources_cost();
+
+            resource_manager rm;
+            rm.add(res);
+
+            tooltip::add(rm.get_formatted_str(true));
+        }
+
         if(ImGui::IsItemHovered() && component_cant_be_used)
         {
             tooltip::add("Cannot be used due to insufficient:");
@@ -310,6 +320,13 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     }
 
     ImGui::ColourNoHoverText("Space: " + to_string_with_enforced_variable_dp(current.get_total_components_size()) + "/" + to_string_with_enforced_variable_dp(ship_component_elements::max_components_total_size), space_colour);
+
+    auto res = current.resources_cost();
+
+    resource_manager rm;
+    rm.add(res);
+
+    ImGui::Text(rm.get_formatted_str(true).c_str());
 
     if(to_erase != -1)
     {
