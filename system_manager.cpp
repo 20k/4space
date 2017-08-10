@@ -331,6 +331,62 @@ void orbital::do_vision_test()
     }
 }
 
+void handle_resources(orbital* me)
+{
+    me->parent_empire = nullptr;
+
+    float harvest_dist = 20.f;
+
+    std::vector<ship*> valid_ships;
+    //std::vector<ship_manager*> valid_fleets;
+
+    for(orbital* o : me->parent_system->orbitals)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        vec2f my_pos = me->absolute_pos;
+        vec2f their_pos = o->absolute_pos;
+
+        float dist = (their_pos - my_pos).length();
+
+        if(dist < harvest_dist)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            for(ship* s : sm->ships)
+            {
+                if(s->get_component_with_primary(ship_component_elements::ORE_HARVESTER))
+                {
+                    valid_ships.push_back(s);
+                }
+            }
+        }
+    }
+
+    for(ship* s : valid_ships)
+    {
+        for(component& c : s->entity_list)
+        {
+            if(c.primary_attribute != ship_component_elements::ORE_HARVESTER)
+                continue;
+
+            for(auto& item : c.components)
+            {
+                const ship_component_element& type = item.first;
+                component_attribute& attr = item.second;
+
+                auto res_type = ship_component_elements::element_infos[(int)type].resource_type;
+
+                if(res_type == resource::COUNT)
+                    continue;
+
+                attr.produced_per_s = me->produced_resources_ps.get_resource(res_type).amount / valid_ships.size();
+            }
+        }
+    }
+}
+
 void orbital::tick(float step_s)
 {
     internal_time_s += step_s;
@@ -341,6 +397,11 @@ void orbital::tick(float step_s)
     //    do_transfer(this, step_s);
 
     command_queue.tick(this, step_s);
+
+    if(type == orbital_info::ASTEROID && is_resource_object)
+    {
+        handle_resources(this);
+    }
 
     if(parent == nullptr)
         return;

@@ -2329,7 +2329,7 @@ int main()
 
     ship* derelict_ship = fleet4->make_new_from(hostile_empire, make_default());
 
-    ship* scout_ship = fleet3->make_new_from(player_empire, make_colony_ship());
+    ship* scout_ship = fleet3->make_new_from(player_empire, make_mining_ship());
     //ship* scout_ship2 = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
 
     test_ship->name = "SS Icarus";
@@ -2423,7 +2423,7 @@ int main()
     oscout->data = fleet5;*/
 
 
-    player_empire->take_ownership_of_all(base);
+    //player_empire->take_ownership_of_all(base);
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
 

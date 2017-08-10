@@ -695,9 +695,6 @@ inline component make_default_mining_system()
 
     for(int i=0; i<ship_component_element::NONE; i++)
     {
-        if(i == (int)ship_component_element::RESEARCH)
-            continue;
-
         if(ship_component_elements::element_infos[i].resource_type == resource::COUNT)
             continue;
 

@@ -1891,26 +1891,21 @@ void ship::tick_all_components(float step_s)
             if(!c.has_element(ship_component_element::RESOURCE_PRODUCTION))
                 continue;
 
-            /*component_attribute attr = c.get_element(ship_component_element::RESOURCE_PRODUCTION);
-
-            float produced = attr.get_produced_amount(step_s);
-
-            auto resources = attr.resources_ratio_produced;
-
-            for(auto& i : resources)
-            {
-                owned_by->parent_empire->add_resource(i.first, i.second * produced);
-            }*/
-
             for(auto& item : c.components)
             {
                 if(ship_component_elements::element_infos[(int)item.first].resource_type != resource::COUNT)
                 {
                     component_attribute& attr = item.second;
 
-                    float produced = attr.get_produced_amount(step_s);
+                    float produced = attr.available_for_consumption;
 
                     owned_by->parent_empire->add_resource(ship_component_elements::element_infos[(int)item.first].resource_type, produced);
+
+                    if(c.primary_attribute == ship_component_elements::ORE_HARVESTER)
+                    {
+                        attr.produced_per_s = 0.f;
+                        attr.available_for_consumption = 0.f;
+                    }
                 }
             }
         }
