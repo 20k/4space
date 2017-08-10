@@ -18,6 +18,7 @@ namespace object_command_queue_info
         WARP,
         COLONISE,
         FIGHT,
+        ANCHOR,
     };
 
     ///given that target might become invalid, we need to check it still exists or clear it if invalid
@@ -45,6 +46,8 @@ namespace object_command_queue_info
         int64_t colony_ship_id = -1;
 
         bool should_pop = false;
+
+        orbital* anchor_target = nullptr;
     };
 
     struct queue_data
@@ -74,6 +77,8 @@ struct object_command_queue
     void try_warp(orbital_system* fin, bool queue_to_back = false);
 
     void colonise(orbital* target, ship* colony_ship);
+
+    void anchor(orbital* target);
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
     void add(const queue_type& type, bool at_back = true, bool queue_to_back = false);

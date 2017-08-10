@@ -737,6 +737,7 @@ std::vector<component> get_component_list()
         make_default_research_factory(),
         make_default_resource_storage(),
         make_default_shipyard(),
+        make_default_mining_system(),
     };
 
     return full_component_list;

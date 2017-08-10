@@ -1724,6 +1724,16 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
+            if(o->type == orbital_info::FLEET && sm->any_with_element(ship_component_elements::MASS_ANCHOR))
+            {
+                /*ImGui::NeutralText("(Test Anchor)");
+
+                if(ImGui::IsItemClicked_Registered())
+                {
+                    o->command_queue.anchor(o->parent_system->get_base());
+                }*/
+            }
+
 
             ///for drawing warp radiuses, but will take anything and might be extended later
             system_manage.add_selected_orbital(orb);

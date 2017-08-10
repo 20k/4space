@@ -196,6 +196,17 @@ void object_command_queue::colonise(orbital* target, ship* colony_ship)
     add(next);
 }
 
+void object_command_queue::anchor(orbital* target)
+{
+    queue_type next;
+
+    next.data.anchor_target = target;
+
+    next.type = object_command_queue_info::ANCHOR;
+
+    add(next);
+}
+
 bool do_colonising(orbital* o, queue_type& type)
 {
     if(o->type != orbital_info::FLEET)
@@ -235,6 +246,31 @@ bool do_colonising(orbital* o, queue_type& type)
     colony->colonise_target = data.colony_target;
 
     return !sm->any_colonising();
+}
+
+bool do_anchor(orbital* o, queue_type& type)
+{
+    if(o->type != orbital_info::FLEET)
+        return true;
+
+    ship_manager* sm = (ship_manager*)o->data;
+
+    object_command_queue_info::queue_element_data& data = type.data;
+
+    if(data.anchor_target == nullptr)
+        return true;
+
+    float maintain_distance = 10.f;
+
+    vec2f my_pos = o->absolute_pos;
+    vec2f their_pos = data.anchor_target->absolute_pos;
+
+    if((their_pos - my_pos).length() > maintain_distance)
+    {
+        o->transfer(data.anchor_target->absolute_pos, o->parent_system, false, false);
+    }
+
+    return false;
 }
 
 /*void object_command_queue::add(object_command_queue_info::queue_element_type type, const object_command_queue_info::queue_element_data& data)
@@ -324,6 +360,14 @@ void object_command_queue::tick(orbital* o, float diff_s)
     if(cur == object_command_queue_info::FIGHT)
     {
 
+    }
+
+    if(cur == object_command_queue_info::ANCHOR)
+    {
+        if(do_anchor(o, next))
+        {
+            next.data.should_pop = true;
+        }
     }
 
     if(is_front_complete() && command_queue.size() > 0)
