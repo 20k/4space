@@ -324,7 +324,30 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     {
         ImGui::SetTooltip("Amount recovered through salvage");
     }
-    ///have a recovery cost display?
+    ///have a recovery cost display
+
+    if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr)
+    {
+        ImGui::NeutralText("(Select Fleet)");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            orbital* o = system_manage.get_by_element_orbital(s.owned_by);
+
+            popup_element elem;
+            elem.element = o;
+
+            if(o)
+            {
+                popup.insert(o);
+                popup.going = true;
+            }
+            else
+            {
+                printf("select fleet popup error no orbital\n");
+            }
+        }
+    }
 
     orbital* o = system_manage.get_by_element_orbital(s.owned_by);
 
@@ -526,29 +549,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
                 }
 
                 s.cleanup = true;
-            }
-        }
-    }
-
-    if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr)
-    {
-        ImGui::NeutralText("(Select Fleet)");
-
-        if(ImGui::IsItemClicked_Registered())
-        {
-            orbital* o = system_manage.get_by_element_orbital(s.owned_by);
-
-            popup_element elem;
-            elem.element = o;
-
-            if(o)
-            {
-                popup.insert(o);
-                popup.going = true;
-            }
-            else
-            {
-                printf("select fleet popup error no orbital\n");
             }
         }
     }
