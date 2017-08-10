@@ -893,7 +893,8 @@ bool orbital::in_friendly_territory_and_not_busy()
     {
         ship_manager* sm = (ship_manager*)data;
 
-        if(sm->any_derelict() || sm->any_in_combat())
+        //if(sm->any_derelict() || sm->any_in_combat())
+        if(sm->any_in_combat())
         {
             fleet_is_in_good_state = false;
         }
