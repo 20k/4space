@@ -530,7 +530,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
-
     if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr)
     {
         ImGui::NeutralText("(Select Fleet)");
@@ -553,7 +552,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             }
         }
     }
-
 
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
