@@ -163,6 +163,9 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
         current.add(c);
     }
 
+    ImGui::SliderFloat("Size", &current.editor_size_storage, 0.1f, 1000.f);
+
+
     auto win_pos = ImGui::GetWindowPos();
     auto win_size = ImGui::GetWindowSize();
 
@@ -435,6 +438,13 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     }
 
     ImGui::End();
+
+    current.editor_size_storage = clamp(current.editor_size_storage, 0.1f, 1000.f);
+
+    if(current.editor_size_storage != current.current_size)
+    {
+        current.set_size(current.editor_size_storage);
+    }
 
     save();
 }

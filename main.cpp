@@ -914,8 +914,14 @@ struct box_selection
 
         bool suppress_mouse = ImGui::IsAnyItemHovered() || ImGui::IsMouseHoveringAnyWindow();
 
+        suppress_mouse = suppress_mouse || ImGui::suppress_clicks;
+
         if(suppress_mouse)
+        {
+            cannot_click = true;
+            last_was_not_click = false;
             return;
+        }
 
         sf::Keyboard key;
 

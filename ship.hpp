@@ -326,8 +326,11 @@ struct component
     float get_hp_frac();
 
     float current_size = 1;
+    float ship_size = 1;
 
+    void upgrade_size(float old_size, float new_size);
     void set_size(float new_size);
+    void set_ship_size(float ship_size);
 
     float scanning_difficulty = randf_s(0.f, 1.f);
 
@@ -637,6 +640,12 @@ struct ship : positional
     orbital* colonise_target = nullptr;
 
     bool shift_clicked = false;
+
+    float current_size = 1.f;
+
+    void set_size(float new_size);
+
+    float editor_size_storage = current_size;
 
     ///?
     //void fire();

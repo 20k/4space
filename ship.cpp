@@ -835,7 +835,7 @@ float component::get_hp_frac()
     return frac;
 }
 
-void component::set_size(float new_size)
+void component::upgrade_size(float old_size, float new_size)
 {
     if(new_size <= 0.f)
         return;
@@ -844,24 +844,36 @@ void component::set_size(float new_size)
     {
         component_attribute& attr = elem.second;
 
-        attr.upgrade_size(current_size, new_size);
+        attr.upgrade_size(old_size, new_size);
     }
 
     if(has_tag(component_tag::DAMAGE))
     {
-        float dam = get_tag(component_tag::DAMAGE) * (new_size / current_size);
+        float dam = get_tag(component_tag::DAMAGE) * (new_size / old_size);
 
         set_tag(component_tag::DAMAGE, dam);
     }
 
     if(has_tag(component_tag::WARP_DISTANCE))
     {
-        float wrp = get_tag(component_tag::WARP_DISTANCE) * (new_size / current_size);
+        float wrp = get_tag(component_tag::WARP_DISTANCE) * (new_size / old_size);
 
         set_tag(component_tag::WARP_DISTANCE, wrp);
     }
+}
+
+void component::set_size(float new_size)
+{
+    upgrade_size(current_size, new_size);
 
     current_size = new_size;
+}
+
+void component::set_ship_size(float new_size)
+{
+    upgrade_size(ship_size, new_size);
+
+    ship_size = new_size;
 }
 
 bool component::has_element(const ship_component_element& type)
@@ -3785,9 +3797,19 @@ bool ship::is_ship_design_valid()
 {
     float max_space = ship_component_elements::max_components_total_size;
 
-
-
     return get_total_components_size() <= max_space + FLOAT_BOUND;
+}
+
+void ship::set_size(float new_size)
+{
+    new_size = clamp(new_size, 0.1f, 1000.f);
+
+    for(component& c : entity_list)
+    {
+        c.set_ship_size(new_size);
+    }
+
+    current_size = new_size;
 }
 
 /*ship* ship_manager::make_new(int team)
