@@ -679,10 +679,12 @@ void orbital::make_random_resource_asteroid(float total_ps)
         produced_resources_ps.resources[rand_res].amount += randf_s(0.25f, total_ps) * resource::global_resource_multiplier;
     }
 
-    if(rad < 2.3)
+    float mrad = 3.f;
+
+    if(rad < mrad)
     {
-        simple_renderable.init(simple_renderable.vert_dist.size(), 2.3, 2.3);
-        rad = 2.3;
+        simple_renderable.init(simple_renderable.vert_dist.size(), mrad, mrad);
+        rad = mrad;
     }
 
     col = {1, 0.8, 0};
