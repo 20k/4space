@@ -101,7 +101,7 @@ namespace ship_component_elements
 
         std::string display_name;
 
-        float base_cost = 1.f;
+        //float base_cost = 1.f;
 
         research_info::types research_type = research_info::COUNT;
 
@@ -190,7 +190,7 @@ namespace ship_component_elements
     extern std::vector<int> weapons_map;
 
     extern std::vector<std::string> display_strings;
-    extern std::vector<float> base_cost_of_component_with_this_primary_attribute;
+    //extern std::vector<float> base_cost_of_component_with_this_primary_attribute;
 
     static float construction_cost_mult = 0.1f;
 
@@ -199,7 +199,7 @@ namespace ship_component_elements
     std::map<resource::types, float> component_storage_to_resources(const types& type);
 
     ///not cost, but if we multiply by cost we get the end cost
-    std::map<resource::types, float> component_base_construction_ratio(const types& type, component& c);
+    //std::map<resource::types, float> component_base_construction_ratio(const types& type, component& c);
 
     static float tech_upgrade_effectiveness = 1.2f;
     static float tech_cooldown_upgrade_effectiveness = 1.1f;
@@ -318,6 +318,8 @@ struct component
     component_attribute */
 
     ship_component_elements::tech_type tech_type = ship_component_elements::NONE_TECH;
+
+    void set_tech_type(int tt);
 
     float get_hp_frac();
 

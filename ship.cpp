@@ -23,7 +23,7 @@ std::vector<int> ship_component_elements::skippable_in_display;
 std::vector<int> ship_component_elements::weapons_map;
 
 std::vector<std::string> ship_component_elements::display_strings;
-std::vector<float> ship_component_elements::base_cost_of_component_with_this_primary_attribute;
+//std::vector<float> ship_component_elements::base_cost_of_component_with_this_primary_attribute;
 std::vector<research_info::types> ship_component_elements::component_element_to_research_type;
 
 
@@ -121,20 +121,17 @@ void ship_component_elements::generate_element_infos()
     std::vector<component_element_info>& ei = element_infos;
 
     ei[COOLING_POTENTIAL].display_name = "Cooling";
-    ei[COOLING_POTENTIAL].base_cost = 6.f;
     ei[COOLING_POTENTIAL].research_type = research_info::MATERIALS;
     ei[COOLING_POTENTIAL].negative_is_bad = true;
 
 
     ei[ENERGY].display_name = "Energy";
-    ei[ENERGY].base_cost = 15.f;
     ei[ENERGY].research_type = research_info::MATERIALS;
     ei[ENERGY].negative_is_bad = true;
 
 
 
     ei[OXYGEN].display_name = "Oxygen";
-    ei[OXYGEN].base_cost = 5;
     ei[OXYGEN].research_type = research_info::MATERIALS;
     ei[OXYGEN].allowed_skip_in_repair = true;
     ei[OXYGEN].negative_is_bad = true;
@@ -143,113 +140,92 @@ void ship_component_elements::generate_element_infos()
 
 
     ei[AMMO].display_name = "Ammo";
-    ei[AMMO].base_cost = 2;
     ei[AMMO].research_type = research_info::MATERIALS;
 
 
     ei[FUEL].display_name = "Fuel";
-    ei[FUEL].base_cost = 1;
     ei[FUEL].research_type = research_info::MATERIALS;
 
 
     ei[CARGO].display_name = "Cargo";
-    ei[CARGO].base_cost = 1;
     ei[CARGO].research_type = research_info::MATERIALS;
 
 
     ei[SHIELD_POWER].display_name = "Shields";
-    ei[SHIELD_POWER].base_cost = 20;
     ei[SHIELD_POWER].research_type = research_info::MATERIALS;
 
 
     ei[ARMOUR].display_name = "Armour";
-    ei[ARMOUR].base_cost = 4;
     ei[ARMOUR].research_type = research_info::MATERIALS;
 
 
     ei[HP].display_name = "HP";
-    ei[HP].base_cost = 0.5;
     ei[HP].research_type = research_info::MATERIALS;
     ei[HP].negative_is_bad = true;
 
 
 
     ei[ENGINE_POWER].display_name = "Engines";
-    ei[ENGINE_POWER].base_cost = 10;
     ei[ENGINE_POWER].research_type = research_info::PROPULSION;
 
 
     ei[WARP_POWER].display_name = "Warp";
-    ei[WARP_POWER].base_cost = 30;
     ei[WARP_POWER].research_type = research_info::PROPULSION;
 
 
     ei[SCANNING_POWER].display_name = "Scanning";
-    ei[SCANNING_POWER].base_cost = 5;
     ei[SCANNING_POWER].research_type = research_info::SCANNERS;
 
 
     ei[COMMAND].display_name = "Command";
-    ei[COMMAND].base_cost = 2;
     ei[COMMAND].research_type = research_info::MATERIALS;
     ei[COMMAND].negative_is_bad = true;
 
 
 
     ei[STEALTH].display_name = "Stealth";
-    ei[STEALTH].base_cost = 80;
     ei[STEALTH].research_type = research_info::MATERIALS;
 
 
     ei[COLONISER].display_name = "Coloniser";
-    ei[COLONISER].base_cost = 120;
     ei[COLONISER].research_type = research_info::MATERIALS;
 
 
     ei[RAILGUN].display_name = "Railgun";
-    ei[RAILGUN].base_cost = 50;
     ei[RAILGUN].research_type = research_info::WEAPONS;
 
 
     ei[TORPEDO].display_name = "Torpedo";
-    ei[TORPEDO].base_cost = 50;
     ei[TORPEDO].research_type = research_info::WEAPONS;
 
 
     ei[PLASMAGUN].display_name = "Plasmagun";
-    ei[PLASMAGUN].base_cost = 35;
     ei[PLASMAGUN].research_type = research_info::WEAPONS;
 
 
     ei[COILGUN].display_name = "Coilgun";
-    ei[COILGUN].base_cost = 30;
     ei[COILGUN].research_type = research_info::WEAPONS;
 
 
     ei[RESOURCE_PRODUCTION].display_name = "Resource Producer";
-    ei[RESOURCE_PRODUCTION].base_cost = 200;
     ei[RESOURCE_PRODUCTION].research_type = research_info::MATERIALS;
 
 
     ei[RESOURCE_STORAGE].display_name = "Storage";
-    ei[RESOURCE_STORAGE].base_cost = 5;
     ei[RESOURCE_STORAGE].research_type = research_info::MATERIALS;
 
 
     ei[SHIPYARD].display_name = "Shipyard";
-    ei[SHIPYARD].base_cost = 5;
     ei[SHIPYARD].research_type = research_info::MATERIALS;
 
     ei[MASS_ANCHOR].display_name = "Mass Anchor";
-    ei[MASS_ANCHOR].base_cost = 5;
     ei[MASS_ANCHOR].research_type = research_info::MATERIALS;
 
     ei[ORE_HARVESTER].display_name = "Ore Harvester";
-    ei[ORE_HARVESTER].base_cost = 5;
     ei[ORE_HARVESTER].research_type = research_info::MATERIALS;
 
 
-    #define DEFINE_RESOURCE(name) ei[name].display_name = #name; ei[name].base_cost = 5; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
+    #define DEFINE_RESOURCE(name) ei[name].display_name = #name; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
 
     DEFINE_RESOURCE(COPPER);
     DEFINE_RESOURCE(HYDROGEN);
@@ -276,7 +252,7 @@ void ship_component_elements::generate_element_infos()
         }
 
         display_strings.push_back(i.display_name);
-        base_cost_of_component_with_this_primary_attribute.push_back(i.base_cost);
+        //base_cost_of_component_with_this_primary_attribute.push_back(i.base_cost);
         component_element_to_research_type.push_back(i.research_type);
 
         num++;
@@ -323,7 +299,7 @@ std::map<resource::types, float> ship_component_elements::component_storage_to_r
 }
 
 ///this will all be obsolete soon
-std::map<resource::types, float> ship_component_elements::component_base_construction_ratio(const types& type, component& c)
+/*std::map<resource::types, float> ship_component_elements::component_base_construction_ratio(const types& type, component& c)
 {
     std::map<resource::types, float> ret;
 
@@ -484,7 +460,7 @@ std::map<resource::types, float> ship_component_elements::component_base_constru
     }
 
     return ret;
-}
+}*/
 
 float get_tech_level_value(float level)
 {
@@ -841,6 +817,11 @@ float component_attribute::consume_from_amount_stored(component_attribute& other
 
     return extra;
 }*/
+
+void component::set_tech_type(int tt)
+{
+    tech_type = (ship_component_elements::tech_type)tt;
+}
 
 float component::get_hp_frac()
 {
@@ -1361,10 +1342,12 @@ float component::get_tech_level_of_primary()
 
 float component::get_base_component_cost()
 {
-    if(primary_attribute == ship_component_elements::NONE)
-        return 0.f;
+    //if(primary_attribute == ship_component_elements::NONE)
+    //    return 0.f;
 
-    return ship_component_elements::base_cost_of_component_with_this_primary_attribute[primary_attribute] * cost_mult * ship_component_elements::construction_cost_mult;
+    //return ship_component_elements::base_cost_of_component_with_this_primary_attribute[primary_attribute] * cost_mult * ship_component_elements::construction_cost_mult;
+
+    return get_tech_type_cost(tech_type);
 }
 
 float component::get_component_cost()
@@ -1408,7 +1391,9 @@ std::map<resource::types, float> component::resources_cost()
     if(hp_elem.max_amount < 0.001f)
         return res;
 
-    res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
+    res = get_tech_type_resource_ratio(tech_type);
+
+    //res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
 
     for(auto& i : res)
     {
@@ -1430,7 +1415,9 @@ std::map<resource::types, float> component::resources_received_when_scrapped()
     if(hp_elem.max_amount < 0.001f)
         return res;
 
-    res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
+    res = get_tech_type_resource_ratio(tech_type);
+
+    //res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
 
     for(auto& i : res)
     {
@@ -1453,7 +1440,9 @@ std::map<resource::types, float> component::resources_needed_to_repair()
     if(hp_elem.max_amount < 0.001f)
         return res;
 
-    res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
+    res = get_tech_type_resource_ratio(tech_type);
+
+    //res = ship_component_elements::component_base_construction_ratio(primary_attribute, *this);
 
     for(auto& i : res)
     {
