@@ -303,15 +303,7 @@ bool do_anchor_ui(orbital* o, queue_type& type)
         if(!test_orbital->is_resource_object)
             continue;
 
-        ImGui::SetNextWindowPos(ImVec2(test_orbital->last_screen_pos.x(), test_orbital->last_screen_pos.y()));
-
-        ImGui::Begin((test_orbital->name + "##" + std::to_string(id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
-
-        ImGui::Text(test_orbital->name.c_str());
-
-        auto info = test_orbital->produced_resources_ps.get_formatted_str();
-
-        ImGui::Text(info.c_str());
+        test_orbital->begin_render_asteroid_window();
 
         if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
         {
@@ -319,7 +311,7 @@ bool do_anchor_ui(orbital* o, queue_type& type)
             o->command_queue.anchor(test_orbital);
         }
 
-        ImGui::End();
+        test_orbital->end_render_asteroid_window();
 
         if(success)
             return true;

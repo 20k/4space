@@ -461,6 +461,29 @@ void orbital::tick(float step_s)
     absolute_pos = orbital_length * (vec2f){impl_cos(orbital_angle), impl_sin(orbital_angle)} + parent->absolute_pos;
 }
 
+void orbital::begin_render_asteroid_window()
+{
+    ImGui::SetNextWindowPos(ImVec2(last_screen_pos.x(), last_screen_pos.y()));
+
+    ImGui::Begin((name + "##" + std::to_string(unique_id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+
+    if(rendered_asteroid_window == false)
+    {
+        ImGui::Text(name.c_str());
+
+        auto info = produced_resources_ps.get_formatted_str();
+
+        ImGui::Text(info.c_str());
+    }
+
+    rendered_asteroid_window = true;
+}
+
+void orbital::end_render_asteroid_window()
+{
+    ImGui::End();
+}
+
 void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 {
     /*std::vector<sf::Vertex> lines;
@@ -539,6 +562,16 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     auto real_coord = mapCoordsToPixel_float(last_viewed_position.x(), last_viewed_position.y(), win.getView(), win);
 
     last_screen_pos = {real_coord.x, real_coord.y};
+
+    sf::Keyboard key;
+
+    rendered_asteroid_window = false;
+
+    if(type == orbital_info::ASTEROID && is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
+    {
+        begin_render_asteroid_window();
+        end_render_asteroid_window();
+    }
 
     if(highlight && type == orbital_info::FLEET)
     {

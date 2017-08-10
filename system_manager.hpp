@@ -162,6 +162,10 @@ struct orbital
 
     void draw(sf::RenderWindow& win, empire* viewer_empire);
 
+    bool rendered_asteroid_window = false;
+    void begin_render_asteroid_window();
+    void end_render_asteroid_window();
+
     float get_pixel_radius(sf::RenderWindow& win);
 
     void center_camera(system_manager& system_manage);
