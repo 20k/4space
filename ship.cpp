@@ -1871,6 +1871,8 @@ void ship::tick_all_components(float step_s)
 
     //std::map<ship_component_element, float> available_capacities = get_available_capacities();
 
+    auto left_after_storage = fully_merge;
+
     auto available_capacities = get_available_capacities_vec();
 
     ///how to apply the output to systems fairly? Try and distribute evenly? Proportionally?
@@ -1888,6 +1890,9 @@ void ship::tick_all_components(float step_s)
             float proportion = i.second / available_capacities[i.first].second;
 
             float applying_to_this = proportion * fully_merge[i.first].produced_per_s;
+
+
+            left_after_storage[(int)i.first].produced_per_s -= applying_to_this;
 
             ///this is slow
             //std::map<ship_component_element, float> tmap;
@@ -1938,26 +1943,27 @@ void ship::tick_all_components(float step_s)
     ///atm this is going to double produce if we have storage for this resource
     if(owned_by != nullptr && owned_by->parent_empire != nullptr)
     {
-        for(component& c : entity_list)
+        //for(component& c : entity_list)
+        for(int i=0; i < left_after_storage.size(); i++)
         {
-            if(!c.has_element(ship_component_element::RESOURCE_PRODUCTION))
-                continue;
+            //if(!c.has_element(ship_component_element::RESOURCE_PRODUCTION))
+            //    continue;
 
-            for(auto& item : c.components)
+            //for(auto& item : c.components)
             {
-                if(ship_component_elements::element_infos[(int)item.first].resource_type != resource::COUNT)
+                if(ship_component_elements::element_infos[i].resource_type != resource::COUNT)
                 {
-                    component_attribute& attr = item.second;
+                    //component_attribute& attr = item.second;
 
-                    float produced = attr.available_for_consumption;
+                    float produced = left_after_storage[i].produced_per_s;
 
-                    owned_by->parent_empire->add_resource(ship_component_elements::element_infos[(int)item.first].resource_type, produced);
+                    owned_by->parent_empire->add_resource(ship_component_elements::element_infos[i].resource_type, produced);
 
-                    if(c.primary_attribute == ship_component_elements::ORE_HARVESTER)
+                    /*if(c.primary_attribute == ship_component_elements::ORE_HARVESTER)
                     {
                         attr.produced_per_s = 0.f;
                         attr.available_for_consumption = 0.f;
-                    }
+                    }*/
                 }
             }
         }
