@@ -29,6 +29,69 @@ std::vector<research_info::types> ship_component_elements::component_element_to_
 
 using component_info_t = ship_component_elements::component_element_info;
 
+float get_tech_type_cost(ship_component_elements::tech_type type)
+{
+    using namespace ship_component_elements;
+
+    if(type & LOW)
+        return 1;
+
+    if(type & MEDIUM)
+        return 2;
+
+    if(type & HIGH)
+        return 4;
+
+    if(type & SUPER_HIGH)
+        return 8;
+
+    return 1;
+}
+
+std::map<resource::types, float> get_tech_type_resource_ratio(ship_component_elements::tech_type type)
+{
+    using namespace ship_component_elements;
+
+    std::map<resource::types, float> ret;
+
+    if(type & COMMON)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::COPPER] = 0.5f;
+    }
+
+    if(type & RARE)
+    {
+        ret[resource::IRON] = 1;
+        ret[resource::COPPER] = 0.5;
+        ret[resource::TITANIUM] = 0.25;
+    }
+
+    if(type & HARD_RARE)
+    {
+        ret[resource::IRON] = 0.5;
+        ret[resource::COPPER] = 0.75;
+        ret[resource::TITANIUM] = 0.55;
+    }
+
+    if(type & LOW_VOLUME)
+    {
+        ret[resource::IRON] = 0.5f;
+        ret[resource::URANIUM] = 0.25f;
+    }
+
+    if(type & ALL_COMMON)
+    {
+        ret[resource::OXYGEN] = 1;
+        ret[resource::COPPER] = 1;
+        ret[resource::HYDROGEN] = 1;
+        ret[resource::IRON] = 1;
+        ret[resource::TITANIUM] = 1;
+    }
+
+    return ret;
+}
+
 void ship_component_elements::generate_element_infos()
 {
     /*COOLING_POTENTIAL,

@@ -37,6 +37,7 @@ namespace ship_component_elements
 
     enum tech_type
     {
+        NONE_TECH = 0,
         LOW = 1,
         MEDIUM = 2,
         HIGH = 4,
@@ -46,7 +47,7 @@ namespace ship_component_elements
         RARE = 32, /// + titanium
         HARD_RARE = 64, ///higher mix of rare elements
         LOW_VOLUME = 128, ///+uranium, does NOT imply hard rare or rare
-        ALL = 256,
+        ALL_COMMON = 256,
     };
 
     ///hmm. This should really be reordered, its a shame I did this wrong initially
@@ -315,6 +316,8 @@ struct component
     component_attribute engine_power;
     component_attribute damage;
     component_attribute */
+
+    ship_component_elements::tech_type tech_type = ship_component_elements::NONE_TECH;
 
     float get_hp_frac();
 
