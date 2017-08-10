@@ -1894,6 +1894,8 @@ void ship::tick_all_components(float step_s)
 
             left_after_storage[(int)i.first].produced_per_s -= applying_to_this;
 
+            left_after_storage[(int)i.first].produced_per_s = std::max(left_after_storage[(int)i.first].produced_per_s, 0.f);
+
             ///this is slow
             //std::map<ship_component_element, float> tmap;
 
