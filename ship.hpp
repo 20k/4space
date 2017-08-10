@@ -35,6 +35,20 @@ namespace ship_component_elements
 {
     void generate_element_infos();
 
+    enum tech_type
+    {
+        LOW = 1,
+        MEDIUM = 2,
+        HIGH = 4,
+        SUPER_HIGH = 8, ///whatever
+
+        COMMON = 16,///iron + copper
+        RARE = 32, /// + titanium
+        HARD_RARE = 64, ///higher mix of rare elements
+        LOW_VOLUME = 128, ///+uranium, does NOT imply hard rare or rare
+        ALL = 256,
+    };
+
     ///hmm. This should really be reordered, its a shame I did this wrong initially
     ///as I'm not 100% sure its kosher to change htis
     enum types
@@ -380,6 +394,7 @@ struct component
     std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_needed_to_repair();
 
+    std::map<resource::types, float> base_resources_cost;
     std::map<resource::types, float> extra_resources_ratio;
 
     ///how much research would empire emp get if they could
