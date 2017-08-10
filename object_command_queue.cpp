@@ -94,6 +94,9 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
         return true;
     }
 
+    if(data.cancel_immediately)
+        return true;
+
     return false;
 }
 
@@ -122,7 +125,7 @@ bool do_warp(orbital* o, queue_type& type)
     return true;
 }
 
-void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move)
+void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool cancel_immediately)
 {
     queue_type next;
 
@@ -135,6 +138,7 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
     next.data.transfer_within = viewing_system;
 
     next.data.combat_move = combat_move;
+    next.data.cancel_immediately = cancel_immediately;
 
     next.type = object_command_queue_info::IN_SYSTEM_PATH;
 
@@ -146,7 +150,7 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
     add(next, at_back);
 }
 
-void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move)
+void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool cancel_immediately)
 {
     vec2f base;
 
@@ -155,7 +159,7 @@ void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewi
 
     vec2f rel = pos - base;
 
-    transfer(rel.length(), rel.angle(), o, viewing_system, at_back, combat_move);
+    transfer(rel.length(), rel.angle(), o, viewing_system, at_back, combat_move, cancel_immediately);
 }
 
 bool object_command_queue::transferring()
@@ -269,14 +273,15 @@ bool do_anchor(orbital* o, queue_type& type)
     if(data.anchor_target == nullptr)
         return true;
 
-    float maintain_distance = 10.f;
+    float maintain_distance = 20.f;
 
     vec2f my_pos = o->absolute_pos;
     vec2f their_pos = data.anchor_target->absolute_pos;
 
     if((their_pos - my_pos).length() > maintain_distance)
     {
-        o->transfer(data.anchor_target->absolute_pos, o->parent_system, false, false);
+        ///sadly cancel immediately doesn't work correctly as transfer isn't constant time
+        o->command_queue.transfer(data.anchor_target->absolute_pos, o, o->parent_system, false, false, false);
     }
 
     return false;

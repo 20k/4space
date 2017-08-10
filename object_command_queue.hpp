@@ -35,6 +35,7 @@ namespace object_command_queue_info
         float new_angle = 0.f;
         float start_time_s = 0.f;
         bool combat_move = false;
+        bool cancel_immediately = false;
 
         vec2f pos = {0,0};
         orbital_system* fin = nullptr;
@@ -70,8 +71,8 @@ struct object_command_queue
 
     std::deque<queue_type> command_queue;
 
-    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false);
-    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false);
+    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool cancel_immediately = false);
+    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool cancel_immediately = false);
     bool transferring();
     bool trying_to_warp();
 

@@ -335,7 +335,7 @@ void handle_resources(orbital* me)
 {
     me->parent_empire = nullptr;
 
-    float harvest_dist = 20.f;
+    float harvest_dist = 40.f;
 
     std::vector<ship*> valid_ships;
     //std::vector<ship_manager*> valid_fleets;
