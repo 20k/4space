@@ -25,7 +25,10 @@ int empire::team_gid = 0;
 
 void empire::take_ownership(orbital* o)
 {
-    if(o->type == orbital_info::ASTEROID && !o->is_resource_object)
+    //if(o->type == orbital_info::ASTEROID && !o->is_resource_object)
+    //    return;
+
+    if(o->type == orbital_info::ASTEROID)
         return;
 
     for(auto& i : owned)
@@ -44,7 +47,10 @@ void empire::take_ownership_of_all(orbital_system* o)
 {
     for(orbital* i : o->orbitals)
     {
-        if(i->type == orbital_info::ASTEROID && !i->is_resource_object)
+        //if(i->type == orbital_info::ASTEROID && !i->is_resource_object)
+        //    continue;
+
+        if(i->type == orbital_info::ASTEROID)
             continue;
 
         take_ownership(i);
@@ -383,7 +389,12 @@ void empire::tick_system_claim()
 
         for(orbital* o : i->orbitals)
         {
-            if((o->type == orbital_info::ASTEROID && o->is_resource_object) || o->type == orbital_info::MOON)
+            /*if((o->type == orbital_info::ASTEROID && o->is_resource_object) || o->type == orbital_info::MOON)
+            {
+                take_ownership(o);
+            }*/
+
+            if(o->type == orbital_info::MOON && o->parent != nullptr && o->parent->parent_empire == this)
             {
                 take_ownership(o);
             }

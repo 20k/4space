@@ -2423,7 +2423,7 @@ int main()
     oscout->data = fleet5;*/
 
 
-    //player_empire->take_ownership_of_all(base);
+    player_empire->take_ownership_of_all(base);
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
 
