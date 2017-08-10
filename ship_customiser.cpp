@@ -163,8 +163,18 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
         current.add(c);
     }
 
-    ImGui::SliderFloat("Size", &current.editor_size_storage, 0.1f, 1000.f);
+    ImGui::NewLine();
 
+    ImGui::Text("Size");
+
+    ImGui::SameLine();
+
+    //ImGui::SliderFloat("###SIZE_FLOATER_SHIP_CUSTOMISE", &current.editor_size_storage, 0.1f, 100.f);
+
+
+    ImGui::PushItemWidth(150.f);
+    ImGui::DragFloat("###SIZE_FLOATER_SHIP_CUSTOMISE", &current.editor_size_storage, 0.1f, 0.1f, 100.f, "%.1f");
+    ImGui::PopItemWidth();
 
     auto win_pos = ImGui::GetWindowPos();
     auto win_size = ImGui::GetWindowSize();

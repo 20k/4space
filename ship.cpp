@@ -1367,7 +1367,7 @@ float component::get_component_cost()
     float tech_level = get_tech_level_of_primary();
     float base_cost = get_base_component_cost();
 
-    float cost = research_info::get_cost_scaling(tech_level, base_cost) * current_size;
+    float cost = research_info::get_cost_scaling(tech_level, base_cost) * current_size * ship_size;
 
     /*if(tech_level > 0)
     {
