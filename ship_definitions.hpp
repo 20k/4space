@@ -860,4 +860,21 @@ inline ship make_colony_ship()
     return test_ship;
 }
 
+inline ship make_mining_ship()
+{
+    ship test_ship;
+    test_ship.add(make_default_crew());
+    test_ship.add(make_default_life_support());
+    test_ship.add(make_default_power_core());
+    test_ship.add(make_default_engines());
+    test_ship.add(make_default_warp_drive());
+    test_ship.add(make_default_heatsink());
+    test_ship.add(make_default_fuel_tank());
+    test_ship.add(make_default_mining_system());
+
+    test_ship.name = "Mining Default";
+
+    return test_ship;
+}
+
 #endif // SHIP_DEFINITIONS_HPP_INCLUDED

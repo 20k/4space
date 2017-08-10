@@ -22,6 +22,8 @@ void popup_info::clear()
         {
             s->shift_clicked = false;
         }
+
+        o->command_queue.remove_any_of(object_command_queue_info::ANCHOR_UI);
     }
 
     //declaring_war = false;

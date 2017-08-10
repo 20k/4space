@@ -19,6 +19,7 @@ namespace object_command_queue_info
         COLONISE,
         FIGHT,
         ANCHOR,
+        ANCHOR_UI,
     };
 
     ///given that target might become invalid, we need to check it still exists or clear it if invalid
@@ -79,6 +80,7 @@ struct object_command_queue
     void colonise(orbital* target, ship* colony_ship);
 
     void anchor(orbital* target);
+    void anchor_ui_state();
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
     void add(const queue_type& type, bool at_back = true, bool queue_to_back = false);
@@ -90,6 +92,8 @@ struct object_command_queue
 
     void cancel();
     void cancel_internal(orbital* o);
+
+    void remove_any_of(object_command_queue_info::queue_element_type type);
 
     std::vector<orbital_system*> get_warp_destinations();
 };

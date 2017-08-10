@@ -144,6 +144,7 @@ struct ship_customiser
         make_civilian(),
         make_scout(),
         make_colony_ship(),
+        make_mining_ship(),
     };
 
     ship current;

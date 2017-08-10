@@ -2,6 +2,7 @@
 #include "system_manager.hpp"
 #include "ship.hpp"
 #include <SFML/Graphics.hpp>
+#include "ui_util.hpp"
 
 
 float get_length_circle(vec2f p1, vec2f p2)
@@ -207,6 +208,14 @@ void object_command_queue::anchor(orbital* target)
     add(next);
 }
 
+void object_command_queue::anchor_ui_state()
+{
+    queue_type next;
+    next.type = object_command_queue_info::ANCHOR_UI;
+
+    add(next);
+}
+
 bool do_colonising(orbital* o, queue_type& type)
 {
     if(o->type != orbital_info::FLEET)
@@ -268,6 +277,45 @@ bool do_anchor(orbital* o, queue_type& type)
     if((their_pos - my_pos).length() > maintain_distance)
     {
         o->transfer(data.anchor_target->absolute_pos, o->parent_system, false, false);
+    }
+
+    return false;
+}
+
+bool do_anchor_ui(orbital* o, queue_type& type)
+{
+    orbital_system* sys = o->parent_system;
+
+    int id = 0;
+
+    bool success = false;
+
+    for(orbital* test_orbital : sys->orbitals)
+    {
+        if(test_orbital->type != orbital_info::ASTEROID)
+            continue;
+
+        if(!test_orbital->is_resource_object)
+            continue;
+
+        ImGui::SetNextWindowPos(ImVec2(test_orbital->last_screen_pos.x(), test_orbital->last_screen_pos.y()));
+
+        ImGui::Begin((test_orbital->name + "##" + std::to_string(id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+
+        ImGui::Text(test_orbital->name.c_str());
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            success = true;
+            o->command_queue.anchor(test_orbital);
+        }
+
+        ImGui::End();
+
+        if(success)
+            return true;
+
+        id++;
     }
 
     return false;
@@ -370,6 +418,14 @@ void object_command_queue::tick(orbital* o, float diff_s)
         }
     }
 
+    if(cur == object_command_queue_info::ANCHOR_UI)
+    {
+        if(do_anchor_ui(o, next))
+        {
+            next.data.should_pop = true;
+        }
+    }
+
     if(is_front_complete() && command_queue.size() > 0)
     {
         command_queue.pop_front();
@@ -442,6 +498,15 @@ void object_command_queue::cancel_internal(orbital* o)
             i--;
             continue;
         }
+    }
+}
+
+void object_command_queue::remove_any_of(object_command_queue_info::queue_element_type type)
+{
+    for(auto& i : command_queue)
+    {
+        if(i.type == type)
+            i.data.should_pop = true;
     }
 }
 

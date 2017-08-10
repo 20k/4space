@@ -218,6 +218,10 @@ struct orbital
     float decolonise_timer_s = 0.f;
     bool being_decolonised = false;
 
+    ///managed by command queue
+    bool in_anchor_ui_state = false;
+    vec2f last_screen_pos = {0,0};
+
     vec2f last_viewed_position;
     //bool ever_viewed = false;
     std::map<empire*, bool> viewed_by;
