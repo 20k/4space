@@ -572,8 +572,15 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     bool force_high_quality = type != orbital_info::ASTEROID;
 
+    bool draw_name_window = type == orbital_info::PLANET;
+
+    sf::Keyboard key;
+
+    if(is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
+        draw_name_window = false;
+
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, type == orbital_info::PLANET, name, current_simple_col);
+        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, draw_name_window, name, current_simple_col);
     if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
@@ -581,7 +588,6 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     last_screen_pos = {real_coord.x, real_coord.y};
 
-    sf::Keyboard key;
 
     rendered_asteroid_window = false;
 
