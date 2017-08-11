@@ -71,14 +71,28 @@ void ImGui::DoFrosting(render_window& win)
 
     states.blendMode = mode;
 
+    sf::Mouse mouse;
+
+    auto mpos = mouse.getPosition(win);
+
     for (int i = 0; i != g.Windows.Size; i++)
     {
         ImGuiWindow* window = g.Windows[i];
         if (window->Active && window->HiddenFrames <= 0 && (window->Flags & (ImGuiWindowFlags_ChildWindow)) == 0)
         {
+            //if(window->BeginCount == 0)
+            //    continue;
+            std::cout << window->Name << std::endl;
+
+            if(strncmp(window->Name, "Debug", strlen("Debug")) == 0)
+                continue;
+
             auto pos = window->Pos;
             //ImRect dim = window->ClipRect;
             ImVec2 dim = window->Size;
+
+            //if(mpos.x > pos.x && mpos.x < pos.x + dim.x && mpos.y > pos.y && mpos.y < pos.y + dim.y)
+            //    std::cout << window->Name << "  ss" << std::endl;
 
             //printf("%f %f\n", pos.x, pos.y);
 
