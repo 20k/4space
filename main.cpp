@@ -2894,10 +2894,10 @@ int main()
 
         ImGui::DoFrosting(window);
 
-        //ImGui::Render();
+        ImGui::Render();
 
         //playing_music.debug(window);
-        //window.display();
+        window.display();
         window.clear();
 
         diff_s = clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f - last_time_s;

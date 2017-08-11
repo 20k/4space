@@ -23,21 +23,19 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
     }
 
     static sf::Texture texture;
-    static sf::Texture ntexture;
+    //static sf::Texture ntexture;
 
     if(texture.getSize().x != win.getSize().x || texture.getSize().y != win.getSize().y)
     {
         texture.create(win.getSize().x, win.getSize().y);
         texture.setSmooth(true);
 
-        ntexture.create(win.getSize().x, win.getSize().y);
-        ntexture.setSmooth(true);
+        //ntexture.create(win.getSize().x, win.getSize().y);
+        //ntexture.setSmooth(true);
     }
 
     texture.update(win);
     texture.generateMipmap();
-
-    const sf::Texture& ref_texture = texture;
 
     sf::RenderStates states;
     states.shader = &shader;
@@ -72,7 +70,7 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
             ImVec2 dim = window->Size;
 
             sf::Sprite spr;
-            spr.setTexture(ref_texture);
+            spr.setTexture(texture);
             spr.setPosition(pos.x, pos.y);
             spr.setTextureRect(sf::IntRect({pos.x, pos.y}, {dim.x, dim.y}));
 
@@ -93,10 +91,6 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
     }
 
     to_skip_frosting.clear();
-
-    ImGui::Render();
-
-    win.display();
 }
 
 void ImGui::SkipFrosting(const std::string& name)
