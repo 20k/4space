@@ -5,18 +5,22 @@
 
 struct render_window : sf::RenderWindow
 {
-    sf::RenderTexture tex;
+    /*sf::RenderTexture tex;
 
     void create(sf::VideoMode mode, const sf::String& title, sf::Uint32 style, const sf::ContextSettings& settings)
     {
         sf::RenderWindow::create(mode, title, style, settings);
         tex.create(mode.width, mode.height);
         tex.setSmooth(true);
+
+        //sf::RenderTexture.crea
     }
 
     template<typename T, typename... U>
     void draw(const T& t, U... u)
     {
+        //sf::RenderWindow::draw(t, u...);
+
         tex.draw(t, u...);
     }
 
@@ -25,7 +29,7 @@ struct render_window : sf::RenderWindow
     {
          sf::RenderWindow::setView(t);
          tex.setView(t);
-    }
+    }*/
 };
 
 #endif // RENDER_WINDOW_HPP_INCLUDED

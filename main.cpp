@@ -2892,9 +2892,9 @@ int main()
 
         ImGui::tick_suppress_frames();
 
-        ImGui::Render();
-
         ImGui::DoFrosting(window);
+
+        //ImGui::Render();
 
         //playing_music.debug(window);
         //window.display();

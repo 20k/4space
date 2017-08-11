@@ -89,6 +89,7 @@
 		<Unit filename="empire.hpp" />
 		<Unit filename="event_system.cpp" />
 		<Unit filename="event_system.hpp" />
+		<Unit filename="gauss.frag" />
 		<Unit filename="main.cpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />
@@ -100,6 +101,7 @@
 		<Unit filename="procedural_text_generator.hpp" />
 		<Unit filename="profile.cpp" />
 		<Unit filename="profile.hpp" />
+		<Unit filename="render_window.hpp" />
 		<Unit filename="research.cpp" />
 		<Unit filename="research.hpp" />
 		<Unit filename="resource_manager.cpp" />
