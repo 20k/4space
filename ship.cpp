@@ -3004,6 +3004,23 @@ bool ship::can_move_in_system()
     return false;
 }
 
+float ship::get_move_system_speed()
+{
+    auto produced = get_produced_resources(1.f);
+
+    float thruster_amount = get_fully_merged(1.f)[ship_component_elements::ENGINE_POWER].produced_per_s;
+
+    float internal_size = get_total_components_size();
+
+    if(thruster_amount <= FLOAT_BOUND)
+        return 0.f;
+
+    if(internal_size <= FLOAT_BOUND)
+        return 0.f;
+
+    return ((thruster_amount / internal_size) + 1.f) / 2.f;
+}
+
 void ship::apply_disengage_penalty()
 {
     if(fully_disabled())
@@ -4266,6 +4283,18 @@ bool ship_manager::can_move_in_system()
     }
 
     return true;
+}
+
+float ship_manager::get_move_system_speed()
+{
+    float min_speed = FLT_MAX;
+
+    for(ship* s : ships)
+    {
+        min_speed = std::min(min_speed, s->get_move_system_speed());
+    }
+
+    return min_speed;
 }
 
 void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)

@@ -180,6 +180,8 @@ struct orbital
     void transfer(float new_rad, float new_angle, orbital_system* in_system);
     void transfer(vec2f pos, orbital_system* in_system, bool at_back = true, bool combat_move = false);
 
+    float get_transfer_speed();
+
     ///only transfers if some underlying thing says yes
     ///eg for fleets, only if they have fuel
     void request_transfer(vec2f pos, orbital_system* in_system);

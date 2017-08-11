@@ -206,7 +206,7 @@ inline component make_default_engines()
     command.drained_per_s = 0.5f;
 
     component_attribute engine;
-    engine.produced_per_s = 1.f;
+    engine.produced_per_s = 9.f;
 
     component_attribute hp;
     hp.max_amount = default_room_hp;

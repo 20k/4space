@@ -585,7 +585,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     rendered_asteroid_window = false;
 
-    if(type == orbital_info::ASTEROID && is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
+    if(is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
     {
         begin_render_asteroid_window();
         end_render_asteroid_window();
@@ -756,6 +756,18 @@ void orbital::transfer(vec2f pos, orbital_system* in_system, bool at_back, bool 
     transfer(rel.length(), rel.angle());*/
 
     command_queue.transfer(pos, this, in_system, at_back, combat_move);
+}
+
+float orbital::get_transfer_speed()
+{
+    float base_speed = 200.f / 5.f;
+
+    if(type != orbital_info::FLEET)
+        return base_speed;
+
+    ship_manager* sm = (ship_manager*)data;
+
+    return sm->get_move_system_speed() * base_speed;
 }
 
 void orbital::request_transfer(vec2f pos, orbital_system* in_system)
