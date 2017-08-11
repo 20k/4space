@@ -149,11 +149,12 @@ namespace ImGui
         p2.x += dim.x;
         p2.y += dim.y;
 
+        auto win_bg_col = GetStyleCol(ImGuiCol_WindowBg);
+
         bool currently_hovered = ImGui::IsWindowHovered() && ImGui::IsRectVisible(dim) && ImGui::IsMouseHoveringRect(screen_pos, p2) && hover;
 
         if(currently_hovered || force_hover)
         {
-
             ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
 
             ImGui::PushStyleColor(ImGuiCol_Button, GetStyleCol(ImGuiCol_WindowBg));
@@ -194,9 +195,11 @@ namespace ImGui
         }
         else
         {
-            ImGui::PushStyleColor(ImGuiCol_Button, GetStyleCol(ImGuiCol_WindowBg));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetStyleCol(ImGuiCol_WindowBg));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetStyleCol(ImGuiCol_WindowBg));
+            win_bg_col.w = 0.f;
+
+            ImGui::PushStyleColor(ImGuiCol_Button, win_bg_col);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, win_bg_col);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, win_bg_col);
 
             ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
 
