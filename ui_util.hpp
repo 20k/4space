@@ -153,6 +153,17 @@ namespace ImGui
 
         if(currently_hovered || force_hover)
         {
+
+            ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));
+
+            ImGui::PushStyleColor(ImGuiCol_Button, GetStyleCol(ImGuiCol_WindowBg));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetStyleCol(ImGuiCol_WindowBg));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetStyleCol(ImGuiCol_WindowBg));
+
+            ImGui::Button("", ImVec2(dim.x + thickness*2, dim.y + thickness*2));
+
+            ImGui::PopStyleColor(3);
+
             if(force_hover && !currently_hovered)
             {
                 thickness = 0;
