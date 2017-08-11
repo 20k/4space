@@ -44,6 +44,9 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
 
     states.blendMode = mode;
 
+    auto backup_view = win.getView();
+    win.setView(win.getDefaultView());
+
     for (int i = 0; i != g.Windows.Size; i++)
     {
         ImGuiWindow* window = g.Windows[i];
@@ -74,8 +77,6 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
             spr.setPosition(pos.x, pos.y);
             spr.setTextureRect(sf::IntRect({pos.x, pos.y}, {dim.x, dim.y}));
 
-            auto backup_view = win.getView();
-            win.setView(win.getDefaultView());
 
             win.draw(spr, states);
 
@@ -85,10 +86,10 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
                 spr.setTexture(ntexture);
                 win.draw(spr, states);
             }*/
-
-            win.setView(backup_view);
         }
     }
+
+    win.setView(backup_view);
 
     to_skip_frosting.clear();
 }
