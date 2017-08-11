@@ -1660,6 +1660,49 @@ void ship::tick_all_components(float step_s)
         }
     }
 
+    ///do resource pulling from empire
+    if(owned_by != nullptr && owned_by->parent_empire != nullptr)
+    {
+        auto available = get_available_capacities_vec();
+
+        for(component& c : entity_list)
+        {
+            if(!c.has_element(ship_component_elements::RESOURCE_PULLER))
+                continue;
+
+            component_attribute& cattr = c.components[ship_component_elements::RESOURCE_PULLER];
+
+            float resources_to_dispense = cattr.get_produced_amount(step_s);
+
+            for(auto& item : c.components)
+            {
+                ship_component_element type = item.first;
+                component_attribute& attr = item.second;
+
+                auto res_type = ship_component_elements::element_infos[(int)type].resource_type;
+
+                if(res_type == resource::COUNT)
+                    continue;
+
+                attr.produced_per_s = 0.f;
+
+                float to_dispense = resources_to_dispense;
+
+                to_dispense = std::min(to_dispense, available[(int)type].second);
+
+                std::map<resource::types, float> res;
+
+                res[res_type] = to_dispense;
+
+                if(owned_by->parent_empire->can_fully_dispense(res))
+                {
+                    owned_by->parent_empire->dispense_resources(res);
+
+                    attr.produced_per_s = to_dispense / step_s;
+                }
+            }
+        }
+    }
 
 
     ///DIRTY HACK ALERT
@@ -1968,6 +2011,8 @@ void ship::tick_all_components(float step_s)
     ///atm this is going to double produce if we have storage for this resource
     if(owned_by != nullptr && owned_by->parent_empire != nullptr)
     {
+        empire* parent_empire = owned_by->parent_empire;
+
         for(int i=0; i < left_after_storage.size(); i++)
         {
             if(ship_component_elements::element_infos[i].resource_type != resource::COUNT)
