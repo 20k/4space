@@ -125,7 +125,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
         ImGui::Text(tag.c_str());
 
-        if(show_detail && o)
+        if(show_detail && o && o->is_resource_object)
         {
             auto info = o->produced_resources_ps.get_formatted_str();
 
@@ -591,6 +591,15 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     //    draw_name_window = false;
 
     bool show_detail = key.isKeyPressed(sf::Keyboard::LAlt);
+
+    if(type == orbital_info::STAR)
+    {
+        if(show_detail)
+        {
+            draw_name_window = true;
+            show_detail = false;
+        }
+    }
 
     if(render_type == 0)
         simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, draw_name_window, name, current_simple_col, show_detail, this);
