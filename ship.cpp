@@ -876,6 +876,14 @@ void component::set_ship_size(float new_size)
     ship_size = new_size;
 }
 
+component component::with_size(float new_size)
+{
+    component c = *this;
+    c.set_size(new_size);
+
+    return c;
+}
+
 bool component::has_element(const ship_component_element& type)
 {
     return components.find(type) != components.end();
