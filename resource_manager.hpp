@@ -85,6 +85,8 @@ namespace sf
     struct RenderWindow;
 }
 
+struct render_window;
+
 struct resource_manager
 {
     resource_manager();
@@ -95,7 +97,7 @@ struct resource_manager
 
     resource_element& get_resource(resource::types type);
 
-    void draw_ui(sf::RenderWindow& win);
+    void draw_ui(render_window& win);
 
     std::string get_unprocessed_str();
     std::string get_processed_str(bool can_skip);

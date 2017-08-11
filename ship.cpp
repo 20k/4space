@@ -4297,7 +4297,7 @@ float ship_manager::get_move_system_speed()
     return min_speed;
 }
 
-void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
+void ship_manager::draw_alerts(render_window& win, vec2f abs_pos)
 {
     float fuel_yellow_alert = 0.2f;
     float fuel_red_alert = 0.1f;

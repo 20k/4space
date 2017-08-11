@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include "ui_util.hpp"
 #include <set>
+#include "render_window.hpp"
 
 int orbital::gid;
 int orbital_system::gid;
@@ -89,7 +90,7 @@ sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, cons
     return pixel;
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col)
+void orbital_simple_renderable::draw(render_window& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col)
 {
     col = col * 255.f;
 
@@ -129,7 +130,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
     main_rendering(win, rotation, absolute_pos, 1.f, col);
 }
 
-void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
+void orbital_simple_renderable::main_rendering(render_window& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
 {
     #if 1
     for(int i=0; i<vert_dist.size(); i++)
@@ -182,7 +183,7 @@ void sprite_renderable::load(const std::string& str)
     ///also looks hideous
 }
 
-void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
+void sprite_renderable::draw(render_window& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
 {
     col = col * 255.f;
 
@@ -502,7 +503,7 @@ void orbital::end_render_asteroid_window()
     ImGui::End();
 }
 
-void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
+void orbital::draw(render_window& win, empire* viewer_empire)
 {
     /*std::vector<sf::Vertex> lines;
 
@@ -616,7 +617,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     highlight = false;
 }
 
-float orbital::get_pixel_radius(sf::RenderWindow& win)
+float orbital::get_pixel_radius(render_window& win)
 {
     float rad_to_check = 0;
 
@@ -877,7 +878,7 @@ bool orbital::can_dispense_resources()
     return false;
 }
 
-void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
+void orbital::draw_alerts(render_window& win, empire* viewing_empire, system_manager& system_manage)
 {
     if(parent_system != system_manage.currently_viewed)
         return;
@@ -1180,7 +1181,7 @@ void orbital_system::steal(orbital* o, orbital_system* s)
 }
 
 ///need to figure out higher positioning, but whatever
-void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
+void orbital_system::draw(render_window& win, empire* viewer_empire)
 {
     //sf::Clock clk;
 
@@ -1431,7 +1432,7 @@ void orbital_system::generate_planet_resources(float max_ps)
     }
 }
 
-void orbital_system::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
+void orbital_system::draw_alerts(render_window& win, empire* viewing_empire, system_manager& system_manage)
 {
     for(orbital* o : orbitals)
     {
@@ -1972,7 +1973,7 @@ void system_manager::add_selected_orbital(orbital* o)
     next_frame_warp_radiuses.push_back(o);
 }
 
-void system_manager::draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_empire)
+void system_manager::draw_warp_radiuses(render_window& win, empire* viewing_empire)
 {
     if(in_system_view())
     {
@@ -2011,7 +2012,7 @@ void system_manager::draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_e
     next_frame_warp_radiuses.clear();
 }
 
-void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
+void system_manager::draw_alerts(render_window& win, empire* viewing_empire)
 {
     ///change this so that later we see alerts from the overall map
     ///would be like, totally useful like!
@@ -2024,7 +2025,7 @@ void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
     }
 }
 
-void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire)
+void system_manager::draw_viewed_system(render_window& win, empire* viewer_empire)
 {
     if(currently_viewed == nullptr)
         return;
@@ -2075,7 +2076,7 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
 }
 
 ///do clicking next, bump up to higher level?
-bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
+bool universe_fleet_ui_tick(render_window& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
 {
     bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
 
@@ -2119,7 +2120,7 @@ bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec
     return is_hovered;
 }
 
-void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
+void system_manager::draw_universe_map(render_window& win, empire* viewer_empire, popup_info& popup)
 {
     //printf("zoom %f\n", zoom_level);
 
@@ -2443,7 +2444,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     to_draw_pathfinding.clear();
 }
 
-void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, empire* viewer_empire)
+void system_manager::process_universe_map(render_window& win, bool lclick, empire* viewer_empire)
 {
     hovered_system = currently_viewed;
 
@@ -2525,7 +2526,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
     }
 }
 
-void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow& win)
+void system_manager::change_zoom(float amount, vec2f mouse_pos, render_window& win)
 {
     //auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
 

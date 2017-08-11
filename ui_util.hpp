@@ -2,7 +2,6 @@
 #define UI_UTIL_HPP_INCLUDED
 
 #include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
 #include "drag_and_drop.hpp"
 
 #define IMGUI_JUST_TEXT_WINDOW ImGuiWindowFlags_AlwaysAutoResize | \
@@ -66,10 +65,14 @@ void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
     ImGui::PlotHistogram("", vals, num_divisions, 0, nullptr, 0, 1, ImVec2(dim.x(), dim.y()));
 }
 
+struct render_window;
+
 namespace ImGui
 {
     extern bool suppress_clicks;
     extern int suppress_frames;
+
+    void DoFrosting(render_window& win);
 
     inline
     bool IsItemClicked_DragCompatible()
