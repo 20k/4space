@@ -1476,6 +1476,8 @@ void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& sy
 
     ImGui::Begin("Diplomacy", &top_bar::active[top_bar_info::DIPLOMACY], IMGUI_WINDOW_FLAGS);
 
+    ImGui::register_window();
+
     ///if we've seen a system or one of their ships
     //for(auto& i : viewer_empire->relations_map)
 
@@ -1690,6 +1692,8 @@ void empire_manager::draw_resource_donation_ui(empire* viewer_empire)
         return;
 
     ImGui::Begin("Offer Resources", &offer_resources_ui, IMGUI_WINDOW_FLAGS);
+
+    ImGui::register_window();
 
     if(ImGui::IsWindowHovered())
     {

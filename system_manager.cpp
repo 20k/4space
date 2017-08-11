@@ -118,6 +118,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
         ImGui::Begin(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+        ImGui::register_window();
 
         ImGui::Text(tag.c_str());
 
@@ -603,6 +604,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
         ImGui::Begin((get_name_with_info_warfare(viewer_empire) + "###" + name + std::to_string(unique_id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+        ImGui::register_window();
 
         ImGui::Text(get_name_with_info_warfare(viewer_empire).c_str());
 
@@ -2525,7 +2527,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
     }
 }
 
-void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow& win)
+void system_manager::change_zoom(float amount, vec2f mouse_pos)
 {
     //auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
 
@@ -2685,6 +2687,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
     bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
 
     ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    ImGui::register_window();
 
     std::map<empire_popup, std::vector<orbital_system*>> empire_to_systems;
 

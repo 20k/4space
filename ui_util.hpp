@@ -66,10 +66,31 @@ void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
     ImGui::PlotHistogram("", vals, num_divisions, 0, nullptr, 0, 1, ImVec2(dim.x(), dim.y()));
 }
 
+namespace sf
+{
+    struct RenderWindow;
+    struct RenderTexture;
+}
+
 namespace ImGui
 {
     extern bool suppress_clicks;
     extern int suppress_frames;
+
+    extern std::vector<vec2f> saved_window_positions;
+    extern std::vector<vec2f> saved_window_sizes;
+
+    inline
+    void register_window()
+    {
+        auto pos = ImGui::GetWindowPos();
+        auto dim = ImGui::GetWindowSize();
+
+        saved_window_positions.push_back({pos.x, pos.y});
+        saved_window_sizes.push_back({dim.x, dim.y});
+    }
+
+    void do_frosting(sf::RenderWindow& output, sf::RenderTexture& in);
 
     inline
     bool IsItemClicked_DragCompatible()
@@ -219,6 +240,7 @@ struct popout_button
         ImGui::SetNextWindowPos(ImVec2(pos.x + dim.x - ImGui::GetStyle().FramePadding.x, pos.y + ypad));
 
         ImGui::Begin(name.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+        ImGui::register_window();
 
         //ImGui::Button(">\n>\n>\n>\n>\n>\n>\n>");
 

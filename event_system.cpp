@@ -933,6 +933,8 @@ void game_event::draw_ui()
 
     ImGui::Begin((header_str + "###DLOGUE" + alert_location->name).c_str(), &dialogue.is_open);
 
+    ImGui::register_window();
+
     std::vector<std::string> dialogue_options = {dialogue.text};
 
     ///patch dialogue options here if necessary

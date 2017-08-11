@@ -9,6 +9,8 @@ void notification_window::tick_draw()
 {
     ImGui::Begin(title.c_str());
 
+    ImGui::register_window();
+
     for(int id = 0; id < (int)elements.size(); id++)
     {
         text_element& elem = elements[id];

@@ -30,6 +30,7 @@
 #include "context_menu.hpp"
 #include "profile.hpp"
 #include "ship_customiser.hpp"
+#include "rendering_info.hpp"
 
 /*std::string obfuscate(const std::string& str, bool should_obfuscate)
 {
@@ -102,6 +103,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
 
     ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    ImGui::register_window();
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -569,6 +572,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     ImGui::Begin(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
+    ImGui::register_window();
+
     if(!s.display_popout)
     {
         ImGui::NeutralText(">\n>\n>\n>\n>\n>\n>\n>", {4, 4});
@@ -661,6 +666,8 @@ void display_ship_info_old(ship& s, float step_s)
 
     ImGui::Begin(s.name.c_str());
 
+    ImGui::register_window();
+
     int num = 0;
 
     for(auto& i : display_strs)
@@ -729,6 +736,7 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
     }
 
     ImGui::Begin("Battle DBG");
+    ImGui::register_window();
 
     if(ImGui::Button("Step Battle 1s"))
     {
@@ -744,6 +752,8 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         return;
 
     ImGui::Begin("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS);
+
+    ImGui::register_window();
 
     for(int i=0; i<all_battles.battles.size(); i++)
     {
@@ -1142,6 +1152,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     global_drag_and_drop.begin_drag_section("INFO_PANEL");
 
     ImGui::Begin(("Selected###INFO_PANEL"), &popup.going, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    ImGui::register_window();
 
     //global_drag_and_drop.begin_dragging(nullptr, drag_and_drop_info::ORBITAL);
 
@@ -2149,6 +2161,8 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     ImGui::Begin(("Ship Construction (" + o->name + ")").c_str(), &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
 
+    ImGui::register_window();
+
     for(int i=0; i<window_state.picked_research_levels.categories.size(); i++)
     {
         research_category& category = window_state.picked_research_levels.categories[i];
@@ -2410,8 +2424,15 @@ int main()
 
     window.create(sf::VideoMode(1500, 900),"Wowee", sf::Style::Default, settings);
 
-    ImGui::SFML::Init(window);
+    sf::RenderTexture offscreen_texture;
+    offscreen_texture.create(1500, 900);
 
+    sf::RenderTexture window_offscreen_texture;
+    window_offscreen_texture.create(1500, 900);
+
+    render_info render_inf(window, window_offscreen_texture);
+
+    ImGui::SFML::Init(window, offscreen_texture);
     ImGui::NewFrame();
 
     ImGuiStyle& style = ImGui::GetStyle();
@@ -2596,6 +2617,8 @@ int main()
                 int y = event.size.height;
 
                 window.create(sf::VideoMode(x, y), "Wowee", sf::Style::Default, settings);
+                offscreen_texture.create(x, y);
+                window_offscreen_texture.create(x, y);
 
                 /*window.setSize({x, y});
 
@@ -2609,16 +2632,21 @@ int main()
 
         if(focused && key.isKeyPressed(sf::Keyboard::LAlt) && ONCE_MACRO(sf::Keyboard::Return))
         {
+            sf::VideoMode mode = sf::VideoMode().getFullscreenModes()[0];
+
             if(!fullscreen)
             {
-                window.create(sf::VideoMode().getFullscreenModes()[0], "Wowee", sf::Style::Fullscreen, settings);
+                window.create(mode, "Wowee", sf::Style::Fullscreen, settings);
                 fullscreen = true;
             }
             else
             {
-                window.create(sf::VideoMode().getFullscreenModes()[0], "Wowee", sf::Style::Default, settings);
+                window.create(mode, "Wowee", sf::Style::Default, settings);
                 fullscreen = false;
             }
+
+            offscreen_texture.create(mode.width, mode.height);
+            window_offscreen_texture.create(mode.width, mode.height);
         }
 
         if(fullscreen)
@@ -2665,7 +2693,7 @@ int main()
         system_manage.pan_camera(cdir * diff_s * 300);
 
         if(no_suppress_mouse)
-            system_manage.change_zoom(-scrollwheel_delta, mpos, window);
+            system_manage.change_zoom(-scrollwheel_delta, mpos);
 
         ///BATTLE MANAGER IS NO LONGER TICKING SHIP COMPONENTS, IT IS ASSUMED TO BE DONE GLOBALLY WHICH WE WONT WANT
         ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME
@@ -2892,6 +2920,10 @@ int main()
         ImGui::tick_suppress_frames();
 
         ImGui::Render();
+
+        ImGui::saved_window_positions.clear();
+        ImGui::saved_window_sizes.clear();
+
         //playing_music.debug(window);
         window.display();
         window.clear();

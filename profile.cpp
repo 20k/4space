@@ -101,6 +101,7 @@ void auto_timer::dump_imgui()
         return;
 
     ImGui::Begin("Perf");
+    ImGui::register_window();
 
     for(const std::pair<timer_info, timer_data>& dat : info)
     {

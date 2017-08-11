@@ -4,6 +4,7 @@
 #include "util.hpp"
 #include <vec/vec.hpp>
 #include "top_bar.hpp"
+#include "ui_util.hpp"
 
 /*resource::types resource::get_random_unprocessed()
 {
@@ -55,6 +56,8 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
         return;
 
     ImGui::Begin("Resources", &top_bar::active[top_bar_info::ECONOMY], IMGUI_WINDOW_FLAGS);
+
+    ImGui::register_window();
 
     /*std::vector<std::string> names_up;
     std::vector<std::string> vals_up;

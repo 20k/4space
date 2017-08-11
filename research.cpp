@@ -66,6 +66,8 @@ void research::draw_ui(empire* emp)
 
     ImGui::Begin("Research", &top_bar::active[top_bar_info::RESEARCH], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
+    ImGui::register_window();
+
     for(int i=0; i<fnames.size(); i++)
     {
         std::string display = format(fnames[i], fnames) + " | " + format(amounts[i], amounts) + " |";
