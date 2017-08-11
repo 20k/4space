@@ -35,7 +35,9 @@ namespace object_command_queue_info
         float new_angle = 0.f;
         float start_time_s = 0.f;
         bool combat_move = false;
-        bool cancel_immediately = false;
+        //bool cancel_immediately = false;
+        bool target_drifts = false;
+
 
         vec2f pos = {0,0};
         orbital_system* fin = nullptr;
@@ -71,8 +73,8 @@ struct object_command_queue
 
     std::deque<queue_type> command_queue;
 
-    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool cancel_immediately = false);
-    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool cancel_immediately = false);
+    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool target_drifts = false);
+    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool target_drifts = false);
     bool transferring();
     bool trying_to_warp();
 
@@ -85,7 +87,9 @@ struct object_command_queue
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
     void add(const queue_type& type, bool at_back = true, bool queue_to_back = false);
-    void tick(orbital* o, float diff_s);
+    void tick(orbital* o, float step_s);
+
+    void drift_applicable_transfer_targets(float step_s);
 
     bool is_front_complete();
 

@@ -443,29 +443,40 @@ void orbital::tick(float step_s)
         being_decolonised = false;
     }
 
-    double mass_of_sun = 2 * pow(10., 30.);
-    double distance_from_earth_to_sun = 149000000000;
-    double g_const = 6.674 * pow(10., -11.);
-
-    float mu = mass_of_sun * g_const;
-
-    //double years_per_second =
-
-    double default_scale = (365*24*60*60.) / 50.;
-
-    double scaled_real_dist = (orbital_length / default_scale) * distance_from_earth_to_sun;
-
-    double vspeed_sq = mu / scaled_real_dist;
-
-    float calculated_angular_velocity_ps = sqrtf(vspeed_sq / (scaled_real_dist * scaled_real_dist));
 
     if(!transferring())
-        orbital_angle += calculated_angular_velocity_ps * step_s;
+        orbital_angle += calculate_orbital_drift_angle(step_s);
 
     //if(orbital_angle >= M_PIf)
     //    orbital_angle -= 2*M_PIf;
 
     absolute_pos = orbital_length * (vec2f){impl_cos(orbital_angle), impl_sin(orbital_angle)} + parent->absolute_pos;
+}
+
+float orbital::calculate_orbital_drift_angle(float orbital_length, float step_s)
+{
+    constexpr double mass_of_sun = 2 * pow(10., 30.);
+    constexpr double distance_from_earth_to_sun = 149000000000;
+    constexpr double g_const = 6.674 * pow(10., -11.);
+
+    constexpr float mu = mass_of_sun * g_const;
+
+    constexpr double default_scale = (365*24*60*60.) / 50.;
+
+    constexpr double dist_div_default_scale = distance_from_earth_to_sun / default_scale;
+
+    double scaled_real_dist = orbital_length * dist_div_default_scale;
+
+    double vspeed_sq = mu / scaled_real_dist;
+
+    float calculated_angular_velocity_ps = sqrtf(vspeed_sq / (scaled_real_dist * scaled_real_dist));
+
+    return calculated_angular_velocity_ps * step_s;
+}
+
+float orbital::calculate_orbital_drift_angle(float step_s)
+{
+    return calculate_orbital_drift_angle(orbital_length, step_s);
 }
 
 void orbital::begin_render_asteroid_window()

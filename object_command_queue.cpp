@@ -26,7 +26,7 @@ float get_length_circle(vec2f p1, vec2f p2)
 
 
 ///returns if finished
-bool do_transfer(orbital* o, float diff_s, queue_type& type)
+bool do_transfer(orbital* o, float step_s, queue_type& type)
 {
     object_command_queue_info::queue_element_data& data = type.data;
 
@@ -48,13 +48,9 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
 
     float straightline_distance = (end_pos - o->absolute_pos).length();
 
-    float linear_extra = fabs(end_pos.length() - o->absolute_pos.length());
-    float radius_extra = get_length_circle(o->absolute_pos, end_pos);
 
-    float dist = sqrt(linear_extra * linear_extra + radius_extra*radius_extra);
-
-    float a1 = o->absolute_pos.angle();
-    float a2 = end_pos.angle();
+    float a1 = (o->absolute_pos - o->parent->absolute_pos).angle();
+    float a2 = (end_pos - o->parent->absolute_pos).angle();
 
     if(fabs(a2 + 2 * M_PI - a1) < fabs(a2 - a1))
     {
@@ -69,13 +65,13 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
     float cur_angle = (o->absolute_pos - o->parent->absolute_pos).angle();
     float cur_rad = (o->absolute_pos - o->parent->absolute_pos).length();
 
-    float iangle = cur_angle + diff_s * (a2 - a1);
-    float irad = cur_rad + diff_s * (data.new_radius - cur_rad);
+    float iangle = cur_angle + step_s * (a2 - a1);
+    float irad = cur_rad + step_s * (data.new_radius - cur_rad);
 
     vec2f calculated_next = irad * (vec2f){cos(iangle), sin(iangle)};
     vec2f calculated_cur = o->orbital_length * (vec2f){cos(o->orbital_angle), sin(o->orbital_angle)};
 
-    float speed = (1/5.f) * diff_s * 200.f;
+    float speed = (1/5.f) * step_s * 200.f;
 
     ///this is the real speed here
     vec2f calc_dir = (calculated_next - calculated_cur).norm() * speed;
@@ -94,8 +90,8 @@ bool do_transfer(orbital* o, float diff_s, queue_type& type)
         return true;
     }
 
-    if(data.cancel_immediately)
-        return true;
+    //if(data.cancel_immediately)
+    //    return true;
 
     return false;
 }
@@ -125,7 +121,7 @@ bool do_warp(orbital* o, queue_type& type)
     return true;
 }
 
-void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool cancel_immediately)
+void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool target_drifts)
 {
     queue_type next;
 
@@ -138,7 +134,8 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
     next.data.transfer_within = viewing_system;
 
     next.data.combat_move = combat_move;
-    next.data.cancel_immediately = cancel_immediately;
+    next.data.target_drifts = target_drifts;
+    //next.data.cancel_immediately = cancel_immediately;
 
     next.type = object_command_queue_info::IN_SYSTEM_PATH;
 
@@ -150,7 +147,7 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
     add(next, at_back);
 }
 
-void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool cancel_immediately)
+void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool target_drifts)
 {
     vec2f base;
 
@@ -159,7 +156,7 @@ void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewi
 
     vec2f rel = pos - base;
 
-    transfer(rel.length(), rel.angle(), o, viewing_system, at_back, combat_move, cancel_immediately);
+    transfer(rel.length(), rel.angle(), o, viewing_system, at_back, combat_move, target_drifts);
 }
 
 bool object_command_queue::transferring()
@@ -281,7 +278,7 @@ bool do_anchor(orbital* o, queue_type& type)
     if((their_pos - my_pos).length() > maintain_distance)
     {
         ///sadly cancel immediately doesn't work correctly as transfer isn't constant time
-        o->command_queue.transfer(data.anchor_target->absolute_pos, o, o->parent_system, false, false, false);
+        o->command_queue.transfer(data.anchor_target->absolute_pos, o, o->parent_system, false, false, true);
     }
 
     return false;
@@ -340,12 +337,14 @@ void object_command_queue::add(const queue_type& type, bool at_back, bool queue_
         command_queue.push_front(type);
 }
 
-void object_command_queue::tick(orbital* o, float diff_s)
+void object_command_queue::tick(orbital* o, float step_s)
 {
     cancel_internal(o);
 
     if(command_queue.size() == 0)
         return;
+
+    drift_applicable_transfer_targets(step_s);
 
     bool first_warp = true;
 
@@ -381,9 +380,8 @@ void object_command_queue::tick(orbital* o, float diff_s)
     ///just do like, ship->tick_path destination etc
     if(cur == object_command_queue_info::IN_SYSTEM_PATH)
     {
-        if(do_transfer(o, diff_s, next))
+        if(do_transfer(o, step_s, next))
         {
-            //should_pop = true;
             next.data.should_pop = true;
         }
     }
@@ -392,7 +390,6 @@ void object_command_queue::tick(orbital* o, float diff_s)
     {
         if(do_warp(o, next))
         {
-            //should_pop = true;
             next.data.should_pop = true;
         }
     }
@@ -401,7 +398,6 @@ void object_command_queue::tick(orbital* o, float diff_s)
     {
         if(do_colonising(o, next))
         {
-            //should_pop = true;
             next.data.should_pop = true;
         }
     }
@@ -435,6 +431,22 @@ void object_command_queue::tick(orbital* o, float diff_s)
     cancel_internal(o);
 
     should_pop = false;
+}
+
+void object_command_queue::drift_applicable_transfer_targets(float step_s)
+{
+    for(auto& i : command_queue)
+    {
+        if(i.type != object_command_queue_info::IN_SYSTEM_PATH)
+            continue;
+
+        if(i.data.target_drifts == false)
+            continue;
+
+        float& target_angle = i.data.new_angle;
+
+        target_angle += orbital::calculate_orbital_drift_angle(i.data.new_radius, step_s);
+    }
 }
 
 bool object_command_queue::is_front_complete()

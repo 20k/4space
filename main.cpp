@@ -2308,6 +2308,8 @@ int main()
 
     full_component_list = get_component_list();
 
+    srand(100);
+
     randf_s();
     randf_s();
 

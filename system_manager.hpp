@@ -232,6 +232,9 @@ struct orbital
     std::map<empire*, bool> viewed_by;
     std::map<empire*, bool> currently_viewed_by;
 
+    static float calculate_orbital_drift_angle(float orbital_length, float step_s);
+    float calculate_orbital_drift_angle(float step_s);
+
     virtual ~orbital(){}
 };
 
