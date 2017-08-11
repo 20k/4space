@@ -9,8 +9,6 @@ namespace sf
     struct RenderWindow;
 }
 
-struct sf::RenderWindow;
-
 struct text_manager
 {
     static bool loaded;

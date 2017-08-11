@@ -85,8 +85,6 @@ namespace sf
     struct RenderWindow;
 }
 
-struct sf::RenderWindow;
-
 struct resource_manager
 {
     resource_manager();
