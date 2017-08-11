@@ -1706,7 +1706,6 @@ void ship::tick_all_components(float step_s)
         }
     }
 
-
     ///DIRTY HACK ALERT
 
     std::map<ship_component_element, float> to_apply_prop;
