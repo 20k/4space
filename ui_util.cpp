@@ -5,6 +5,8 @@
 bool ImGui::suppress_clicks = false;
 int ImGui::suppress_frames = 2;
 
+std::vector<std::string> ImGui::to_skip_frosting;
+
 void ImGui::DoFrosting(sf::RenderWindow& win)
 {
     ImGuiContext& g = *GImGui;
@@ -52,6 +54,20 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
             if(strncmp(window->Name, "Debug", strlen("Debug")) == 0)
                 continue;
 
+            bool skip = false;
+
+            for(auto& str : to_skip_frosting)
+            {
+                if(strncmp(window->Name, str.c_str(), strlen(str.c_str())) == 0)
+                {
+                    skip = true;
+                    break;
+                }
+            }
+
+            if(skip)
+                continue;
+
             auto pos = window->Pos;
             ImVec2 dim = window->Size;
 
@@ -76,7 +92,14 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
         }
     }
 
+    to_skip_frosting.clear();
+
     ImGui::Render();
 
     win.display();
+}
+
+void ImGui::SkipFrosting(const std::string& name)
+{
+    to_skip_frosting.push_back(name);
 }

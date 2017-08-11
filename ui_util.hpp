@@ -75,7 +75,10 @@ namespace ImGui
     extern bool suppress_clicks;
     extern int suppress_frames;
 
+    extern std::vector<std::string> to_skip_frosting;
+
     void DoFrosting(sf::RenderWindow& win);
+    void SkipFrosting(const std::string& name);
 
     inline
     bool IsItemClicked_DragCompatible()

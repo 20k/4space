@@ -90,7 +90,7 @@ sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, cons
     return pixel;
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col)
+void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col, bool show_detail, orbital* o)
 {
     col = col * 255.f;
 
@@ -114,6 +114,9 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     if(draw_outline)
     {
+        if(!show_detail)
+            ImGui::SkipFrosting(tag);
+
         ImGui::SetNextWindowPos(ImVec2(real_coord.x + pixel_rad.x, real_coord.y));
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
@@ -121,6 +124,13 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         ImGui::Begin(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
 
         ImGui::Text(tag.c_str());
+
+        if(show_detail && o)
+        {
+            auto info = o->produced_resources_ps.get_formatted_str();
+
+            ImGui::Text(info.c_str());
+        }
 
         ImGui::End();
 
@@ -577,11 +587,13 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     sf::Keyboard key;
 
-    if(is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
-        draw_name_window = false;
+    //if(is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
+    //    draw_name_window = false;
+
+    bool show_detail = key.isKeyPressed(sf::Keyboard::LAlt);
 
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, draw_name_window, name, current_simple_col);
+        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, draw_name_window, name, current_simple_col, show_detail, this);
     if(render_type == 1)
         sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
 
@@ -591,7 +603,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     rendered_asteroid_window = false;
 
-    if(is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
+    if(is_resource_object && show_detail && !draw_name_window)
     {
         begin_render_asteroid_window();
         end_render_asteroid_window();
