@@ -79,6 +79,7 @@ namespace ship_component_elements
         SHIPYARD,
         MASS_ANCHOR, ///can be tied to a planetary body, sun, or asteroid etc
         ORE_HARVESTER, ///does not actually harvest ore, simply stores information about it. Do this through resource production
+        RESOURCE_PULLER, ///pulls resources from empire at rate of produced_per_s
 
         ///RESOURCES SHOULD BE ENTIRELY MIGRATED TO SHIP COMPONENT ELEMENTS
         OXYGEN,

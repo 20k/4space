@@ -224,6 +224,9 @@ void ship_component_elements::generate_element_infos()
     ei[ORE_HARVESTER].display_name = "Ore Harvester";
     ei[ORE_HARVESTER].research_type = research_info::MATERIALS;
 
+    ei[RESOURCE_PULLER].display_name = "Resource Requester";
+    ei[RESOURCE_PULLER].research_type = research_info::MATERIALS;
+
 
     #define DEFINE_RESOURCE(name) ei[name].display_name = #name; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
 

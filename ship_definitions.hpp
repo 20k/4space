@@ -695,6 +695,38 @@ inline component make_default_mining_system()
     return mining;
 }
 
+inline component make_default_resource_puller()
+{
+    component_attribute hp;
+    hp.max_amount = default_room_hp;
+    hp.cur_amount = hp.max_amount;
+
+    component mining;
+
+    component_attribute resources_pulled;
+    resources_pulled.produced_per_s = 2.f;
+
+    mining.add(ship_component_element::HP, hp);
+    mining.add(ship_component_element::RESOURCE_PULLER, resources_pulled));
+    mining.add(ship_component_element::RESOURCE_PRODUCTION, component_attribute());
+
+    for(int i=0; i<ship_component_element::NONE; i++)
+    {
+        if(ship_component_elements::element_infos[i].resource_type == resource::COUNT)
+            continue;
+
+        mining.add((ship_component_elements::types)i, component_attribute());
+    }
+
+    mining.name = "Resource Requester";
+    mining.primary_attribute = ship_component_element::RESOURCE_PULLER;
+    mining.cost_mult = 5.f;
+
+    mining.set_tech_type(ship_component_elements::RARE | ship_component_elements::MEDIUM);
+
+    return mining;
+}
+
 ///seriously fuck static initialisation
 inline
 std::vector<component> get_component_list()
@@ -722,6 +754,7 @@ std::vector<component> get_component_list()
         make_default_resource_storage(),
         make_default_shipyard(),
         make_default_mining_system(),
+        make_default_resource_puller(),
     };
 
     return full_component_list;
