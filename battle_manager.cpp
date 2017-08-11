@@ -4,6 +4,7 @@
 #include "empire.hpp"
 #include "util.hpp"
 #include <set>
+#include "rendering_info.hpp"
 
 uint32_t battle_manager::gid = 0;
 
@@ -142,7 +143,7 @@ void projectile_manager::destroy_all()
     projectiles.clear();
 }
 
-void projectile_manager::draw(sf::RenderWindow& win)
+void projectile_manager::draw(render_info& inf)
 {
     /*sf::RectangleShape rect;
 
@@ -178,7 +179,7 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
         spr.setScale(scale, scale);
 
-        win.draw(spr);
+        inf.tex.draw(spr);
     }
 }
 
@@ -334,9 +335,9 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
     frame_counter++;
 }
 
-void battle_manager::draw(sf::RenderWindow& win)
+void battle_manager::draw(render_info& inf)
 {
-    projectile_manage.draw(win);
+    projectile_manage.draw(inf);
 
     //sf::RectangleShape rect;
 
@@ -396,7 +397,7 @@ void battle_manager::draw(sf::RenderWindow& win)
                 {
                     spr.setPosition(s->local_pos.x() + x, s->local_pos.y() + y);
 
-                    win.draw(spr);
+                    inf.tex.draw(spr);
                 }
             }
 
@@ -405,7 +406,7 @@ void battle_manager::draw(sf::RenderWindow& win)
             spr.setPosition(s->local_pos.x(), s->local_pos.y());
         }
 
-        win.draw(spr);
+        inf.tex.draw(spr);
 
         s->highlight = false;
     }
@@ -754,12 +755,12 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage)
     }
 }
 
-void all_battles_manager::draw_viewing(sf::RenderWindow& win)
+void all_battles_manager::draw_viewing(render_info& inf)
 {
     if(currently_viewing == nullptr)
         return;
 
-    currently_viewing->draw(win);
+    currently_viewing->draw(inf);
 }
 
 void all_battles_manager::set_viewing(battle_manager* bm, system_manager& system_manage, bool jump)

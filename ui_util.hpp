@@ -72,6 +72,8 @@ namespace sf
     struct RenderTexture;
 }
 
+struct render_info;
+
 namespace ImGui
 {
     extern bool suppress_clicks;
@@ -90,7 +92,7 @@ namespace ImGui
         saved_window_sizes.push_back({dim.x, dim.y});
     }
 
-    void do_frosting(sf::RenderWindow& output, sf::RenderTexture& in);
+    void do_frosting(sf::RenderWindow& output, render_info& inf);
 
     inline
     bool IsItemClicked_DragCompatible()

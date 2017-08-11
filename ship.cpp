@@ -4297,7 +4297,7 @@ float ship_manager::get_move_system_speed()
     return min_speed;
 }
 
-void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
+void ship_manager::draw_alerts(render_info& inf, vec2f abs_pos)
 {
     float fuel_yellow_alert = 0.2f;
     float fuel_red_alert = 0.1f;
@@ -4404,7 +4404,7 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
 
     //printf("fpos %f %f\n", final_pos.x(), final_pos.y());
 
-    text_manager::render(win, alert_symbol, abs_pos + (vec2f){8, -20}, alert_colour);
+    text_manager::render(inf, alert_symbol, abs_pos + (vec2f){8, -20}, alert_colour);
 }
 
 void ship_manager::try_warp(orbital_system* fin, orbital* o)

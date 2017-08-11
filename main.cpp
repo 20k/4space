@@ -863,14 +863,14 @@ struct box_selection
     bool last_was_not_click = false;
     bool cannot_click = false;
 
-    void tick(system_manager& system_manage, orbital_system* cur, sf::RenderWindow& win, popup_info& popup, empire* viewer_empire)
+    void tick(system_manager& system_manage, orbital_system* cur, render_info& inf, popup_info& popup, empire* viewer_empire)
     {
         if(cur == nullptr)
             return;
 
         sf::Mouse mouse;
 
-        vec2f mpos = {mouse.getPosition(win).x, mouse.getPosition(win).y};
+        vec2f mpos = {mouse.getPosition(inf.window).x, mouse.getPosition(inf.window).y};
 
         bool lclick = mouse.isButtonPressed(sf::Mouse::Left);
 
@@ -897,7 +897,7 @@ struct box_selection
                 vec2f tl = min(mpos, start_pos);
                 vec2f br = max(mpos, start_pos);
 
-                auto spos = win.mapCoordsToPixel({pos.x(), pos.y()});
+                auto spos = inf.window.mapCoordsToPixel({pos.x(), pos.y()});
 
                 if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
                 {
@@ -967,9 +967,9 @@ struct box_selection
 
             vec2f tl = min(mpos, start_pos);
 
-            auto backup_view = win.getView();
+            auto backup_view = inf.tex.getView();
 
-            win.setView(win.getDefaultView());
+            inf.tex.setView(inf.tex.getDefaultView());
 
             shape.setSize({fabs(mpos.x() - start_pos.x()), fabs(mpos.y() - start_pos.y())});
             shape.setOutlineColor(sf::Color(0, 128, 255, 255));
@@ -978,9 +978,9 @@ struct box_selection
 
             shape.setPosition(tl.x(), tl.y());
 
-            win.draw(shape);
+            inf.tex.draw(shape);
 
-            win.setView(backup_view);
+            inf.tex.setView(backup_view);
         }
     }
 };
@@ -2305,15 +2305,16 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
     return built;
 }
 
-void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
+void handle_camera(render_info& inf, system_manager& system_manage)
 {
-    sf::View view = window.getDefaultView();
+    sf::View view = inf.window.getDefaultView();
 
-    view.setSize(window.getSize().x * system_manage.zoom_level, window.getSize().y * system_manage.zoom_level);
+    view.setSize(inf.window.getSize().x * system_manage.zoom_level, inf.window.getSize().y * system_manage.zoom_level);
     //view.zoom(system_manage.zoom_level);
     view.setCenter({system_manage.camera.x(), system_manage.camera.y()});
 
-    window.setView(view);
+    inf.window.setView(view);
+    inf.tex.setView(view);
 }
 
 int main()
@@ -2426,9 +2427,11 @@ int main()
 
     sf::RenderTexture offscreen_texture;
     offscreen_texture.create(1500, 900);
+    offscreen_texture.setSmooth(true);
 
-    sf::RenderTexture window_offscreen_texture;
+    custom_rendertexture window_offscreen_texture;
     window_offscreen_texture.create(1500, 900);
+    window_offscreen_texture.setSmooth(true);
 
     render_info render_inf(window, window_offscreen_texture);
 
@@ -2704,7 +2707,7 @@ int main()
 
         all_battles.tick(diff_s, system_manage);
 
-        handle_camera(window, system_manage);
+        handle_camera(render_inf, system_manage);
 
         if(ONCE_MACRO(sf::Keyboard::M) && focused && !ship_customise.text_input_going)
         {
@@ -2756,7 +2759,7 @@ int main()
 
         //debug_menu({test_ship});
 
-        handle_camera(window, system_manage);
+        handle_camera(render_inf, system_manage);
 
         debug_all_battles(all_battles, window, lclick, system_manage, player_empire);
 
@@ -2765,7 +2768,7 @@ int main()
             //debug_battle(*battle, window, lclick);
 
 
-            all_battles.draw_viewing(window);
+            all_battles.draw_viewing(render_inf);
 
             //battle->draw(window);
         }
@@ -2783,15 +2786,15 @@ int main()
         if(state == 0)
         {
             ///this is slow
-            system_manage.draw_viewed_system(window, player_empire);
+            system_manage.draw_viewed_system(render_inf, player_empire);
             ///dis kinda slow too
-            system_manage.draw_universe_map(window, player_empire, popup);
-            system_manage.process_universe_map(window, lclick, player_empire);
-            system_manage.draw_warp_radiuses(window, player_empire);
+            system_manage.draw_universe_map(render_inf, player_empire, popup);
+            system_manage.process_universe_map(render_inf, lclick, player_empire);
+            system_manage.draw_warp_radiuses(render_inf, player_empire);
         }
 
         //if(system_manage.in_system_view())
-            box_selector.tick(system_manage, system_manage.currently_viewed, window, popup, player_empire);
+            box_selector.tick(system_manage, system_manage.currently_viewed, render_inf, popup, player_empire);
 
 
         //printf("ui\n");
@@ -2859,7 +2862,7 @@ int main()
 
         if(state != 1)
         {
-            system_manage.draw_alerts(window, player_empire);
+            system_manage.draw_alerts(render_inf, player_empire);
         }
 
         ///this is slow
@@ -2867,7 +2870,7 @@ int main()
 
         //printf("predrawres\n");
 
-        player_empire->resources.draw_ui(window);
+        player_empire->resources.draw_ui();
         //printf("Pregen\n");
 
 
@@ -2921,12 +2924,16 @@ int main()
 
         ImGui::Render();
 
+        ImGui::do_frosting(window, render_inf);
+
         ImGui::saved_window_positions.clear();
         ImGui::saved_window_sizes.clear();
 
         //playing_music.debug(window);
         window.display();
         window.clear();
+        render_inf.tex.clear();
+        offscreen_texture.clear();
 
         diff_s = clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f - last_time_s;
         last_time_s = clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f;

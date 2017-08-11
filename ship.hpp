@@ -655,6 +655,7 @@ struct ship : positional
 
 struct orbital_system;
 struct orbital;
+struct render_info;
 
 ///can be used as a fleet
 struct ship_manager
@@ -702,7 +703,7 @@ struct ship_manager
     bool can_move_in_system();
     float get_move_system_speed();
 
-    void draw_alerts(sf::RenderWindow& win, vec2f abs_pos);
+    void draw_alerts(render_info& inf, vec2f abs_pos);
 
     void force_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     void try_warp(orbital_system* fin, orbital* o);

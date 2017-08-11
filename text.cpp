@@ -1,6 +1,6 @@
 #include "text.hpp"
-
 #include <SFML/Graphics.hpp>
+#include "rendering_info.hpp"
 
 bool text_manager::loaded = false;
 sf::Font text_manager::font;
@@ -15,7 +15,7 @@ void text_manager::load()
     loaded = true;
 }
 
-void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool rounding, float char_size, float scale)
+void text_manager::render(render_info& inf, const std::string& str, vec2f pos, vec3f col, bool rounding, float char_size, float scale)
 {
     load();
 
@@ -33,10 +33,10 @@ void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f p
     text.setPosition(pos.x(), pos.y());
     text.setScale(scale, scale);
 
-    win.draw(text);
+    inf.tex.draw(text);
 }
 
-void text_manager::render_without_zoom(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool centered, float scale)
+void text_manager::render_without_zoom(render_info& inf, const std::string& str, vec2f pos, vec3f col, bool centered, float scale)
 {
     load();
 
@@ -90,10 +90,10 @@ void text_manager::render_without_zoom(sf::RenderWindow& win, const std::string&
     if(str == "")
         return;
 
-    sf::View current_view = win.getView();
-    sf::View default_view = win.getDefaultView();
+    sf::View current_view = inf.tex.getView();
+    sf::View default_view = inf.tex.getDefaultView();
 
-    auto projected = win.mapCoordsToPixel({pos.x(), pos.y()});
+    auto projected = inf.tex.mapCoordsToPixel({pos.x(), pos.y()});
 
     vec2f spos = {projected.x, projected.y};
 
@@ -106,9 +106,9 @@ void text_manager::render_without_zoom(sf::RenderWindow& win, const std::string&
 
     text.setPosition({spos.x(), spos.y()});
 
-    win.setView(default_view);
+    inf.tex.setView(default_view);
 
-    win.draw(text);
+    inf.tex.draw(text);
 
-    win.setView(current_view);
+    inf.tex.setView(current_view);
 }

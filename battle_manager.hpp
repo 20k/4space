@@ -6,6 +6,7 @@
 
 struct empire;
 struct ship;
+struct render_info;
 
 struct projectile : positional
 {
@@ -45,7 +46,7 @@ struct projectile_manager
     void destroy(projectile* proj);
     void destroy_all();
 
-    void draw(sf::RenderWindow& win);
+    void draw(render_info& inf);
 };
 
 struct all_battles_manager;
@@ -64,7 +65,7 @@ struct battle_manager
 
     void tick(float step_s, system_manager& system_manage);
 
-    void draw(sf::RenderWindow& win);
+    void draw(render_info& inf);
 
     void add_ship(ship* s);
 
@@ -108,7 +109,7 @@ struct all_battles_manager
 
     void tick(float step_s, system_manager& system_manage);
 
-    void draw_viewing(sf::RenderWindow& win);
+    void draw_viewing(render_info& inf);
     void set_viewing(battle_manager* bm, system_manager& system_manage, bool jump = false);
 
     battle_manager* make_new_battle(std::vector<orbital*> t1);

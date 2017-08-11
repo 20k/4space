@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include "ui_util.hpp"
 #include <set>
+#include "rendering_info.hpp"
 
 int orbital::gid;
 int orbital_system::gid;
@@ -89,13 +90,13 @@ sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, cons
     return pixel;
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col)
+void orbital_simple_renderable::draw(render_info& inf, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col)
 {
     col = col * 255.f;
 
-    auto real_coord = win.mapCoordsToPixel({absolute_pos.x(), absolute_pos.y()});
+    auto real_coord = inf.window.mapCoordsToPixel({absolute_pos.x(), absolute_pos.y()});
 
-    if(real_coord.x < 0 || real_coord.x > win.getSize().x || real_coord.y < 0 || real_coord.y >= win.getSize().y)
+    if(real_coord.x < 0 || real_coord.x > inf.window.getSize().x || real_coord.y < 0 || real_coord.y >= inf.window.getSize().y)
         return;
 
     float rad_to_check = 0;
@@ -107,9 +108,9 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     rad_to_check /= vert_dist.size();
 
-    auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
+    auto pixel_rad = mapCoordsToPixel_float(rad_to_check + inf.window.getView().getCenter().x, inf.window.getView().getCenter().y, inf.window.getView(), inf.window);
 
-    pixel_rad.x -= win.getSize().x/2;
+    pixel_rad.x -= inf.window.getSize().x/2;
 
     if(draw_outline)
     {
@@ -127,10 +128,10 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         ImGui::PopStyleColor();
     }
 
-    main_rendering(win, rotation, absolute_pos, 1.f, col);
+    main_rendering(inf, rotation, absolute_pos, 1.f, col);
 }
 
-void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
+void orbital_simple_renderable::main_rendering(render_info& inf, float rotation, vec2f absolute_pos, float scale, vec3f col)
 {
     #if 1
     for(int i=0; i<vert_dist.size(); i++)
@@ -169,7 +170,7 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
         v[2].color = scol;
         v[3].color = scol;
 
-        win.draw(v, 4, sf::Quads);
+        inf.tex.draw(v, 4, sf::Quads);
     }
     #endif
 }
@@ -183,7 +184,7 @@ void sprite_renderable::load(const std::string& str)
     ///also looks hideous
 }
 
-void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
+void sprite_renderable::draw(render_info& inf, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
 {
     col = col * 255.f;
 
@@ -218,7 +219,7 @@ void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolu
 
     spr.setPosition(absolute_pos.x(), absolute_pos.y());
 
-    win.draw(spr);
+    inf.tex.draw(spr);
 }
 
 void orbital::set_orbit(float ang, float len)
@@ -503,7 +504,7 @@ void orbital::end_render_asteroid_window()
     ImGui::End();
 }
 
-void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
+void orbital::draw(render_info& inf, empire* viewer_empire)
 {
     /*std::vector<sf::Vertex> lines;
 
@@ -581,11 +582,11 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         draw_name_window = false;
 
     if(render_type == 0)
-        simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, draw_name_window, name, current_simple_col);
+        simple_renderable.draw(inf, rotation, last_viewed_position, force_high_quality, draw_name_window, name, current_simple_col);
     if(render_type == 1)
-        sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
+        sprite.draw(inf, rotation, last_viewed_position, current_sprite_col, highlight);
 
-    auto real_coord = mapCoordsToPixel_float(last_viewed_position.x(), last_viewed_position.y(), win.getView(), win);
+    auto real_coord = mapCoordsToPixel_float(last_viewed_position.x(), last_viewed_position.y(), inf.window.getView(), inf.window);
 
     last_screen_pos = {real_coord.x, real_coord.y};
 
@@ -599,7 +600,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     if(highlight && type == orbital_info::FLEET)
     {
-        ImGui::SetNextWindowPos(ImVec2(round(real_coord.x + get_pixel_radius(win)), round(real_coord.y)));
+        ImGui::SetNextWindowPos(ImVec2(round(real_coord.x + get_pixel_radius(inf.window)), round(real_coord.y)));
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
@@ -879,7 +880,7 @@ bool orbital::can_dispense_resources()
     return false;
 }
 
-void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
+void orbital::draw_alerts(render_info& inf, empire* viewing_empire, system_manager& system_manage)
 {
     if(parent_system != system_manage.currently_viewed)
         return;
@@ -892,7 +893,7 @@ void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_
     {
         if(has_quest_alert)
         {
-            text_manager::render(win, "?", absolute_pos + (vec2f){8, -20}, {0.3, 1.0, 0.3});
+            text_manager::render(inf, "?", absolute_pos + (vec2f){8, -20}, {0.3, 1.0, 0.3});
         }
 
         return;
@@ -903,7 +904,7 @@ void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_
 
     ship_manager* sm = (ship_manager*)data;
 
-    sm->draw_alerts(win, absolute_pos);
+    sm->draw_alerts(inf, absolute_pos);
 }
 
 bool orbital::is_colonised()
@@ -1182,7 +1183,7 @@ void orbital_system::steal(orbital* o, orbital_system* s)
 }
 
 ///need to figure out higher positioning, but whatever
-void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
+void orbital_system::draw(render_info& inf, empire* viewer_empire)
 {
     //sf::Clock clk;
 
@@ -1191,12 +1192,12 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     for(auto& i : asteroids)
     {
-        i->draw(win, viewer_empire);
+        i->draw(inf, viewer_empire);
     }
 
     for(int kk=orbitals.size()-1; kk >= 0; kk--)
     {
-        orbitals[kk]->draw(win, viewer_empire);
+        orbitals[kk]->draw(inf, viewer_empire);
     }
 
     //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);
@@ -1433,11 +1434,11 @@ void orbital_system::generate_planet_resources(float max_ps)
     }
 }
 
-void orbital_system::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
+void orbital_system::draw_alerts(render_info& inf, empire* viewing_empire, system_manager& system_manage)
 {
     for(orbital* o : orbitals)
     {
-        o->draw_alerts(win, viewing_empire, system_manage);
+        o->draw_alerts(inf, viewing_empire, system_manage);
     }
 }
 
@@ -1974,7 +1975,7 @@ void system_manager::add_selected_orbital(orbital* o)
     next_frame_warp_radiuses.push_back(o);
 }
 
-void system_manager::draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_empire)
+void system_manager::draw_warp_radiuses(render_info& inf, empire* viewing_empire)
 {
     if(in_system_view())
     {
@@ -2007,13 +2008,13 @@ void system_manager::draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_e
 
         circle.setPosition({pos.x(), pos.y()});
 
-        win.draw(circle);
+        inf.tex.draw(circle);
     }
 
     next_frame_warp_radiuses.clear();
 }
 
-void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
+void system_manager::draw_alerts(render_info& inf, empire* viewing_empire)
 {
     ///change this so that later we see alerts from the overall map
     ///would be like, totally useful like!
@@ -2022,11 +2023,11 @@ void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 
     for(auto& i : systems)
     {
-        i->draw_alerts(win, viewing_empire, *this);
+        i->draw_alerts(inf, viewing_empire, *this);
     }
 }
 
-void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire)
+void system_manager::draw_viewed_system(render_info& inf, empire* viewer_empire)
 {
     if(currently_viewed == nullptr)
         return;
@@ -2034,7 +2035,7 @@ void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_em
     if(!in_system_view())
         return;
 
-    currently_viewed->draw(win, viewer_empire);
+    currently_viewed->draw(inf, viewer_empire);
 }
 
 void system_manager::set_viewed_system(orbital_system* s, bool reset_zoom)
@@ -2077,15 +2078,15 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
 }
 
 ///do clicking next, bump up to higher level?
-bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
+bool universe_fleet_ui_tick(render_info& inf, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
 {
     bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
 
     sf::Mouse mouse;
 
-    vec2f mpos = {mouse.getPosition(win).x, mouse.getPosition(win).y};
+    vec2f mpos = {mouse.getPosition(inf.window).x, mouse.getPosition(inf.window).y};
 
-    auto scr_pos = win.mapCoordsToPixel({pos.x(), pos.y()});
+    auto scr_pos = inf.window.mapCoordsToPixel({pos.x(), pos.y()});
 
     vec2f real_pos = {scr_pos.x + screen_offset.x(), scr_pos.y + screen_offset.y() - fleet_sprite.getGlobalBounds().height/2.f};
 
@@ -2113,15 +2114,15 @@ bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec
     fleet_sprite.setPosition(real_pos.x(), real_pos.y());
     fleet_sprite.setColor(sf::Color(col.x() * 255.f, col.y() * 255.f, col.z() * 255.f, 255));
 
-    auto backup_view = win.getView();
-    win.setView(win.getDefaultView());
-    win.draw(fleet_sprite);
-    win.setView(backup_view);
+    auto backup_view = inf.tex.getView();
+    inf.tex.setView(inf.tex.getDefaultView());
+    inf.tex.draw(fleet_sprite);
+    inf.tex.setView(backup_view);
 
     return is_hovered;
 }
 
-void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
+void system_manager::draw_universe_map(render_info& inf, empire* viewer_empire, popup_info& popup)
 {
     //printf("zoom %f\n", zoom_level);
 
@@ -2185,7 +2186,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             ncircle.setPointCount(100.f);
 
-            win.draw(ncircle, blend);
+            inf.tex.draw(ncircle, blend);
         }
     }
 
@@ -2214,7 +2215,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             ncircle.setPointCount(100.f);
 
             ///change to add if we want to see overlap
-            win.draw(ncircle);
+            inf.tex.draw(ncircle);
         }
     }
 
@@ -2258,11 +2259,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             shape.setFillColor({colour.x(), colour.y(), colour.z()});
 
-            win.draw(shape);
+            inf.tex.draw(shape);
 
             /*shape.setPosition(p2.x(), p2.y());
 
-            win.draw(shape);*/
+            inf.tex.draw(shape);*/
         }
     }
 
@@ -2287,7 +2288,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         circle.setRadius(sun_universe_rad);
         circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
 
-        win.draw(circle);
+        inf.tex.draw(circle);
 
         os->highlight = false;
 
@@ -2379,11 +2380,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 //o->universe_view_pos = fleet_draw_pos;
 
-                auto mapped_spos = win.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
+                auto mapped_spos = inf.tex.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
 
                 mapped_spos = mapped_spos + sf::Vector2i(screen_offset.x(), screen_offset.y());
 
-                auto mapped_wpos = win.mapPixelToCoords(mapped_spos);
+                auto mapped_wpos = inf.tex.mapPixelToCoords(mapped_spos);
 
                 o->universe_view_pos = {mapped_wpos.x, mapped_wpos.y};
             }
@@ -2393,7 +2394,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 col = {0, 0.5, 1};
             }
 
-            bool hovered = universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, col);
+            bool hovered = universe_fleet_ui_tick(inf, fleet_sprite, fleet_draw_pos, screen_offset, col);
 
             if(hovered)
             {
@@ -2438,14 +2439,14 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             rect.setPosition(next_pos.x(), next_pos.y());
 
-            win.draw(rect);
+            inf.tex.draw(rect);
         }
     }
 
     to_draw_pathfinding.clear();
 }
 
-void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, empire* viewer_empire)
+void system_manager::process_universe_map(render_info& inf, bool lclick, empire* viewer_empire)
 {
     hovered_system = currently_viewed;
 
@@ -2483,10 +2484,10 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 
     sf::Mouse mouse;
 
-    int x = mouse.getPosition(win).x;
-    int y = mouse.getPosition(win).y;
+    int x = mouse.getPosition(inf.window).x;
+    int y = mouse.getPosition(inf.window).y;
 
-    auto transformed = win.mapPixelToCoords({x, y});
+    auto transformed = inf.tex.mapPixelToCoords({x, y});
 
     vec2f tpos = {transformed.x, transformed.y};
 
