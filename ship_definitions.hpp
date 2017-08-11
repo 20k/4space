@@ -707,7 +707,7 @@ inline component make_default_resource_puller()
     resources_pulled.produced_per_s = 2.f;
 
     mining.add(ship_component_element::HP, hp);
-    mining.add(ship_component_element::RESOURCE_PULLER, resources_pulled));
+    mining.add(ship_component_element::RESOURCE_PULLER, resources_pulled);
     mining.add(ship_component_element::RESOURCE_PRODUCTION, component_attribute());
 
     for(int i=0; i<ship_component_element::NONE; i++)
