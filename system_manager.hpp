@@ -85,9 +85,9 @@ struct orbital_simple_renderable
 
     void init(int n, float min_rad, float max_rad);
 
-    void draw(render_window& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col = {1,1,1});
+    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col = {1,1,1});
 
-    void main_rendering(render_window& win, float rotation, vec2f absolute_pos, float scale, vec3f col);
+    void main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col);
 };
 
 struct sprite_renderable
@@ -97,7 +97,7 @@ struct sprite_renderable
 
     void load(const std::string& str);
 
-    void draw(render_window& win, float rotation, vec2f absolute_pos, vec3f col = {1,1,1}, bool highlight = false);
+    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col = {1,1,1}, bool highlight = false);
 };
 
 struct empire;
@@ -160,13 +160,13 @@ struct orbital
     void do_vision_test();
     void tick(float step_s);
 
-    void draw(render_window& win, empire* viewer_empire);
+    void draw(sf::RenderWindow& win, empire* viewer_empire);
 
     bool rendered_asteroid_window = false;
     void begin_render_asteroid_window();
     void end_render_asteroid_window();
 
-    float get_pixel_radius(render_window& win);
+    float get_pixel_radius(sf::RenderWindow& win);
 
     void center_camera(system_manager& system_manage);
 
@@ -201,7 +201,7 @@ struct orbital
 
     empire* parent_empire = nullptr;
 
-    void draw_alerts(render_window& win, empire* viewer_empire, system_manager& system_manage);
+    void draw_alerts(sf::RenderWindow& win, empire* viewer_empire, system_manager& system_manage);
 
     orbital_system* parent_system = nullptr;
 
@@ -264,7 +264,7 @@ struct orbital_system
     void steal(orbital*, orbital_system* s);
 
     ///currently viewed empire is drawn differently, see
-    void draw(render_window& win, empire* viewer_empire);
+    void draw(sf::RenderWindow& win, empire* viewer_empire);
 
     void cull_empty_orbital_fleets(empire_manager& empire_manage, popup_info& popup);
 
@@ -274,7 +274,7 @@ struct orbital_system
     void generate_asteroids_old(int n, int num_belts, int num_resource_asteroids);
     void generate_planet_resources(float max_ps);
 
-    void draw_alerts(render_window& win, empire* viewing_empire, system_manager& system_manage);
+    void draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage);
 
     void generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids);
     void generate_full_random_system();
@@ -340,19 +340,19 @@ struct system_manager
 
     void add_selected_orbital(orbital* o);
 
-    void draw_warp_radiuses(render_window& win, empire* viewing_empire);
-    void draw_alerts(render_window& win, empire* viewing_empire);
+    void draw_warp_radiuses(sf::RenderWindow& win, empire* viewing_empire);
+    void draw_alerts(sf::RenderWindow& win, empire* viewing_empire);
 
-    void draw_viewed_system(render_window& win, empire* viewer_empire);
+    void draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire);
 
     void set_viewed_system(orbital_system* s, bool reset_zoom = true);
 
-    void draw_universe_map(render_window& win, empire* viewer_empire, popup_info& popup);
-    void process_universe_map(render_window& win, bool lclick, empire* viewer_empire);
+    void draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup);
+    void process_universe_map(sf::RenderWindow& win, bool lclick, empire* viewer_empire);
 
     ///camera. Set here because zoom will be useful
     ///Camera panning should also probably go here
-    void change_zoom(float zoom, vec2f mouse_pos, render_window& win);
+    void change_zoom(float zoom, vec2f mouse_pos, sf::RenderWindow& win);
     void set_zoom(float zoom, bool auto_enter_system = false);
     void pan_camera(vec2f dir);
 

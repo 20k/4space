@@ -4,7 +4,7 @@
 #include "empire.hpp"
 #include "util.hpp"
 #include <set>
-#include "render_window.hpp"
+
 
 uint32_t battle_manager::gid = 0;
 
@@ -143,7 +143,7 @@ void projectile_manager::destroy_all()
     projectiles.clear();
 }
 
-void projectile_manager::draw(render_window& win)
+void projectile_manager::draw(sf::RenderWindow& win)
 {
     /*sf::RectangleShape rect;
 
@@ -335,7 +335,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
     frame_counter++;
 }
 
-void battle_manager::draw(render_window& win)
+void battle_manager::draw(sf::RenderWindow& win)
 {
     projectile_manage.draw(win);
 
@@ -755,7 +755,7 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage)
     }
 }
 
-void all_battles_manager::draw_viewing(render_window& win)
+void all_battles_manager::draw_viewing(sf::RenderWindow& win)
 {
     if(currently_viewing == nullptr)
         return;

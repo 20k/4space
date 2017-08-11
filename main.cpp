@@ -30,7 +30,7 @@
 #include "context_menu.hpp"
 #include "profile.hpp"
 #include "ship_customiser.hpp"
-#include "render_window.hpp"
+
 
 /*std::string obfuscate(const std::string& str, bool should_obfuscate)
 {
@@ -705,7 +705,7 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }*/
 
-void debug_battle(battle_manager* battle, render_window& win, bool lclick, system_manager& system_manage)
+void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, system_manager& system_manage)
 {
     if(battle == nullptr)
         return;
@@ -739,7 +739,7 @@ void debug_battle(battle_manager* battle, render_window& win, bool lclick, syste
     ImGui::End();
 }
 
-void debug_all_battles(all_battles_manager& all_battles, render_window& win, bool lclick, system_manager& system_manage, empire* player_empire)
+void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire)
 {
     if(!top_bar::get_active(top_bar_info::BATTLES))
         return;
@@ -854,7 +854,7 @@ struct box_selection
     bool last_was_not_click = false;
     bool cannot_click = false;
 
-    void tick(system_manager& system_manage, orbital_system* cur, render_window& win, popup_info& popup, empire* viewer_empire)
+    void tick(system_manager& system_manage, orbital_system* cur, sf::RenderWindow& win, popup_info& popup, empire* viewer_empire)
     {
         if(cur == nullptr)
             return;
@@ -978,7 +978,7 @@ struct box_selection
 
 ///this function is one of the worst in the code, there's a lot of duplication that's gradually being exposed
 ///new functionality is however forcing this to be refactored to be less dumb
-void debug_system(system_manager& system_manage, render_window& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage, all_events_manager& all_events)
+void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lclick, bool rclick, popup_info& popup, empire* player_empire, all_battles_manager& all_battles, fleet_manager& fleet_manage, all_events_manager& all_events)
 {
     popup.remove_scheduled();
 
@@ -1120,7 +1120,7 @@ void debug_system(system_manager& system_manage, render_window& win, bool lclick
     }
 }
 
-void do_popup(popup_info& popup, render_window& win, fleet_manager& fleet_manage, system_manager& system_manage, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events, all_battles_manager& all_battles, bool rclick)
+void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_manage, system_manager& system_manage, orbital_system* current_system, empire_manager& empires, empire* player_empire, all_events_manager& all_events, all_battles_manager& all_battles, bool rclick)
 {
     popup.remove_scheduled();
 
@@ -2292,7 +2292,7 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
     return built;
 }
 
-void handle_camera(render_window& window, system_manager& system_manage)
+void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 {
     sf::View view = window.getDefaultView();
 
@@ -2407,7 +2407,7 @@ int main()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
-    render_window window;
+    sf::RenderWindow window;
 
     window.create(sf::VideoMode(1500, 900),"Wowee", sf::Style::Default, settings);
 

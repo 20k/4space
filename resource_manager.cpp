@@ -49,7 +49,7 @@ resource_element& resource_manager::get_resource(resource::types type)
     throw;
 }
 
-void resource_manager::draw_ui(render_window& win)
+void resource_manager::draw_ui(sf::RenderWindow& win)
 {
     if(!top_bar::get_active(top_bar_info::ECONOMY))
         return;

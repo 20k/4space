@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "render_window.hpp"
+
 
 bool text_manager::loaded = false;
 sf::Font text_manager::font;
@@ -17,7 +17,7 @@ void text_manager::load()
     loaded = true;
 }
 
-void text_manager::render(render_window& win, const std::string& str, vec2f pos, vec3f col, bool rounding, float char_size, float scale)
+void text_manager::render(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool rounding, float char_size, float scale)
 {
     load();
 
@@ -38,7 +38,7 @@ void text_manager::render(render_window& win, const std::string& str, vec2f pos,
     win.draw(text);
 }
 
-void text_manager::render_without_zoom(render_window& win, const std::string& str, vec2f pos, vec3f col, bool centered, float scale)
+void text_manager::render_without_zoom(sf::RenderWindow& win, const std::string& str, vec2f pos, vec3f col, bool centered, float scale)
 {
     load();
 

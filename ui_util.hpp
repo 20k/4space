@@ -65,14 +65,17 @@ void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
     ImGui::PlotHistogram("", vals, num_divisions, 0, nullptr, 0, 1, ImVec2(dim.x(), dim.y()));
 }
 
-struct render_window;
+namespace sf
+{
+    struct RenderWindow;
+}
 
 namespace ImGui
 {
     extern bool suppress_clicks;
     extern int suppress_frames;
 
-    void DoFrosting(render_window& win);
+    void DoFrosting(sf::RenderWindow& win);
 
     inline
     bool IsItemClicked_DragCompatible()
