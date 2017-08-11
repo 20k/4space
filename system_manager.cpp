@@ -588,7 +588,6 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     last_screen_pos = {real_coord.x, real_coord.y};
 
-
     rendered_asteroid_window = false;
 
     if(is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
