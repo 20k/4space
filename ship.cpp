@@ -1694,7 +1694,9 @@ void ship::tick_all_components(float step_s)
 
                 res[res_type] = to_dispense;
 
-                if(owned_by->parent_empire->can_fully_dispense(res))
+                bool valid = owned_by->in_friendly_territory && !owned_by->any_in_combat();
+
+                if(valid && owned_by->parent_empire->can_fully_dispense(res))
                 {
                     owned_by->parent_empire->dispense_resources(res);
 

@@ -749,6 +749,7 @@ struct ship_manager
 
     bool can_merge = false;
 
+    bool in_friendly_territory = false;
 
     static int gid;
     int my_id = gid++;

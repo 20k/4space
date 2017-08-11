@@ -215,6 +215,7 @@ struct orbital
 
     ///busy as in in combat or otherwise indisposed
     bool in_friendly_territory_and_not_busy();
+    bool in_friendly_territory();
 
     //virtual void process_context_ui() override;
 

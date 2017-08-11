@@ -403,6 +403,13 @@ void orbital::tick(float step_s)
         handle_resources(this);
     }
 
+    if(type == orbital_info::FLEET)
+    {
+        ship_manager* sm = (ship_manager*)data;
+
+        sm->in_friendly_territory = in_friendly_territory();
+    }
+
     if(parent == nullptr)
         return;
 
@@ -921,6 +928,39 @@ bool orbital::in_friendly_territory_and_not_busy()
         return false;
 
     return (owning_system_empire == parent_empire || owning_system_empire->is_allied(parent_empire)) && fleet_is_in_good_state;
+}
+
+bool orbital::in_friendly_territory()
+{
+    if(parent_empire == nullptr)
+        return false;
+
+    if(parent_system == nullptr)
+        return false;
+
+    bool in_good_state = true;
+
+    for(orbital* o : parent_system->orbitals)
+    {
+        if(o->parent_empire == nullptr)
+            continue;
+
+        if(o->parent_empire == parent_empire)
+            continue;
+
+        if(o->parent_empire->is_hostile(parent_empire))
+        {
+            in_good_state = false;
+            break;
+        }
+    }
+
+    empire* owning_system_empire = parent_system->get_base()->parent_empire;
+
+    if(owning_system_empire == nullptr)
+        return false;
+
+    return (owning_system_empire == parent_empire || owning_system_empire->is_allied(parent_empire)) && in_good_state;
 }
 
 /*void orbital::process_context_ui()
