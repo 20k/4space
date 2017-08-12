@@ -2182,56 +2182,56 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     float frad = sun_universe_rad * 6.5f;
 
+    sf::CircleShape nc2;
+    nc2.setFillColor({0,0,0,255});
+    nc2.setRadius(frad);
+    nc2.setOrigin(nc2.getLocalBounds().width/2, nc2.getLocalBounds().height/2);
+    nc2.setPointCount(80.f);
+    nc2.setOutlineThickness(sun_universe_rad / 15.f);
+
     for(orbital_system* os : systems)
     {
         vec2f pos = os->universe_pos * universe_scale;
+
+        auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
+
+        if(projected.x + frad < 0 || projected.y + frad < 0 || projected.x - frad >= win.getSize().x || projected.y - frad >= win.getSize().y)
+            continue;
 
         if(os->get_base()->parent_empire != nullptr)
         {
             vec3f col = os->get_base()->parent_empire->colour * 255.f;
 
-            sf::CircleShape ncircle;
+            nc2.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
+            nc2.setPosition({pos.x(), pos.y()});
 
-            //ncircle.setFillColor({20, 20, 20, 255});
-            ncircle.setFillColor({0,0,0,255});
-            ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
-
-            ncircle.setRadius(frad);
-
-            ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
-
-            ncircle.setOutlineThickness(sun_universe_rad / 15.f);
-            ncircle.setPosition({pos.x(), pos.y()});
-
-            ncircle.setPointCount(100.f);
-
-            win.draw(ncircle, blend);
+            win.draw(nc2, blend);
         }
     }
 
     //sf::BlendMode b2(sf::BlendMode::SrcColor, sf::BlendMode::DstColor, sf::BlendMode::Add);
+    sf::CircleShape ncircle;
+    ncircle.setFillColor({20, 20, 20, 255});
+    ncircle.setRadius(frad);
+    ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
+    ncircle.setPointCount(80.f);
+
 
     for(orbital_system* os : systems)
     {
         vec2f pos = os->universe_pos * universe_scale;
 
+        auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
+
+        if(projected.x + frad < 0 || projected.y + frad < 0 || projected.x - frad >= win.getSize().x || projected.y - frad >= win.getSize().y)
+            continue;
+
         if(os->get_base()->parent_empire != nullptr)
         {
             vec3f col = os->get_base()->parent_empire->colour * 255.f;
 
-            sf::CircleShape ncircle;
-
-            ncircle.setFillColor({20, 20, 20, 255});
             ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
-
-            ncircle.setRadius(frad);
-
-            ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
-
-            //ncircle.setOutlineThickness(sun_universe_rad / 15.f);
             ncircle.setPosition({pos.x(), pos.y()});
-
-            ncircle.setPointCount(100.f);
 
             ///change to add if we want to see overlap
             win.draw(ncircle);
@@ -2286,26 +2286,36 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
     }
 
+    sf::CircleShape circle;
+    circle.setRadius(sun_universe_rad);
+    circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
+
+    bool change_colour = true;
 
     for(int i=0; i<systems.size(); i++)
     {
         orbital_system* os = systems[i];
 
-
         vec2f pos = os->universe_pos * universe_scale;
 
-        sf::CircleShape circle;
+        auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
+
+        if(projected.x + frad < 0 || projected.y + frad < 0 || projected.x - frad >= win.getSize().x || projected.y - frad >= win.getSize().y)
+            continue;
 
         circle.setPosition({pos.x(), pos.y()});
-        circle.setFillColor(sf::Color(255, 200, 50));
+
+        if(change_colour)
+        {
+            change_colour = false;
+            circle.setFillColor(sf::Color(255, 200, 50));
+        }
 
         if(os->highlight)
         {
+            change_colour = true;
             circle.setFillColor(sf::Color(255, 255, 150));
         }
-
-        circle.setRadius(sun_universe_rad);
-        circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
 
         win.draw(circle);
 
@@ -2646,20 +2656,63 @@ orbital_system* system_manager::get_nearest_to_camera()
     return f;
 }
 
+float get_next_radius(float angle_in)
+{
+    float A = 1.f;
+    float B = 0.5f;
+
+    float N = M_PI * 1.1;
+
+    float tan_val = tan(angle_in / (2 * N));
+
+    if(fabs(tan_val) > 100000000.f)
+    {
+        return 0.f;
+    }
+
+    float ltan_val = log(B * tan_val);
+
+    return A / ltan_val;
+}
+
+vec2f get_random_pos(int neg_status = 0)
+{
+    float random_angle = randf_s(0.f, 2*M_PI);
+
+    float rad_scale = 300.f;
+
+    float radius = get_next_radius(random_angle) * rad_scale;
+
+    float random_scale = rad_scale / 5.f;
+
+    //random_scale = mix(rad_scale / 4.f, rad_scale / 10.f, fabs(radius / rad_scale));
+
+    float random_radius = radius + randf_s(-1.f, 1.f) * random_scale;
+
+    /*if(randf_s(0.f, 1.f) < 0.1f)
+    {
+        random_radius = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * rad_scale * 1.f;
+    }*/
+
+    vec2f random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
+
+    random_position = random_position.rot((neg_status / 2.f) * 2 * M_PI);
+
+    return random_position;
+}
+
 void system_manager::generate_universe(int num)
 {
     float exclusion_rad = 20.f;
 
     for(int i=0; i<num; i++)
     {
+        int neg = (i % 2);
+
         orbital_system* sys = make_new();
         sys->generate_full_random_system();
 
-        float random_angle = randf_s(0.f, 2*M_PI);
-
-        float random_radius = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * 500;
-
-        vec2f random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
+        vec2f random_position = get_random_pos(neg);
 
         int c = 0;
 
@@ -2680,12 +2733,7 @@ void system_manager::generate_universe(int num)
             if(all_good)
                 break;
 
-            //random_position = randv<2, float>(-200.f, 200.f);
-
-            random_angle = randf_s(0.f, 2*M_PI);
-            random_radius = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * 500;
-
-            random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
+            random_position = get_random_pos(neg);
 
             c++;
         }
