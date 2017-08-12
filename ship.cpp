@@ -3313,9 +3313,9 @@ float ship::get_tech_adjusted_military_power()
         if(!c.is_weapon())
             continue;
 
-        //accum += c.get_tech_level_of_primary() * c.current_size * current_size;
+        accum += (c.get_tech_level_of_primary() + 1) * c.current_size * current_size;
 
-        accum += c.current_size * current_size;
+        //accum += c.current_size * current_size;
     }
 
     return accum;
