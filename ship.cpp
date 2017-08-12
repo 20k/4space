@@ -228,14 +228,14 @@ void ship_component_elements::generate_element_infos()
     ei[RESOURCE_PULLER].research_type = research_info::MATERIALS;
 
 
-    #define DEFINE_RESOURCE(name) ei[name].display_name = #name; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
+    #define DEFINE_RESOURCE(name, rarity) ei[name].display_name = #name; ei[name].resource_rarity = rarity; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
 
-    DEFINE_RESOURCE(COPPER);
-    DEFINE_RESOURCE(HYDROGEN);
-    DEFINE_RESOURCE(IRON);
-    DEFINE_RESOURCE(TITANIUM);
-    DEFINE_RESOURCE(URANIUM);
-    DEFINE_RESOURCE(RESEARCH);
+    DEFINE_RESOURCE(COPPER, 0.5);
+    DEFINE_RESOURCE(HYDROGEN, 1);
+    DEFINE_RESOURCE(IRON, 1);
+    DEFINE_RESOURCE(TITANIUM, 0.25);
+    DEFINE_RESOURCE(URANIUM), 0.1;
+    DEFINE_RESOURCE(RESEARCH, 0.25);
 
     int num = 0;
 
@@ -3313,7 +3313,7 @@ float ship::get_tech_adjusted_military_power()
         if(!c.is_weapon())
             continue;
 
-        accum += c.get_tech_level_of_primary();
+        accum += c.get_tech_level_of_primary() * c.current_size * current_size;
     }
 
     return accum;

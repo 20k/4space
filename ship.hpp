@@ -94,6 +94,7 @@ namespace ship_component_elements
 
     struct component_element_info
     {
+        float resource_rarity = 0.f; ///1 means common, 0 means cannot be found
         resource::types resource_type = resource::COUNT;
         bool negative_is_bad = false;
         bool is_weapon = false;
