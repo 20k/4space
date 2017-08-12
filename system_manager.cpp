@@ -2238,6 +2238,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
     }
 
+    sf::RectangleShape shape;
+
     for(orbital_system* o1 : systems)
     {
         for(orbital_system* o2 : systems)
@@ -2262,7 +2264,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             vec2f p1 = intersection.first;
             vec2f p2 = intersection.second;
 
-            sf::RectangleShape shape;
 
             //shape.setSize({400.f, 400.f});
             shape.setSize({(p2 - p1).length(), sun_universe_rad/15.f});
