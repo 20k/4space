@@ -33,7 +33,7 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
     return ret;
 }
 
-void try_colonise(ship_manager* sm, orbital* o)
+void try_colonise(ship_manager* sm, orbital* my_o)
 {
     if(!sm->any_with_element(ship_component_elements::COLONISER))
         return;
@@ -46,26 +46,23 @@ void try_colonise(ship_manager* sm, orbital* o)
 
     std::unordered_set<orbital*> free_planets;
 
-    for(orbital* test_o : o->parent_system->orbitals)
+    for(orbital* test_o : my_o->parent_system->orbitals)
     {
-        if(o->type == orbital_info::PLANET && o->parent_empire == nullptr)
+        if(test_o->type == orbital_info::PLANET && test_o->parent_empire == nullptr)
         {
-            free_planets.insert(o);
+            free_planets.insert(test_o);
         }
     }
-
-    //printf("hi thar\n");
 
     if(free_planets.size() == 0)
         return;
 
-
-    for(orbital* orb_1 : o->parent_system->orbitals)
+    for(orbital* orb_1 : my_o->parent_system->orbitals)
     {
-        if(o->type != orbital_info::FLEET)
+        if(orb_1->type != orbital_info::FLEET)
             continue;
 
-        ship_manager* sm = (ship_manager*)o->data;
+        ship_manager* sm = (ship_manager*)orb_1->data;
 
         for(ship* s : sm->ships)
         {
@@ -88,7 +85,7 @@ void try_colonise(ship_manager* sm, orbital* o)
         {
             if(s->can_colonise())
             {
-                o->command_queue.colonise(*free_planets.begin(), s);
+                my_o->command_queue.colonise(*free_planets.begin(), s);
                 return;
             }
         }
