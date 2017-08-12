@@ -119,6 +119,10 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 if(!sm->any_in_combat() && available_scanning_power <= ship_info::accessory_information_obfuscation_level)
                     continue;
 
+                //std::cout << base->name << std::endl;
+
+                //std::cout << base->parent_empire->name << std::endl;
+
                 desc.contains_hostiles = true;
 
                 ///WARNING NEED TO WORK IN STEALTH
@@ -149,6 +153,12 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             }
         }
 
+        //if(desc.contains_hostiles)
+        if(fabs(desc.hostiles_threat_rating) > 0.1f)
+        {
+            //printf("%f\n", desc.hostiles_threat_rating);
+        }
+
         id++;
     }
 
@@ -166,7 +176,7 @@ void ensure_adequate_defence(ai_empire& ai, empire* e)
 
 
 
-void ai_empire::tick(system_manager& sm, empire* e)
+void ai_empire::tick(system_manager& system_manage, empire* e)
 {
     ensure_adequate_defence(*this, e);
 
@@ -188,13 +198,16 @@ void ai_empire::tick(system_manager& sm, empire* e)
         if(sm->any_derelict())
             continue;
 
+        if(o->command_queue.get_warp_destinations().size() > 0)
+            continue;
+
         if(sm->ai_controller.ai_state == ai_empire_info::IDLE)
         {
             free_defence_ships.push_back(o);
         }
     }
 
-    std::vector<orbital_system_descriptor> descriptors = process_orbitals(sm, e);
+    std::vector<orbital_system_descriptor> descriptors = process_orbitals(system_manage, e);
 
     for(orbital_system_descriptor& desc : descriptors)
     {
@@ -202,7 +215,25 @@ void ai_empire::tick(system_manager& sm, empire* e)
         {
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
+                for(int i=free_defence_ships.size()-1; i >= 0; i--)
+                {
+                    orbital* o = free_defence_ships[i];
+                    free_defence_ships.pop_back();
 
+                    ship_manager* sm = (ship_manager*)o->data;
+                    desc.my_threat_rating += sm->get_tech_adjusted_military_power();
+
+                    sm->ai_controller.on_route_to = desc.os;
+
+                    auto path = system_manage.pathfind(o, desc.os);
+
+                    printf("DEFENDING\n");
+
+                    for(auto& sys : path)
+                    {
+                        o->command_queue.try_warp(sys, true);
+                    }
+                }
             }
         }
     }

@@ -2368,7 +2368,6 @@ int main()
     ship_manager* fleet2 = fleet_manage.make_new();
     ship_manager* fleet3 = fleet_manage.make_new();
     ship_manager* fleet4 = fleet_manage.make_new();
-    //ship_manager* fleet5 = fleet_manage.make_new();
 
     //ship test_ship = make_default();
     //ship test_ship2 = make_default();
@@ -2386,7 +2385,6 @@ int main()
     ship* derelict_ship = fleet4->make_new_from(hostile_empire, make_default());
 
     ship* scout_ship = fleet3->make_new_from(player_empire, make_mining_ship());
-    //ship* scout_ship2 = fleet5->make_new_from(player_empire->team_id, make_colony_ship());
 
     test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
@@ -2438,6 +2436,10 @@ int main()
     orbital_system* sys_2 = system_manage.make_new();
     sys_2->generate_full_random_system();
     sys_2->universe_pos = {10, 10};
+
+    orbital_system* sys_3 = system_manage.make_new();
+    sys_3->generate_full_random_system();
+    sys_3->universe_pos = {10, 40};
 
     orbital_system* base = system_manage.make_new();
 
@@ -2513,6 +2515,24 @@ int main()
 
 
     empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
+    e2->take_ownership_of_all(sys_3);
+
+
+    ship_manager* fleet5 = fleet_manage.make_new();
+
+    fleet5->make_new_from(e2, make_default());
+    fleet5->make_new_from(e2, make_default());
+    fleet5->make_new_from(e2, make_default());
+
+    orbital* op3 = sys_3->make_new(orbital_info::FLEET, 5.f);
+    op3->orbital_angle = 0.f;
+    op3->orbital_length = 250;
+    op3->parent = sys_3->get_base();
+    op3->data = fleet5;
+
+    e2->take_ownership(op3);
+    e2->take_ownership(fleet5);
+
     //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
 
     //player_empire->become_hostile(e2);

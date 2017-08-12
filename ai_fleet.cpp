@@ -35,6 +35,8 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
 ///this takes like 4ms
 void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
 {
+    ///change this whole function to work with idle state and defend state
+
     auto timer = MAKE_AUTO_TIMER();
 
     timer.start();
