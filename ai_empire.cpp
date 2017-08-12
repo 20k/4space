@@ -7,6 +7,7 @@ void ensure_adequate_defence(ai_empire& ai, empire* e)
 
     ///how do we pathfind ships
     ///ship command queue? :(
+    ///Hooray! All neceessary work is done to implement empire behaviours! :)
 }
 
 void ai_empire::tick(empire* e)

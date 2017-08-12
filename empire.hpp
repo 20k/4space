@@ -6,6 +6,7 @@
 #include "research.hpp"
 #include <vec/vec.hpp>
 #include "ai_empire.hpp"
+#include <unordered_set>
 
 struct orbital;
 struct orbital_system;
@@ -75,6 +76,8 @@ struct empire
 
     std::vector<orbital*> owned;
     std::vector<ship_manager*> owned_fleets;
+
+    std::unordered_set<orbital_system*> calculated_owned_systems;
 
     std::map<empire*, faction_relations> relations_map;
 
@@ -186,6 +189,7 @@ struct empire
     void tick_decolonisation();
     void tick_relation_ship_occupancy_loss(float diff_s, system_manager& system_manage);
     void tick_relation_alliance_changes(empire* player_empire);
+    void tick_calculate_owned_systems();
 
     bool has_vision(orbital_system* os);
 

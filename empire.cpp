@@ -364,7 +364,6 @@ void empire::tick_system_claim()
         systems.insert(os);
     }
 
-
     ///Ok. Change this from own all to own 1 if nobody else owns any
     for(auto& i : systems)
     {
@@ -1061,6 +1060,19 @@ void empire::tick_relation_alliance_changes(empire* player_empire)
     }
 }
 
+void empire::tick_calculate_owned_systems()
+{
+    std::unordered_set<orbital_system*> systems;
+
+    for(orbital* o : owned)
+    {
+        if(o->type == orbital_info::STAR && o->parent_empire == this)
+            systems.insert(o->parent_system);
+    }
+
+    calculated_owned_systems = systems;
+}
+
 bool empire::has_vision(orbital_system* os)
 {
     empire* them = os->get_base()->parent_empire;
@@ -1252,6 +1264,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
 {
     for(empire* emp : empires)
     {
+        emp->tick_calculate_owned_systems();
         emp->tick(step_s);
         emp->tick_system_claim();
         emp->tick_ai(all_battles, system_manage);
