@@ -122,7 +122,7 @@ struct empire
     void tick_system_claim();
     void tick(float step_s);
     void tick_ai(all_battles_manager& all_battles, system_manager& system_manage);
-    void tick_high_level_ai();
+    void tick_high_level_ai(system_manager& sm);
     void draw_ui();
 
     float empire_culture_distance(empire* e);

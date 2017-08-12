@@ -19,6 +19,9 @@ namespace ai_empire_info
         INVASION,
     };
 }
+
+struct system_manager;
+
 ///ok new plan for empire ship states
 ///systems request a certain amount of ships for their defence
 ///we set to defence if we don't have enough
@@ -31,7 +34,7 @@ struct ai_empire
 {
     std::map<ship_manager*, ship_general_state> general_purpose_state;
 
-    void tick(empire* e);
+    void tick(system_manager& sm, empire* e);
 };
 
 #endif // AI_EMPIRE_HPP_INCLUDED

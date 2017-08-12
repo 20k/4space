@@ -234,7 +234,7 @@ void ship_component_elements::generate_element_infos()
     DEFINE_RESOURCE(HYDROGEN, 1);
     DEFINE_RESOURCE(IRON, 1);
     DEFINE_RESOURCE(TITANIUM, 0.25);
-    DEFINE_RESOURCE(URANIUM), 0.1;
+    DEFINE_RESOURCE(URANIUM, 0.1);
     DEFINE_RESOURCE(RESEARCH, 0.25);
 
     int num = 0;
