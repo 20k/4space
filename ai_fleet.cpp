@@ -71,12 +71,16 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     ///split fleets up after we finish basic ai
     if(ship_manage->any_derelict())
     {
+        ai_state = 0;
         return;
     }
 
     ///fly around?
     if(!ship_manage->can_engage())
+    {
+        ai_state = 0;
         return;
+    }
 
     orbital_system* os = o->parent_system;
 
@@ -111,7 +115,10 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     }
 
     if(targets.size() == 0)
+    {
+        ai_state = 0;
         return;
+    }
 
     ///perform !suicidal check in here once we can instruct the ai to run ships away
     ///can use same check for fuel etc

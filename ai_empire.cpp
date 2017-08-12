@@ -136,6 +136,19 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             }
         }
 
+        for(orbital* o : e->owned)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && sm->ai_controller.on_route_to == os)
+            {
+                desc.my_threat_rating += sm->get_tech_adjusted_military_power();
+            }
+        }
+
         id++;
     }
 
@@ -149,8 +162,6 @@ void ensure_adequate_defence(ai_empire& ai, empire* e)
     ///how do we pathfind ships
     ///ship command queue? :(
     ///Hooray! All neceessary work is done to implement empire behaviours! :)
-
-    std::vector<orbital_system_descriptor> descriptors;
 }
 
 
@@ -158,4 +169,41 @@ void ensure_adequate_defence(ai_empire& ai, empire* e)
 void ai_empire::tick(system_manager& sm, empire* e)
 {
     ensure_adequate_defence(*this, e);
+
+    std::vector<orbital*> free_defence_ships;
+
+    for(orbital* o : e->owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        if(!sm->is_military())
+            continue;
+
+        if(sm->any_in_combat())
+            continue;
+
+        if(sm->any_derelict())
+            continue;
+
+        if(sm->ai_controller.ai_state == ai_empire_info::IDLE)
+        {
+            free_defence_ships.push_back(o);
+        }
+    }
+
+    std::vector<orbital_system_descriptor> descriptors = process_orbitals(sm, e);
+
+    for(orbital_system_descriptor& desc : descriptors)
+    {
+        if(desc.contains_hostiles)
+        {
+            if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
+            {
+
+            }
+        }
+    }
 }

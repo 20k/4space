@@ -4716,6 +4716,20 @@ float ship_manager::get_tech_adjusted_military_power()
     return accum;
 }
 
+bool ship_manager::is_military()
+{
+    float tech_power = get_tech_adjusted_military_power();
+
+    if(tech_power <= FLOAT_BOUND)
+        return false;
+
+    if(any_with_element(ship_component_elements::COLONISER) ||
+       any_with_element(ship_component_elements::ORE_HARVESTER))
+        return false;
+
+    return true;
+}
+
 std::string ship_manager::get_engage_str()
 {
     if(can_engage())

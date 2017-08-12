@@ -14,9 +14,10 @@ namespace ai_empire_info
     enum ship_state
     {
         IDLE,
-        DEFENCE,
-        STAGING,
-        INVASION,
+        DEFEND,
+        //DEFENCE,
+        //STAGING,
+        //INVASION,
     };
 }
 

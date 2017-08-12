@@ -8,6 +8,7 @@ struct orbital;
 struct battle_manager;
 struct all_battles_manager;
 struct system_manager;
+struct orbital_system;
 
 ///fleet manager owns the ai_fleet?
 ///would simplify dependency management as it all already works fine
@@ -25,6 +26,10 @@ struct ai_fleet
 
     uint32_t resupply_offset = gid++;
     uint32_t current_resupply_frame = 0;
+
+    ///externally managed
+    int ai_state = 0;
+    orbital_system* on_route_to = nullptr;
 
     void tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage);
 };

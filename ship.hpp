@@ -742,6 +742,7 @@ struct ship_manager
     void fully_dispense(std::map<resource::types, float> resources);
 
     float get_tech_adjusted_military_power();
+    bool is_military();
 
     float accumulated_dt = 0;
 
