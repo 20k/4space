@@ -138,6 +138,8 @@ void empire::generate_resource_from_owned(float step_s)
         last_income.resources[i].amount = mix(cur_res, (resources.resources[i].amount - backup_income.resources[i].amount) / step_s, 0.3f);
     }*/
 
+    static float last_step_s = 1.f;
+
     resource_manager diff_res;
 
     for(int i=0; i<backup_income.resources.size(); i++)
@@ -149,13 +151,15 @@ void empire::generate_resource_from_owned(float step_s)
             cur_res = 0;
         }
 
-        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount) / step_s;
-
+        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount) / last_step_s;
     }
+
+    last_step_s = step_s;
+
 
     backup_income_list.push_back(diff_res);
 
-    while(backup_income_list.size() > 20)
+    while(backup_income_list.size() > 80)
     {
         backup_income_list.pop_front();
     }
