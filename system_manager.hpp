@@ -277,7 +277,7 @@ struct orbital_system
     void draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage);
 
     void generate_random_system(int planets, int num_asteroids, int num_belts, int num_resource_asteroids);
-    void generate_full_random_system();
+    void generate_full_random_system(bool force_planet = false);
 
     bool highlight = false;
 

@@ -1558,10 +1558,13 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
     //generate_planet_resources(2.f);
 }
 
-void orbital_system::generate_full_random_system()
+void orbital_system::generate_full_random_system(bool force_planet)
 {
     int min_planets = 0;
     int max_planets = 5;
+
+    if(force_planet)
+        min_planets = 1;
 
     int min_asteroids = 100;
     int max_asteroids = 200;

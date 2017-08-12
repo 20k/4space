@@ -85,7 +85,11 @@ void try_colonise(ship_manager* sm, orbital* my_o)
         {
             if(s->can_colonise())
             {
+                my_o->command_queue.cancel();
                 my_o->command_queue.colonise(*free_planets.begin(), s);
+
+                //std::cout << (*free_planets.begin())->name << std::endl;
+
                 return;
             }
         }
@@ -112,6 +116,11 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
             all_battles.end_battle_peacefully(bm);
         }
     }
+
+    /*if(ship_manage->any_colonising())
+    {
+        printf("any\n");
+    }*/
 
     if(ship_manage->any_in_combat())
         return;

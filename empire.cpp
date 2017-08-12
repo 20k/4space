@@ -1383,6 +1383,20 @@ empire* empire_manager::birth_empire(system_manager& system_manage, fleet_manage
         if(sys->is_owned())
             continue;
 
+        bool any_planets = false;
+
+        for(orbital* o : sys->orbitals)
+        {
+            if(o->type == orbital_info::PLANET)
+            {
+                any_planets = true;
+                break;
+            }
+        }
+
+        if(!any_planets)
+            continue;
+
         if(num >= system_size)
             break;
 
