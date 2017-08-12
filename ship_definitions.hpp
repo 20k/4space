@@ -673,9 +673,12 @@ inline component make_default_mining_system()
 
     component mining;
 
+    component_attribute ore_harvest;
+    ore_harvest.produced_per_s = 1.f;
+
     mining.add(ship_component_element::HP, hp);
     mining.add(ship_component_element::MASS_ANCHOR, component_attribute());
-    mining.add(ship_component_element::ORE_HARVESTER, component_attribute());
+    mining.add(ship_component_element::ORE_HARVESTER, ore_harvest);
     mining.add(ship_component_element::RESOURCE_PRODUCTION, component_attribute());
 
     for(int i=0; i<ship_component_element::NONE; i++)

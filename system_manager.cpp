@@ -392,7 +392,13 @@ void handle_resources(orbital* me)
                 if(res_type == resource::COUNT)
                     continue;
 
-                attr.produced_per_s = me->produced_resources_ps.get_resource(res_type).amount / valid_ships.size();
+                float ore_mult = c.components[ship_component_elements::ORE_HARVESTER].produced_per_s;
+
+                //ore_mult = std::min(ore_mult, 1.5f);
+
+                ore_mult = (1 + ore_mult)/2.f;
+
+                attr.produced_per_s = ore_mult * me->produced_resources_ps.get_resource(res_type).amount / valid_ships.size();
             }
         }
     }

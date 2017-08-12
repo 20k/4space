@@ -279,7 +279,7 @@ std::map<resource::types, float> ship_component_elements::component_storage_to_r
 
     if(type == FUEL)
     {
-        ret[resource::URANIUM] = 1;
+        ret[resource::HYDROGEN] = 1;
     }
 
     if(type == ARMOUR)
@@ -2022,6 +2022,20 @@ void ship::tick_all_components(float step_s)
 
                 owned_by->parent_empire->add_resource(ship_component_elements::element_infos[i].resource_type, produced);
             }
+        }
+    }
+
+    for(component& c : entity_list)
+    {
+        if(!c.has_element(ship_component_elements::ORE_HARVESTER))
+            continue;
+
+        for(int i=0; i<ship_component_elements::element_infos.size(); i++)
+        {
+            if(ship_component_elements::element_infos[i].resource_type == resource::COUNT)
+                continue;
+
+            c.components[(ship_component_elements::types)i].produced_per_s = 0.f;
         }
     }
 
