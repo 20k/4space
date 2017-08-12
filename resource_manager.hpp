@@ -97,7 +97,7 @@ struct resource_manager
 
     float get_weighted_rarity();
 
-    void draw_ui(sf::RenderWindow& win);
+    void draw_ui(sf::RenderWindow& win, resource_manager& produced_ps);
 
     std::string get_unprocessed_str();
     std::string get_processed_str(bool can_skip);

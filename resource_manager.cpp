@@ -70,12 +70,12 @@ float resource_manager::get_weighted_rarity()
     return accum;
 }
 
-void resource_manager::draw_ui(sf::RenderWindow& win)
+void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced_ps)
 {
     if(!top_bar::get_active(top_bar_info::ECONOMY))
         return;
 
-    ImGui::Begin("Resources", &top_bar::active[top_bar_info::ECONOMY], IMGUI_WINDOW_FLAGS);
+    ImGui::Begin("Resources", &top_bar::active[top_bar_info::ECONOMY], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     /*std::vector<std::string> names_up;
     std::vector<std::string> vals_up;
@@ -145,9 +145,46 @@ void resource_manager::draw_ui(sf::RenderWindow& win)
 
     ImGui::EndGroup();*/
 
-    auto str = get_formatted_str(false);
+    std::vector<std::string> names;
+    std::vector<std::string> vals;
 
-    ImGui::Text(str.c_str());
+    for(resource_element& elem : resources)
+    {
+        std::string name = resource::short_names[elem.type];
+
+        std::string val = to_string_with_enforced_variable_dp(elem.amount);
+
+        names.push_back(name);
+        vals.push_back(val);
+    }
+
+    for(int i=0; i<resource::unprocessed_end; i++)
+    {
+        names.erase(names.begin());
+        vals.erase(vals.begin());
+    }
+
+    std::string ret;
+
+    for(int i=0; i<names.size(); i++)
+    {
+        float val = produced_ps.resources[i].amount;
+
+        std::string p_str = to_string_with_enforced_variable_dp(val);
+
+        if(val < 0)
+        {
+            p_str = "-" + p_str;
+        }
+        else
+        {
+            p_str = "+" + p_str;
+        }
+
+        ret = ret + format(names[i], names) + ": " + format(vals[i], vals) + " | " + p_str + "\n";
+    }
+
+    ImGui::Text(ret.c_str());
 
     ImGui::End();
 }

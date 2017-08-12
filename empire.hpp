@@ -7,6 +7,7 @@
 #include <vec/vec.hpp>
 #include "ai_empire.hpp"
 #include <unordered_set>
+#include <deque>
 
 struct orbital;
 struct orbital_system;
@@ -95,6 +96,10 @@ struct empire
     bool owns(orbital* o);
 
     void generate_resource_from_owned(float step_s);
+
+    resource_manager last_income;
+    resource_manager backup_income;
+    std::deque<resource_manager> backup_income_list;
 
     bool can_fully_dispense(const resource_manager& res);
     bool can_fully_dispense(const std::map<resource::types, float>& res);

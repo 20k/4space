@@ -126,6 +126,54 @@ void empire::generate_resource_from_owned(float step_s)
     std::vector<float> res;
     res.resize(resource::COUNT);
 
+    /*for(int i=0; i<backup_income.resources.size(); i++)
+    {
+        float cur_res = last_income.resources[i].amount;
+
+        if(std::isnan(cur_res))
+        {
+            cur_res = 0;
+        }
+
+        last_income.resources[i].amount = mix(cur_res, (resources.resources[i].amount - backup_income.resources[i].amount) / step_s, 0.3f);
+    }*/
+
+    resource_manager diff_res;
+
+    for(int i=0; i<backup_income.resources.size(); i++)
+    {
+        float cur_res = last_income.resources[i].amount;
+
+        if(std::isnan(cur_res))
+        {
+            cur_res = 0;
+        }
+
+        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount) / step_s;
+
+    }
+
+    backup_income_list.push_back(diff_res);
+
+    while(backup_income_list.size() > 20)
+    {
+        backup_income_list.pop_front();
+    }
+
+    last_income = resource_manager();
+
+    for(int kk=0; kk<backup_income_list.size(); kk++)
+    {
+        resource_manager& res_manage = backup_income_list[kk];
+
+        for(int i=0; i<res_manage.resources.size(); i++)
+        {
+            last_income.resources[i].amount += res_manage.resources[i].amount / backup_income_list.size();
+        }
+    }
+
+    backup_income = resources;
+
     for(orbital* o : owned)
     {
         if(!o->is_resource_object)
@@ -136,8 +184,11 @@ void empire::generate_resource_from_owned(float step_s)
         for(int i=0; i<manager.resources.size(); i++)
         {
             res[i] += manager.resources[i].amount * step_s;
+
+            //last_income.resources[i].amount += res[i] / step_s;
         }
     }
+
 
     for(int i=0; i<res.size(); i++)
     {
@@ -180,12 +231,16 @@ void empire::add_resource(const resource_manager& res)
     for(int i=0; i<res.resources.size(); i++)
     {
         resources.resources[i].amount += res.resources[i].amount;
+
+        //last_income.resources[i].amount += res.resources[i].amount;
     }
 }
 
 void empire::add_resource(resource::types type, float amount)
 {
     resources.resources[(int)type].amount += amount;
+
+    //last_income.resources[(int)type].amount += amount;
 }
 
 float empire::get_relations_shift_of_adding_resources(const resource_manager& res)
