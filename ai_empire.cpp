@@ -1,6 +1,7 @@
 #include "ai_empire.hpp"
 #include "empire.hpp"
 #include "system_manager.hpp"
+#include "ship.hpp"
 
 struct orbital_system_descriptor
 {
@@ -14,6 +15,7 @@ struct orbital_system_descriptor
     bool is_owned_by_me = false;
     bool is_owned = false;
     bool is_allied = false;
+    bool contains_hostiles = false;
 
     float resource_rating = 0.f;
     float distance_rating = 0.f;
@@ -23,6 +25,12 @@ struct orbital_system_descriptor
 
     float empire_threat_rating = 0.f;
     int empire_threat_ranking = 9999999;
+
+    float hostiles_threat_rating = 0.f;
+    int hostiles_threat_ranking = 9999999;
+
+    float friendly_threat_rating = 0.f;
+    float my_threat_rating = 0.f;
 };
 
 std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empire* e)
@@ -93,6 +101,40 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         }
 
         desc.distance_rating = (os->universe_pos - my_avg_pos).length();
+
+        for(orbital* o : os->orbitals)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(e->is_hostile(o->parent_empire))
+            {
+                if(sm->all_derelict())
+                    continue;
+
+                float available_scanning_power = e->available_scanning_power_on(o);
+
+                if(available_scanning_power <= ship_info::accessory_information_obfuscation_level)
+                    continue;
+
+                desc.contains_hostiles = true;
+
+                ///WARNING NEED TO WORK IN STEALTH
+                desc.hostiles_threat_rating += sm->get_tech_adjusted_military_power();
+            }
+
+            if(e->is_allied(o->parent_empire))
+            {
+                desc.friendly_threat_rating += sm->get_tech_adjusted_military_power();
+            }
+
+            if(o->parent_empire == e)
+            {
+                desc.my_threat_rating += sm->get_tech_adjusted_military_power();
+            }
+        }
 
         id++;
     }

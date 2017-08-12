@@ -4704,6 +4704,18 @@ void ship_manager::fully_dispense(std::map<resource::types, float> resources)
     }
 }
 
+float ship_manager::get_tech_adjusted_military_power()
+{
+    float accum = 0.f;
+
+    for(ship* s : ships)
+    {
+        accum += s->get_tech_adjusted_military_power();
+    }
+
+    return accum;
+}
+
 std::string ship_manager::get_engage_str()
 {
     if(can_engage())

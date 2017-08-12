@@ -477,10 +477,7 @@ float empire::get_military_strength()
 
     for(ship_manager* sm : owned_fleets)
     {
-        for(ship* s : sm->ships)
-        {
-            accum += s->get_tech_adjusted_military_power();
-        }
+        accum += sm->get_tech_adjusted_military_power();
     }
 
     return accum;
