@@ -1746,6 +1746,9 @@ vec3f hsv_to_rgb(vec3f in)
     S = clamp(S, 0.f, 1.f);
     V = clamp(V, 0.f, 1.f);
 
+    if(H < 0)
+        H = fabs(H);
+
     float C = V * S;
 
     float hd = H / d2r(60.f);
