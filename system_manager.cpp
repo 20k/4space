@@ -899,6 +899,14 @@ bool orbital::can_dispense_resources()
     return false;
 }
 
+void orbital::release_ownership()
+{
+    if(parent_empire == nullptr)
+        return;
+
+    parent_empire->release_ownership(this);
+}
+
 void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
 {
     if(parent_system != system_manage.currently_viewed)

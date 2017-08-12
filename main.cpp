@@ -2576,18 +2576,18 @@ int main()
     vec2f mouse_last = {0,0};
     vec2f mpos = {0,0};
 
-    for(orbital_system* sys : system_manage.systems)
+    /*for(orbital_system* sys : system_manage.systems)
     {
-        sys->get_base()->parent_empire = nullptr;
+        sys->get_base()->release_ownership();
 
         for(orbital* o : sys->orbitals)
         {
             if(o->type == orbital_info::PLANET)
             {
-                o->parent_empire = nullptr;
+                o->release_ownership();
             }
         }
-    }
+    }*/
 
     while(window.isOpen())
     {

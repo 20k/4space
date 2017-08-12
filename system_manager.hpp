@@ -201,6 +201,8 @@ struct orbital
 
     empire* parent_empire = nullptr;
 
+    void release_ownership();
+
     void draw_alerts(sf::RenderWindow& win, empire* viewer_empire, system_manager& system_manage);
 
     orbital_system* parent_system = nullptr;
