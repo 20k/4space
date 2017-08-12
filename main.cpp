@@ -2576,6 +2576,19 @@ int main()
     vec2f mouse_last = {0,0};
     vec2f mpos = {0,0};
 
+    for(orbital_system* sys : system_manage.systems)
+    {
+        sys->get_base()->parent_empire = nullptr;
+
+        for(orbital* o : sys->orbitals)
+        {
+            if(o->type == orbital_info::PLANET)
+            {
+                o->parent_empire = nullptr;
+            }
+        }
+    }
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);

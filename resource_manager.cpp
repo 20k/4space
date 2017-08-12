@@ -60,7 +60,7 @@ float resource_manager::get_weighted_rarity()
         {
             if(ship_component_elements::element_infos[i].resource_type == resources[kk].type)
             {
-                accum += (1.f/ship_component_elements::element_infos[i].resource_rarity) * resources[i].amount;
+                accum += (1.f/ship_component_elements::element_infos[i].resource_rarity) * resources[kk].amount;
 
                 break;
             }

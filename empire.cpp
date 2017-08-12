@@ -1093,6 +1093,9 @@ bool empire::has_vision(orbital_system* os)
     {
         if(o->parent_empire == this)
             return true;
+
+        if(is_allied(o->parent_empire))
+            return true;
     }
 
     return false;
@@ -1317,7 +1320,9 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
     ship_manager* fleet1 = fleet_manage.make_new();
 
-    ship* test_ship = fleet1->make_new_from(e, make_default());
+    ship* test_ship = fleet1->make_new_from(e, make_colony_ship());
+    test_ship->refill_all_components();
+    //ship* test_ship = fleet1->make_new_from(e, make_default());
     //test_ship->name = "SS Still Todo";
 
     orbital* ofleet = os->make_new(orbital_info::FLEET, 5.f);
@@ -1327,7 +1332,7 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     ofleet->parent = os->get_base();
     ofleet->data = fleet1;
 
-    for(orbital* o : os->orbitals)
+    /*for(orbital* o : os->orbitals)
     {
         if(o->type == orbital_info::FLEET)
             continue;
@@ -1336,7 +1341,9 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
             continue;
 
         e->take_ownership(o);
-    }
+    }*/
+
+    e->take_ownership_of_all(os);
 
     e->take_ownership(ofleet);
     e->take_ownership(fleet1);

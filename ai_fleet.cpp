@@ -54,8 +54,11 @@ void try_colonise(ship_manager* sm, orbital* o)
         }
     }
 
+    //printf("hi thar\n");
+
     if(free_planets.size() == 0)
         return;
+
 
     for(orbital* orb_1 : o->parent_system->orbitals)
     {
