@@ -95,6 +95,8 @@ struct resource_manager
 
     resource_element& get_resource(resource::types type);
 
+    float get_weighted_rarity();
+
     void draw_ui(sf::RenderWindow& win);
 
     std::string get_unprocessed_str();

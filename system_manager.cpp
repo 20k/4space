@@ -1691,6 +1691,24 @@ std::string orbital_system::get_resource_str(bool include_vision, empire* viewer
     return resources.get_processed_str(true);
 }
 
+resource_manager orbital_system::get_potential_resources()
+{
+    resource_manager resources;
+
+    for(orbital* o : orbitals)
+    {
+        if(!o->is_resource_object)
+            continue;
+
+        for(int res = 0; res < o->produced_resources_ps.resources.size(); res++)
+        {
+            resources.resources[res].amount += o->produced_resources_ps.resources[res].amount;
+        }
+    }
+
+    return resources;
+}
+
 system_manager::system_manager()
 {
     fleet_tex.loadFromFile(orbital_info::load_strs[orbital_info::FLEET]);

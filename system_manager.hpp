@@ -293,6 +293,7 @@ struct orbital_system
     bool is_owned();
 
     std::string get_resource_str(bool include_vision, empire* viewer_empire, bool only_owned);
+    resource_manager get_potential_resources();
 
     ///for overall fleet window
     bool toggle_fleet_ui = true;

@@ -4,6 +4,7 @@
 #include "util.hpp"
 #include <vec/vec.hpp>
 #include "top_bar.hpp"
+#include "ship.hpp"
 
 /*resource::types resource::get_random_unprocessed()
 {
@@ -47,6 +48,26 @@ resource_element& resource_manager::get_resource(resource::types type)
     }
 
     throw;
+}
+
+float resource_manager::get_weighted_rarity()
+{
+    float accum = 0.f;
+
+    for(int i=0; i<ship_component_elements::element_infos.size(); i++)
+    {
+        for(int kk = 0; kk < resources.size(); kk++)
+        {
+            if(ship_component_elements::element_infos[i].resource_type == resources[kk].type)
+            {
+                accum += (1.f/ship_component_elements::element_infos[i].resource_rarity) * resources[i].amount;
+
+                break;
+            }
+        }
+    }
+
+    return accum;
 }
 
 void resource_manager::draw_ui(sf::RenderWindow& win)
