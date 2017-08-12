@@ -2690,10 +2690,10 @@ vec2f get_random_pos(int neg_status = 0)
 
     float random_radius = radius + randf_s(-1.f, 1.f) * random_scale;
 
-    /*if(randf_s(0.f, 1.f) < 0.1f)
+    if(randf_s(0.f, 1.f) < 0.1f)
     {
-        random_radius = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * rad_scale * 1.f;
-    }*/
+        random_radius = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * rad_scale * 0.5;
+    }
 
     vec2f random_position = random_radius * (vec2f){cosf(random_angle), sinf(random_angle)};
 
