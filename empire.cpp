@@ -1756,7 +1756,7 @@ vec3f hsv_to_rgb(vec3f in)
 
     vec3f t1;
 
-    if(hd > 0)
+    if(hd >= 0)
         t1 = {C, X, 0};
 
     if(hd > 1)
