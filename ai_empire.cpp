@@ -152,7 +152,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         //if(desc.contains_hostiles)
         if(fabs(desc.hostiles_threat_rating) > 0.1f)
         {
-            printf("%f\n", desc.hostiles_threat_rating);
+            //printf("%f\n", desc.hostiles_threat_rating);
         }
 
         descriptor.push_back(desc);

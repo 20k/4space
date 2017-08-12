@@ -32,6 +32,14 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
     return ret;
 }
 
+void try_colonise(ship_manager* sm)
+{
+    if(!sm->any_with_element(ship_component_elements::COLONISER))
+        return;
+
+
+}
+
 ///this takes like 4ms
 void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
 {
@@ -55,6 +63,8 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     if(ship_manage->any_in_combat())
         return;
+
+    try_colonise(ship_manage);
 
     ///we're not in combat here
 
