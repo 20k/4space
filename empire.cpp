@@ -1856,6 +1856,9 @@ void empire_manager::assign_colours_non_randomly()
 
         found_e->colour = hsv_to_rgb(hsv_2);
         found_e->temporary_hsv = hsv_2;
+
+        //e->colour = pow(e->colour, 1/2.2);
+        //found_e->colour = pow(found_e->colour, 1/2.2);
     }
 }
 
