@@ -1374,6 +1374,8 @@ empire* empire_manager::birth_empire(system_manager& system_manage, fleet_manage
         num++;
     }
 
+    initial_spawn_reference[e] = os;
+
     return e;
 }
 
@@ -1453,6 +1455,8 @@ void empire_manager::birth_empires_random(fleet_manager& fleet_manage, system_ma
 
         birth_empire(system_manage, fleet_manage, os, randf_s(1.f, 10.f));
     }
+
+    assign_colours_non_randomly();
 }
 
 void empire_manager::birth_empires_without_ownership(fleet_manager& fleet_manage, system_manager& system_manage)
@@ -1731,4 +1735,145 @@ void empire_manager::draw_resource_donation_ui(empire* viewer_empire)
     }
 
     ImGui::End();
+}
+
+vec3f hsv_to_rgb(vec3f in)
+{
+    float H = in.x();
+    float S = in.y();
+    float V = in.z();
+
+    S = clamp(S, 0.f, 1.f);
+    V = clamp(V, 0.f, 1.f);
+
+    float C = V * S;
+
+    float hd = H / d2r(60.f);
+
+    float mod_H = fmod(hd, 2.f) - 1;
+
+    float X = C * (1.f - fabs(mod_H));
+
+    vec3f t1;
+
+    if(hd > 0)
+        t1 = {C, X, 0};
+
+    if(hd > 1)
+        t1 = {X, C, 0};
+
+    if(hd > 2)
+        t1 = {0, C, X};
+
+    if(hd > 3)
+        t1 = {0, X, C};
+
+    if(hd > 4)
+        t1 = {X, 0, C};
+
+    if(hd > 5)
+        t1 = {C, 0, X};
+
+    float m = V - C;
+
+    //printf("%f %f %f\n", m, hd, H);
+
+    return t1 + (vec3f){m,m,m};
+}
+
+void empire_manager::assign_colours_non_randomly()
+{
+    if(empires.size() == 0)
+        return;
+
+    float num = empires.size();
+
+    float S = 0.99f;
+    float V = 0.995f;
+
+    float current_colour_angle = 0.01f;
+
+    std::deque<vec3f> available_colours;
+
+    for(int i=0; i<empires.size(); i++)
+    {
+        float angle = (i / (num + 1.f)) * 2 * M_PI;
+
+        available_colours.push_back({angle + 0.01f + randf_s(-M_PI/4, M_PI/4), S, V});
+    }
+
+    for(empire* e : empires)
+    {
+        if(e->given_colour)
+            continue;
+
+        if(e->is_pirate)
+            continue;
+
+        float max_dist = FLT_MAX;
+        empire* found_e = nullptr;
+
+        for(empire* other : empires)
+        {
+            if(other->is_pirate)
+                continue;
+
+            if(other->given_colour)
+                continue;
+
+            if(other == e)
+                continue;
+
+            float dist = get_spawn_empire_distance(e, other);
+
+            if(dist < max_dist)
+            {
+                max_dist = dist;
+                found_e = other;
+            }
+        }
+
+        if(found_e == nullptr)
+            continue;
+
+        found_e->given_colour = true;
+        e->given_colour = true;
+
+        vec3f hsv_1 = available_colours.front();
+
+        available_colours.pop_front();
+
+        int id = available_colours.size() / 2;
+
+        id = clamp(id, 0, available_colours.size()-1);
+
+        vec3f hsv_2 = available_colours[id];
+
+        available_colours.erase(available_colours.begin() + id);
+
+        e->colour = hsv_to_rgb(hsv_1);
+        e->temporary_hsv = hsv_1;
+
+        found_e->colour = hsv_to_rgb(hsv_2);
+        found_e->temporary_hsv = hsv_2;
+    }
+}
+
+float empire_manager::get_spawn_empire_distance(empire* e1, empire* e2)
+{
+    orbital_system* my_os = initial_spawn_reference[e1];
+
+    if(my_os == nullptr)
+        return 0.f;
+
+    vec2f my_pos = my_os->universe_pos;
+
+    orbital_system* their_os = initial_spawn_reference[e2];
+
+    if(their_os == nullptr)
+        return 0.f;
+
+    vec2f their_pos = their_os->universe_pos;
+
+    return (their_pos - my_pos).length();
 }

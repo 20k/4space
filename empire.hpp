@@ -54,6 +54,8 @@ struct empire
 
     bool has_ai = false;
     vec3f colour = {1,1,1};
+    bool given_colour = false;
+    vec3f temporary_hsv;
 
     ///a two dimensional vector that we can use to determine our similarity to other empires
     ///used for determining tech and ship operating capability
@@ -210,6 +212,9 @@ struct empire_manager
 {
     std::vector<empire*> empires;
     std::vector<empire*> pirate_empires;
+
+    ///NEVER USE FOR ANYTHING OTHER THAN COLOUR PICKING INSTANTLY BAD
+    std::map<empire*, orbital_system*> initial_spawn_reference;
     ///ok so. if a pirate empire has a fleet alive in not an owned system, they can keep launching attacks
 
     empire* unknown_empire = nullptr;
@@ -244,6 +249,9 @@ struct empire_manager
     void draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage);
     void draw_resource_donation_ui(empire* viewer_empire);
 
+    void assign_colours_non_randomly();
+
+    float get_spawn_empire_distance(empire* e1, empire* e2);
 
     bool confirm_break_alliance = false;
     bool confirm_declare_war = false;
