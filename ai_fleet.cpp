@@ -5,6 +5,7 @@
 #include "battle_manager.hpp"
 #include <assert.h>
 #include "profile.hpp"
+#include <unordered_set>
 
 uint32_t ai_fleet::gid;
 
@@ -32,12 +33,63 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
     return ret;
 }
 
-void try_colonise(ship_manager* sm)
+void try_colonise(ship_manager* sm, orbital* o)
 {
     if(!sm->any_with_element(ship_component_elements::COLONISER))
         return;
 
+    if(sm->any_colonising())
+        return;
 
+    ///if hostiles in system, flee!
+    ///set ai state to request flee
+
+    std::unordered_set<orbital*> free_planets;
+
+    for(orbital* test_o : o->parent_system->orbitals)
+    {
+        if(o->type == orbital_info::PLANET && o->parent_empire == nullptr)
+        {
+            free_planets.insert(o);
+        }
+    }
+
+    if(free_planets.size() == 0)
+        return;
+
+    for(orbital* orb_1 : o->parent_system->orbitals)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        for(ship* s : sm->ships)
+        {
+            if(!s->colonising)
+                continue;
+
+            if(std::find(free_planets.begin(), free_planets.end(), s->colonise_target) != free_planets.end())
+            {
+                free_planets.erase(s->colonise_target);
+            }
+        }
+
+        if(free_planets.size() == 0)
+            return;
+    }
+
+    if(free_planets.size() > 0)
+    {
+        for(ship* s : sm->ships)
+        {
+            if(s->can_colonise())
+            {
+                o->command_queue.colonise(*free_planets.begin(), s);
+                return;
+            }
+        }
+    }
 }
 
 ///this takes like 4ms
@@ -64,7 +116,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     if(ship_manage->any_in_combat())
         return;
 
-    try_colonise(ship_manage);
+    try_colonise(ship_manage, o);
 
     ///we're not in combat here
 
