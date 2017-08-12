@@ -247,6 +247,9 @@ struct empire_manager
     empire* birth_empire(system_manager& system_manage,fleet_manager& fleet_manage, orbital_system* os, int system_size = 1);
     empire* birth_empire_without_system_ownership(fleet_manager& fleet_manage, orbital_system* os, int fleets = 2, int ships_per_fleet = 2);
 
+    void setup_relations();
+
+
     void birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage);
     void birth_empires_without_ownership(fleet_manager& fleet_manage, system_manager& system_manage);
 

@@ -1432,23 +1432,31 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
         e->take_ownership(fleet1);
     }
 
-    for(empire* emp : empires)
+    return e;
+}
+
+void empire_manager::setup_relations()
+{
+    for(empire* e : empires)
     {
-        if(emp == e)
+        if(!e->is_pirate)
             continue;
 
-        if(emp->is_pirate)
+        for(empire* emp : empires)
         {
-            emp->ally(e);
-        }
-        else
-        {
-            emp->become_hostile(e);
-        }
+            if(emp == e)
+                continue;
 
+            if(emp->is_pirate)
+            {
+                emp->ally(e);
+            }
+            else
+            {
+                emp->become_hostile(e);
+            }
+        }
     }
-
-    return e;
 }
 
 void empire_manager::birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage)
@@ -1481,6 +1489,8 @@ void empire_manager::birth_empires_without_ownership(fleet_manager& fleet_manage
 
         birth_empire_without_system_ownership(fleet_manage, sys, randf_s(1.f, 4.f), randf_s(1.f, 3.f));
     }
+
+    setup_relations();
 }
 
 void empire_manager::draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage)

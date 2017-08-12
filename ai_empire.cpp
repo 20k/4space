@@ -109,7 +109,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             ship_manager* sm = (ship_manager*)o->data;
 
-            if(e->is_hostile(o->parent_empire))
+            if(e != o->parent_empire && e->is_hostile(o->parent_empire))
             {
                 if(sm->all_derelict())
                     continue;
@@ -119,17 +119,13 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 if(!sm->any_in_combat() && available_scanning_power <= ship_info::accessory_information_obfuscation_level)
                     continue;
 
-                //std::cout << base->name << std::endl;
-
-                //std::cout << base->parent_empire->name << std::endl;
-
                 desc.contains_hostiles = true;
 
                 ///WARNING NEED TO WORK IN STEALTH
                 desc.hostiles_threat_rating += sm->get_tech_adjusted_military_power();
             }
 
-            if(e->is_allied(o->parent_empire))
+            if(e != o->parent_empire && e->is_allied(o->parent_empire))
             {
                 desc.friendly_threat_rating += sm->get_tech_adjusted_military_power();
             }
@@ -159,6 +155,8 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             //printf("%f\n", desc.hostiles_threat_rating);
         }
 
+        descriptor.push_back(desc);
+
         id++;
     }
 
@@ -174,10 +172,11 @@ void ensure_adequate_defence(ai_empire& ai, empire* e)
     ///Hooray! All neceessary work is done to implement empire behaviours! :)
 }
 
-
-
 void ai_empire::tick(system_manager& system_manage, empire* e)
 {
+    if(e->is_pirate)
+        return;
+
     ensure_adequate_defence(*this, e);
 
     std::vector<orbital*> free_defence_ships;
@@ -211,11 +210,13 @@ void ai_empire::tick(system_manager& system_manage, empire* e)
 
     for(orbital_system_descriptor& desc : descriptors)
     {
-        if(desc.contains_hostiles)
+        if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
         {
+            //printf("hi there\n");
+
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
-                for(int i=free_defence_ships.size()-1; i >= 0; i--)
+                for(int i=(int)free_defence_ships.size()-1; i >= 0; i--)
                 {
                     orbital* o = free_defence_ships[i];
                     free_defence_ships.pop_back();
@@ -227,7 +228,7 @@ void ai_empire::tick(system_manager& system_manage, empire* e)
 
                     auto path = system_manage.pathfind(o, desc.os);
 
-                    printf("DEFENDING\n");
+                    //printf("DEFENDING\n");
 
                     for(auto& sys : path)
                     {
