@@ -116,7 +116,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
                 float available_scanning_power = e->available_scanning_power_on(o);
 
-                if(available_scanning_power <= ship_info::accessory_information_obfuscation_level)
+                if(!sm->any_in_combat() && available_scanning_power <= ship_info::accessory_information_obfuscation_level)
                     continue;
 
                 desc.contains_hostiles = true;
@@ -150,7 +150,7 @@ void ensure_adequate_defence(ai_empire& ai, empire* e)
     ///ship command queue? :(
     ///Hooray! All neceessary work is done to implement empire behaviours! :)
 
-
+    std::vector<orbital_system_descriptor> descriptors;
 }
 
 
