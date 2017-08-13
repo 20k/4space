@@ -245,7 +245,8 @@ struct ships_info
     int num_mining_ships = 0;
 };
 
-void try_construct(orbital_system_descriptor& desc, ship_type::types type, empire* e)
+///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
+void try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e)
 {
     ship to_build;
 
@@ -265,13 +266,48 @@ void try_construct(orbital_system_descriptor& desc, ship_type::types type, empir
 
     auto res_cost = to_build.resources_cost();
 
+    bool build = false;
+    float rad = 0.f;
+    float angle = 0.f;
+
     if(e->can_fully_dispense(res_cost) && desc.owned_planets.size() > 0)
     {
         orbital* o = desc.owned_planets.front();
 
         e->dispense_resources(res_cost);
 
+        rad = o->orbital_length;
+        angle = o->orbital_angle;
 
+        build = true;
+    }
+
+    if(!build && desc.constructor_ships.size() > 0)
+    {
+        for(orbital* o : desc.constructor_ships)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(sm->can_fully_dispense(cost))
+            {
+                sm->fully_dispense(cost);
+                build = true;
+
+                rad = o->orbital_length;
+                angle = o->orbital_angle;
+
+                break;
+            }
+        }
+    }
+
+    if(build)
+    {
+        orbital* new_o = desc.os->make_fleet(fleet_manage, rad, angle, e);
+
+        ship_manager* sm = (ship_manager*)new_o->data;
+
+        ship* s = sm->make_new_from(e, to_build.duplicate());
     }
 }
 
@@ -379,7 +415,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         for(int i=0; i<mining_deficit; i++)
         {
-            try_construct(desc, ship_type::MINING, e);
+            try_construct(fleet_manage, desc, ship_type::MINING, e);
         }
 
         num_resource_asteroids += desc.num_resource_asteroids;
