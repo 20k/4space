@@ -62,18 +62,10 @@ void try_colonise(ship_manager* sm, orbital* my_o)
         if(orb_1->type != orbital_info::FLEET)
             continue;
 
-        ship_manager* sm = (ship_manager*)orb_1->data;
+        if(!orb_1->command_queue.is_currently_colonising())
+            continue;
 
-        for(ship* s : sm->ships)
-        {
-            if(!s->colonising)
-                continue;
-
-            if(std::find(free_planets.begin(), free_planets.end(), s->colonise_target) != free_planets.end())
-            {
-                free_planets.erase(s->colonise_target);
-            }
-        }
+        free_planets.erase(orb_1->command_queue.get_colonising_target());
 
         if(free_planets.size() == 0)
             return;

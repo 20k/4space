@@ -175,6 +175,22 @@ bool object_command_queue::trying_to_warp()
     return command_queue.front().type == object_command_queue_info::WARP;
 }
 
+bool object_command_queue::is_currently_colonising()
+{
+    if(command_queue.size() == 0)
+        return false;
+
+    return command_queue.front().type == object_command_queue_info::COLONISE;
+}
+
+orbital* object_command_queue::get_colonising_target()
+{
+    if(!is_currently_colonising())
+        return nullptr;
+
+    return command_queue.front().data.colony_target;
+}
+
 void object_command_queue::try_warp(orbital_system* fin, bool queue_to_back)
 {
     queue_type next;

@@ -15,6 +15,7 @@ struct orbital_system_descriptor
     bool is_owned_by_me = false;
     bool is_owned = false;
     bool is_allied = false;
+    ///is_hostile?
     bool contains_hostiles = false;
 
     float resource_rating = 0.f;
