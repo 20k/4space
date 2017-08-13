@@ -140,7 +140,7 @@ void try_mine(ship_manager* sm, orbital* my_o)
         if(c == nullptr)
             continue;
 
-        my_o->command_queue.cancel();
+        //my_o->command_queue.cancel();
         my_o->command_queue.anchor(*free_asteroids.begin());
 
         my_o->mining_target = *free_asteroids.begin();
