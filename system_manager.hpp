@@ -218,6 +218,7 @@ struct orbital
     bool can_colonise();
 
     bool is_mining = false;
+    orbital* mining_target = nullptr;
 
     ///busy as in in combat or otherwise indisposed
     bool in_friendly_territory_and_not_busy();

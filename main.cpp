@@ -1775,7 +1775,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
-            if(o->type == orbital_info::FLEET && sm->any_with_element(ship_component_elements::MASS_ANCHOR))
+            if(o->type == orbital_info::FLEET && sm->any_with_element(ship_component_elements::MASS_ANCHOR) && o->parent_empire == player_empire)
             {
                 ImGui::NeutralText("(Harvest Ore From)");
 

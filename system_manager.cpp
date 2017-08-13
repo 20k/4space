@@ -399,6 +399,7 @@ void check_for_resources(orbital* me)
                 attr.produced_per_s = ore_mult * o->produced_resources_ps.get_resource(res_type).amount / num_harvest;
 
                 me->is_mining = true;
+                me->mining_target = o;
             }
 
             return;

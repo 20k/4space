@@ -101,6 +101,49 @@ void try_mine(ship_manager* sm, orbital* my_o)
     ///prevention for this
     if(my_o->is_mining)
         return;
+
+    std::unordered_set<orbital*> free_asteroids;
+
+    for(orbital* test_o : my_o->parent_system->orbitals)
+    {
+        if(test_o->type == orbital_info::ASTEROID && test_o->is_resource_object)
+        {
+            free_asteroids.insert(test_o);
+        }
+    }
+
+    if(free_asteroids.size() == 0)
+        return;
+
+    for(orbital* orb_1 : my_o->parent_system->orbitals)
+    {
+        if(orb_1->type != orbital_info::FLEET)
+            continue;
+
+        if(!orb_1->is_mining)
+            continue;
+
+        free_asteroids.erase(orb_1->mining_target);
+
+        if(free_asteroids.size() == 0)
+            return;
+    }
+
+    if(free_asteroids.size() == 0)
+        return;
+
+    for(ship* s : sm->ships)
+    {
+        component* c = s->get_component_with_primary(ship_component_elements::ORE_HARVESTER);
+
+        if(c == nullptr)
+            continue;
+
+        my_o->command_queue.anchor(*free_asteroids.begin());
+        my_o->mining_target = *free_asteroids.begin();
+
+        return;
+    }
 }
 
 ///this takes like 4ms
@@ -132,8 +175,6 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     if(ship_manage->any_in_combat())
         return;
 
-    try_colonise(ship_manage, o);
-
     ///we're not in combat here
 
     ///spread resupply check across this many frames
@@ -154,6 +195,9 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
         ai_state = 0;
         return;
     }
+
+    try_colonise(ship_manage, o);
+    try_mine(ship_manage, o);
 
     ///fly around?
     if(!ship_manage->can_engage())
