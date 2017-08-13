@@ -246,12 +246,12 @@ struct ships_info
 };
 
 ///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
-void try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e)
+bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e)
 {
-    ship to_build;
+    static ship to_build[] = {make_colony_ship(), make_mining_ship(), make_default()};
 
     ///we should probably tag ships with their purpose to let the AI know
-    if(type == ship_type::COLONY)
+    /*if(type == ship_type::COLONY)
     {
         to_build = make_colony_ship();
     }
@@ -262,9 +262,9 @@ void try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc,
     if(type == ship_type::MILITARY)
     {
         to_build = make_default();
-    }
+    }*/
 
-    auto res_cost = to_build.resources_cost();
+    auto res_cost = to_build[(int)type].resources_cost();
 
     bool build = false;
     float rad = 0.f;
@@ -288,9 +288,9 @@ void try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc,
         {
             ship_manager* sm = (ship_manager*)o->data;
 
-            if(sm->can_fully_dispense(cost))
+            if(sm->can_fully_dispense(res_cost))
             {
-                sm->fully_dispense(cost);
+                sm->fully_dispense(res_cost);
                 build = true;
 
                 rad = o->orbital_length;
@@ -307,8 +307,10 @@ void try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc,
 
         ship_manager* sm = (ship_manager*)new_o->data;
 
-        ship* s = sm->make_new_from(e, to_build.duplicate());
+        ship* s = sm->make_new_from(e, to_build[(int)type].duplicate());
     }
+
+    return build;
 }
 
 void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
@@ -385,6 +387,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     for(orbital_system_descriptor& desc : descriptors)
     {
+        if(!desc.is_owned)
+            continue;
+
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
         {
             //printf("hi there\n");
@@ -415,7 +420,12 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         for(int i=0; i<mining_deficit; i++)
         {
-            try_construct(fleet_manage, desc, ship_type::MINING, e);
+            bool success = try_construct(fleet_manage, desc, ship_type::MINING, e);
+
+            if(success)
+            {
+                desc.num_ships[ship_type::MINING]++;
+            }
         }
 
         num_resource_asteroids += desc.num_resource_asteroids;
@@ -428,6 +438,4 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     int mining_ship_deficit = num_resource_asteroids - num_ships[ship_type::MINING];
     mining_ship_deficit = std::max(mining_ship_deficit, 0);
-
-
 }
