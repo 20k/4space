@@ -95,12 +95,10 @@ void try_colonise(ship_manager* sm, orbital* my_o)
 void try_mine(ship_manager* sm, orbital* my_o)
 {
     if(!sm->any_with_element(ship_component_elements::ORE_HARVESTER))
+    {
+        my_o->mining_target = nullptr;
         return;
-
-    ///if we accidentally mine, multiple ships may get trapped on one asteroid if we don't have some sort of
-    ///prevention for this
-    if(my_o->is_mining)
-        return;
+    }
 
     if(my_o->command_queue.is_ever(object_command_queue_info::ANCHOR))
         return;
@@ -123,8 +121,8 @@ void try_mine(ship_manager* sm, orbital* my_o)
         if(orb_1->type != orbital_info::FLEET)
             continue;
 
-        if(!orb_1->is_mining)
-            continue;
+        //if(!orb_1->is_mining)
+        //    continue;
 
         free_asteroids.erase(orb_1->mining_target);
 
@@ -144,6 +142,8 @@ void try_mine(ship_manager* sm, orbital* my_o)
 
         my_o->command_queue.cancel();
         my_o->command_queue.anchor(*free_asteroids.begin());
+
+        my_o->mining_target = *free_asteroids.begin();
 
         return;
     }

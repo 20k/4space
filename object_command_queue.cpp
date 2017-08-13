@@ -308,6 +308,9 @@ bool do_anchor(orbital* o, queue_type& type)
     if(data.anchor_target == nullptr)
         return true;
 
+    if(data.anchor_target->parent_system != o->parent_system)
+        return true;
+
     float maintain_distance = 20.f;
 
     vec2f my_pos = o->absolute_pos;

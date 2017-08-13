@@ -1379,7 +1379,7 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
     ship_manager* fleet1 = fleet_manage.make_new();
 
-    ship* test_ship = fleet1->make_new_from(e, make_colony_ship());
+    ship* test_ship = fleet1->make_new_from(e, make_mining_ship());
 
     //ship* test_ship = fleet1->make_new_from(e, make_default());
     //test_ship->name = "SS Still Todo";
@@ -1390,6 +1390,16 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     ofleet->orbital_length = 200.f;
     ofleet->parent = os->get_base();
     ofleet->data = fleet1;
+
+    ship_manager* fleet2 = fleet_manage.make_new();
+    ship* test_ship2 = fleet2->make_new_from(e, make_mining_ship());
+
+    orbital* ofleet2 = os->make_new(orbital_info::FLEET, 5.f);
+
+    ofleet2->orbital_angle = M_PI/13.f;
+    ofleet2->orbital_length = 400.f;
+    ofleet2->parent = os->get_base();
+    ofleet2->data = fleet2;
 
     /*for(orbital* o : os->orbitals)
     {
@@ -1406,6 +1416,9 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 
     e->take_ownership(ofleet);
     e->take_ownership(fleet1);
+
+    e->take_ownership(ofleet2);
+    e->take_ownership(fleet2);
 
 }
 
