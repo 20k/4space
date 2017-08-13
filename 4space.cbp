@@ -25,6 +25,7 @@
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-O3" />
 					<Add option="-march=native" />
+					<Add option="-ffast-math" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
