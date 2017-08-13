@@ -2519,13 +2519,13 @@ int main()
     empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
     e2->take_ownership_of_all(sys_3);
 
-    /*e2->resources.resources[resource::IRON].amount = 5000.f;
+    e2->resources.resources[resource::IRON].amount = 5000.f;
     e2->resources.resources[resource::COPPER].amount = 5000.f;
     e2->resources.resources[resource::TITANIUM].amount = 5000.f;
     e2->resources.resources[resource::URANIUM].amount = 5000.f;
     e2->resources.resources[resource::RESEARCH].amount = 8000.f;
     e2->resources.resources[resource::HYDROGEN].amount = 8000.f;
-    e2->resources.resources[resource::OXYGEN].amount = 8000.f;*/
+    e2->resources.resources[resource::OXYGEN].amount = 8000.f;
 
 
     ship_manager* fleet5 = fleet_manage.make_new();

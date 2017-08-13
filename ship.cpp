@@ -2491,6 +2491,17 @@ component* ship::get_component_with_primary(ship_component_elements::types type)
     return nullptr;
 }
 
+component* ship::get_component_with(ship_component_elements::types type)
+{
+    for(component& c : entity_list)
+    {
+        if(c.has_element(type))
+            return &c;
+    }
+
+    return nullptr;
+}
+
 std::vector<component> ship::fire()
 {
     std::vector<component> ret;

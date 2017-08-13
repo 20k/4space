@@ -15,6 +15,8 @@ std::map<int, bool> component_open;
 ship_customiser::ship_customiser()
 {
     //last_selected = current.id;
+
+    saved = default_ships_list;
 }
 
 void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)

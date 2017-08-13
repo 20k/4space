@@ -138,14 +138,7 @@ struct ship_customiser
 {
     bool text_input_going = false;
 
-    std::vector<ship> saved
-    {
-        make_default(),
-        make_civilian(),
-        make_scout(),
-        make_colony_ship(),
-        make_mining_ship(),
-    };
+    std::vector<ship> saved;
 
     ship current;
     int64_t last_selected = -1;

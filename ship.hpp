@@ -507,6 +507,7 @@ struct ship : positional
     void use(component& c);
 
     component* get_component_with_primary(ship_component_elements::types type);
+    component* get_component_with(ship_component_elements::types type);
 
     std::vector<component> fire();
     bool can_use_warp_drives();

@@ -246,25 +246,67 @@ struct ships_info
 };
 
 ///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
-bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e)
+bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e, bool warp_capable)
 {
-    static ship to_build[] = {make_colony_ship(), make_mining_ship(), make_default()};
+    //static ship to_build[] = {make_colony_ship(), make_mining_ship(), make_default()};
 
-    ///we should probably tag ships with their purpose to let the AI know
-    /*if(type == ship_type::COLONY)
-    {
-        to_build = make_colony_ship();
-    }
-    if(type == ship_type::MINING)
-    {
-        to_build = make_mining_ship();
-    }
-    if(type == ship_type::MILITARY)
-    {
-        to_build = make_default();
-    }*/
+    ///we should probably tag ships with their purpose to let the AI know as any decision tree here
+    ///will be very incomplete (except warp/not warp)
+    ship* identified_ship = nullptr;
 
-    auto res_cost = to_build[(int)type].resources_cost();
+    for(ship& s : default_ships_list)
+    {
+        if(type == ship_type::MILITARY)
+        {
+            if(s.is_military())
+            {
+                identified_ship = &s;
+                break;
+            }
+        }
+
+        std::vector<ship_component_elements::types> features;
+
+        if(type == ship_type::COLONY)
+        {
+            features.push_back(ship_component_elements::COLONISER);
+        }
+
+        if(type == ship_type::MINING)
+        {
+            features.push_back(ship_component_elements::ORE_HARVESTER);
+        }
+
+        if(warp_capable)
+        {
+            features.push_back(ship_component_elements::WARP_POWER);
+        }
+
+        bool all = true;
+
+        for(auto& i : features)
+        {
+            if(!s.get_component_with(i))
+            {
+                all = false;
+            }
+        }
+
+        if(all)
+        {
+            identified_ship = &s;
+            break;
+        }
+    }
+
+    if(identified_ship == nullptr)
+    {
+        printf("rip");
+
+        return false;
+    }
+
+    auto res_cost = identified_ship->resources_cost();
 
     bool build = false;
     float rad = 0.f;
@@ -307,7 +349,7 @@ bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc,
 
         ship_manager* sm = (ship_manager*)new_o->data;
 
-        ship* s = sm->make_new_from(e, to_build[(int)type].duplicate());
+        ship* s = sm->make_new_from(e, identified_ship->duplicate());
     }
 
     return build;
@@ -420,7 +462,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         for(int i=0; i<mining_deficit; i++)
         {
-            bool success = try_construct(fleet_manage, desc, ship_type::MINING, e);
+            bool success = try_construct(fleet_manage, desc, ship_type::MINING, e, false);
 
             if(success)
             {
