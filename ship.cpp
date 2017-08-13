@@ -666,6 +666,9 @@ void component_attribute::calculate_efficiency(float step_s)
 
 float component_attribute::get_efficiency(float step_s)
 {
+    if(drained_per_s * step_s < FLOAT_BOUND)
+        return 1.f;
+
     return currently_drained / (drained_per_s * step_s);
 }
 

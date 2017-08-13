@@ -1401,17 +1401,6 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     ofleet2->parent = os->get_base();
     ofleet2->data = fleet2;
 
-    /*for(orbital* o : os->orbitals)
-    {
-        if(o->type == orbital_info::FLEET)
-            continue;
-
-        if(o->parent_empire != nullptr)
-            continue;
-
-        e->take_ownership(o);
-    }*/
-
     e->take_ownership_of_all(os);
 
     e->take_ownership(ofleet);
