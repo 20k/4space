@@ -393,7 +393,8 @@ void check_for_resources(orbital* me)
 
                 float ore_mult = primary->components[ship_component_elements::ORE_HARVESTER].produced_per_s;
 
-                ore_mult = (1 + ore_mult)/2.f;
+                if(ore_mult > FLOAT_BOUND)
+                    ore_mult = (1 + ore_mult)/2.f;
 
                 attr.produced_per_s = ore_mult * o->produced_resources_ps.get_resource(res_type).amount / num_harvest;
 
