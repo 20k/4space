@@ -102,6 +102,9 @@ void try_mine(ship_manager* sm, orbital* my_o)
     if(my_o->is_mining)
         return;
 
+    if(my_o->command_queue.is_ever(object_command_queue_info::ANCHOR))
+        return;
+
     std::unordered_set<orbital*> free_asteroids;
 
     for(orbital* test_o : my_o->parent_system->orbitals)
@@ -139,8 +142,8 @@ void try_mine(ship_manager* sm, orbital* my_o)
         if(c == nullptr)
             continue;
 
+        my_o->command_queue.cancel();
         my_o->command_queue.anchor(*free_asteroids.begin());
-        my_o->mining_target = *free_asteroids.begin();
 
         return;
     }

@@ -1379,8 +1379,8 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
     ship_manager* fleet1 = fleet_manage.make_new();
 
-    ship* test_ship = fleet1->make_new_from(e, make_mining_ship());
-    test_ship->refill_all_components();
+    ship* test_ship = fleet1->make_new_from(e, make_colony_ship());
+
     //ship* test_ship = fleet1->make_new_from(e, make_default());
     //test_ship->name = "SS Still Todo";
 

@@ -884,6 +884,16 @@ component component::with_size(float new_size)
     component c = *this;
     c.set_size(new_size);
 
+    for(auto& item : c.components)
+    {
+        if(item.first == ship_component_elements::HP)
+        {
+            component_attribute& attr = item.second;
+
+            attr.cur_amount = attr.max_amount;
+        }
+    }
+
     return c;
 }
 

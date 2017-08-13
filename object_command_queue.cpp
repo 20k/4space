@@ -233,6 +233,28 @@ void object_command_queue::anchor_ui_state()
     add(next);
 }
 
+bool object_command_queue::is_currently(object_command_queue_info::queue_element_type type)
+{
+    if(command_queue.size() == 0)
+        return false;
+
+    return command_queue.front().type == type;
+}
+
+bool object_command_queue::is_ever(object_command_queue_info::queue_element_type type)
+{
+    if(command_queue.size() == 0)
+        return false;
+
+    for(auto& elem : command_queue)
+    {
+        if(elem.type == type)
+            return true;
+    }
+
+    return false;
+}
+
 bool do_colonising(orbital* o, queue_type& type)
 {
     if(o->type != orbital_info::FLEET)
