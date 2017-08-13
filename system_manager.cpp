@@ -1125,6 +1125,26 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     return n;
 }
 
+orbital orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, float angle, empire* e)
+{
+    ship_manager* sm = fleet_manage.make_new();
+
+    orbital* o = make_new(orbital_info::FLEET, 5);
+    o->orbital_angle = angle;
+    o->orbital_length = rad;
+
+    o->parent = get_base();
+    o->data = sm;
+
+    if(e != nullptr)
+    {
+        e->take_ownership(o);
+        e->take_ownership(sm);
+    }
+
+    o->tick(0.f);
+}
+
 void orbital_system::vision_test_all()
 {
     for(orbital* o : orbitals)

@@ -249,6 +249,7 @@ struct orbital
 };
 
 struct popup_info;
+struct fleet_manager;
 
 struct orbital_system
 {
@@ -262,6 +263,9 @@ struct orbital_system
     std::set<empire*> advertised_empires;
 
     orbital* make_new(orbital_info::type type, float rad, int num_verts = 5);
+
+    ///with 0 ships
+    orbital* make_fleet(fleet_manager& fm, float rad, float angle, empire* e = nullptr);
 
     void vision_test_all();
 

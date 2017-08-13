@@ -2,6 +2,7 @@
 #include "empire.hpp"
 #include "system_manager.hpp"
 #include "ship.hpp"
+#include "ship_definitions.hpp"
 
 namespace ship_type
 {
@@ -244,7 +245,37 @@ struct ships_info
     int num_mining_ships = 0;
 };
 
-void ai_empire::tick(system_manager& system_manage, empire* e)
+void try_construct(orbital_system_descriptor& desc, ship_type::types type, empire* e)
+{
+    ship to_build;
+
+    ///we should probably tag ships with their purpose to let the AI know
+    if(type == ship_type::COLONY)
+    {
+        to_build = make_colony_ship();
+    }
+    if(type == ship_type::MINING)
+    {
+        to_build = make_mining_ship();
+    }
+    if(type == ship_type::MILITARY)
+    {
+        to_build = make_default();
+    }
+
+    auto res_cost = to_build.resources_cost();
+
+    if(e->can_fully_dispense(res_cost) && desc.owned_planets.size() > 0)
+    {
+        orbital* o = desc.owned_planets.front();
+
+        e->dispense_resources(res_cost);
+
+
+    }
+}
+
+void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
 {
     if(e->is_pirate)
         return;
@@ -342,6 +373,13 @@ void ai_empire::tick(system_manager& system_manage, empire* e)
                     }
                 }
             }
+        }
+
+        int mining_deficit = std::max(desc.num_resource_asteroids - desc.num_ships[ship_type::MINING], 0);
+
+        for(int i=0; i<mining_deficit; i++)
+        {
+            try_construct(desc, ship_type::MINING, e);
         }
 
         num_resource_asteroids += desc.num_resource_asteroids;

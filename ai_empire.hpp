@@ -32,11 +32,13 @@ struct system_manager;
 
 using ship_general_state = ai_empire_info::ship_state;
 
+struct fleet_manager;
+
 struct ai_empire
 {
     std::map<ship_manager*, ship_general_state> general_purpose_state;
 
-    void tick(system_manager& sm, empire* e);
+    void tick(fleet_manager& fm, system_manager& sm, empire* e);
 };
 
 #endif // AI_EMPIRE_HPP_INCLUDED
