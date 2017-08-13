@@ -923,6 +923,8 @@ inline std::vector<ship> get_default_ships_list()
     ships.push_back(make_mining_ship());
     ships.push_back(make_small_mining_ship());
 
+    std::sort(ships.begin(), ships.end(), [](ship& s1, ship& s2){return s1.get_total_cost() < s2.get_total_cost();});
+
     return ships;
 }
 
