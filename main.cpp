@@ -2309,6 +2309,8 @@ int main()
 
     full_component_list = get_component_list();
 
+    default_ships_list = get_default_ships_list();
+
     srand(100);
 
     randf_s();

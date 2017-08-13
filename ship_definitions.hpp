@@ -897,4 +897,35 @@ inline ship make_mining_ship()
     return test_ship;
 }
 
+inline ship make_small_mining_ship()
+{
+    ship test_ship;
+    test_ship.add(make_default_crew().with_size(0.25));
+    test_ship.add(make_default_life_support().with_size(0.25));
+    test_ship.add(make_default_power_core().with_size(0.25));
+    test_ship.add(make_default_fuel_tank());
+    test_ship.add(make_default_mining_system());
+    test_ship.add(make_default_engines().with_size(0.25));
+
+    test_ship.name = "Small Mining Default";
+
+    return test_ship;
+}
+
+inline std::vector<ship> get_default_ships_list()
+{
+    std::vector<ship> ships;
+
+    ships.push_back(make_default());
+    ships.push_back(make_civilian());
+    ships.push_back(make_scout());
+    ships.push_back(make_colony_ship());
+    ships.push_back(make_mining_ship());
+    ships.push_back(make_small_mining_ship());
+
+    return ships;
+}
+
+extern std::vector<ship> default_ships_list;
+
 #endif // SHIP_DEFINITIONS_HPP_INCLUDED
