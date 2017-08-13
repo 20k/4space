@@ -23,7 +23,7 @@ struct orbital_system_descriptor
 
     int num_mining_ships = 0;
 
-    int num_unmined_asteroids = 0;
+    int num_resource_asteroids = 0;
 
     float resource_rating = 0.f;
     float distance_rating = 0.f;
@@ -117,6 +117,11 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 desc.num_unowned_planets++;
             }
 
+            if(o->type == orbital_info::ASTEROID && o->is_resource_object)
+            {
+                desc.num_resource_asteroids++;
+            }
+
             if(o->type != orbital_info::FLEET)
                 continue;
 
@@ -125,6 +130,11 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             if(sm->any_with_element(ship_component_elements::COLONISER))
             {
                 desc.num_colony_ships++;
+            }
+
+            if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
+            {
+                desc.num_mining_ships++;
             }
 
             if(e != o->parent_empire && e->is_hostile(o->parent_empire))
@@ -164,6 +174,11 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             if(sm->any_with_element(ship_component_elements::COLONISER) && sm->ai_controller.on_route_to == os)
             {
                 desc.num_colony_ships++;
+            }
+
+            if(sm->any_with_element(ship_component_elements::ORE_HARVESTER) && sm->ai_controller.on_route_to == os)
+            {
+                desc.num_mining_ships++;
             }
 
             if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && sm->ai_controller.on_route_to == os)
@@ -233,6 +248,39 @@ void ai_empire::tick(system_manager& system_manage, empire* e)
         if(sm->ai_controller.ai_state == ai_empire_info::IDLE)
         {
             free_defence_ships.push_back(o);
+        }
+    }
+
+    std::vector<orbital*> free_mining_ships;
+    std::vector<orbital*> free_colony_ships;
+
+    for(orbital* o : e->owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        if(sm->is_military())
+            continue;
+
+        if(sm->any_in_combat())
+            continue;
+
+        if(sm->any_derelict())
+            continue;
+
+        if(o->command_queue.get_warp_destinations().size() > 0)
+            continue;
+
+        if(sm->any_with_element(ship_component_elements::COLONISER))
+        {
+            free_colony_ships.push_back(o);
+        }
+
+        if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
+        {
+            free_mining_ships.push_back(o);
         }
     }
 
