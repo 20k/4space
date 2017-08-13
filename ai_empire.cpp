@@ -21,6 +21,10 @@ struct orbital_system_descriptor
     int num_unowned_planets = 0;
     int num_colony_ships = 0;
 
+    int num_mining_ships = 0;
+
+    int num_unmined_asteroids = 0;
+
     float resource_rating = 0.f;
     float distance_rating = 0.f;
 
@@ -190,6 +194,13 @@ void ensure_adequate_defence(ai_empire& ai, empire* e)
     ///ship command queue? :(
     ///Hooray! All neceessary work is done to implement empire behaviours! :)
 }
+
+struct ships_info
+{
+    int num_colony_ships = 0;
+    int num_military_ships = 0;
+    int num_mining_ships = 0;
+};
 
 void ai_empire::tick(system_manager& system_manage, empire* e)
 {

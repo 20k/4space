@@ -94,17 +94,6 @@ void try_colonise(ship_manager* sm, orbital* my_o)
 
 void try_mine(ship_manager* sm, orbital* my_o)
 {
-    auto warp_path = my_o->command_queue.get_warp_destinations();
-
-    if(warp_path.size() > 0)
-    {
-        sm->ai_controller.on_route_to = warp_path.back();
-    }
-    else
-    {
-        sm->ai_controller.on_route_to = nullptr;
-    }
-
     if(!sm->any_with_element(ship_component_elements::ORE_HARVESTER))
     {
         my_o->mining_target = nullptr;
@@ -164,6 +153,18 @@ void try_mine(ship_manager* sm, orbital* my_o)
 void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
 {
     ///change this whole function to work with idle state and defend state
+
+    auto warp_path = o->command_queue.get_warp_destinations();
+
+    if(warp_path.size() > 0)
+    {
+        ship_manage->ai_controller.on_route_to = warp_path.back();
+    }
+    else
+    {
+        ship_manage->ai_controller.on_route_to = nullptr;
+    }
+
 
     auto timer = MAKE_AUTO_TIMER();
 
