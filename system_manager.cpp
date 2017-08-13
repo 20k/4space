@@ -1125,7 +1125,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     return n;
 }
 
-orbital orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, float angle, empire* e)
+orbital* orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, float angle, empire* e)
 {
     ship_manager* sm = fleet_manage.make_new();
 
@@ -1143,6 +1143,8 @@ orbital orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, float
     }
 
     o->tick(0.f);
+
+    return o;
 }
 
 void orbital_system::vision_test_all()
