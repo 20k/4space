@@ -38,7 +38,7 @@ void try_colonise(ship_manager* sm, orbital* my_o)
     if(!sm->any_with_element(ship_component_elements::COLONISER))
         return;
 
-    if(sm->any_colonising())
+    if(my_o->command_queue.is_currently_colonising())
         return;
 
     ///if hostiles in system, flee!
