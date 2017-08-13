@@ -3,6 +3,17 @@
 #include "system_manager.hpp"
 #include "ship.hpp"
 
+namespace ship_type
+{
+    enum types
+    {
+        COLONY,
+        MINING,
+        MILITARY,
+        COUNT,
+    };
+}
+
 struct orbital_system_descriptor
 {
     int position = -1;
@@ -19,9 +30,15 @@ struct orbital_system_descriptor
     bool contains_hostiles = false;
 
     int num_unowned_planets = 0;
-    int num_colony_ships = 0;
 
-    int num_mining_ships = 0;
+    std::vector<orbital*> owned_planets;
+    std::vector<orbital*> constructor_ships;
+
+    //int num_colony_ships = 0;
+
+    //int num_mining_ships = 0;
+
+    int num_ships[ship_type::COUNT] = {0};
 
     int num_resource_asteroids = 0;
 
@@ -117,6 +134,16 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 desc.num_unowned_planets++;
             }
 
+            if(o->type == orbital_info::PLANET && o->parent_empire == e && o->can_construct_ships)
+            {
+                desc.owned_planets.push_back(o);
+            }
+
+            if(o->type == orbital_info::FLEET && o->parent_empire == e && o->can_construct_ships)
+            {
+                desc.constructor_ships.push_back(o);
+            }
+
             if(o->type == orbital_info::ASTEROID && o->is_resource_object)
             {
                 desc.num_resource_asteroids++;
@@ -129,12 +156,12 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             if(sm->any_with_element(ship_component_elements::COLONISER))
             {
-                desc.num_colony_ships++;
+                desc.num_ships[ship_type::COLONY]++;
             }
 
             if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
             {
-                desc.num_mining_ships++;
+                desc.num_ships[ship_type::MINING]++;
             }
 
             if(e != o->parent_empire && e->is_hostile(o->parent_empire))
@@ -173,12 +200,12 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             if(sm->any_with_element(ship_component_elements::COLONISER) && sm->ai_controller.on_route_to == os)
             {
-                desc.num_colony_ships++;
+                desc.num_ships[ship_type::COLONY]++;
             }
 
             if(sm->any_with_element(ship_component_elements::ORE_HARVESTER) && sm->ai_controller.on_route_to == os)
             {
-                desc.num_mining_ships++;
+                desc.num_ships[ship_type::MINING]++;
             }
 
             if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && sm->ai_controller.on_route_to == os)
@@ -286,6 +313,9 @@ void ai_empire::tick(system_manager& system_manage, empire* e)
 
     std::vector<orbital_system_descriptor> descriptors = process_orbitals(system_manage, e);
 
+    int num_resource_asteroids = 0;
+    int num_ships[ship_type::COUNT] = {0};
+
     for(orbital_system_descriptor& desc : descriptors)
     {
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
@@ -313,5 +343,17 @@ void ai_empire::tick(system_manager& system_manage, empire* e)
                 }
             }
         }
+
+        num_resource_asteroids += desc.num_resource_asteroids;
+
+        for(int i=0; i<ship_type::COUNT; i++)
+        {
+            num_ships[i] += desc.num_ships[i];
+        }
     }
+
+    int mining_ship_deficit = num_resource_asteroids - num_ships[ship_type::MINING];
+    mining_ship_deficit = std::max(mining_ship_deficit, 0);
+
+
 }
