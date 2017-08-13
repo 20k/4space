@@ -108,10 +108,20 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
         for(orbital* o : os->orbitals)
         {
+            if(o->type == orbital_info::PLANET && o->parent_empire == nullptr)
+            {
+                desc.num_unowned_planets++;
+            }
+
             if(o->type != orbital_info::FLEET)
                 continue;
 
             ship_manager* sm = (ship_manager*)o->data;
+
+            if(sm->any_with_element(ship_component_elements::COLONISER))
+            {
+                desc.num_colony_ships++;
+            }
 
             if(e != o->parent_empire && e->is_hostile(o->parent_empire))
             {
@@ -142,20 +152,10 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
         for(orbital* o : e->owned)
         {
-            if(o->type == orbital_info::PLANET && o->parent_empire == nullptr)
-            {
-                desc.num_unowned_planets++;
-            }
-
             if(o->type != orbital_info::FLEET)
                 continue;
 
             ship_manager* sm = (ship_manager*)o->data;
-
-            if(sm->any_with_element(ship_component_elements::COLONISER))
-            {
-                desc.num_colony_ships++;
-            }
 
             if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && sm->ai_controller.on_route_to == os)
             {
