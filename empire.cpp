@@ -1392,7 +1392,7 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     ofleet->data = fleet1;
 
     ship_manager* fleet2 = fleet_manage.make_new();
-    ship* test_ship2 = fleet2->make_new_from(e, make_mining_ship());
+    ship* test_ship2 = fleet2->make_new_from(e, make_default());
 
     orbital* ofleet2 = os->make_new(orbital_info::FLEET, 5.f);
 

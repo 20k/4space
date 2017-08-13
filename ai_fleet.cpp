@@ -94,6 +94,17 @@ void try_colonise(ship_manager* sm, orbital* my_o)
 
 void try_mine(ship_manager* sm, orbital* my_o)
 {
+    auto warp_path = my_o->command_queue.get_warp_destinations();
+
+    if(warp_path.size() > 0)
+    {
+        sm->ai_controller.on_route_to = warp_path.back();
+    }
+    else
+    {
+        sm->ai_controller.on_route_to = nullptr;
+    }
+
     if(!sm->any_with_element(ship_component_elements::ORE_HARVESTER))
     {
         my_o->mining_target = nullptr;

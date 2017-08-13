@@ -157,6 +157,11 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             ship_manager* sm = (ship_manager*)o->data;
 
+            if(sm->any_with_element(ship_component_elements::COLONISER) && sm->ai_controller.on_route_to == os)
+            {
+                desc.num_colony_ships++;
+            }
+
             if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && sm->ai_controller.on_route_to == os)
             {
                 desc.my_threat_rating += sm->get_tech_adjusted_military_power();
@@ -237,8 +242,6 @@ void ai_empire::tick(system_manager& system_manage, empire* e)
 
                     ship_manager* sm = (ship_manager*)o->data;
                     desc.my_threat_rating += sm->get_tech_adjusted_military_power();
-
-                    sm->ai_controller.on_route_to = desc.os;
 
                     auto path = system_manage.pathfind(o, desc.os);
 

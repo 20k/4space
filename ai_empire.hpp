@@ -15,6 +15,7 @@ namespace ai_empire_info
     {
         IDLE,
         DEFEND,
+
         //DEFENCE,
         //STAGING,
         //INVASION,
