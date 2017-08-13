@@ -389,8 +389,11 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         }
     }
 
-    std::vector<orbital*> free_mining_ships;
-    std::vector<orbital*> free_colony_ships;
+    std::vector<std::vector<orbital*>> free_ships;
+    free_ships.resize(ship_type::COUNT);
+
+    //std::vector<orbital*> free_mining_ships;
+    //std::vector<orbital*> free_colony_ships;
 
     for(orbital* o : e->owned)
     {
@@ -408,17 +411,22 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(sm->any_derelict())
             continue;
 
-        if(o->command_queue.get_warp_destinations().size() > 0)
+        //if(o->command_queue.get_warp_destinations().size() > 0)
+        //    continue;
+
+        if(o->command_queue.command_queue.size() != 0)
             continue;
 
         if(sm->any_with_element(ship_component_elements::COLONISER))
         {
-            free_colony_ships.push_back(o);
+            //free_colony_ships.push_back(o);
+            free_ships[ship_type::COLONY].push_back(o);
         }
 
         if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
         {
-            free_mining_ships.push_back(o);
+            //free_mining_ships.push_back(o);
+            free_ships[ship_type::MINING].push_back(o);
         }
     }
 
@@ -458,27 +466,39 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
 
+        int ship_deficit[ship_type::COUNT] = {0};
+
         int mining_deficit = std::max(desc.num_resource_asteroids - desc.num_ships[ship_type::MINING], 0);
-
-        for(int i=0; i<mining_deficit; i++)
-        {
-            bool success = try_construct(fleet_manage, desc, ship_type::MINING, e, false);
-
-            if(success)
-            {
-                desc.num_ships[ship_type::MINING]++;
-            }
-        }
-
         int colony_deficit = std::max(desc.num_unowned_planets - desc.num_ships[ship_type::COLONY], 0);
 
-        for(int i=0; i<colony_deficit; i++)
-        {
-            bool success = try_construct(fleet_manage, desc, ship_type::COLONY, e, false);
+        ship_deficit[ship_type::MINING] = mining_deficit;
+        ship_deficit[ship_type::COLONY] = colony_deficit;
 
-            if(success)
+        for(int i=0; i<ship_type::COUNT; i++)
+        {
+            for(int kk = 0; kk < ship_deficit[i]; kk++)
             {
-                desc.num_ships[ship_type::COLONY]++;
+                if(free_ships[i].size() > 0)
+                {
+                    orbital* o = free_ships[i].back();
+                    free_ships[i].pop_back();
+
+                    auto path = system_manage.pathfind(o, desc.os);
+
+                    for(auto& sys : path)
+                    {
+                        o->command_queue.try_warp(sys, true);
+                    }
+
+                    continue;
+                }
+
+                bool success = try_construct(fleet_manage, desc, (ship_type::types)i, e, false);
+
+                if(success)
+                {
+                    desc.num_ships[i]++;
+                }
             }
         }
 
