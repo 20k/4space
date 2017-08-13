@@ -470,6 +470,18 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
 
+        int colony_deficit = std::max(desc.num_unowned_planets - desc.num_ships[ship_type::COLONY], 0);
+
+        for(int i=0; i<colony_deficit; i++)
+        {
+            bool success = try_construct(fleet_manage, desc, ship_type::COLONY, e, false);
+
+            if(success)
+            {
+                desc.num_ships[ship_type::COLONY]++;
+            }
+        }
+
         num_resource_asteroids += desc.num_resource_asteroids;
 
         for(int i=0; i<ship_type::COUNT; i++)
