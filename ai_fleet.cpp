@@ -165,7 +165,6 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
         ship_manage->ai_controller.on_route_to = nullptr;
     }
 
-
     auto timer = MAKE_AUTO_TIMER();
 
     timer.start();
@@ -213,6 +212,12 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     try_colonise(ship_manage, o);
     try_mine(ship_manage, o);
+
+    if(!ship_manage->is_military())
+    {
+        ai_state = 0;
+        return;
+    }
 
     ///fly around?
     if(!ship_manage->can_engage())
