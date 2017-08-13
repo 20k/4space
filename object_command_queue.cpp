@@ -290,6 +290,12 @@ bool do_colonising(orbital* o, queue_type& type)
     if(sm->any_colonising())
         return false;
 
+    if(data.colony_target == nullptr)
+        return true;
+
+    if(data.colony_target->parent_system != o->parent_system)
+        return true;
+
     colony->colonising = true;
     colony->colonise_target = data.colony_target;
 
