@@ -217,6 +217,8 @@ struct orbital
     bool is_colonised();
     bool can_colonise();
 
+    bool is_mining = false;
+
     ///busy as in in combat or otherwise indisposed
     bool in_friendly_territory_and_not_busy();
     bool in_friendly_territory();
@@ -238,6 +240,9 @@ struct orbital
 
     static float calculate_orbital_drift_angle(float orbital_length, float step_s);
     float calculate_orbital_drift_angle(float step_s);
+
+    int last_num_harvesting = 0;
+    int current_num_harvesting = 0;
 
     virtual ~orbital(){}
 };

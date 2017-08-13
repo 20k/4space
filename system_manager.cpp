@@ -342,7 +342,7 @@ void orbital::do_vision_test()
     }
 }
 
-void handle_resources(orbital* me)
+/*void handle_resources(orbital* me)
 {
     me->parent_empire = nullptr;
 
@@ -402,6 +402,67 @@ void handle_resources(orbital* me)
             }
         }
     }
+}*/
+
+void check_for_resources(orbital* me)
+{
+    if(me->type != orbital_info::FLEET)
+        return;
+
+    ship_manager* sm = (ship_manager*)me->data;
+
+    if(!sm->any_with_element(ship_component_elements::ORE_HARVESTER))
+        return;
+
+    float harvest_dist = 40.f;
+
+    for(orbital* o : me->parent_system->orbitals)
+    {
+        if(o->type != orbital_info::ASTEROID && !o->is_resource_object)
+            continue;
+
+        vec2f my_pos = me->absolute_pos;
+        vec2f their_pos = o->absolute_pos;
+
+        float dist = (their_pos - my_pos).length();
+
+        if(dist > harvest_dist)
+            continue;
+
+        for(ship* s : sm->ships)
+        {
+            component* primary = s->get_component_with_primary(ship_component_elements::ORE_HARVESTER);
+
+            if(primary == nullptr)
+                continue;
+
+            o->current_num_harvesting++;
+
+            int num_harvest = o->last_num_harvesting;
+
+            if(num_harvest == 0)
+                return;
+
+            for(auto& item : primary->components)
+            {
+                const ship_component_element& type = item.first;
+                component_attribute& attr = item.second;
+
+                auto res_type = ship_component_elements::element_infos[(int)type].resource_type;
+
+                if(res_type == resource::COUNT)
+                    continue;
+
+                float ore_mult = primary->components[ship_component_elements::ORE_HARVESTER].produced_per_s;
+
+                ore_mult = (1 + ore_mult)/2.f;
+
+                attr.produced_per_s = ore_mult * o->produced_resources_ps.get_resource(res_type).amount / num_harvest;
+            }
+
+            return;
+        }
+    }
 }
 
 void orbital::tick(float step_s)
@@ -415,9 +476,21 @@ void orbital::tick(float step_s)
 
     command_queue.tick(this, step_s);
 
-    if(type == orbital_info::ASTEROID && is_resource_object)
+    /*if(type == orbital_info::ASTEROID && is_resource_object)
     {
         handle_resources(this);
+    }*/
+
+    if(type == orbital_info::FLEET && ((ship_manager*)data)->any_with_element(ship_component_elements::ORE_HARVESTER))
+    {
+        check_for_resources(this);
+    }
+
+
+    if(type == orbital_info::ASTEROID && is_resource_object)
+    {
+        last_num_harvesting = current_num_harvesting;
+        current_num_harvesting = 0;
     }
 
     if(type == orbital_info::FLEET)

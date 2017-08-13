@@ -33,6 +33,10 @@ std::pair<orbital*, ship_manager*> get_nearest(const std::vector<std::pair<orbit
     return ret;
 }
 
+///change command queue to accept is_currently(item_type);
+///and get_target(item_type); or something, so we can at least try and generalise this a bit
+///this codebase suffers way too much from a lack of genericness partly driven by the slightly not quite
+///enough kinds of things that can be done, so its very easy to just have can_x and can_y, not can(x)
 void try_colonise(ship_manager* sm, orbital* my_o)
 {
     if(!sm->any_with_element(ship_component_elements::COLONISER))
@@ -86,6 +90,17 @@ void try_colonise(ship_manager* sm, orbital* my_o)
             }
         }
     }
+}
+
+void try_mine(ship_manager* sm, orbital* my_o)
+{
+    if(!sm->any_with_element(ship_component_elements::ORE_HARVESTER))
+        return;
+
+    ///if we accidentally mine, multiple ships may get trapped on one asteroid if we don't have some sort of
+    ///prevention for this
+    if(my_o->is_mining)
+        return;
 }
 
 ///this takes like 4ms
