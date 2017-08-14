@@ -1409,6 +1409,14 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     e->take_ownership(ofleet2);
     e->take_ownership(fleet2);
 
+    /*for(int i=0; i<5; i++)
+    {
+        orbital* test_o = os->make_fleet(fleet_manage, 100.f, 5.f, e);
+
+        ship_manager* sm = (ship_manager*)test_o->data;
+
+        ship* s = sm->make_new_from(e, make_mining_ship().duplicate());
+    }*/
 }
 
 empire* empire_manager::birth_empire(system_manager& system_manage, fleet_manager& fleet_manage, orbital_system* os, int system_size)
