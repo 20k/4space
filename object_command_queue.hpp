@@ -81,6 +81,7 @@ struct object_command_queue
     bool is_currently_colonising();
     orbital* get_colonising_target();
 
+    void try_warp(const std::vector<orbital_system*>& systems, bool queue_to_back = false);
     void try_warp(orbital_system* fin, bool queue_to_back = false);
 
     void colonise(orbital* target, ship* colony_ship);

@@ -4610,20 +4610,20 @@ bool ship_manager::any_with_element(ship_component_element elem)
 
 bool ship_manager::all_with_element(ship_component_element elem)
 {
-    bool all = true;
+    int num_with = 0;
 
     for(ship* s : ships)
     {
         for(component& c : s->entity_list)
         {
-            if(!c.has_element(elem))
+            if(c.has_element(elem))
             {
-                all = false;
+                num_with++;
             }
         }
     }
 
-    return all;
+    return num_with == ships.size();
 }
 
 void ship_manager::enter_combat()

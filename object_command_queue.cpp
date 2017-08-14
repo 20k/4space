@@ -191,6 +191,14 @@ orbital* object_command_queue::get_colonising_target()
     return command_queue.front().data.colony_target;
 }
 
+void object_command_queue::try_warp(const std::vector<orbital_system*>& systems, bool queue_at_back)
+{
+    for(auto& i : systems)
+    {
+        try_warp(i, queue_at_back);
+    }
+}
+
 void object_command_queue::try_warp(orbital_system* fin, bool queue_to_back)
 {
     queue_type next;
