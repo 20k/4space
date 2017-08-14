@@ -39,7 +39,8 @@ struct orbital_system_descriptor
 
     //int num_mining_ships = 0;
 
-    int num_ships[ship_type::COUNT] = {0};
+    int num_ships_raw[ship_type::COUNT] = {0};
+    int num_ships_predicted[ship_type::COUNT] = {0};
 
     int num_resource_asteroids = 0;
 
@@ -157,12 +158,12 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             if(sm->any_with_element(ship_component_elements::COLONISER))
             {
-                desc.num_ships[ship_type::COLONY]++;
+                desc.num_ships_raw[ship_type::COLONY]++;
             }
 
             if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
             {
-                desc.num_ships[ship_type::MINING]++;
+                desc.num_ships_raw[ship_type::MINING]++;
             }
 
             if(e != o->parent_empire && e->is_hostile(o->parent_empire))
@@ -203,12 +204,12 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             if(sm->any_with_element(ship_component_elements::COLONISER) && fin == os)
             {
-                desc.num_ships[ship_type::COLONY]++;
+                desc.num_ships_predicted[ship_type::COLONY]++;
             }
 
             if(sm->any_with_element(ship_component_elements::ORE_HARVESTER) && fin == os)
             {
-                desc.num_ships[ship_type::MINING]++;
+                desc.num_ships_predicted[ship_type::MINING]++;
             }
 
             if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && fin == os)
@@ -221,6 +222,11 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         if(fabs(desc.hostiles_threat_rating) > 0.1f)
         {
             //printf("%f\n", desc.hostiles_threat_rating);
+        }
+
+        for(int kk = 0; kk < ship_type::COUNT; kk++)
+        {
+            desc.num_ships_predicted[kk] += desc.num_ships_raw[kk];
         }
 
         descriptor.push_back(desc);
@@ -493,8 +499,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         int ship_deficit[ship_type::COUNT] = {0};
 
-        int mining_deficit = std::max(desc.num_resource_asteroids - desc.num_ships[ship_type::MINING], 0);
-        int colony_deficit = std::max(desc.num_unowned_planets - desc.num_ships[ship_type::COLONY], 0);
+        int mining_deficit = std::max(desc.num_resource_asteroids - desc.num_ships_predicted[ship_type::MINING], 0);
+        int colony_deficit = std::max(desc.num_unowned_planets - desc.num_ships_predicted[ship_type::COLONY], 0);
 
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
@@ -520,7 +526,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                         free_ships[i].erase(free_ships[i].begin() + jj);
 
                         found = true;
-                        desc.num_ships[i]++;
+                        desc.num_ships_predicted[i]++;
                         break;
                     }
                 }
@@ -532,7 +538,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
                 if(success)
                 {
-                    desc.num_ships[i]++;
+                    desc.num_ships_raw[i]++;
+                    desc.num_ships_predicted[i]++;
                 }
             }
         }
@@ -541,7 +548,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         for(int i=0; i<ship_type::COUNT; i++)
         {
-            num_ships[i] += desc.num_ships[i];
+            num_ships[i] += desc.num_ships_raw[i];
         }
     }
 
