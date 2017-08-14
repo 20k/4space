@@ -247,13 +247,8 @@ struct ships_info
     int num_mining_ships = 0;
 };
 
-///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
-bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e, bool warp_capable)
+ship* get_ship_with_need(ship_type::types type, bool warp_capable)
 {
-    //static ship to_build[] = {make_colony_ship(), make_mining_ship(), make_default()};
-
-    ///we should probably tag ships with their purpose to let the AI know as any decision tree here
-    ///will be very incomplete (except warp/not warp)
     ship* identified_ship = nullptr;
 
     for(ship& s : default_ships_list)
@@ -300,6 +295,18 @@ bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc,
             break;
         }
     }
+
+    return identified_ship;
+}
+
+///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
+bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e, bool warp_capable)
+{
+    //static ship to_build[] = {make_colony_ship(), make_mining_ship(), make_default()};
+
+    ///we should probably tag ships with their purpose to let the AI know as any decision tree here
+    ///will be very incomplete (except warp/not warp)
+    ship* identified_ship = get_ship_with_need(type, warp_capable);
 
     if(identified_ship == nullptr)
     {
