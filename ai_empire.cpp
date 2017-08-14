@@ -498,10 +498,11 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             {
                 bool found = false;
 
-                /*for(int jj=free_ships[i].size()-1; jj >= 0; jj--)
+                int fs_size = free_ships[i].size();
+
+                for(int jj=fs_size-1; jj >= 0; jj--)
                 {
                     orbital* o = free_ships[i][jj];
-                    //free_ships[i].pop_back();
 
                     auto path = system_manage.pathfind(o, desc.os);
 
@@ -509,30 +510,12 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
                     if(path.size() > 0)
                     {
-                        free_ships.erase(free_ships.begin() + jj);
+                        free_ships[i].erase(free_ships[i].begin() + jj);
 
                         found = true;
                         desc.num_ships[i]++;
                         break;
                     }
-                }*/
-
-                if(free_ships[i].size() > 0)
-                {
-                    orbital* o = free_ships[i].back();
-                    free_ships[i].pop_back();
-
-                    auto path = system_manage.pathfind(o, desc.os);
-
-                    o->command_queue.try_warp(path, true);
-
-                    if(path.size() > 0)
-                    {
-                        found = true;
-                        desc.num_ships[i]++;
-                        continue;
-                    }
-
                 }
 
                 if(found)
