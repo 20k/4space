@@ -417,9 +417,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     std::vector<std::vector<orbital*>> free_ships;
     free_ships.resize(ship_type::COUNT);
 
-    //std::vector<orbital*> free_mining_ships;
-    //std::vector<orbital*> free_colony_ships;
-
     for(orbital* o : e->owned)
     {
         if(o->type != orbital_info::FLEET)
@@ -457,13 +454,11 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         if(sm->any_with_element(ship_component_elements::COLONISER))
         {
-            //free_colony_ships.push_back(o);
             free_ships[ship_type::COLONY].push_back(o);
         }
 
         if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
         {
-            //free_mining_ships.push_back(o);
             free_ships[ship_type::MINING].push_back(o);
         }
     }
@@ -483,8 +478,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
         {
-            //printf("hi there\n");
-
             ///we're not updating threat rating calculation which means we'll send all available ships
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
@@ -498,12 +491,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
                     auto path = system_manage.pathfind(o, desc.os);
 
-                    //printf("DEFENDING\n");
-
-                    for(auto& sys : path)
-                    {
-                        o->command_queue.try_warp(sys, true);
-                    }
+                    o->command_queue.try_warp(path, true);
                 }
             }
         }
