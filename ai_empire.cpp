@@ -11,6 +11,7 @@ namespace ship_type
         COLONY,
         MINING,
         MILITARY,
+        SCOUT,
         COUNT,
     };
 }
@@ -253,6 +254,7 @@ struct ships_info
     int num_mining_ships = 0;
 };
 
+///need to tag ships with what they do instead of this
 ship* get_ship_with_need(ship_type::types type, bool warp_capable)
 {
     ship* identified_ship = nullptr;
@@ -278,6 +280,12 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
         if(type == ship_type::MINING)
         {
             features.push_back(ship_component_elements::ORE_HARVESTER);
+        }
+
+        if(type == ship_type::SCOUT)
+        {
+            features.push_back(ship_component_elements::SCANNING_POWER);
+            features.push_back(ship_component_elements::STEALTH);
         }
 
         if(warp_capable)
