@@ -4798,11 +4798,13 @@ bool ship_manager::majority_of_type(ship_type::types type)
         ship_types[s->ai_fleet_type]++;
     }
 
-    std::sort(std::begin(ship_types),
+    /*std::sort(std::begin(ship_types),
               std::end(ship_types),
-              std::greater<int>());
+              std::greater<int>());*/
 
-    return ship_types[0] == type;
+    int index = std::distance(std::begin(ship_types), std::max_element(std::begin(ship_types), std::end(ship_types)));
+
+    return index == type && ship_types[index] > 0;
 }
 
 std::string ship_manager::get_engage_str()
