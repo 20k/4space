@@ -2571,6 +2571,7 @@ int main()
     test_event2->set_faction(derelict_empire);
 
 
+    ///If empire colours are getting messed up on loading from a file (eventually) itll be this
     empire_manage.assign_colours_non_randomly();
 
 
