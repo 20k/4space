@@ -558,5 +558,13 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     global_ship_deficit[ship_type::MINING] = mining_deficit;
     global_ship_deficit[ship_type::COLONY] = colony_deficit;
 
+    for(int i=0; i<ship_type::COUNT; i++)
+    {
+        int deficit = global_ship_deficit[i];
 
+        if(deficit <= 0)
+            continue;
+
+        try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
+    }
 }

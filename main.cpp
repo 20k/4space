@@ -2436,11 +2436,11 @@ int main()
     system_manager system_manage;
 
     orbital_system* sys_2 = system_manage.make_new();
-    sys_2->generate_full_random_system(true);
+    sys_2->generate_full_random_system(false);
     sys_2->universe_pos = {10, 10};
 
     orbital_system* sys_3 = system_manage.make_new();
-    sys_3->generate_full_random_system(true);
+    sys_3->generate_full_random_system(false);
     sys_3->universe_pos = {10, 40};
 
     orbital_system* base = system_manage.make_new();
