@@ -305,11 +305,8 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
     return identified_ship;
 }
 
-///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
-bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e, bool warp_capable)
+bool try_construct_any(fleet_manager& fleet_manage, const std::vector<orbital_system_descriptor>& descriptors, ship_type::types type, empire* e, bool warp_capable)
 {
-    //static ship to_build[] = {make_colony_ship(), make_mining_ship(), make_default()};
-
     ///we should probably tag ships with their purpose to let the AI know as any decision tree here
     ///will be very incomplete (except warp/not warp)
     ship* identified_ship = get_ship_with_need(type, warp_capable);
@@ -327,47 +324,60 @@ bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc,
     float rad = 0.f;
     float angle = 0.f;
 
-    if(e->can_fully_dispense(res_cost) && desc.owned_planets.size() > 0)
+    bool can_empire_dispense = e->can_fully_dispense(res_cost);
+
+    for(const orbital_system_descriptor& desc : descriptors)
     {
-        orbital* o = desc.owned_planets.front();
-
-        e->dispense_resources(res_cost);
-
-        rad = o->orbital_length;
-        angle = o->orbital_angle;
-
-        build = true;
-    }
-
-    if(!build && desc.constructor_ships.size() > 0)
-    {
-        for(orbital* o : desc.constructor_ships)
+        if(can_empire_dispense && desc.owned_planets.size() > 0)
         {
-            ship_manager* sm = (ship_manager*)o->data;
+            orbital* o = desc.owned_planets.front();
 
-            if(sm->can_fully_dispense(res_cost))
+            e->dispense_resources(res_cost);
+
+            rad = o->orbital_length;
+            angle = o->orbital_angle;
+
+            build = true;
+        }
+
+        if(!build && desc.constructor_ships.size() > 0)
+        {
+            for(orbital* o : desc.constructor_ships)
             {
-                sm->fully_dispense(res_cost);
-                build = true;
+                ship_manager* sm = (ship_manager*)o->data;
 
-                rad = o->orbital_length;
-                angle = o->orbital_angle;
+                if(sm->can_fully_dispense(res_cost))
+                {
+                    sm->fully_dispense(res_cost);
+                    build = true;
 
-                break;
+                    rad = o->orbital_length;
+                    angle = o->orbital_angle;
+
+                    break;
+                }
             }
+        }
+
+        if(build)
+        {
+            orbital* new_o = desc.os->make_fleet(fleet_manage, rad, angle, e);
+
+            ship_manager* sm = (ship_manager*)new_o->data;
+
+            ship* s = sm->make_new_from(e, identified_ship->duplicate());
+
+            return true;
         }
     }
 
-    if(build)
-    {
-        orbital* new_o = desc.os->make_fleet(fleet_manage, rad, angle, e);
+    return false;
+}
 
-        ship_manager* sm = (ship_manager*)new_o->data;
-
-        ship* s = sm->make_new_from(e, identified_ship->duplicate());
-    }
-
-    return build;
+///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
+bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e, bool warp_capable)
+{
+    return try_construct_any(fleet_manage, {desc}, type, e, warp_capable);
 }
 
 void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
@@ -460,6 +470,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     std::vector<orbital_system_descriptor> descriptors = process_orbitals(system_manage, e);
 
+    int num_unowned_planets = 0;
     int num_resource_asteroids = 0;
     int num_ships[ship_type::COUNT] = {0};
 
@@ -497,11 +508,10 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
 
-        int ship_deficit[ship_type::COUNT] = {0};
-
         int mining_deficit = std::max(desc.num_resource_asteroids - desc.num_ships_predicted[ship_type::MINING], 0);
         int colony_deficit = std::max(desc.num_unowned_planets - desc.num_ships_predicted[ship_type::COLONY], 0);
 
+        int ship_deficit[ship_type::COUNT] = {0};
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
 
@@ -545,6 +555,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         }
 
         num_resource_asteroids += desc.num_resource_asteroids;
+        num_unowned_planets += desc.num_unowned_planets;
 
         for(int i=0; i<ship_type::COUNT; i++)
         {
@@ -552,6 +563,12 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         }
     }
 
-    int mining_ship_deficit = num_resource_asteroids - num_ships[ship_type::MINING];
-    mining_ship_deficit = std::max(mining_ship_deficit, 0);
+    int mining_deficit = std::max(num_resource_asteroids - num_ships[ship_type::MINING], 0);
+    int colony_deficit = std::max(num_unowned_planets - num_ships[ship_type::COLONY], 0);
+
+    int global_ship_deficit[ship_type::COUNT] = {0};
+    global_ship_deficit[ship_type::MINING] = mining_deficit;
+    global_ship_deficit[ship_type::COLONY] = colony_deficit;
+
+
 }
