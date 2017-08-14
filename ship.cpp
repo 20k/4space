@@ -4608,6 +4608,24 @@ bool ship_manager::any_with_element(ship_component_element elem)
     return false;
 }
 
+bool ship_manager::all_with_element(ship_component_element elem)
+{
+    bool all = true;
+
+    for(ship* s : ships)
+    {
+        for(component& c : s->entity_list)
+        {
+            if(!c.has_element(elem))
+            {
+                all = false;
+            }
+        }
+    }
+
+    return all;
+}
+
 void ship_manager::enter_combat()
 {
     for(ship* s : ships)

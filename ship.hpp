@@ -715,6 +715,7 @@ struct ship_manager
     float get_overall_warp_drive_use_frac();
 
     bool any_with_element(ship_component_element elem);
+    bool all_with_element(ship_component_element elem);
 
     void leave_combat();
     void enter_combat();

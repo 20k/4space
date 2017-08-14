@@ -429,6 +429,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(sm->ai_controller.ai_state != ai_empire_info::IDLE)
             continue;
 
+        if(!sm->all_with_element(ship_component_elements::WARP_POWER))
+            continue;
+
         if(sm->any_with_element(ship_component_elements::COLONISER))
         {
             //free_colony_ships.push_back(o);
@@ -489,34 +492,36 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
 
-        ///ok problem: The ai is preferentially building ships and not suppressing building even when
-        ///ships are pathfinding their way there
         for(int i=0; i<ship_type::COUNT; i++)
         {
             for(int kk = 0; kk < ship_deficit[i]; kk++)
             {
-                if(free_ships[i].size() > 0)
+                bool found = false;
+
+                for(int jj=free_ships[i].size()-1; jj >= 0; jj--)
                 {
-                    orbital* o = free_ships[i].back();
-                    free_ships[i].pop_back();
+                    orbital* o = free_ships[i][jj];
+                    //free_ships[i].pop_back();
 
                     auto path = system_manage.pathfind(o, desc.os);
-
-                    //printf("hi\n");
-
 
                     for(auto& sys : path)
                     {
                         o->command_queue.try_warp(sys, true);
                     }
 
-
                     if(path.size() > 0)
                     {
+                        free_ships.erase(free_ships.begin() + jj);
+
+                        found = true;
                         desc.num_ships[i]++;
-                        continue;
+                        break;
                     }
                 }
+
+                if(found)
+                    continue;
 
                 bool success = try_construct(fleet_manage, desc, (ship_type::types)i, e, false);
 
