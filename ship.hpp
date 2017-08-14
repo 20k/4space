@@ -748,6 +748,7 @@ struct ship_manager
 
     float get_tech_adjusted_military_power();
     bool is_military();
+    bool majority_of_type(ship_type::types type);
 
     float accumulated_dt = 0;
 
@@ -759,6 +760,7 @@ struct ship_manager
     bool can_merge = false;
 
     bool in_friendly_territory = false;
+
 
     static int gid;
     int my_id = gid++;

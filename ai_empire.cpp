@@ -392,7 +392,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     std::vector<std::vector<orbital*>> free_ships;
     free_ships.resize(ship_type::COUNT);
 
-    for(orbital* o : e->owned)
+    /*for(orbital* o : e->owned)
     {
         if(o->type != orbital_info::FLEET)
             continue;
@@ -415,7 +415,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         {
             free_ships[ship_type::MILITARY].push_back(o);
         }
-    }
+    }*/
 
     for(orbital* o : e->owned)
     {
@@ -424,8 +424,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         ship_manager* sm = (ship_manager*)o->data;
 
-        if(sm->is_military())
-            continue;
+        /*if(sm->is_military())
+            continue;*/
 
         if(sm->any_in_combat())
             continue;
@@ -452,7 +452,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(!sm->all_with_element(ship_component_elements::WARP_POWER))
             continue;
 
-        if(sm->any_with_element(ship_component_elements::COLONISER))
+        /*if(sm->any_with_element(ship_component_elements::COLONISER))
         {
             free_ships[ship_type::COLONY].push_back(o);
         }
@@ -460,8 +460,16 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
         {
             free_ships[ship_type::MINING].push_back(o);
+        }*/
+
+        for(int i=0; i<ship_type::COUNT; i++)
+        {
+            if(sm->majority_of_type((ship_type::types)i))
+                free_ships[i].push_back(o);
         }
     }
+
+    printf("%i\n", free_ships[ship_type::MILITARY].size());
 
     std::vector<orbital_system_descriptor> descriptors = process_orbitals(system_manage, e);
 
@@ -481,7 +489,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             ///we're not updating threat rating calculation which means we'll send all available ships
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
-                for(int i=(int)free_ships[ship_type::MILITARY].size()-1; i >= 0; i--)
+                for(int i=((int)free_ships[ship_type::MILITARY].size())-1; i >= 0; i--)
                 {
                     orbital* o = free_ships[ship_type::MILITARY][i];
                     free_ships[ship_type::MILITARY].pop_back();

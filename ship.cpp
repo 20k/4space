@@ -8,6 +8,7 @@
 #include "procedural_text_generator.hpp"
 #include <unordered_map>
 #include "profile.hpp"
+#include <iterator>
 
 int ship_manager::gid;
 
@@ -4786,6 +4787,22 @@ bool ship_manager::is_military()
         return false;
 
     return true;
+}
+
+bool ship_manager::majority_of_type(ship_type::types type)
+{
+    int ship_types[ship_type::COUNT + 1] = {0};
+
+    for(ship* s : ships)
+    {
+        ship_types[s->ai_fleet_type]++;
+    }
+
+    std::sort(std::begin(ship_types),
+              std::end(ship_types),
+              std::greater<int>());
+
+    return ship_types[0] == type;
 }
 
 std::string ship_manager::get_engage_str()
