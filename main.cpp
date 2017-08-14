@@ -2570,6 +2570,10 @@ int main()
 
     test_event2->set_faction(derelict_empire);
 
+
+    empire_manage.assign_colours_non_randomly();
+
+
     ship_customiser ship_customise;
 
     sf::Keyboard key;
