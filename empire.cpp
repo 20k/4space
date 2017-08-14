@@ -1377,7 +1377,7 @@ void empire_manager::tick_name_fleets()
 
 void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
-    ship_manager* fleet1 = fleet_manage.make_new();
+    /*ship_manager* fleet1 = fleet_manage.make_new();
 
     ship* test_ship = fleet1->make_new_from(e, make_colony_ship());
 
@@ -1401,13 +1401,14 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     ofleet2->parent = os->get_base();
     ofleet2->data = fleet2;
 
-    e->take_ownership_of_all(os);
 
     e->take_ownership(ofleet);
     e->take_ownership(fleet1);
 
     e->take_ownership(ofleet2);
-    e->take_ownership(fleet2);
+    e->take_ownership(fleet2);*/
+
+    e->take_ownership_of_all(os);
 
     /*for(int i=0; i<5; i++)
     {

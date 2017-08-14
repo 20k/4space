@@ -94,7 +94,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
     {
         orbital* base = os->get_base();
 
-        if(!base->viewed_by[e])
+        if(!base->viewed_by[e] && base->parent_empire != e)
             continue;
 
         orbital_system_descriptor desc;
@@ -216,6 +216,9 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 desc.my_threat_rating += sm->get_tech_adjusted_military_power();
             }
         }
+
+        if(desc.is_owned_by_me)
+            printf("%i\n", desc.num_ships[ship_type::MINING]);
 
         //if(desc.contains_hostiles)
         if(fabs(desc.hostiles_threat_rating) > 0.1f)
@@ -413,10 +416,14 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(sm->any_derelict())
             continue;
 
-        //if(o->command_queue.get_warp_destinations().size() > 0)
+        if(o->command_queue.get_warp_destinations().size() > 0)
+            continue;
+
+        ///this breaks everything
+        //if(o->command_queue.command_queue.size() > 0)
         //    continue;
 
-        if(o->command_queue.command_queue.size() != 0)
+        if(o->command_queue.is_ever(object_command_queue_info::ANCHOR))
             continue;
 
         if(sm->ai_controller.ai_state != ai_empire_info::IDLE)
@@ -440,9 +447,11 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     int num_resource_asteroids = 0;
     int num_ships[ship_type::COUNT] = {0};
 
+    bool do_print = false;
+
     for(orbital_system_descriptor& desc : descriptors)
     {
-        if(!desc.is_owned)
+        if(!desc.is_owned_by_me)
             continue;
 
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
@@ -480,6 +489,18 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
 
+        if(ship_deficit[ship_type::MINING] > 0)
+        {
+            printf("%i found with %i deficit\n", desc.num_ships[ship_type::MINING], mining_deficit);
+            //printf("%i s\n", desc.num_resource_asteroids);
+
+            do_print = true;
+        }
+
+        printf("%i free\n", free_ships[ship_type::MINING].size());
+
+        int requested = 0;
+
         ///ok problem: The ai is preferentially building ships and not suppressing building even when
         ///ships are pathfinding their way there
         for(int i=0; i<ship_type::COUNT; i++)
@@ -493,13 +514,18 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
                     auto path = system_manage.pathfind(o, desc.os);
 
+                    //printf("hi\n");
+
+
                     for(auto& sys : path)
                     {
                         o->command_queue.try_warp(sys, true);
                     }
 
+
                     if(path.size() > 0)
                     {
+                        requested++;
                         desc.num_ships[i]++;
                         continue;
                     }
@@ -514,12 +540,19 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
 
+        printf("%i requested \n", requested);
+
         num_resource_asteroids += desc.num_resource_asteroids;
 
         for(int i=0; i<ship_type::COUNT; i++)
         {
             num_ships[i] += desc.num_ships[i];
         }
+    }
+
+    if(do_print)
+    {
+        printf("\n");
     }
 
     int mining_ship_deficit = num_resource_asteroids - num_ships[ship_type::MINING];

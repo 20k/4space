@@ -103,6 +103,9 @@ void try_mine(ship_manager* sm, orbital* my_o)
     if(my_o->command_queue.is_ever(object_command_queue_info::ANCHOR))
         return;
 
+    if(my_o->command_queue.is_ever(object_command_queue_info::WARP))
+        return;
+
     std::unordered_set<orbital*> free_asteroids;
 
     for(orbital* test_o : my_o->parent_system->orbitals)
@@ -119,6 +122,9 @@ void try_mine(ship_manager* sm, orbital* my_o)
     for(orbital* orb_1 : my_o->parent_system->orbitals)
     {
         if(orb_1->type != orbital_info::FLEET)
+            continue;
+
+        if(orb_1 == my_o)
             continue;
 
         //if(!orb_1->is_mining)
