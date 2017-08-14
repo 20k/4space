@@ -107,6 +107,7 @@ struct object_command_queue
     void remove_any_of(object_command_queue_info::queue_element_type type);
 
     std::vector<orbital_system*> get_warp_destinations();
+    orbital_system* get_warp_destination();
 };
 
 #endif // OBJECT_COMMAND_QUEUE_HPP_INCLUDED

@@ -197,19 +197,21 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             if(o->type != orbital_info::FLEET)
                 continue;
 
+            auto fin = o->command_queue.get_warp_destination();
+
             ship_manager* sm = (ship_manager*)o->data;
 
-            if(sm->any_with_element(ship_component_elements::COLONISER) && sm->ai_controller.on_route_to == os)
+            if(sm->any_with_element(ship_component_elements::COLONISER) && fin == os)
             {
                 desc.num_ships[ship_type::COLONY]++;
             }
 
-            if(sm->any_with_element(ship_component_elements::ORE_HARVESTER) && sm->ai_controller.on_route_to == os)
+            if(sm->any_with_element(ship_component_elements::ORE_HARVESTER) && fin == os)
             {
                 desc.num_ships[ship_type::MINING]++;
             }
 
-            if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && sm->ai_controller.on_route_to == os)
+            if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && fin == os)
             {
                 desc.my_threat_rating += sm->get_tech_adjusted_military_power();
             }
@@ -417,6 +419,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(o->command_queue.command_queue.size() != 0)
             continue;
 
+        if(sm->ai_controller.ai_state != ai_empire_info::IDLE)
+            continue;
+
         if(sm->any_with_element(ship_component_elements::COLONISER))
         {
             //free_colony_ships.push_back(o);
@@ -444,6 +449,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         {
             //printf("hi there\n");
 
+            ///we're not updating threat rating calculation which means we'll send all available ships
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
                 for(int i=(int)free_defence_ships.size()-1; i >= 0; i--)
@@ -474,6 +480,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
 
+        ///ok problem: The ai is preferentially building ships and not suppressing building even when
+        ///ships are pathfinding their way there
         for(int i=0; i<ship_type::COUNT; i++)
         {
             for(int kk = 0; kk < ship_deficit[i]; kk++)
@@ -491,7 +499,10 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                     }
 
                     if(path.size() > 0)
+                    {
+                        desc.num_ships[i]++;
                         continue;
+                    }
                 }
 
                 bool success = try_construct(fleet_manage, desc, (ship_type::types)i, e, false);

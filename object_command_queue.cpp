@@ -586,3 +586,20 @@ std::vector<orbital_system*> object_command_queue::get_warp_destinations()
 
     return systems;
 }
+
+orbital_system* object_command_queue::get_warp_destination()
+{
+    orbital_system* sys = nullptr;
+
+    for(auto& i : command_queue)
+    {
+        if(i.type != object_command_queue_info::WARP)
+            continue;
+
+        object_command_queue_info::queue_element_data& data = i.data;
+
+        sys = data.fin;
+    }
+
+    return sys;
+}

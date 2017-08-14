@@ -2586,6 +2586,15 @@ int main()
     vec2f mouse_last = {0,0};
     vec2f mpos = {0,0};
 
+    for(int i=0; i<5; i++)
+    {
+        orbital* test_o = sys_3->make_fleet(fleet_manage, 100.f, 5.f, e2);
+
+        ship_manager* sm = (ship_manager*)test_o->data;
+
+        ship* s = sm->make_new_from(e2, make_mining_ship().duplicate());
+    }
+
     /*for(orbital_system* sys : system_manage.systems)
     {
         sys->get_base()->release_ownership();
