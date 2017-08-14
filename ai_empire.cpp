@@ -145,20 +145,12 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             ship_manager* sm = (ship_manager*)o->data;
 
-            if(sm->any_with_element(ship_component_elements::COLONISER))
+            for(int i=0; i<ship_type::COUNT; i++)
             {
-                desc.num_ships_raw[ship_type::COLONY]++;
-            }
-
-            if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
-            {
-                desc.num_ships_raw[ship_type::MINING]++;
-            }
-
-            if(sm->any_with_element(ship_component_elements::SCANNING_POWER) &&
-               sm->any_with_element(ship_component_elements::STEALTH))
-            {
-                desc.num_ships_raw[ship_type::SCOUT]++;
+                if(sm->majority_of_type((ship_type::types)i))
+                {
+                    desc.num_ships_raw[i]++;
+                }
             }
 
             if(e != o->parent_empire && e->is_hostile(o->parent_empire))
@@ -197,14 +189,16 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             ship_manager* sm = (ship_manager*)o->data;
 
-            if(sm->any_with_element(ship_component_elements::COLONISER) && fin == os)
+            if(fin == os)
             {
-                desc.num_ships_predicted[ship_type::COLONY]++;
-            }
-
-            if(sm->any_with_element(ship_component_elements::ORE_HARVESTER) && fin == os)
-            {
-                desc.num_ships_predicted[ship_type::MINING]++;
+                for(int i=0; i<ship_type::COUNT; i++)
+                {
+                    if(sm->majority_of_type((ship_type::types)i))
+                    {
+                        desc.num_ships_predicted[i]++;
+                        break;
+                    }
+                }
             }
 
             if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && fin == os)
