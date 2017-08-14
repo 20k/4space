@@ -23,9 +23,9 @@
 				<Option compiler="mingw64" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
-					<Add option="-O3" />
 					<Add option="-march=native" />
 					<Add option="-ffast-math" />
+					<Add option="-Ofast" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />

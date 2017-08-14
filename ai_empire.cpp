@@ -490,7 +490,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                         o->command_queue.try_warp(sys, true);
                     }
 
-                    continue;
+                    if(path.size() > 0)
+                        continue;
                 }
 
                 bool success = try_construct(fleet_manage, desc, (ship_type::types)i, e, false);
