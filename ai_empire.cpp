@@ -4,18 +4,6 @@
 #include "ship.hpp"
 #include "ship_definitions.hpp"
 
-namespace ship_type
-{
-    enum types
-    {
-        COLONY,
-        MINING,
-        MILITARY,
-        SCOUT,
-        COUNT,
-    };
-}
-
 struct orbital_system_descriptor
 {
     int position = -1;
@@ -165,6 +153,12 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             if(sm->any_with_element(ship_component_elements::ORE_HARVESTER))
             {
                 desc.num_ships_raw[ship_type::MINING]++;
+            }
+
+            if(sm->any_with_element(ship_component_elements::SCANNING_POWER) &&
+               sm->any_with_element(ship_component_elements::STEALTH))
+            {
+                desc.num_ships_raw[ship_type::SCOUT]++;
             }
 
             if(e != o->parent_empire && e->is_hostile(o->parent_empire))
@@ -395,7 +389,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     ensure_adequate_defence(*this, e);
 
-    std::vector<orbital*> free_defence_ships;
+    std::vector<std::vector<orbital*>> free_ships;
+    free_ships.resize(ship_type::COUNT);
 
     for(orbital* o : e->owned)
     {
@@ -418,12 +413,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         if(sm->ai_controller.ai_state == ai_empire_info::IDLE)
         {
-            free_defence_ships.push_back(o);
+            free_ships[ship_type::MILITARY].push_back(o);
         }
     }
-
-    std::vector<std::vector<orbital*>> free_ships;
-    free_ships.resize(ship_type::COUNT);
 
     for(orbital* o : e->owned)
     {
@@ -489,10 +481,10 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             ///we're not updating threat rating calculation which means we'll send all available ships
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
-                for(int i=(int)free_defence_ships.size()-1; i >= 0; i--)
+                for(int i=(int)free_ships[ship_type::MILITARY].size()-1; i >= 0; i--)
                 {
-                    orbital* o = free_defence_ships[i];
-                    free_defence_ships.pop_back();
+                    orbital* o = free_ships[ship_type::MILITARY][i];
+                    free_ships[ship_type::MILITARY].pop_back();
 
                     ship_manager* sm = (ship_manager*)o->data;
                     desc.my_threat_rating += sm->get_tech_adjusted_military_power();

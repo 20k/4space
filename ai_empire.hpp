@@ -22,6 +22,18 @@ namespace ai_empire_info
     };
 }
 
+namespace ship_type
+{
+    enum types
+    {
+        COLONY,
+        MINING,
+        MILITARY,
+        SCOUT,
+        COUNT,
+    };
+}
+
 struct system_manager;
 
 ///ok new plan for empire ship states

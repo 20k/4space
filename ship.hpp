@@ -8,6 +8,7 @@
 #include "resource_manager.hpp"
 #include "research.hpp"
 #include "ai_fleet.hpp"
+#include "ai_empire.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -450,6 +451,8 @@ namespace ship_info
 
 struct ship : positional
 {
+    ship_type::types ai_fleet_type = ship_type::COUNT;
+
     std::string name;
 
     uint32_t id = gid++;

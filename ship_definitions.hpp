@@ -818,6 +818,7 @@ inline ship make_default()
     //test_ship.add(make_default_repair_systems());
 
     test_ship.name = "Military Default";
+    test_ship.ai_fleet_type = ship_type::MILITARY;
 
     return test_ship;
 }
@@ -858,6 +859,7 @@ inline ship make_scout()
     test_ship.add(make_default_fuel_tank());
 
     test_ship.name = "Scout Default";
+    test_ship.ai_fleet_type = ship_type::SCOUT;
 
     return test_ship;
 }
@@ -876,6 +878,7 @@ inline ship make_colony_ship()
     test_ship.add(make_default_fuel_tank());
 
     test_ship.name = "Colony Default";
+    test_ship.ai_fleet_type = ship_type::COLONY;
 
     return test_ship;
 }
@@ -893,6 +896,7 @@ inline ship make_mining_ship()
     test_ship.add(make_default_mining_system());
 
     test_ship.name = "Mining Default";
+    test_ship.ai_fleet_type = ship_type::MINING;
 
     return test_ship;
 }
@@ -908,6 +912,7 @@ inline ship make_small_mining_ship()
     test_ship.add(make_default_engines().with_size(0.25));
 
     test_ship.name = "Small Mining Default";
+    test_ship.ai_fleet_type = ship_type::MINING;
 
     return test_ship;
 }
