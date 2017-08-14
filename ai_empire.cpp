@@ -150,6 +150,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 if(sm->majority_of_type((ship_type::types)i))
                 {
                     desc.num_ships_raw[i]++;
+                    break;
                 }
             }
 
