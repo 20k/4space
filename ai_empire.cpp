@@ -489,8 +489,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
 
-        int requested = 0;
-
         ///ok problem: The ai is preferentially building ships and not suppressing building even when
         ///ships are pathfinding their way there
         for(int i=0; i<ship_type::COUNT; i++)
@@ -515,7 +513,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
                     if(path.size() > 0)
                     {
-                        requested++;
                         desc.num_ships[i]++;
                         continue;
                     }
