@@ -217,9 +217,6 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             }
         }
 
-        if(desc.is_owned_by_me)
-            printf("%i\n", desc.num_ships[ship_type::MINING]);
-
         //if(desc.contains_hostiles)
         if(fabs(desc.hostiles_threat_rating) > 0.1f)
         {
@@ -426,6 +423,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(o->command_queue.is_ever(object_command_queue_info::ANCHOR))
             continue;
 
+        if(o->command_queue.is_ever(object_command_queue_info::COLONISE))
+            continue;
+
         if(sm->ai_controller.ai_state != ai_empire_info::IDLE)
             continue;
 
@@ -489,16 +489,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
 
-        if(ship_deficit[ship_type::MINING] > 0)
-        {
-            printf("%i found with %i deficit\n", desc.num_ships[ship_type::MINING], mining_deficit);
-            //printf("%i s\n", desc.num_resource_asteroids);
-
-            do_print = true;
-        }
-
-        printf("%i free\n", free_ships[ship_type::MINING].size());
-
         int requested = 0;
 
         ///ok problem: The ai is preferentially building ships and not suppressing building even when
@@ -540,19 +530,12 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
 
-        printf("%i requested \n", requested);
-
         num_resource_asteroids += desc.num_resource_asteroids;
 
         for(int i=0; i<ship_type::COUNT; i++)
         {
             num_ships[i] += desc.num_ships[i];
         }
-    }
-
-    if(do_print)
-    {
-        printf("\n");
     }
 
     int mining_ship_deficit = num_resource_asteroids - num_ships[ship_type::MINING];

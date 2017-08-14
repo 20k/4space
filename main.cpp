@@ -2586,7 +2586,7 @@ int main()
     vec2f mouse_last = {0,0};
     vec2f mpos = {0,0};
 
-    for(int i=0; i<5; i++)
+    for(int i=0; i<4; i++)
     {
         orbital* test_o = sys_3->make_fleet(fleet_manage, 100.f, 5.f, e2);
 
