@@ -80,8 +80,8 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
     {
         orbital* base = os->get_base();
 
-        if(!base->viewed_by[e] && base->parent_empire != e)
-            continue;
+        //if(!base->viewed_by[e] && base->parent_empire != e)
+        //    continue;
 
         orbital_system_descriptor desc;
         desc.os = os;
@@ -362,6 +362,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     std::vector<std::vector<orbital*>> free_ships;
     free_ships.resize(ship_type::COUNT);
 
+    int num_ships[ship_type::COUNT] = {0};
+
     for(orbital* o : e->owned)
     {
         if(o->type != orbital_info::FLEET)
@@ -369,6 +371,14 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         ship_manager* sm = (ship_manager*)o->data;
 
+        for(int i=0; i<ship_type::COUNT; i++)
+        {
+            if(sm->majority_of_type((ship_type::types)i))
+            {
+                num_ships[i]++;
+                break;
+            }
+        }
 
         if(sm->any_in_combat())
             continue;
@@ -398,7 +408,10 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         for(int i=0; i<ship_type::COUNT; i++)
         {
             if(sm->majority_of_type((ship_type::types)i))
+            {
                 free_ships[i].push_back(o);
+                break;
+            }
         }
     }
 
@@ -406,7 +419,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     int num_unowned_planets = 0;
     int num_resource_asteroids = 0;
-    int num_ships[ship_type::COUNT] = {0};
 
     bool do_print = false;
 
@@ -490,13 +502,17 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         }
     }
 
+    std::sort(descriptors.begin(), descriptors.end(), [](auto& s1, auto& s2){return s1.distance_rating < s2.distance_rating;});
+
     int mining_deficit = std::max(num_resource_asteroids - num_ships[ship_type::MINING], 0);
     int colony_deficit = std::max(num_unowned_planets - num_ships[ship_type::COLONY], 0);
+
+    int max_scout_ships = 3;
 
     int global_ship_deficit[ship_type::COUNT] = {0};
     global_ship_deficit[ship_type::MINING] = mining_deficit;
     global_ship_deficit[ship_type::COLONY] = colony_deficit;
-    global_ship_deficit[ship_type::SCOUT] = std::max(3 - num_ships[ship_type::SCOUT], 0);
+    global_ship_deficit[ship_type::SCOUT] = std::max(max_scout_ships - num_ships[ship_type::SCOUT], 0);
 
     if(global_ship_deficit[ship_type::MINING] > 0)
     {
@@ -514,7 +530,30 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
     }
 
+    ///systematic exploration behaviour
     for(orbital* o : free_ships[ship_type::SCOUT])
+    {
+        orbital_system_descriptor* found_desc = nullptr;
+
+        for(auto& desc : descriptors)
+        {
+            if(desc.os->get_base()->viewed_by[e])
+                continue;
+
+            if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
+                continue;
+
+            desc.num_ships_predicted[ship_type::SCOUT]++;
+
+            auto path = system_manage.pathfind(o, desc.os);
+
+            o->command_queue.try_warp(path, true);
+            break;
+        }
+    }
+
+    ///random exploration behaviour, need a mix of the two.. ie random explore if we don't need any nearby exploration
+    /*for(orbital* o : free_ships[ship_type::SCOUT])
     {
         int random_start = randf_s(0.f, system_manage.systems.size());
 
@@ -538,5 +577,5 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                 break;
             }
         }
-    }
+    }*/
 }
