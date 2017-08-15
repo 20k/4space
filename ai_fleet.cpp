@@ -219,7 +219,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     try_colonise(ship_manage, o);
     try_mine(ship_manage, o);
 
-    if(!ship_manage->is_military())
+    if(!ship_manage->majority_of_type(ship_type::MILITARY))
     {
         ai_state = 0;
         return;
