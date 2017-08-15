@@ -93,7 +93,7 @@ struct object_command_queue
     bool is_ever(object_command_queue_info::queue_element_type type);
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
-    void add(const queue_type& type, bool at_back = true, bool queue_to_back = false);
+    void add(const queue_type& type, bool at_back = true, bool does_not_cancel_if_at_back = false);
     void tick(orbital* o, float step_s);
 
     void drift_applicable_transfer_targets(float step_s);

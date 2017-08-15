@@ -379,11 +379,11 @@ bool do_anchor_ui(orbital* o, queue_type& type)
     return add({type, data})
 }*/
 
-void object_command_queue::add(const queue_type& type, bool at_back, bool queue_to_back)
+void object_command_queue::add(const queue_type& type, bool at_back, bool does_not_cancel_if_at_back)
 {
     sf::Keyboard key;
 
-    if(!key.isKeyPressed(sf::Keyboard::LShift) && at_back && !queue_to_back)
+    if(!key.isKeyPressed(sf::Keyboard::LShift) && at_back && !does_not_cancel_if_at_back)
          cancel();
 
     if(at_back)

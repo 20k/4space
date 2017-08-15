@@ -2010,8 +2010,8 @@ void repulse(orbital* o1, orbital* o2)
     vec2f new_o1_pos = -o1_to_o2.norm() + o1->absolute_pos;
     vec2f new_o2_pos = o1_to_o2.norm() + o2->absolute_pos;
 
-    o1->transfer(new_o1_pos, o1->parent_system);
-    o2->transfer(new_o2_pos, o2->parent_system);
+    o1->transfer(new_o1_pos, o1->parent_system, false);
+    o2->transfer(new_o2_pos, o2->parent_system, false);
 }
 
 void system_manager::repulse_fleets()

@@ -323,7 +323,7 @@ bool can_afford_resource_cost(empire* e, orbital_system_descriptor& desc, const 
     return false;
 }
 
-bool try_construct_any(fleet_manager& fleet_manage, const std::vector<orbital_system_descriptor>& descriptors, ship_type::types type, empire* e, bool warp_capable)
+orbital* try_construct_any(fleet_manager& fleet_manage, const std::vector<orbital_system_descriptor>& descriptors, ship_type::types type, empire* e, bool warp_capable)
 {
     ///we should probably tag ships with their purpose to let the AI know as any decision tree here
     ///will be very incomplete (except warp/not warp)
@@ -333,7 +333,7 @@ bool try_construct_any(fleet_manager& fleet_manage, const std::vector<orbital_sy
     {
         printf("rip");
 
-        return false;
+        return nullptr;
     }
 
     auto res_cost = identified_ship->resources_cost();
@@ -385,15 +385,15 @@ bool try_construct_any(fleet_manager& fleet_manage, const std::vector<orbital_sy
 
             ship* s = sm->make_new_from(e, identified_ship->duplicate());
 
-            return true;
+            return new_o;
         }
     }
 
-    return false;
+    return nullptr;
 }
 
 ///integrate tech levels in here? I guess by the time that's necessary itll no longer affect cost
-bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e, bool warp_capable)
+orbital* try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc, ship_type::types type, empire* e, bool warp_capable)
 {
     return try_construct_any(fleet_manage, {desc}, type, e, warp_capable);
 }
@@ -652,9 +652,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                 if(found)
                     continue;
 
-                bool success = try_construct(fleet_manage, desc, (ship_type::types)i, e, false);
+                orbital* new_orbital = try_construct(fleet_manage, desc, (ship_type::types)i, e, false);
 
-                if(success)
+                if(new_orbital != nullptr)
                 {
                     desc.num_ships_raw[i]++;
                     desc.num_ships_predicted[i]++;
@@ -744,10 +744,19 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         ///this can return different for different systems currently due to ships with internal construction bays
         if(can_afford_resource_cost(e, desc, {mil, colony}))
         {
-            bool success = try_construct_any(fleet_manage, descriptors, ship_type::MILITARY, e, true);
+            orbital* o = try_construct_any(fleet_manage, descriptors, ship_type::MILITARY, e, true);
 
-            if(success)
+            if(o != nullptr)
             {
+                auto path = system_manage.pathfind(o, desc.os);
+
+                if(path.size() == 0)
+                    continue;
+
+                o->command_queue.try_warp(path, true);
+
+                //printf("%i\n", o->command_queue.command_queue.size());
+
                 speculatively_owned.insert(desc.os);
                 break;
             }
