@@ -545,8 +545,8 @@ void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int
         if(desc.contains_hostiles)
             continue;
 
-        //if(!desc.viewed)
-        //    continue;
+        if(!desc.viewed)
+            continue;
 
         if(desc.num_unowned_planets == 0)
             continue;
@@ -702,6 +702,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(!desc.is_speculatively_owned_by_me)
             continue;
 
+        ///if a fight becomes too costly, we need to have a way to abandon a system
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
         {
             ///we're not updating threat rating calculation which means we'll send all available ships
