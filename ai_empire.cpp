@@ -250,32 +250,9 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
 
     for(ship& s : default_ships_list)
     {
-        if(type == ship_type::MILITARY)
-        {
-            if(s.is_military())
-            {
-                identified_ship = &s;
-                break;
-            }
-        }
-
         std::vector<ship_component_elements::types> features;
 
-        if(type == ship_type::COLONY)
-        {
-            features.push_back(ship_component_elements::COLONISER);
-        }
-
-        if(type == ship_type::MINING)
-        {
-            features.push_back(ship_component_elements::ORE_HARVESTER);
-        }
-
-        if(type == ship_type::SCOUT)
-        {
-            features.push_back(ship_component_elements::SCANNING_POWER);
-            features.push_back(ship_component_elements::STEALTH);
-        }
+        ship_type::types found_type = s.ai_fleet_type;
 
         if(warp_capable)
         {
@@ -291,6 +268,8 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
                 all = false;
             }
         }
+
+        all = all && (type == found_type);
 
         if(all)
         {
