@@ -823,11 +823,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         num_resource_asteroids += desc.num_resource_asteroids;
         num_unowned_planets += desc.num_unowned_planets;
         needed_military_ships += estimate_number_of_defence_ships_base(desc);
-
-        /*for(int i=0; i<ship_type::COUNT; i++)
-        {
-            num_ships[i] += desc.num_ships_raw[i];
-        }*/
     }
 
     std::sort(descriptors.begin(), descriptors.end(), [](auto& s1, auto& s2){return s1.distance_rating < s2.distance_rating;});
@@ -835,8 +830,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     int military_deficit = std::max(needed_military_ships - num_ships[ship_type::MILITARY], 0);
     int mining_deficit = std::max(num_resource_asteroids - num_ships[ship_type::MINING], 0);
     int colony_deficit = std::max(num_unowned_planets - num_ships[ship_type::COLONY], 0);
-
-    //printf("%i mil\n", needed_military_ships);
 
     //printf("%i %i\n", needed_military_ships, num_ships[ship_type::MILITARY]);
 
@@ -851,7 +844,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     if(global_ship_deficit[ship_type::MINING] > 0)
     {
         global_ship_deficit[ship_type::SCOUT] = 0;
-        //global_ship_deficit[ship_type::MILITARY] = 0;
+        global_ship_deficit[ship_type::MILITARY] = 0;
     }
 
     for(int i=0; i<ship_type::COUNT; i++)
