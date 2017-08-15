@@ -332,6 +332,23 @@ orbital* get_constructor_for(empire* e, const std::vector<orbital_system_descrip
 ///update to allow partial building through shipyards?
 bool can_afford_resource_cost(empire* e, orbital_system_descriptor& desc, const std::vector<ship*>& ships)
 {
+    std::map<resource::types, float> res_cost;
+
+    for(ship* s : ships)
+    {
+        auto nres_cost = s->resources_cost();
+
+        for(auto& i : nres_cost)
+        {
+            res_cost[i.first] += i.second;
+        }
+    }
+
+    bool can_empire_dispense = e->can_fully_dispense(res_cost);
+
+    if(can_empire_dispense)
+        return true;
+
     return get_constructor_for(e, {desc}, ships) != nullptr;
 }
 
@@ -528,8 +545,8 @@ void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int
         if(desc.contains_hostiles)
             continue;
 
-        if(!desc.viewed)
-            continue;
+        //if(!desc.viewed)
+        //    continue;
 
         if(desc.num_unowned_planets == 0)
             continue;
@@ -580,8 +597,6 @@ void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int
                 }
 
                 o->command_queue.try_warp(path, true);
-
-                //printf("%i\n", o->command_queue.command_queue.size());
 
                 e->ai_empire_controller.speculatively_owned.insert(desc.os);
                 break;
