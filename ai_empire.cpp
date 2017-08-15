@@ -352,6 +352,104 @@ bool try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& desc,
     return try_construct_any(fleet_manage, {desc}, type, e, warp_capable);
 }
 
+void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::vector<orbital_system_descriptor>& descriptors, system_manager& system_manage)
+{
+    std::vector<orbital_system*> to_explore;
+
+    ///systematic exploration behaviour
+    for(orbital* o : free_ships[ship_type::SCOUT])
+    {
+        for(auto& desc : descriptors)
+        {
+            if(desc.os->get_base()->viewed_by[o->parent_empire])
+                continue;
+
+            if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
+                continue;
+
+            desc.num_ships_predicted[ship_type::SCOUT]++;
+
+            auto path = system_manage.pathfind(o, desc.os);
+
+            if(path.size() > 0)
+            {
+                //o->command_queue.try_warp(path, true);
+
+                to_explore.push_back(desc.os);
+                break;
+            }
+        }
+    }
+
+    if(to_explore.size() == 0)
+        return;
+
+    ///find nearest ship and use that to explore
+    for(orbital* o : free_ships[ship_type::SCOUT])
+    {
+        float min_dist = FLT_MAX;
+        orbital_system* found = nullptr;
+
+        auto it = to_explore.begin();
+
+        for(it = to_explore.begin(); it != to_explore.end(); it++)
+        {
+            float dist = ((*it)->universe_pos - o->parent_system->universe_pos).length();
+
+            auto path = system_manage.pathfind(o, *it);
+
+            if(path.size() == 0)
+                continue;
+
+            if(dist < min_dist)
+            {
+                min_dist = dist;
+                found = *it;
+            }
+        }
+
+        if(it != to_explore.end())
+            to_explore.erase(it);
+
+        if(found == nullptr)
+            continue;
+
+        auto path = system_manage.pathfind(o, found);
+
+        if(path.size() > 0)
+        {
+            o->command_queue.try_warp(path, true);
+        }
+    }
+
+    ///random exploration behaviour, need a mix of the two.. ie random explore if we don't need any nearby exploration
+    /*for(orbital* o : free_ships[ship_type::SCOUT])
+    {
+        int random_start = randf_s(0.f, system_manage.systems.size());
+
+        int max_count = system_manage.systems.size();
+
+        for(int i=0; i<max_count; i++)
+        {
+            int modc = (i + random_start) % max_count;
+
+            orbital_system* sys = system_manage.systems[modc];
+
+            if(!sys->get_base()->viewed_by[e])
+            {
+                auto path = system_manage.pathfind(o, sys);
+
+                if(path.size() == 0)
+                    continue;
+
+                o->command_queue.try_warp(path);
+
+                break;
+            }
+        }
+    }*/
+}
+
 void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
 {
     if(e->is_pirate)
@@ -530,95 +628,5 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
     }
 
-    std::vector<orbital_system*> to_explore;
-
-    ///systematic exploration behaviour
-    for(orbital* o : free_ships[ship_type::SCOUT])
-    {
-        for(auto& desc : descriptors)
-        {
-            if(desc.os->get_base()->viewed_by[e])
-                continue;
-
-            if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
-                continue;
-
-            desc.num_ships_predicted[ship_type::SCOUT]++;
-
-            auto path = system_manage.pathfind(o, desc.os);
-
-            if(path.size() > 0)
-            {
-                //o->command_queue.try_warp(path, true);
-
-                to_explore.push_back(desc.os);
-                break;
-            }
-        }
-    }
-
-    ///find nearest ship and use that to explore
-    for(orbital* o : free_ships[ship_type::SCOUT])
-    {
-        float min_dist = FLT_MAX;
-        orbital_system* found = nullptr;
-
-        auto it = to_explore.begin();
-
-        for(it = to_explore.begin(); it != to_explore.end(); it++)
-        {
-            float dist = ((*it)->universe_pos - o->parent_system->universe_pos).length();
-
-            auto path = system_manage.pathfind(o, *it);
-
-            if(path.size() == 0)
-                continue;
-
-            if(dist < min_dist)
-            {
-                min_dist = dist;
-                found = *it;
-            }
-        }
-
-        if(it != to_explore.end())
-            to_explore.erase(it);
-
-        if(found == nullptr)
-            continue;
-
-        auto path = system_manage.pathfind(o, found);
-
-        if(path.size() > 0)
-        {
-            o->command_queue.try_warp(path, true);
-        }
-    }
-
-    ///random exploration behaviour, need a mix of the two.. ie random explore if we don't need any nearby exploration
-    /*for(orbital* o : free_ships[ship_type::SCOUT])
-    {
-        int random_start = randf_s(0.f, system_manage.systems.size());
-
-        int max_count = system_manage.systems.size();
-
-        for(int i=0; i<max_count; i++)
-        {
-            int modc = (i + random_start) % max_count;
-
-            orbital_system* sys = system_manage.systems[modc];
-
-            if(!sys->get_base()->viewed_by[e])
-            {
-                auto path = system_manage.pathfind(o, sys);
-
-                if(path.size() == 0)
-                    continue;
-
-                o->command_queue.try_warp(path);
-
-                break;
-            }
-        }
-    }*/
+    scout_explore(free_ships, descriptors, system_manage);
 }
