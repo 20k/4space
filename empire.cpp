@@ -711,6 +711,8 @@ void empire::ally(empire* e)
 
        o->viewed_by[e] = true;
     }
+
+    trade_space_access(e, true);
 }
 
 void empire::unally(empire* e)
