@@ -188,7 +188,7 @@ void ship_component_elements::generate_element_infos()
     ei[STEALTH].research_type = research_info::MATERIALS;
 
 
-    ei[COLONISER].display_name = "Coloniser";
+    ei[COLONISER].display_name = "Habitation Systems";
     ei[COLONISER].research_type = research_info::MATERIALS;
 
 
