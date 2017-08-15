@@ -244,6 +244,8 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         id++;
     }
 
+    //printf("end\n");
+
     return descriptor;
 }
 
@@ -678,6 +680,11 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
 
+        /*if(sm->majority_of_type(ship_type::MILITARY))
+        {
+            std::cout << o->name << std::endl;
+        }*/
+
         if(sm->any_in_combat())
             continue;
 
@@ -817,10 +824,10 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         num_unowned_planets += desc.num_unowned_planets;
         needed_military_ships += estimate_number_of_defence_ships_base(desc);
 
-        for(int i=0; i<ship_type::COUNT; i++)
+        /*for(int i=0; i<ship_type::COUNT; i++)
         {
             num_ships[i] += desc.num_ships_raw[i];
-        }
+        }*/
     }
 
     std::sort(descriptors.begin(), descriptors.end(), [](auto& s1, auto& s2){return s1.distance_rating < s2.distance_rating;});
