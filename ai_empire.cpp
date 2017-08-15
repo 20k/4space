@@ -250,9 +250,10 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
 
     for(ship& s : default_ships_list)
     {
-        std::vector<ship_component_elements::types> features;
+        if(s.ai_fleet_type != type)
+            continue;
 
-        ship_type::types found_type = s.ai_fleet_type;
+        std::vector<ship_component_elements::types> features;
 
         if(warp_capable)
         {
@@ -266,10 +267,9 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
             if(!s.get_component_with(i))
             {
                 all = false;
+                break;
             }
         }
-
-        all = all && (type == found_type);
 
         if(all)
         {
