@@ -637,11 +637,15 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     if(highlight && type == orbital_info::FLEET)
     {
+        std::string nname = get_name_with_info_warfare(viewer_empire) + "###" + name + std::to_string(unique_id);
+
+        ImGui::SkipFrosting(nname);
+
         ImGui::SetNextWindowPos(ImVec2(round(real_coord.x + get_pixel_radius(win)), round(real_coord.y)));
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
-        ImGui::Begin((get_name_with_info_warfare(viewer_empire) + "###" + name + std::to_string(unique_id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+        ImGui::Begin(nname.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
 
         ImGui::Text(get_name_with_info_warfare(viewer_empire).c_str());
 
