@@ -2339,7 +2339,8 @@ int main()
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
-    hostile_empire->has_ai = true;
+    //hostile_empire->has_ai = true;
+    hostile_empire->has_ai = false;
 
     hostile_empire->research_tech_level.categories[research_info::MATERIALS].amount = 3.f;
     hostile_empire->trade_space_access(player_empire, true);

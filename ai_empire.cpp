@@ -46,6 +46,13 @@ struct orbital_system_descriptor
     float my_threat_rating = 0.f;
 };
 
+int estimate_number_of_defence_ships_base(orbital_system_descriptor& desc)
+{
+    int rough_valuable_entities = desc.owned_planets.size() + desc.num_unowned_planets + desc.num_resource_asteroids;
+
+    return std::max((int)ceil(rough_valuable_entities/2), 1);
+}
+
 std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empire* e, ai_empire& ai_emp)
 {
     vec2f my_avg_pos = {0,0};
@@ -151,7 +158,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
 
             ship_manager* sm = (ship_manager*)o->data;
 
-            for(int i=0; i<ship_type::COUNT; i++)
+            for(int i=0; i<ship_type::COUNT && o->parent_empire == e; i++)
             {
                 if(sm->majority_of_type((ship_type::types)i))
                 {
@@ -159,6 +166,13 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                     break;
                 }
             }
+
+            /*if(sm->majority_of_type(ship_type::MILITARY))
+            {
+                std::cout << "hi\n";
+                std::cout << o->name << std::endl;
+                std::cout << o->parent_empire->name << std::endl;
+            }*/
 
             if(e != o->parent_empire && e->is_hostile(o->parent_empire))
             {
@@ -569,7 +583,16 @@ void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int
         ship* colony = get_ship_with_need(ship_type::COLONY, true);
         ship* mil = get_ship_with_need(ship_type::MILITARY, true);
 
-        orbital* constructor_orbital = get_constructor_for(e, descriptors, {mil, colony});
+        int estimated_defence_ships = estimate_number_of_defence_ships_base(desc);
+
+        std::vector<ship*> ships = {colony};
+
+        for(int i=0; i<estimated_defence_ships; i++)
+        {
+            ships.push_back(mil);
+        }
+
+        orbital* constructor_orbital = get_constructor_for(e, descriptors, ships);
 
         if(constructor_orbital == nullptr)
             continue;
@@ -694,6 +717,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     int num_unowned_planets = 0;
     int num_resource_asteroids = 0;
+    int needed_military_ships = 0;
 
     bool do_print = false;
 
@@ -714,9 +738,16 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                     free_ships[ship_type::MILITARY].pop_back();
 
                     ship_manager* sm = (ship_manager*)o->data;
-                    desc.my_threat_rating += sm->get_tech_adjusted_military_power();
+
+                    if(!sm->all_with_element(ship_component_elements::WARP_POWER))
+                        continue;
 
                     auto path = system_manage.pathfind(o, desc.os);
+
+                    if(path.size() == 0)
+                        continue;
+
+                    desc.my_threat_rating += sm->get_tech_adjusted_military_power();
 
                     o->command_queue.try_warp(path, true);
 
@@ -728,12 +759,18 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
 
+        int military_deficit = std::max(estimate_number_of_defence_ships_base(desc) - desc.num_ships_predicted[ship_type::MILITARY], 0);
         int mining_deficit = std::max(desc.num_resource_asteroids - desc.num_ships_predicted[ship_type::MINING], 0);
         int colony_deficit = std::max(desc.num_unowned_planets - desc.num_ships_predicted[ship_type::COLONY], 0);
 
         int ship_deficit[ship_type::COUNT] = {0};
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
+
+        if(mining_deficit == 0)
+        {
+            ship_deficit[ship_type::MILITARY] = military_deficit;
+        }
 
         for(int i=0; i<ship_type::COUNT; i++)
         {
@@ -764,6 +801,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                 if(found)
                     continue;
 
+                ///need some way to fairly distribute building ships so we never get stuck
+                ///only build mining ships, or military ships
                 orbital* new_orbital = try_construct(fleet_manage, desc, (ship_type::types)i, e, false);
 
                 if(new_orbital != nullptr)
@@ -776,6 +815,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
         num_resource_asteroids += desc.num_resource_asteroids;
         num_unowned_planets += desc.num_unowned_planets;
+        needed_military_ships += estimate_number_of_defence_ships_base(desc);
 
         for(int i=0; i<ship_type::COUNT; i++)
         {
@@ -785,8 +825,13 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     std::sort(descriptors.begin(), descriptors.end(), [](auto& s1, auto& s2){return s1.distance_rating < s2.distance_rating;});
 
+    int military_deficit = std::max(needed_military_ships - num_ships[ship_type::MILITARY], 0);
     int mining_deficit = std::max(num_resource_asteroids - num_ships[ship_type::MINING], 0);
     int colony_deficit = std::max(num_unowned_planets - num_ships[ship_type::COLONY], 0);
+
+    //printf("%i mil\n", needed_military_ships);
+
+    //printf("%i %i\n", needed_military_ships, num_ships[ship_type::MILITARY]);
 
     int max_scout_ships = 3;
 
@@ -794,10 +839,12 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     global_ship_deficit[ship_type::MINING] = mining_deficit;
     global_ship_deficit[ship_type::COLONY] = colony_deficit;
     global_ship_deficit[ship_type::SCOUT] = std::max(max_scout_ships - num_ships[ship_type::SCOUT], 0);
+    global_ship_deficit[ship_type::MILITARY] = military_deficit;
 
     if(global_ship_deficit[ship_type::MINING] > 0)
     {
         global_ship_deficit[ship_type::SCOUT] = 0;
+        //global_ship_deficit[ship_type::MILITARY] = 0;
     }
 
     for(int i=0; i<ship_type::COUNT; i++)
