@@ -850,10 +850,10 @@ inline ship make_scout()
     //test_ship.add(make_default_ammo_store());
     //test_ship.add(make_default_shields());
     test_ship.add(make_default_power_core().with_size(1.25));
-    test_ship.add(make_default_engines().with_size(0.75));
+    test_ship.add(make_default_engines().with_size(0.5));
     test_ship.add(make_default_warp_drive().with_size(1.25));
     test_ship.add(make_default_scanner());
-    test_ship.add(make_default_heatsink().with_size(0.75));
+    test_ship.add(make_default_heatsink().with_size(1.));
     test_ship.add(make_default_torpedo().with_size(0.5));
     test_ship.add(make_default_stealth());
     test_ship.add(make_default_fuel_tank());

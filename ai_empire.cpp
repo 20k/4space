@@ -530,6 +530,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
     }
 
+    std::vector<orbital_system*> to_explore;
+
     ///systematic exploration behaviour
     for(orbital* o : free_ships[ship_type::SCOUT])
     {
@@ -547,8 +549,44 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
             auto path = system_manage.pathfind(o, desc.os);
 
+            if(path.size() > 0)
+            {
+                //o->command_queue.try_warp(path, true);
+
+                to_explore.push_back(desc.os);
+                break;
+            }
+        }
+    }
+    for(orbital* o : free_ships[ship_type::SCOUT])
+    {
+        float min_dist = FLT_MAX;
+        orbital_system* found = nullptr;
+
+        auto it = to_explore.begin();
+
+        for(it = to_explore.begin(); it != to_explore.end(); it++)
+        {
+            float dist = ((*it)->universe_pos - o->parent_system->universe_pos).length();
+
+            if(dist < min_dist)
+            {
+                min_dist = dist;
+                found = *it;
+            }
+        }
+
+        if(it != to_explore.end())
+            to_explore.erase(it);
+
+        if(found == nullptr)
+            continue;
+
+        auto path = system_manage.pathfind(o, found);
+
+        if(path.size() > 0)
+        {
             o->command_queue.try_warp(path, true);
-            break;
         }
     }
 
