@@ -123,7 +123,7 @@ namespace ship_component_elements
 
     static std::vector<types> skippable_in_display_def
     {
-        COLONISER,
+        //COLONISER,
         RAILGUN,
         TORPEDO,
         PLASMAGUN,

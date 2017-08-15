@@ -607,6 +607,13 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                     auto path = system_manage.pathfind(o, desc.os);
 
                     o->command_queue.try_warp(path, true);
+
+                    desc.my_threat_rating += sm->get_tech_adjusted_military_power();
+
+                    bool high_threat = desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating);
+
+                    if(!high_threat)
+                        break;
                 }
             }
         }
@@ -698,9 +705,12 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     std::vector<orbital_system_descriptor> to_consider_colonising;
 
-    for(int i=0; i<10 && i < descriptors.size(); i++)
+    for(int i=0; i< descriptors.size(); i++)
     {
         orbital_system_descriptor& desc = descriptors[i];
+
+        if(desc.is_speculatively_owned_by_me)
+            continue;
 
         if(desc.is_owned)
             continue;
@@ -715,6 +725,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             continue;
 
         to_consider_colonising.push_back(desc);
+
+        if(to_consider_colonising.size() >= 10)
+            break;
     }
 
     if(global_ship_deficit[ship_type::MINING] != 0)
@@ -733,7 +746,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         ///this can return different for different systems currently due to ships with internal construction bays
         if(can_afford_resource_cost(e, desc, {mil, colony}))
         {
-            bool success = try_construct(fleet_manage, desc, ship_type::MILITARY, e, true);
+            bool success = try_construct_any(fleet_manage, descriptors, ship_type::MILITARY, e, true);
 
             if(success)
             {
@@ -741,5 +754,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
                 break;
             }
         }
+
+        break;
     }
 }
