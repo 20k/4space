@@ -10,14 +10,15 @@ struct orbital_system_descriptor
 
     orbital_system* os = nullptr;
 
-    //float weighted_resource_importance = 0.f;
-
     ///how valuable are the resources in this system to us
+    bool is_speculatively_owned_by_me = false;
     bool is_owned_by_me = false;
     bool is_owned = false;
     bool is_allied = false;
     ///is_hostile?
     bool contains_hostiles = false;
+
+    bool viewed = false;
 
     int num_unowned_planets = 0;
 
@@ -45,7 +46,7 @@ struct orbital_system_descriptor
     float my_threat_rating = 0.f;
 };
 
-std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empire* e)
+std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empire* e, ai_empire& ai_emp)
 {
     vec2f my_avg_pos = {0,0};
 
@@ -86,9 +87,20 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         orbital_system_descriptor desc;
         desc.os = os;
 
+        for(orbital_system* other_os : ai_emp.speculatively_owned)
+        {
+            if(os == other_os)
+            {
+                desc.is_speculatively_owned_by_me = true;
+            }
+        }
+
+        desc.viewed = base->viewed_by[e];
+
         if(base->parent_empire == e)
         {
             desc.is_owned_by_me = true;
+            desc.is_speculatively_owned_by_me = true;
         }
 
         if(base->parent_empire != nullptr)
@@ -107,9 +119,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         {
             resource_manager potential_resources = os->get_potential_resources();
 
-            float rarity = potential_resources.get_weighted_rarity();
-
-            desc.resource_rating = rarity;
+            desc.resource_rating = potential_resources.get_weighted_rarity();
         }
 
         desc.distance_rating = (os->universe_pos - my_avg_pos).length();
@@ -275,6 +285,42 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
     }
 
     return identified_ship;
+}
+
+///update to allow partial building through shipyards?
+bool can_afford_resource_cost(empire* e, orbital_system_descriptor& desc, const std::vector<ship*>& ships)
+{
+    std::map<resource::types, float> res_cost;
+
+    for(ship* s : ships)
+    {
+        auto nres_cost = s->resources_cost();
+
+        for(auto& i : nres_cost)
+        {
+            res_cost[i.first] += i.second;
+        }
+    }
+
+    if(e->can_fully_dispense(res_cost))
+    {
+        return true;
+    }
+
+    if(desc.constructor_ships.size() > 0)
+    {
+        for(orbital* o : desc.constructor_ships)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(sm->can_fully_dispense(res_cost))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool try_construct_any(fleet_manager& fleet_manage, const std::vector<orbital_system_descriptor>& descriptors, ship_type::types type, empire* e, bool warp_capable)
@@ -450,6 +496,26 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
     }*/
 }
 
+bool has_resources_to_colonise(empire* e, orbital_system_descriptor& desc)
+{
+    int num_military_ships = 1;
+    int num_colony_ships = 1;
+
+    std::vector<ship*> ships;
+
+    for(int i=0; i<num_military_ships; i++)
+    {
+        ships.push_back(get_ship_with_need(ship_type::MILITARY, true));
+    }
+
+    for(int i=0; i<num_colony_ships; i++)
+    {
+        ships.push_back(get_ship_with_need(ship_type::COLONY, true));
+    }
+
+    return can_afford_resource_cost(e, desc, ships);
+}
+
 void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
 {
     if(e->is_pirate)
@@ -513,7 +579,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         }
     }
 
-    std::vector<orbital_system_descriptor> descriptors = process_orbitals(system_manage, e);
+    std::vector<orbital_system_descriptor> descriptors = process_orbitals(system_manage, e, *this);
 
     int num_unowned_planets = 0;
     int num_resource_asteroids = 0;
@@ -522,7 +588,7 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     for(orbital_system_descriptor& desc : descriptors)
     {
-        if(!desc.is_owned_by_me)
+        if(!desc.is_speculatively_owned_by_me)
             continue;
 
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
@@ -629,4 +695,51 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     }
 
     scout_explore(free_ships, descriptors, system_manage);
+
+    std::vector<orbital_system_descriptor> to_consider_colonising;
+
+    for(int i=0; i<10 && i < descriptors.size(); i++)
+    {
+        orbital_system_descriptor& desc = descriptors[i];
+
+        if(desc.is_owned)
+            continue;
+
+        if(desc.contains_hostiles)
+            continue;
+
+        if(!desc.viewed)
+            continue;
+
+        if(desc.num_unowned_planets == 0)
+            continue;
+
+        to_consider_colonising.push_back(desc);
+    }
+
+    if(global_ship_deficit[ship_type::MINING] != 0)
+    {
+        to_consider_colonising.clear();
+    }
+
+    std::sort(to_consider_colonising.begin(), to_consider_colonising.end(), [](auto& s1, auto& s2){return s1.resource_rating > s2.resource_rating;});
+
+    for(auto& desc : to_consider_colonising)
+    {
+        ship* colony = get_ship_with_need(ship_type::COLONY, true);
+        ship* mil = get_ship_with_need(ship_type::MILITARY, true);
+
+        ///expected to vary per system down the road based on military costs etc
+        ///this can return different for different systems currently due to ships with internal construction bays
+        if(can_afford_resource_cost(e, desc, {mil, colony}))
+        {
+            bool success = try_construct(fleet_manage, desc, ship_type::MILITARY, e, true);
+
+            if(success)
+            {
+                speculatively_owned.insert(desc.os);
+                break;
+            }
+        }
+    }
 }

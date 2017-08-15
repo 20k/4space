@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <unordered_set>
 
 struct ship_manager;
 struct empire;
@@ -35,6 +36,7 @@ namespace ship_type
 }
 
 struct system_manager;
+struct orbital_system;
 
 ///ok new plan for empire ship states
 ///systems request a certain amount of ships for their defence
@@ -49,6 +51,7 @@ struct fleet_manager;
 struct ai_empire
 {
     std::map<ship_manager*, ship_general_state> general_purpose_state;
+    std::unordered_set<orbital_system*> speculatively_owned;
 
     void tick(fleet_manager& fm, system_manager& sm, empire* e);
 };
