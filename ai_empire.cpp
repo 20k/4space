@@ -287,8 +287,7 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
     return identified_ship;
 }
 
-///update to allow partial building through shipyards?
-bool can_afford_resource_cost(empire* e, orbital_system_descriptor& desc, const std::vector<ship*>& ships)
+orbital* get_constructor_for(empire* e, const std::vector<orbital_system_descriptor>& descriptors, const std::vector<ship*>& ships)
 {
     std::map<resource::types, float> res_cost;
 
@@ -302,25 +301,38 @@ bool can_afford_resource_cost(empire* e, orbital_system_descriptor& desc, const 
         }
     }
 
-    if(e->can_fully_dispense(res_cost))
-    {
-        return true;
-    }
+    bool can_empire_dispense = e->can_fully_dispense(res_cost);
 
-    if(desc.constructor_ships.size() > 0)
+    for(const orbital_system_descriptor& desc : descriptors)
     {
-        for(orbital* o : desc.constructor_ships)
+        if(can_empire_dispense && desc.owned_planets.size() > 0)
         {
-            ship_manager* sm = (ship_manager*)o->data;
+            orbital* o = desc.owned_planets.front();
 
-            if(sm->can_fully_dispense(res_cost))
+            return o;
+        }
+
+        if(desc.constructor_ships.size() > 0)
+        {
+            for(orbital* o : desc.constructor_ships)
             {
-                return true;
+                ship_manager* sm = (ship_manager*)o->data;
+
+                if(sm->can_fully_dispense(res_cost))
+                {
+                    return o;
+                }
             }
         }
     }
 
-    return false;
+    return nullptr;
+}
+
+///update to allow partial building through shipyards?
+bool can_afford_resource_cost(empire* e, orbital_system_descriptor& desc, const std::vector<ship*>& ships)
+{
+    return get_constructor_for(e, {desc}, ships) != nullptr;
 }
 
 orbital* try_construct_any(fleet_manager& fleet_manage, const std::vector<orbital_system_descriptor>& descriptors, ship_type::types type, empire* e, bool warp_capable)
@@ -524,7 +536,7 @@ void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int
 
         to_consider_colonising.push_back(desc);
 
-        if(to_consider_colonising.size() >= 10)
+        if(to_consider_colonising.size() >= 20)
             break;
     }
 
@@ -540,24 +552,32 @@ void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int
         ship* colony = get_ship_with_need(ship_type::COLONY, true);
         ship* mil = get_ship_with_need(ship_type::MILITARY, true);
 
+        orbital* constructor_orbital = get_constructor_for(e, descriptors, {mil, colony});
+
+        if(constructor_orbital == nullptr)
+            continue;
+
+        auto test_path = system_manage.pathfind(std::min(colony->get_warp_distance(), mil->get_warp_distance()),
+                                                constructor_orbital->parent_system,
+                                                desc.os);
+
+        if(test_path.size() == 0)
+            continue;
+
         ///expected to vary per system down the road based on military costs etc
         ///this can return different for different systems currently due to ships with internal construction bays
         if(can_afford_resource_cost(e, desc, {mil, colony}))
         {
             orbital* o = try_construct_any(fleet_manage, descriptors, ship_type::MILITARY, e, true);
 
-            printf("hi there\n");
-
             if(o != nullptr)
             {
                 auto path = system_manage.pathfind(o, desc.os);
 
-                printf("hi 2\n");
-
                 if(path.size() == 0)
+                {
                     continue;
-
-                printf("hi 3\n");
+                }
 
                 o->command_queue.try_warp(path, true);
 

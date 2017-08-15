@@ -336,6 +336,7 @@ struct system_manager
     orbital_system* get_by_element(void* ptr);
     orbital* get_by_element_orbital(void* ptr);
 
+    std::vector<orbital_system*> pathfind(float max_warp_distance, orbital_system* start, orbital_system* fin);
     std::vector<orbital_system*> pathfind(orbital* o, orbital_system* fin);
     void add_draw_pathfinding(const std::vector<orbital_system*>& path);
 
