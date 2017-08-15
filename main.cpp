@@ -1133,6 +1133,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     sf::Mouse mouse;
     sf::Keyboard key;
 
+    bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
     bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
 
     int x = mouse.getPosition(win).x;
@@ -1276,7 +1277,9 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(rclick && (o->type == orbital_info::FLEET) && o->parent_empire == player_empire && !sm->any_colonising() && system_manage.in_system_view())
                 {
-                    o->request_transfer({transformed.x, transformed.y}, system_manage.currently_viewed);
+                    //o->request_transfer({transformed.x, transformed.y}, system_manage.currently_viewed);
+
+                    o->command_queue.transfer({transformed.x, transformed.y}, o, system_manage.currently_viewed, true, false, false, lshift);
                 }
 
                 ImGui::BeginGroup();
@@ -1770,7 +1773,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         //colony_ship->colonising = true;
                         //colony_ship->colonise_target = system_orbital;
 
-                        o->command_queue.colonise(system_orbital, colony_ship);
+                        o->command_queue.colonise(system_orbital, colony_ship, lshift);
                     }
                 }
             }
@@ -1782,7 +1785,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 if(ImGui::IsItemClicked_Registered())
                 {
                     //o->command_queue.anchor(o->parent_system->get_base());
-                    o->command_queue.anchor_ui_state();
+                    o->command_queue.anchor_ui_state(lshift);
                 }
             }
 
@@ -1974,7 +1977,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     if(!skip)
                     {
                         for(orbital_system* sys : path)
-                            o->command_queue.try_warp(sys, true);
+                            o->command_queue.try_warp(sys, true, lshift);
                     }
                 }
             }

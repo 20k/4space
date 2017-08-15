@@ -121,7 +121,7 @@ bool do_warp(orbital* o, queue_type& type)
     return true;
 }
 
-void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool target_drifts)
+void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool target_drifts, bool lshift)
 {
     queue_type next;
 
@@ -144,10 +144,10 @@ void object_command_queue::transfer(float pnew_rad, float pnew_angle, orbital* o
         command_queue.pop_front();
     }
 
-    add(next, at_back);
+    add(next, at_back, false, lshift);
 }
 
-void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool target_drifts)
+void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back, bool combat_move, bool target_drifts, bool lshift)
 {
     vec2f base;
 
@@ -156,7 +156,7 @@ void object_command_queue::transfer(vec2f pos, orbital* o, orbital_system* viewi
 
     vec2f rel = pos - base;
 
-    transfer(rel.length(), rel.angle(), o, viewing_system, at_back, combat_move, target_drifts);
+    transfer(rel.length(), rel.angle(), o, viewing_system, at_back, combat_move, target_drifts, lshift);
 }
 
 bool object_command_queue::transferring()
@@ -199,7 +199,7 @@ void object_command_queue::try_warp(const std::vector<orbital_system*>& systems,
     }
 }
 
-void object_command_queue::try_warp(orbital_system* fin, bool queue_to_back)
+void object_command_queue::try_warp(orbital_system* fin, bool queue_to_back, bool lshift)
 {
     queue_type next;
 
@@ -207,10 +207,10 @@ void object_command_queue::try_warp(orbital_system* fin, bool queue_to_back)
 
     next.type = object_command_queue_info::WARP;
 
-    add(next, true, queue_to_back);
+    add(next, true, queue_to_back, lshift);
 }
 
-void object_command_queue::colonise(orbital* target, ship* colony_ship)
+void object_command_queue::colonise(orbital* target, ship* colony_ship, bool lshift)
 {
     queue_type next;
 
@@ -219,10 +219,10 @@ void object_command_queue::colonise(orbital* target, ship* colony_ship)
 
     next.type = object_command_queue_info::COLONISE;
 
-    add(next);
+    add(next, true, false, lshift);
 }
 
-void object_command_queue::anchor(orbital* target)
+void object_command_queue::anchor(orbital* target, bool lshift)
 {
     queue_type next;
 
@@ -230,15 +230,15 @@ void object_command_queue::anchor(orbital* target)
 
     next.type = object_command_queue_info::ANCHOR;
 
-    add(next);
+    add(next, true, false, lshift);
 }
 
-void object_command_queue::anchor_ui_state()
+void object_command_queue::anchor_ui_state(bool lshift)
 {
     queue_type next;
     next.type = object_command_queue_info::ANCHOR_UI;
 
-    add(next);
+    add(next, true, false, lshift);
 }
 
 bool object_command_queue::is_currently(object_command_queue_info::queue_element_type type)
@@ -379,12 +379,11 @@ bool do_anchor_ui(orbital* o, queue_type& type)
     return add({type, data})
 }*/
 
-void object_command_queue::add(const queue_type& type, bool at_back, bool does_not_cancel_if_at_back)
+void object_command_queue::add(const queue_type& type, bool at_back, bool does_not_cancel_if_at_back, bool shift_queue)
 {
-    sf::Keyboard key;
-
-    if(!key.isKeyPressed(sf::Keyboard::LShift) && at_back && !does_not_cancel_if_at_back)
-         cancel();
+    ///ALERT THIS IS SUPER BROKEN
+    if(!shift_queue && at_back && !does_not_cancel_if_at_back)
+        cancel();
 
     if(at_back)
         command_queue.push_back(type);

@@ -73,8 +73,8 @@ struct object_command_queue
 
     std::deque<queue_type> command_queue;
 
-    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool target_drifts = false);
-    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool target_drifts = false);
+    void transfer(float new_rad, float new_angle, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool target_drifts = false, bool lshift = false);
+    void transfer(vec2f pos, orbital* o, orbital_system* viewing_system, bool at_back = true, bool combat_move = false, bool target_drifts = false, bool lshift = false);
     bool transferring();
     bool trying_to_warp();
 
@@ -82,18 +82,18 @@ struct object_command_queue
     orbital* get_colonising_target();
 
     void try_warp(const std::vector<orbital_system*>& systems, bool queue_to_back = false);
-    void try_warp(orbital_system* fin, bool queue_to_back = false);
+    void try_warp(orbital_system* fin, bool queue_to_back = false, bool lshift = false);
 
-    void colonise(orbital* target, ship* colony_ship);
+    void colonise(orbital* target, ship* colony_ship, bool lshift = false);
 
-    void anchor(orbital* target);
-    void anchor_ui_state();
+    void anchor(orbital* target, bool lshift = false);
+    void anchor_ui_state(bool lshift = false);
 
     bool is_currently(object_command_queue_info::queue_element_type type);
     bool is_ever(object_command_queue_info::queue_element_type type);
 
     //void add(object_command_queue_info::queue_element_data type, const object_command_queue_info::queue_element_data& data);
-    void add(const queue_type& type, bool at_back = true, bool does_not_cancel_if_at_back = false);
+    void add(const queue_type& type, bool at_back = true, bool does_not_cancel_if_at_back = false, bool shift_queue = false);
     void tick(orbital* o, float step_s);
 
     void drift_applicable_transfer_targets(float step_s);
