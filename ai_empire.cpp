@@ -701,6 +701,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     scout_explore(free_ships, descriptors, system_manage);
 
+    ///move all of this into a check_colonise thing
+    ///potentially arbitrarily limit colonisation speed at the moment to 1 every ~30 seconds
+    ///at least until there are enough mechanics in place to make this more organic
     std::vector<orbital_system_descriptor> to_consider_colonising;
 
     for(int i=0; i< descriptors.size(); i++)
@@ -716,8 +719,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(desc.contains_hostiles)
             continue;
 
-        //if(!desc.viewed)
-        //    continue;
+        if(!desc.viewed)
+            continue;
 
         if(desc.num_unowned_planets == 0)
             continue;
