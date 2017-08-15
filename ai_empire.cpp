@@ -608,8 +608,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
                     o->command_queue.try_warp(path, true);
 
-                    desc.my_threat_rating += sm->get_tech_adjusted_military_power();
-
                     bool high_threat = desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating);
 
                     if(!high_threat)
@@ -718,8 +716,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(desc.contains_hostiles)
             continue;
 
-        if(!desc.viewed)
-            continue;
+        //if(!desc.viewed)
+        //    continue;
 
         if(desc.num_unowned_planets == 0)
             continue;
