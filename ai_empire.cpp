@@ -558,6 +558,8 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             }
         }
     }
+
+    ///find nearest ship and use that to explore
     for(orbital* o : free_ships[ship_type::SCOUT])
     {
         float min_dist = FLT_MAX;
@@ -568,6 +570,11 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         for(it = to_explore.begin(); it != to_explore.end(); it++)
         {
             float dist = ((*it)->universe_pos - o->parent_system->universe_pos).length();
+
+            auto path = system_manage.pathfind(o, *it);
+
+            if(path.size() == 0)
+                continue;
 
             if(dist < min_dist)
             {
