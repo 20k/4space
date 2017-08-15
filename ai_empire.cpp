@@ -535,8 +535,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     ///systematic exploration behaviour
     for(orbital* o : free_ships[ship_type::SCOUT])
     {
-        orbital_system_descriptor* found_desc = nullptr;
-
         for(auto& desc : descriptors)
         {
             if(desc.os->get_base()->viewed_by[e])
