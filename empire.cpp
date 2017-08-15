@@ -1038,16 +1038,14 @@ void empire::tick_decolonisation()
 
 void empire::tick_relation_ship_occupancy_loss(float step_s, system_manager& system_manage)
 {
+    std::map<empire*, std::map<orbital_system*, bool>> infringing_table;
+
     for(orbital* o : owned)
     {
         if(o->type != orbital_info::FLEET)
             continue;
 
         orbital_system* sys = o->parent_system;
-
-        ship_manager* sm = (ship_manager*)o->data;
-
-        int ship_num = sm->ships.size();
 
         empire* system_owner = sys->get_base()->parent_empire;
 
@@ -1057,19 +1055,14 @@ void empire::tick_relation_ship_occupancy_loss(float step_s, system_manager& sys
         if(can_traverse_space(system_owner))
             continue;
 
-        int relation_loss_ships = 0;
+        if(infringing_table[o->parent_empire][sys])
+            continue;
 
-        for(ship* s : sm->ships)
-        {
-            if(system_owner->available_scanning_power_on(s, system_manage) > 0)
-            {
-                relation_loss_ships++;
-            }
-        }
+        infringing_table[o->parent_empire][sys] = true;
 
-        float relation_loss_ps_per_ship = 0.005f;
+        float relation_loss_ps_per_system_infringing = 0.001f;
 
-        float relation_loss = relation_loss_ps_per_ship * step_s * relation_loss_ships;
+        float relation_loss = relation_loss_ps_per_system_infringing * step_s;
 
         system_owner->negative_relations(this, relation_loss);
     }
