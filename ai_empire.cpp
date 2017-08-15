@@ -539,9 +539,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
             try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
     }
 
-    //int free_scout_num = free_ships[ship_type::SCOUT];
-
-    //if(free_scout_num > 0)
     for(orbital* o : free_ships[ship_type::SCOUT])
     {
         int random_start = randf_s(0.f, system_manage.systems.size());
