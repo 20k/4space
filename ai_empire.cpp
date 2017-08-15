@@ -521,6 +521,12 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     int global_ship_deficit[ship_type::COUNT] = {0};
     global_ship_deficit[ship_type::MINING] = mining_deficit;
     global_ship_deficit[ship_type::COLONY] = colony_deficit;
+    global_ship_deficit[ship_type::SCOUT] = std::max(3 - num_ships[ship_type::SCOUT], 0);
+
+    if(global_ship_deficit[ship_type::MINING] > 0)
+    {
+        global_ship_deficit[ship_type::SCOUT] = 0;
+    }
 
     for(int i=0; i<ship_type::COUNT; i++)
     {
@@ -529,6 +535,36 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
         if(deficit <= 0)
             continue;
 
-        try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
+        for(int kk = 0; kk < deficit; kk++)
+            try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
+    }
+
+    //int free_scout_num = free_ships[ship_type::SCOUT];
+
+    //if(free_scout_num > 0)
+    for(orbital* o : free_ships[ship_type::SCOUT])
+    {
+        int random_start = randf_s(0.f, system_manage.systems.size());
+
+        int max_count = system_manage.systems.size();
+
+        for(int i=0; i<max_count; i++)
+        {
+            int modc = (i + random_start) % max_count;
+
+            orbital_system* sys = system_manage.systems[modc];
+
+            if(!sys->get_base()->viewed_by[e])
+            {
+                auto path = system_manage.pathfind(o, sys);
+
+                if(path.size() == 0)
+                    continue;
+
+                o->command_queue.try_warp(path);
+
+                break;
+            }
+        }
     }
 }
