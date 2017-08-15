@@ -24,10 +24,6 @@ struct orbital_system_descriptor
     std::vector<orbital*> owned_planets;
     std::vector<orbital*> constructor_ships;
 
-    //int num_colony_ships = 0;
-
-    //int num_mining_ships = 0;
-
     int num_ships_raw[ship_type::COUNT] = {0};
     int num_ships_predicted[ship_type::COUNT] = {0};
 
