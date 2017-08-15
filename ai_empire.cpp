@@ -496,6 +496,82 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
     }*/
 }
 
+void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int global_ship_deficit[], empire* e, system_manager& system_manage, fleet_manager& fleet_manage)
+{
+    ///move all of this into a check_colonise thing
+    ///potentially arbitrarily limit colonisation speed at the moment to 1 every ~30 seconds
+    ///at least until there are enough mechanics in place to make this more organic
+    std::vector<orbital_system_descriptor> to_consider_colonising;
+
+    for(int i=0; i < descriptors.size(); i++)
+    {
+        orbital_system_descriptor& desc = descriptors[i];
+
+        if(desc.is_speculatively_owned_by_me)
+            continue;
+
+        if(desc.is_owned)
+            continue;
+
+        if(desc.contains_hostiles)
+            continue;
+
+        if(!desc.viewed)
+            continue;
+
+        if(desc.num_unowned_planets == 0)
+            continue;
+
+        to_consider_colonising.push_back(desc);
+
+        if(to_consider_colonising.size() >= 10)
+            break;
+    }
+
+    if(global_ship_deficit[ship_type::MINING] != 0)
+    {
+        to_consider_colonising.clear();
+    }
+
+    std::sort(to_consider_colonising.begin(), to_consider_colonising.end(), [](auto& s1, auto& s2){return s1.resource_rating > s2.resource_rating;});
+
+    for(auto& desc : to_consider_colonising)
+    {
+        ship* colony = get_ship_with_need(ship_type::COLONY, true);
+        ship* mil = get_ship_with_need(ship_type::MILITARY, true);
+
+        ///expected to vary per system down the road based on military costs etc
+        ///this can return different for different systems currently due to ships with internal construction bays
+        if(can_afford_resource_cost(e, desc, {mil, colony}))
+        {
+            orbital* o = try_construct_any(fleet_manage, descriptors, ship_type::MILITARY, e, true);
+
+            printf("hi there\n");
+
+            if(o != nullptr)
+            {
+                auto path = system_manage.pathfind(o, desc.os);
+
+                printf("hi 2\n");
+
+                if(path.size() == 0)
+                    continue;
+
+                printf("hi 3\n");
+
+                o->command_queue.try_warp(path, true);
+
+                //printf("%i\n", o->command_queue.command_queue.size());
+
+                e->ai_empire_controller.speculatively_owned.insert(desc.os);
+                break;
+            }
+        }
+
+        break;
+    }
+}
+
 bool has_resources_to_colonise(empire* e, orbital_system_descriptor& desc)
 {
     int num_military_ships = 1;
@@ -701,70 +777,5 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     scout_explore(free_ships, descriptors, system_manage);
 
-    ///move all of this into a check_colonise thing
-    ///potentially arbitrarily limit colonisation speed at the moment to 1 every ~30 seconds
-    ///at least until there are enough mechanics in place to make this more organic
-    std::vector<orbital_system_descriptor> to_consider_colonising;
-
-    for(int i=0; i< descriptors.size(); i++)
-    {
-        orbital_system_descriptor& desc = descriptors[i];
-
-        if(desc.is_speculatively_owned_by_me)
-            continue;
-
-        if(desc.is_owned)
-            continue;
-
-        if(desc.contains_hostiles)
-            continue;
-
-        if(!desc.viewed)
-            continue;
-
-        if(desc.num_unowned_planets == 0)
-            continue;
-
-        to_consider_colonising.push_back(desc);
-
-        if(to_consider_colonising.size() >= 10)
-            break;
-    }
-
-    if(global_ship_deficit[ship_type::MINING] != 0)
-    {
-        to_consider_colonising.clear();
-    }
-
-    std::sort(to_consider_colonising.begin(), to_consider_colonising.end(), [](auto& s1, auto& s2){return s1.resource_rating > s2.resource_rating;});
-
-    for(auto& desc : to_consider_colonising)
-    {
-        ship* colony = get_ship_with_need(ship_type::COLONY, true);
-        ship* mil = get_ship_with_need(ship_type::MILITARY, true);
-
-        ///expected to vary per system down the road based on military costs etc
-        ///this can return different for different systems currently due to ships with internal construction bays
-        if(can_afford_resource_cost(e, desc, {mil, colony}))
-        {
-            orbital* o = try_construct_any(fleet_manage, descriptors, ship_type::MILITARY, e, true);
-
-            if(o != nullptr)
-            {
-                auto path = system_manage.pathfind(o, desc.os);
-
-                if(path.size() == 0)
-                    continue;
-
-                o->command_queue.try_warp(path, true);
-
-                //printf("%i\n", o->command_queue.command_queue.size());
-
-                speculatively_owned.insert(desc.os);
-                break;
-            }
-        }
-
-        break;
-    }
+    check_colonisation(descriptors, global_ship_deficit, e, system_manage, fleet_manage);
 }
