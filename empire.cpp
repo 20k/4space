@@ -963,6 +963,7 @@ void empire::tick_cleanup_colonising()
                 if(s->colonise_target->parent_empire != nullptr)
                 {
                     s->colonising = false;
+                    s->colonise_target = nullptr;
                     continue;
                 }
 

@@ -42,9 +42,6 @@ void try_colonise(ship_manager* sm, orbital* my_o)
     if(!sm->any_with_element(ship_component_elements::COLONISER))
         return;
 
-    if(my_o->command_queue.is_ever(object_command_queue_info::COLONISE))
-        return;
-
     ///if hostiles in system, flee!
     ///set ai state to request flee
 
@@ -66,13 +63,33 @@ void try_colonise(ship_manager* sm, orbital* my_o)
         if(orb_1->type != orbital_info::FLEET)
             continue;
 
+        ///enforce colonising is happening in current system
         if(!orb_1->command_queue.is_currently_colonising())
             continue;
 
+        ///slight hack, but we're making sure that the only way our current colony target
+        ///is not in the free pool is if someone else has nicked it, not us
+        if(orb_1 == my_o)
+            continue;
+
+        ///get colonising target gets first colonising target, but we've enforced in system
         free_planets.erase(orb_1->command_queue.get_colonising_target());
 
         if(free_planets.size() == 0)
             return;
+    }
+
+    if(my_o->command_queue.is_ever(object_command_queue_info::COLONISE))
+    {
+        orbital* colony_target = my_o->command_queue.get_colonising_target();
+
+        ///someone else is colonising the planet, cancel our colonisation efforts
+        if(free_planets.find(colony_target) == free_planets.end())
+        {
+            my_o->command_queue.cancel();
+        }
+
+        return;
     }
 
     if(free_planets.size() > 0)
