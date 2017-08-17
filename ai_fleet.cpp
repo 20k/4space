@@ -83,6 +83,13 @@ void try_colonise(ship_manager* sm, orbital* my_o)
     {
         orbital* colony_target = my_o->command_queue.get_colonising_target();
 
+        ///should be impossible
+        if(colony_target == nullptr)
+            return;
+
+        if(colony_target->parent_system != my_o->parent_system)
+            return;
+
         ///someone else is colonising the planet, cancel our colonisation efforts
         if(free_planets.find(colony_target) == free_planets.end())
         {
