@@ -2368,6 +2368,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     circle.setRadius(sun_universe_rad);
     circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
 
+    sf::Keyboard key;
+
     bool change_colour = true;
 
     for(int i=0; i<systems.size(); i++)
@@ -2405,6 +2407,21 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
 
         win.draw(circle);
+
+        /*if(key.isKeyPressed(sf::Keyboard::LAlt))
+        {
+            std::string use_name = os->get_base()->name + "##" + std::to_string(i);
+
+            ImGui::SkipFrosting(use_name);
+
+            ImGui::SetNextWindowPos(ImVec2(projected.x, projected.y));
+
+            ImGui::Begin(use_name.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+
+            ImGui::Text(os->get_base()->name.c_str());
+
+            ImGui::End();
+        }*/
 
         os->highlight = false;
 
