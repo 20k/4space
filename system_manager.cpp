@@ -2253,7 +2253,7 @@ vec3f get_gray_colour(vec3f in)
 
     vec3f avg_vec = {avg, avg, avg};
 
-    return mix(avg_vec, in, 0.4f);
+    return mix(avg_vec, in, 0.2f);
 }
 
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
