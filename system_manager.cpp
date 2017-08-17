@@ -2423,18 +2423,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         circle.setPosition({pos.x(), pos.y()});
 
-        /*if(change_colour)
-        {
-            change_colour = false;
-            circle.setFillColor(sf::Color(255, 200, 50));
-        }
-
-        if(os->highlight)
-        {
-            change_colour = true;
-            circle.setFillColor(sf::Color(255, 255, 150));
-        }*/
-
         vec3f col = temperature_fraction_to_colour(os->get_base()->star_temperature_fraction);
 
         if(os->highlight)
@@ -2450,15 +2438,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         col = clamp(col, 0.f, 255.f);
 
         circle.setFillColor(sf::Color(col.x(), col.y(), col.z()));
-
-        /*if(!os->get_base()->viewed_by[viewer_empire])
-        {
-            change_colour = true;
-            if(!os->highlight)
-                circle.setFillColor(sf::Color(150, 140, 100));
-            else
-                circle.setFillColor(sf::Color(170, 170, 170));
-        }*/
 
         win.draw(circle);
 
