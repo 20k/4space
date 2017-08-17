@@ -869,7 +869,7 @@ inline ship make_colony_ship()
     ship test_ship;
     test_ship.add(make_default_crew().with_size(0.5f));
     test_ship.add(make_default_life_support().with_size(0.5f));
-    test_ship.add(make_default_power_core().with_size(1.25f));
+    test_ship.add(make_default_power_core().with_size(1.5f));
     test_ship.add(make_default_engines());
     test_ship.add(make_default_warp_drive());
     test_ship.add(make_default_scanner().with_size(0.25f));
