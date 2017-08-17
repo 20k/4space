@@ -185,10 +185,18 @@ bool object_command_queue::is_currently_colonising()
 
 orbital* object_command_queue::get_colonising_target()
 {
-    if(!is_currently_colonising())
+    if(!is_ever(object_command_queue_info::COLONISE))
         return nullptr;
 
-    return command_queue.front().data.colony_target;
+    for(queue_type& queue_t : command_queue)
+    {
+        if(queue_t.type == object_command_queue_info::COLONISE)
+        {
+            return queue_t.data.colony_target;
+        }
+    }
+
+    return nullptr;
 }
 
 void object_command_queue::try_warp(const std::vector<orbital_system*>& systems, bool queue_at_back)
