@@ -2221,6 +2221,30 @@ bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec
     return is_hovered;
 }
 
+template<typename T>
+void piecewise_linear(T& accumulator, T mstart, T mend, float mstart_frac, float mend_frac, float val)
+{
+    if(val <= mstart_frac || val > mend_frac)
+        return;
+
+    float modified = (val - mstart_frac) / (mend_frac - mstart_frac);
+
+    accumulator = mix(mstart, mend, modified);
+}
+
+vec3f temperature_fraction_to_colour(float temperature_fraction)
+{
+    vec3f rcol = {1, 0, 1};
+
+    float vmax = 230;
+
+    piecewise_linear<vec3f>(rcol, {vmax, 40, 40}, {vmax, vmax, 0}, 0.f, 0.4f, temperature_fraction);
+    piecewise_linear<vec3f>(rcol, {vmax, vmax, 0}, {vmax, vmax, vmax}, 0.4f, 0.6f, temperature_fraction);
+    piecewise_linear<vec3f>(rcol, {vmax, vmax, vmax}, {10, 10, vmax}, 0.8f, 1.f, temperature_fraction);
+
+    return rcol;
+}
+
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
 {
     //printf("zoom %f\n", zoom_level);
@@ -2400,14 +2424,18 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             circle.setFillColor(sf::Color(255, 255, 150));
         }
 
-        if(!os->get_base()->viewed_by[viewer_empire])
+        vec3f col = temperature_fraction_to_colour(os->get_base()->star_temperature_fraction);
+
+        circle.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+
+        /*if(!os->get_base()->viewed_by[viewer_empire])
         {
             change_colour = true;
             if(!os->highlight)
                 circle.setFillColor(sf::Color(150, 140, 100));
             else
                 circle.setFillColor(sf::Color(170, 170, 170));
-        }
+        }*/
 
         win.draw(circle);
 
