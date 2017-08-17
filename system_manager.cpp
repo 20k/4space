@@ -2395,6 +2395,15 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             circle.setFillColor(sf::Color(255, 255, 150));
         }
 
+        if(!os->get_base()->viewed_by[viewer_empire])
+        {
+            change_colour = true;
+            if(!os->highlight)
+                circle.setFillColor(sf::Color(150, 140, 100));
+            else
+                circle.setFillColor(sf::Color(170, 170, 170));
+        }
+
         win.draw(circle);
 
         os->highlight = false;
