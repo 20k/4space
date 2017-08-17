@@ -2161,19 +2161,38 @@ bool intersect(vec2f p1, vec2f p2, float r)
     return (p1 - p2).length() < r * 2;
 }
 
-std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float r)
+std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float rad)
 {
-    vec2f avg = (p1 + p2) / 2.f;
+    vec2f sub_1 = p1 - p2;
 
-    float r1_len = (avg - p1).length();
+    float R = sub_1.length();
 
-    float olen = sqrt(std::max(r*r - r1_len*r1_len, 0.f));
+    float r1 = rad;
+    float r2 = rad;
 
-    vec2f o2dir = (p1 - avg).norm();
+    float x1 = p1.x();
+    float y1 = p1.y();
+    float x2 = p2.x();
+    float y2 = p2.y();
 
-    o2dir = o2dir.rot(M_PI/2) * olen/2.f;
+    float R2 = R*R;
+    float R4 = R2*R2;
 
-    return {avg - o2dir * 1.02f, avg + o2dir * 1.02f};
+    if(fabs(r1 - r2) > R || R > r1 + r2)
+        return {0.f, 0.f};
+
+    float a = (r1 * r1 - r2 * r2) / (2 * R2);
+    float r2r2 = (r1 * r1 - r2 * r2);
+    float c = sqrt(2 * (r1 * r1 + r2 * r2) / R2 - (r2r2 * r2r2) / R4 - 1);
+
+    vec2f fv = (p1 + p2) / 2.f + a * (p2 - p1);
+    vec2f iv_gv = (c * (p1 - p2) / 2.f);
+    vec2f gv = {-iv_gv.y(), iv_gv.x()};
+
+    vec2f i1 = fv + gv;
+    vec2f i2 = fv - gv;
+
+    return {i1, i2};
 }
 
 ///do clicking next, bump up to higher level?
@@ -2267,8 +2286,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     if(in_system_view())
         return;
 
-    sf::BlendMode blend(sf::BlendMode::DstAlpha, sf::BlendMode::DstAlpha, sf::BlendMode::Subtract);
-
     /*for(orbital_system* os : systems)
     {
         vec2f pos = os->universe_pos * universe_scale;
@@ -2295,7 +2312,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
     }*/
 
-    float frad = sun_universe_rad * 6.5f;
+    sf::BlendMode blend(sf::BlendMode::One, sf::BlendMode::One, sf::BlendMode::Add);
+
+    float frad = sun_universe_rad * 60.5f;
 
     sf::CircleShape nc2;
     nc2.setFillColor({0,0,0,255});
@@ -2320,16 +2339,42 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             nc2.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
             nc2.setPosition({pos.x(), pos.y()});
 
-            win.draw(nc2, blend);
+            win.draw(nc2);
+            //win.draw(nc2, blend);
         }
     }
 
     //sf::BlendMode b2(sf::BlendMode::SrcColor, sf::BlendMode::DstColor, sf::BlendMode::Add);
-    sf::CircleShape ncircle;
-    ncircle.setFillColor({20, 20, 20, 255});
-    ncircle.setRadius(frad);
-    ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
-    ncircle.setPointCount(80.f);
+    //sf::CircleShape ncircle;
+    //ncircle.setFillColor({0, 0, 0, 255});
+    //ncircle.setRadius(frad);
+    //ncircle.setOutlineThickness(sun_universe_rad / 15.f);
+    //ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
+    //ncircle.setPointCount(80.f);
+    nc2.setOutlineColor(sf::Color(0,0,0,0));
+
+    for(orbital_system* os : systems)
+    {
+        vec2f pos = os->universe_pos * universe_scale;
+
+        auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
+
+        if(projected.x + frad < 0 || projected.y + frad < 0 || projected.x - frad >= win.getSize().x || projected.y - frad >= win.getSize().y)
+            continue;
+
+        if(os->get_base()->parent_empire != nullptr)
+        {
+            nc2.setPosition({pos.x(), pos.y()});
+
+            ///change to add if we want to see overlap
+            win.draw(nc2);
+        }
+    }
+
+    nc2.setFillColor({20, 20, 20, 255});
+    //ncircle.setRadius(frad);
+    //ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
+    //ncircle.setPointCount(80.f);
 
 
     for(orbital_system* os : systems)
@@ -2345,11 +2390,13 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         {
             vec3f col = os->get_base()->parent_empire->colour * 255.f;
 
-            ncircle.setOutlineColor(sf::Color(col.x(), col.y(), col.z()));
-            ncircle.setPosition({pos.x(), pos.y()});
+            col = col / 10.f;
+
+            //nc2.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+            nc2.setPosition({pos.x(), pos.y()});
 
             ///change to add if we want to see overlap
-            win.draw(ncircle);
+            win.draw(nc2);
         }
     }
 
@@ -2384,7 +2431,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             shape.setSize({(p2 - p1).length(), sun_universe_rad/15.f});
             shape.setRotation(r2d((p2 - p1).angle()));
 
-            shape.setOrigin(shape.getLocalBounds().width/2, shape.getLocalBounds().height/2);
+            //shape.setOrigin(shape.getLocalBounds().width/2, shape.getLocalBounds().height/2);
+            shape.setOrigin(0.f, shape.getLocalBounds().height/2.f);
 
             shape.setPosition(p1.x(), p1.y());
 
@@ -2395,10 +2443,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             shape.setFillColor({colour.x(), colour.y(), colour.z()});
 
             win.draw(shape);
-
-            /*shape.setPosition(p2.x(), p2.y());
-
-            win.draw(shape);*/
         }
     }
 
