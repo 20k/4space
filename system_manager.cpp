@@ -2245,6 +2245,17 @@ vec3f temperature_fraction_to_colour(float temperature_fraction)
     return rcol;
 }
 
+vec3f get_gray_colour(vec3f in)
+{
+    in = in / 2.f;
+
+    float avg = (in.x() + in.y() + in.z()) / 3.f;
+
+    vec3f avg_vec = {avg, avg, avg};
+
+    return mix(avg_vec, in, 0.4f);
+}
+
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
 {
     //printf("zoom %f\n", zoom_level);
@@ -2412,7 +2423,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         circle.setPosition({pos.x(), pos.y()});
 
-        if(change_colour)
+        /*if(change_colour)
         {
             change_colour = false;
             circle.setFillColor(sf::Color(255, 200, 50));
@@ -2422,9 +2433,21 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         {
             change_colour = true;
             circle.setFillColor(sf::Color(255, 255, 150));
-        }
+        }*/
 
         vec3f col = temperature_fraction_to_colour(os->get_base()->star_temperature_fraction);
+
+        if(os->highlight)
+        {
+            col = col * 1.5f;
+        }
+
+        if(!os->get_base()->viewed_by[viewer_empire])
+        {
+            col = get_gray_colour(col);
+        }
+
+        col = clamp(col, 0.f, 255.f);
 
         circle.setFillColor(sf::Color(col.x(), col.y(), col.z()));
 
