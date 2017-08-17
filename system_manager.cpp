@@ -1092,7 +1092,10 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     {
         n->name = generator.generate_star_name();
 
-        n->description = generator.generate_star_text(n);
+        float temperature_fraction = generator.generate_star_temperature_fraction(n);
+        n->description = generator.generate_star_text(n, temperature_fraction);
+
+        n->star_temperature_fraction = temperature_fraction;
     }
 
     else if(type == orbital_info::ASTEROID)

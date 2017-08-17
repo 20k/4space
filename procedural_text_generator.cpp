@@ -168,12 +168,19 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
     return fix_grammar(description);
 }
 
-std::string procedural_text_generator::generate_star_text(orbital* o)
+float procedural_text_generator::generate_star_temperature_fraction(orbital* o)
+{
+    float temperature_fraction = randf_s(0.f, 1.f) * randf_s(0.f, 1.f);
+
+    return temperature_fraction;
+}
+
+std::string procedural_text_generator::generate_star_text(orbital* o, float temperature_fraction)
 {
     float mint = 2000.f;
     float maxt = 40000.f;
 
-    float temperature = randf_s(0.f, 1.f) * randf_s(0.f, 1.f) * (maxt - mint) + mint;
+    float temperature = temperature_fraction * (maxt - mint) + mint;
 
     std::vector<int> lower_bounds = {0, 3500, 5000, 6000, 7500, 10000, 30000};
 

@@ -114,6 +114,7 @@ struct orbital
 
     std::string name;
     std::string description;
+    float star_temperature_fraction = 0.f;
 
     int resource_type_for_flavour_text = 0;
 
