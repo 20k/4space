@@ -2547,6 +2547,8 @@ int main()
     e2->take_ownership(op3);
     e2->take_ownership(fleet5);
 
+    e2->desired_empire_size = 5;
+
     //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
 
     //player_empire->become_hostile(e2);

@@ -652,6 +652,22 @@ bool has_resources_to_colonise(empire* e, orbital_system_descriptor& desc)
     return can_afford_resource_cost(e, desc, ships);
 }
 
+bool wants_to_expand(empire* e, const std::vector<orbital_system_descriptor>& descriptors)
+{
+    int num_owned_speculatively = 0;
+
+    for(const orbital_system_descriptor& desc : descriptors)
+    {
+        if(desc.is_speculatively_owned_by_me)
+            num_owned_speculatively++;
+    }
+
+    if(num_owned_speculatively < e->desired_empire_size)
+        return true;
+
+    return false;
+}
+
 void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
 {
     if(e->is_pirate)
@@ -860,5 +876,6 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     scout_explore(free_ships, descriptors, system_manage);
 
-    check_colonisation(descriptors, global_ship_deficit, e, system_manage, fleet_manage);
+    if(wants_to_expand(e, descriptors))
+        check_colonisation(descriptors, global_ship_deficit, e, system_manage, fleet_manage);
 }
