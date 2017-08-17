@@ -1472,6 +1472,8 @@ empire* empire_manager::birth_empire(system_manager& system_manage, fleet_manage
 
     initial_spawn_reference[e] = os;
 
+    e->desired_empire_size = system_size * 2;
+
     return e;
 }
 

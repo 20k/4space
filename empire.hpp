@@ -213,6 +213,8 @@ struct empire
     bool toggle_systems_ui = true;
 
     uint16_t fleet_name_counter = 0;
+
+    int desired_empire_size = 1;
 };
 
 struct fleet_manager;
