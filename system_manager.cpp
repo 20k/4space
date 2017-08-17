@@ -2258,7 +2258,7 @@ vec3f temperature_fraction_to_colour(float temperature_fraction)
     float vmax = 230;
 
     piecewise_linear<vec3f>(rcol, {vmax, 40, 40}, {vmax, vmax, 0}, 0.f, 0.4f, temperature_fraction);
-    piecewise_linear<vec3f>(rcol, {vmax, vmax, 0}, {vmax, vmax, vmax}, 0.4f, 0.6f, temperature_fraction);
+    piecewise_linear<vec3f>(rcol, {vmax, vmax, 0}, {vmax, vmax, vmax}, 0.4f, 0.8f, temperature_fraction);
     piecewise_linear<vec3f>(rcol, {vmax, vmax, vmax}, {10, 10, vmax}, 0.8f, 1.f, temperature_fraction);
 
     return rcol;
