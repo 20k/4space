@@ -668,6 +668,15 @@ bool wants_to_expand(empire* e, const std::vector<orbital_system_descriptor>& de
     return false;
 }
 
+/**
+Ok, I can do invasion in a fun way now
+Firstly: Only applies to empries who don't like other empires, we're talking < 0.3
+Only applies to empires of roughly the same size or smaller
+Only applies if we've reached max size, or we're unable to reach max size
+Then, if we find a close empire that we think we can defeat
+Do invasion
+*/
+
 void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
 {
     if(e->is_pirate)
