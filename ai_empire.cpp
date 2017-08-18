@@ -857,8 +857,8 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
 
     float relations = e->get_culture_modified_friendliness(other_empire);
 
-    float relations_bound = 0.9f;
-    //float relations_bound = 0.3f;
+    //float relations_bound = 0.9f;
+    float relations_bound = 0.3f;
 
     if(relations > relations_bound)
         return false;
@@ -992,6 +992,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         bool invading_system = at_war_in(owner, desc.os);
 
         ///part of the problem is we have no vision
+
         ///if a fight becomes too costly, we need to have a way to abandon a system
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
         {
@@ -1129,7 +1130,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
     //if(empire_might_want_to_invade_generally(e, descriptors))
 
-    if(invasion_targets.size() == 0)
+    if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0)
     {
         for(orbital_system_descriptor& desc : descriptors)
         {
@@ -1137,6 +1138,9 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
                 continue;
 
             if(!desc.is_owned)
+                continue;
+
+            if(!desc.viewed)
                 continue;
 
             if(empire_could_invade_specific_system(e, desc))
