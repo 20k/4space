@@ -737,12 +737,18 @@ bool empire::is_allied(empire* e)
     if(e == nullptr)
         return false;
 
+    if(e == this)
+        return false;
+
     return relations_map[e].allied;
 }
 
 bool empire::is_hostile(empire* e)
 {
     if(e == nullptr)
+        return false;
+
+    if(e == this)
         return false;
 
     return relations_map[e].hostile;

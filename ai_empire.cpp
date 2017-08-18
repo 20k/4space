@@ -847,13 +847,17 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
     if(my_strength < their_strength * 1.2f)
         return false;
 
+
     ///don't start invading if much weaker
     if(my_strength > their_strength * 5.f)
         return false;
 
     float relations = e->get_culture_modified_friendliness(other_empire);
 
-    if(relations > 0.5f)
+    float relations_bound = 0.8f;
+    //float relations_bound = 0.3f;
+
+    if(relations > relations_bound)
         return false;
 
     ///check if this is a sane idea
@@ -861,6 +865,14 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
 
     for(auto& relation : e->relations_map)
     {
+        empire* other = relation.first;
+
+        if(other->is_pirate)
+            continue;
+
+        if(other->is_derelict)
+            continue;
+
         if(e->is_hostile(relation.first))
         {
             total_hostile_strength += relation.first->get_military_strength();
@@ -870,7 +882,6 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
     ///not a sane idea, already at war with too many people
     if(my_strength < total_hostile_strength + their_strength * 1.2f)
         return false;
-
 
     return true;
 }
@@ -890,6 +901,11 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 {
     if(e->is_pirate)
         return;
+
+    for(auto& i : invasion_targets)
+    {
+        i.second.invasion_timer_s += dt_s;
+    }
 
     ensure_adequate_defence(*this, e);
 
@@ -1075,25 +1091,38 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     global_ship_deficit[ship_type::SCOUT] = max_scout_ships - num_ships[ship_type::SCOUT];
     global_ship_deficit[ship_type::MILITARY] = military_deficit;
 
-    if(empire_might_want_to_invade_generally(e, descriptors))
+    //if(empire_might_want_to_invade_generally(e, descriptors))
+
+    if(invasion_targets.size() == 0)
     {
         for(orbital_system_descriptor& desc : descriptors)
         {
             if(desc.is_speculatively_owned_by_me)
                 continue;
 
-            if(desc.is_owned)
+            if(!desc.is_owned)
                 continue;
 
             if(empire_could_invade_specific_system(e, desc))
             {
                 int ships_needed = get_ships_needed_to_invade_system(e, desc);
 
+                printf("hi %i %i\n", ships_needed, (int)free_ships[ship_type::MILITARY].size());
+
+                global_ship_deficit[ship_type::MILITARY] += ships_needed;
+
                 ///WAR WERE DECLARED
                 ///well. not yet, but we're doing it
                 if((int)free_ships[ship_type::MILITARY].size() >= ships_needed)
                 {
+                    invasion_info inf;
+                    inf.systems.insert(desc.os);
 
+                    invasion_targets[desc.os->get_base()->parent_empire] = inf;
+
+                    e->become_hostile(desc.os->get_base()->parent_empire);
+
+                    break;
                 }
             }
         }

@@ -2578,7 +2578,7 @@ int main()
     //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
 
     //player_empire->become_hostile(e2);
-    player_empire->ally(e2);
+    //player_empire->ally(e2);
     player_empire->positive_relations(e2, 0.5f);
 
     system_manage.generate_universe(200);
