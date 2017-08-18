@@ -334,6 +334,58 @@ ship* get_ship_with_need(ship_type::types type, bool warp_capable)
     return identified_ship;
 }
 
+bool could_construct_across_any(empire* e, const std::vector<orbital_system_descriptor>& descriptors, const std::vector<ship*>& ships)
+{
+    std::map<resource::types, float> total_res_cost;
+
+    for(ship* s : ships)
+    {
+        auto nres_cost = s->resources_cost();
+
+        for(auto& i : nres_cost)
+        {
+            total_res_cost[i.first] += i.second;
+        }
+    }
+
+    std::map<resource::types, float> avg_res_cost;
+
+    for(auto& i : total_res_cost)
+    {
+        avg_res_cost[i.first] = i.second / (float)total_res_cost.size();
+    }
+
+    bool can_empire_dispense = e->can_fully_dispense(total_res_cost);
+
+    int num_ships_potentially_built_so_far = 0;
+
+    for(const orbital_system_descriptor& desc : descriptors)
+    {
+        if(can_empire_dispense && desc.owned_planets.size() > 0)
+        {
+            return true;
+        }
+
+        if(desc.constructor_ships.size() > 0)
+        {
+            for(orbital* o : desc.constructor_ships)
+            {
+                ship_manager* sm = (ship_manager*)o->data;
+
+                num_ships_potentially_built_so_far += sm->number_of_times_can_fully_dispense(avg_res_cost);
+
+                if(num_ships_potentially_built_so_far >= ships.size())
+                    return true;
+            }
+        }
+    }
+
+    if(num_ships_potentially_built_so_far >= ships.size())
+        return true;
+
+    return false;
+}
+
 orbital* get_constructor_for(empire* e, const std::vector<orbital_system_descriptor>& descriptors, const std::vector<ship*>& ships)
 {
     std::map<resource::types, float> res_cost;

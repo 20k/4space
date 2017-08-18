@@ -590,8 +590,9 @@ struct ship : positional
     std::map<resource::types, float> resources_received_when_scrapped();
     std::map<resource::types, float> resources_cost();
 
-    bool can_fully_dispense(std::map<resource::types, float> resources);
-    void fully_dispense(std::map<resource::types, float> resources);
+    int number_of_times_can_fully_dispense(const std::map<resource::types, float>& resources);
+    bool can_fully_dispense(const std::map<resource::types, float>& resources);
+    void fully_dispense(const std::map<resource::types, float>& resources);
 
     void empty_resources();
 
@@ -743,8 +744,9 @@ struct ship_manager
 
     bool any_damaged();
 
-    bool can_fully_dispense(std::map<resource::types, float> resources);
-    void fully_dispense(std::map<resource::types, float> resources);
+    int number_of_times_can_fully_dispense(const std::map<resource::types, float>& resources);
+    bool can_fully_dispense(const std::map<resource::types, float>& resources);
+    void fully_dispense(const std::map<resource::types, float>& resources);
 
     float get_tech_adjusted_military_power();
     bool is_military();

@@ -3431,7 +3431,43 @@ std::map<resource::types, float> ship::resources_cost()
     return ret;
 }
 
-bool ship::can_fully_dispense(std::map<resource::types, float> resources)
+int ship::number_of_times_can_fully_dispense(const std::map<resource::types, float>& resources)
+{
+    auto res = get_fully_merged(1.f);
+
+    int min_num = 99999999999;
+    bool has_any = false;
+
+    for(int i=0; i<(int)ship_component_elements::NONE; i++)
+    {
+        component_attribute& attr = res[i];
+
+        resource::types type = ship_component_elements::element_infos[i].resource_type;
+
+        if(type == resource::COUNT)
+            continue;
+
+        auto found = resources.find(type);
+
+        if(found == resources.end())
+            continue;
+
+        if(attr.cur_amount < found->second)
+            return 0;
+
+        int num = floor(attr.cur_amount / found->second);
+
+        min_num = std::min(num, min_num);
+        has_any = true;
+    }
+
+    if(!has_any)
+        return 0;
+
+    return min_num;
+}
+
+bool ship::can_fully_dispense(const std::map<resource::types, float>& resources)
 {
     auto res = get_fully_merged(1.f);
 
@@ -3444,7 +3480,12 @@ bool ship::can_fully_dispense(std::map<resource::types, float> resources)
         if(type == resource::COUNT)
             continue;
 
-        if(attr.cur_amount < resources[type])
+        auto found = resources.find(type);
+
+        if(found == resources.end())
+            continue;
+
+        if(attr.cur_amount < found->second)
             return false;
     }
 
@@ -3452,7 +3493,7 @@ bool ship::can_fully_dispense(std::map<resource::types, float> resources)
 }
 
 
-void ship::fully_dispense(std::map<resource::types, float> resources)
+void ship::fully_dispense(const std::map<resource::types, float>& resources)
 {
     auto res = get_fully_merged(1.f);
 
@@ -3465,10 +3506,19 @@ void ship::fully_dispense(std::map<resource::types, float> resources)
         if(type == resource::COUNT)
             continue;
 
-        if(attr.cur_amount >= resources[type])
+        auto found = resources.find(type);
+
+        float amount = 0.f;
+
+        if(found != resources.end())
+        {
+            amount = found->second;
+        }
+
+        if(attr.cur_amount >= amount)
         {
             std::map<ship_component_element, float> vals;
-            vals[(ship_component_elements::types)i] = -resources[type];
+            vals[(ship_component_elements::types)i] = -amount;
 
             add_negative_resources(vals);
         }
@@ -4740,7 +4790,19 @@ bool ship_manager::any_damaged()
     return false;
 }
 
-bool ship_manager::can_fully_dispense(std::map<resource::types, float> resources)
+int ship_manager::number_of_times_can_fully_dispense(const std::map<resource::types, float>& resources)
+{
+    int accum_num = 0;
+
+    for(ship* s : ships)
+    {
+        accum_num += s->number_of_times_can_fully_dispense(resources);
+    }
+
+    return accum_num;
+}
+
+bool ship_manager::can_fully_dispense(const std::map<resource::types, float>& resources)
 {
     for(ship* s : ships)
     {
@@ -4751,7 +4813,7 @@ bool ship_manager::can_fully_dispense(std::map<resource::types, float> resources
     return false;
 }
 
-void ship_manager::fully_dispense(std::map<resource::types, float> resources)
+void ship_manager::fully_dispense(const std::map<resource::types, float>& resources)
 {
     for(ship* s : ships)
     {
