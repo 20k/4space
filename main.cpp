@@ -865,6 +865,12 @@ struct box_selection
 
         bool lclick = mouse.isButtonPressed(sf::Mouse::Left);
 
+        sf::Keyboard key;
+
+        bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
+
+        std::vector<orbital*> potential_orbitals;
+
         if(going)
         {
             std::vector<orbital*>* orbitals = &cur->orbitals;
@@ -894,7 +900,10 @@ struct box_selection
                 {
                     ship_manager* sm = (ship_manager*)o->data;
 
-                    if(!lclick)
+                    //if(!lctrl && o->parent_empire != viewer_empire)
+                    //    continue;
+
+                    /*if(!lclick)
                     {
                         sm->toggle_fleet_ui = true;
 
@@ -905,12 +914,49 @@ struct box_selection
                     else
                     {
                         o->highlight = true;
-                    }
+                    }*/
+
+                    potential_orbitals.push_back(o);
                 }
             }
 
             if(!lclick)
                 going = false;
+        }
+
+        bool can_select_not_my_orbitals = true;
+
+        for(orbital* o : potential_orbitals)
+        {
+            if(o->parent_empire == viewer_empire)
+            {
+                can_select_not_my_orbitals = false;
+                break;
+            }
+        }
+
+        if(lctrl)
+            can_select_not_my_orbitals = true;
+
+        for(orbital* o : potential_orbitals)
+        {
+            ship_manager* sm = (ship_manager*)o->data;
+
+            if(!can_select_not_my_orbitals && o->parent_empire != viewer_empire)
+                continue;
+
+            if(!lclick)
+            {
+                sm->toggle_fleet_ui = true;
+
+                popup.insert(o);
+
+                popup.going = true;
+            }
+            else
+            {
+                o->highlight = true;
+            }
         }
 
         bool suppress_mouse = ImGui::IsAnyItemHovered() || ImGui::IsMouseHoveringAnyWindow();
@@ -923,8 +969,6 @@ struct box_selection
             last_was_not_click = false;
             return;
         }
-
-        sf::Keyboard key;
 
         if(!key.isKeyPressed(sf::Keyboard::LShift) && !going)
         {
