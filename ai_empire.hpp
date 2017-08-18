@@ -53,7 +53,7 @@ struct invasion_info
 {
     std::unordered_set<orbital_system*> systems;
     float invasion_timer_s = 0.f;
-    float invasion_timer_max = 10 * 1;
+    float invasion_timer_max = 30 * 1;
 
     bool invading(orbital_system* sys)
     {

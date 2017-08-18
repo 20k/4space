@@ -1168,7 +1168,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     //if(empire_might_want_to_invade_generally(e, descriptors))
 
     //if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0)
-    if(invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max)
+    if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max)
     {
         for(orbital_system_descriptor& desc : descriptors)
         {
@@ -1178,10 +1178,10 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             if(!desc.is_owned)
                 continue;
 
-            /*if(!desc.viewed)
-                continue;*/
+            if(!desc.viewed)
+                continue;
 
-            //if(empire_could_invade_specific_system(e, desc))
+            if(empire_could_invade_specific_system(e, desc))
             {
                 int ships_needed = get_ships_needed_to_invade_system(e, desc);
 
