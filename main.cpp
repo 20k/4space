@@ -898,24 +898,6 @@ struct box_selection
 
                 if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
                 {
-                    ship_manager* sm = (ship_manager*)o->data;
-
-                    //if(!lctrl && o->parent_empire != viewer_empire)
-                    //    continue;
-
-                    /*if(!lclick)
-                    {
-                        sm->toggle_fleet_ui = true;
-
-                        popup.insert(o);
-
-                        popup.going = true;
-                    }
-                    else
-                    {
-                        o->highlight = true;
-                    }*/
-
                     potential_orbitals.push_back(o);
                 }
             }
