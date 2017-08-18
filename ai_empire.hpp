@@ -48,12 +48,33 @@ using ship_general_state = ai_empire_info::ship_state;
 
 struct fleet_manager;
 
+struct invasion_info
+{
+    orbital_system* sys = nullptr;
+    float invasion_timer_s = 0.f;
+    float invasion_time_max = 120.f;
+};
+
+inline
+bool operator==(const invasion_info& i1, const invasion_info& i2)
+{
+    return i1.sys == i2.sys;
+}
+
+struct invasion_hash
+{
+    size_t operator()(const invasion_info& i1) const {
+        return std::hash<orbital_system*>()(i1.sys);
+    }
+};
+
 struct ai_empire
 {
     std::map<ship_manager*, ship_general_state> general_purpose_state;
     std::unordered_set<orbital_system*> speculatively_owned;
+    std::unordered_set<invasion_info, invasion_hash> invasion_targets;
 
-    void tick(fleet_manager& fm, system_manager& sm, empire* e);
+    void tick(float dt_s, fleet_manager& fm, system_manager& sm, empire* e);
 };
 
 #endif // AI_EMPIRE_HPP_INCLUDED

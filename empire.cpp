@@ -502,12 +502,12 @@ void empire::tick_ai(all_battles_manager& all_battles, system_manager& system_ma
 ///alliance of alliance system needs work.. somehow
 ///maybe ai should come to the aid of allies?
 ///maybe declaring war on someone automatically declares war on their allies?
-void empire::tick_high_level_ai(fleet_manager& fm, system_manager& sm)
+void empire::tick_high_level_ai(float dt_s, fleet_manager& fm, system_manager& sm)
 {
     if(!has_ai)
         return;
 
-    ai_empire_controller.tick(fm, sm, this);
+    ai_empire_controller.tick(dt_s, fm, sm, this);
 }
 
 void empire::draw_ui()
@@ -1323,7 +1323,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick(step_s);
         emp->tick_system_claim();
         emp->tick_ai(all_battles, system_manage);
-        emp->tick_high_level_ai(fleet_manage, system_manage);
+        emp->tick_high_level_ai(step_s, fleet_manage, system_manage);
         emp->tick_relation_ship_occupancy_loss(step_s, system_manage);
         emp->tick_relation_alliance_changes(player_empire);
     }

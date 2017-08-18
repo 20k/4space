@@ -2358,13 +2358,13 @@ int main()
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
     player_empire->ship_prefix = "SS";
 
-    /*player_empire->resources.resources[resource::IRON].amount = 5000.f;
+    player_empire->resources.resources[resource::IRON].amount = 5000.f;
     player_empire->resources.resources[resource::COPPER].amount = 5000.f;
     player_empire->resources.resources[resource::TITANIUM].amount = 5000.f;
     player_empire->resources.resources[resource::URANIUM].amount = 5000.f;
     player_empire->resources.resources[resource::RESEARCH].amount = 8000.f;
     player_empire->resources.resources[resource::HYDROGEN].amount = 8000.f;
-    player_empire->resources.resources[resource::OXYGEN].amount = 8000.f;*/
+    player_empire->resources.resources[resource::OXYGEN].amount = 8000.f;
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";

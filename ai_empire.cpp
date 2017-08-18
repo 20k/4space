@@ -801,7 +801,7 @@ int get_ships_needed_to_invade_system(empire* e, orbital_system_descriptor& desc
 
 ///assumes might want to invade generally
 ///how do we calculate how many ships to build to invade somewhere (from a code structuring perspective)
-bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& desc, int free_military_ships)
+bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& desc)
 {
     ///check we have enough free military ships to launch the invasion
     ///check we have enough money to build enough ships
@@ -815,8 +815,8 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
 
     int ships_needed = get_ships_needed_to_invade_system(e, desc);
 
-    if(ships_needed > free_military_ships)
-        return false;
+    /*if(ships_needed > free_military_ships)
+        return false;*/
 
     ///make sure we have this much money
     float partial_replacement_frac = 0.5f;
@@ -886,7 +886,7 @@ Do invasion
 Need a way to assess if we're likely to win an invasion, need a way for ai to abandon system
 */
 
-void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
+void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
 {
     if(e->is_pirate)
         return;
@@ -1061,9 +1061,9 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
 
     std::sort(descriptors.begin(), descriptors.end(), [](auto& s1, auto& s2){return s1.distance_rating < s2.distance_rating;});
 
-    int military_deficit = std::max(needed_military_ships - num_ships[ship_type::MILITARY], 0);
-    int mining_deficit = std::max(num_resource_asteroids - num_ships[ship_type::MINING], 0);
-    int colony_deficit = std::max(num_unowned_planets - num_ships[ship_type::COLONY], 0);
+    int military_deficit = needed_military_ships - num_ships[ship_type::MILITARY];
+    int mining_deficit = num_resource_asteroids - num_ships[ship_type::MINING];
+    int colony_deficit = num_unowned_planets - num_ships[ship_type::COLONY];
 
     //printf("%i %i\n", needed_military_ships, num_ships[ship_type::MILITARY]);
 
@@ -1072,13 +1072,42 @@ void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage,
     int global_ship_deficit[ship_type::COUNT] = {0};
     global_ship_deficit[ship_type::MINING] = mining_deficit;
     global_ship_deficit[ship_type::COLONY] = colony_deficit;
-    global_ship_deficit[ship_type::SCOUT] = std::max(max_scout_ships - num_ships[ship_type::SCOUT], 0);
+    global_ship_deficit[ship_type::SCOUT] = max_scout_ships - num_ships[ship_type::SCOUT];
     global_ship_deficit[ship_type::MILITARY] = military_deficit;
+
+    if(empire_might_want_to_invade_generally(e, descriptors))
+    {
+        for(orbital_system_descriptor& desc : descriptors)
+        {
+            if(desc.is_speculatively_owned_by_me)
+                continue;
+
+            if(desc.is_owned)
+                continue;
+
+            if(empire_could_invade_specific_system(e, desc))
+            {
+                int ships_needed = get_ships_needed_to_invade_system(e, desc);
+
+                ///WAR WERE DECLARED
+                ///well. not yet, but we're doing it
+                if((int)free_ships[ship_type::MILITARY].size() >= ships_needed)
+                {
+
+                }
+            }
+        }
+    }
 
     if(global_ship_deficit[ship_type::MINING] > 0)
     {
         global_ship_deficit[ship_type::SCOUT] = 0;
         global_ship_deficit[ship_type::MILITARY] = 0;
+    }
+
+    for(int i=0; i<ship_type::COUNT; i++)
+    {
+        global_ship_deficit[i] = std::max(global_ship_deficit[i], 0);
     }
 
     for(int i=0; i<ship_type::COUNT; i++)
