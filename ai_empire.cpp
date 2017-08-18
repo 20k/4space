@@ -19,6 +19,7 @@ struct orbital_system_descriptor
     bool contains_hostiles = false;
 
     bool viewed = false;
+    bool currently_viewed = false;
 
     int num_unowned_planets = 0;
 
@@ -110,6 +111,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         }
 
         desc.viewed = base->viewed_by[e];
+        desc.currently_viewed = base->currently_viewed_by[e];
 
         if(base->parent_empire == e)
         {
@@ -240,7 +242,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         //if(desc.contains_hostiles)
         if(fabs(desc.hostiles_threat_rating) > 0.1f)
         {
-            //printf("%f\n", desc.hostiles_threat_rating);
+            printf("%f\n", desc.hostiles_threat_rating);
         }
 
         for(int kk = 0; kk < ship_type::COUNT; kk++)
@@ -975,17 +977,29 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     int num_unowned_planets = 0;
     int num_resource_asteroids = 0;
     int needed_military_ships = 0;
+    int num_scouts_needed = 0;
 
     bool do_print = false;
 
     for(orbital_system_descriptor& desc : descriptors)
     {
-        if(!desc.is_speculatively_owned_by_me)
+        empire* owner = desc.os->get_base()->parent_empire;
+
+        if(!desc.is_speculatively_owned_by_me && !at_war_in(owner, desc.os))
             continue;
 
+        bool invading_system = at_war_in(owner, desc.os);
+
+        //printf("%f host\n", desc.hostiles_threat_rating);
+
+        //printf("%i invde\n", invading_system);
+
+        ///part of the problem is we have no vision
         ///if a fight becomes too costly, we need to have a way to abandon a system
-        if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND)
+        if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
         {
+            printf("ships!\n");
+
             ///we're not updating threat rating calculation which means we'll send all available ships
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
@@ -1016,21 +1030,40 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             }
         }
 
-        int military_deficit = std::max(estimate_number_of_defence_ships_base(desc) - desc.num_ships_predicted[ship_type::MILITARY], 0);
-        int mining_deficit = std::max(desc.num_resource_asteroids - desc.num_ships_predicted[ship_type::MINING], 0);
-        int colony_deficit = std::max(desc.num_unowned_planets - desc.num_ships_predicted[ship_type::COLONY], 0);
+        //if(invasion_targets.find(owner) != invasion_targets.end() && invasion_targets[owner].invading(desc.os))
+        //    printf("is invading\n");
+
+        int military_deficit = estimate_number_of_defence_ships_base(desc) - desc.num_ships_predicted[ship_type::MILITARY];
+        int mining_deficit = desc.num_resource_asteroids - desc.num_ships_predicted[ship_type::MINING];
+        int colony_deficit = desc.num_unowned_planets - desc.num_ships_predicted[ship_type::COLONY];
 
         int ship_deficit[ship_type::COUNT] = {0};
         ship_deficit[ship_type::MINING] = mining_deficit;
         ship_deficit[ship_type::COLONY] = colony_deficit;
 
-        if(mining_deficit == 0)
+        if(at_war_in(owner, desc.os))
+        {
+            for(int i=0; i<ship_type::COUNT; i++)
+            {
+                ship_deficit[i] = 0;
+            }
+
+            if(!desc.currently_viewed)
+            {
+                ship_deficit[ship_type::SCOUT] = 1 - desc.num_ships_predicted[ship_type::SCOUT];
+                printf("need scout\n");
+            }
+        }
+
+        if(mining_deficit <= 0)
         {
             ship_deficit[ship_type::MILITARY] = military_deficit;
         }
 
         for(int i=0; i<ship_type::COUNT; i++)
         {
+            ship_deficit[i] = std::max(ship_deficit[i], 0);
+
             for(int kk = 0; kk < ship_deficit[i]; kk++)
             {
                 bool found = false;
@@ -1070,6 +1103,9 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             }
         }
 
+        if(!desc.is_speculatively_owned_by_me)
+            continue;
+
         num_resource_asteroids += desc.num_resource_asteroids;
         num_unowned_planets += desc.num_unowned_planets;
         needed_military_ships += estimate_number_of_defence_ships_base(desc);
@@ -1080,6 +1116,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     int military_deficit = needed_military_ships - num_ships[ship_type::MILITARY];
     int mining_deficit = num_resource_asteroids - num_ships[ship_type::MINING];
     int colony_deficit = num_unowned_planets - num_ships[ship_type::COLONY];
+    int scouts_deficit = num_scouts_needed - num_ships[ship_type::SCOUT];
 
     //printf("%i %i\n", needed_military_ships, num_ships[ship_type::MILITARY]);
 
@@ -1088,7 +1125,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     int global_ship_deficit[ship_type::COUNT] = {0};
     global_ship_deficit[ship_type::MINING] = mining_deficit;
     global_ship_deficit[ship_type::COLONY] = colony_deficit;
-    global_ship_deficit[ship_type::SCOUT] = max_scout_ships - num_ships[ship_type::SCOUT];
+    global_ship_deficit[ship_type::SCOUT] = max_scout_ships - num_ships[ship_type::SCOUT] + scouts_deficit;
     global_ship_deficit[ship_type::MILITARY] = military_deficit;
 
     //if(empire_might_want_to_invade_generally(e, descriptors))
@@ -1107,7 +1144,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             {
                 int ships_needed = get_ships_needed_to_invade_system(e, desc);
 
-                printf("hi %i %i\n", ships_needed, (int)free_ships[ship_type::MILITARY].size());
+                //printf("hi %i %i\n", ships_needed, (int)free_ships[ship_type::MILITARY].size());
 
                 global_ship_deficit[ship_type::MILITARY] += ships_needed;
 
@@ -1119,6 +1156,8 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
                     inf.systems.insert(desc.os);
 
                     invasion_targets[desc.os->get_base()->parent_empire] = inf;
+
+                    printf("invade\n");
 
                     e->become_hostile(desc.os->get_base()->parent_empire);
 

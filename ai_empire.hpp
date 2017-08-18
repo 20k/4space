@@ -52,7 +52,12 @@ struct invasion_info
 {
     std::unordered_set<orbital_system*> systems;
     float invasion_timer_s = 0.f;
-    float invasion_timer_max = 120.f;
+    float invasion_timer_max = 60 * 5;
+
+    bool invading(orbital_system* sys)
+    {
+        return systems.find(sys) != systems.end();
+    }
 };
 
 /*inline
@@ -74,6 +79,14 @@ struct ai_empire
     std::unordered_set<orbital_system*> speculatively_owned;
     //std::map<orbital_system*, invasion_info> invasion_targets;
     std::map<empire*, invasion_info> invasion_targets;
+
+    bool at_war_in(empire* e, orbital_system* sys)
+    {
+        if(invasion_targets.find(e) == invasion_targets.end())
+            return false;
+
+        return invasion_targets[e].invading(sys);
+    }
 
     void tick(float dt_s, fleet_manager& fm, system_manager& sm, empire* e);
 };
