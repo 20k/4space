@@ -3009,6 +3009,8 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
             found_empire = unknown_empire;
         }
 
+        ///need to skip systems if we have no scanning power on it
+        ///also skip ships with no scanning power on them
         empire_popup pop;
         pop.e = found_empire;
         pop.id = os->unique_id;

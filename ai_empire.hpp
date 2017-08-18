@@ -53,7 +53,7 @@ struct invasion_info
 {
     std::unordered_set<orbital_system*> systems;
     float invasion_timer_s = 0.f;
-    float invasion_timer_max = 60 * 5;
+    float invasion_timer_max = 10 * 1;
 
     bool invading(orbital_system* sys)
     {
@@ -89,7 +89,20 @@ struct ai_empire
         return invasion_targets[e].invading(sys);
     }
 
+    bool may_cancel_invasion(empire* e, orbital_system* sys)
+    {
+        if(invasion_targets.find(e) == invasion_targets.end())
+            return false;
+
+        return invasion_targets[e].invasion_timer_s >= invasion_targets[e].invasion_timer_max;
+    }
+
+    void cancel_invasion(empire* e, empire* my_empire);
+
     void tick(float dt_s, fleet_manager& fm, system_manager& sm, empire* e);
+
+    float invasion_cooldown_max = 60 * 5.f;
+    float invasion_cooldown_s = invasion_cooldown_max;
 };
 
 #endif // AI_EMPIRE_HPP_INCLUDED

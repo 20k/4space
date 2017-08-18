@@ -2375,13 +2375,13 @@ int main()
     hostile_empire->trade_space_access(player_empire, true);
 
 
-    hostile_empire->resources.resources[resource::IRON].amount = 5000.f;
-    hostile_empire->resources.resources[resource::COPPER].amount = 5000.f;
-    hostile_empire->resources.resources[resource::TITANIUM].amount = 5000.f;
-    hostile_empire->resources.resources[resource::URANIUM].amount = 5000.f;
-    hostile_empire->resources.resources[resource::RESEARCH].amount = 8000.f;
-    hostile_empire->resources.resources[resource::HYDROGEN].amount = 8000.f;
-    hostile_empire->resources.resources[resource::OXYGEN].amount = 8000.f;
+    hostile_empire->resources.resources[resource::IRON].amount = 500.f;
+    hostile_empire->resources.resources[resource::COPPER].amount = 500.f;
+    hostile_empire->resources.resources[resource::TITANIUM].amount = 500.f;
+    hostile_empire->resources.resources[resource::URANIUM].amount = 500.f;
+    hostile_empire->resources.resources[resource::RESEARCH].amount = 800.f;
+    hostile_empire->resources.resources[resource::HYDROGEN].amount = 800.f;
+    hostile_empire->resources.resources[resource::OXYGEN].amount = 800.f;
 
     //player_empire->ally(hostile_empire);
     //player_empire->become_hostile(hostile_empire);

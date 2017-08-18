@@ -4,6 +4,31 @@
 #include "ship.hpp"
 #include "ship_definitions.hpp"
 
+void ai_empire::cancel_invasion(empire* e, empire* my_empire)
+{
+    auto found = invasion_targets.find(e);
+
+    if(found != invasion_targets.end())
+    {
+        for(orbital* o : my_empire->owned)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            for(orbital_system* sys : (*found).second.systems)
+            {
+                if(o->command_queue.get_warp_destination() == sys)
+                {
+                    o->command_queue.cancel();
+                    break;
+                }
+            }
+        }
+
+        invasion_targets.erase(found);
+    }
+}
+
 struct orbital_system_descriptor
 {
     int position = -1;
@@ -900,6 +925,11 @@ Do invasion
 Need a way to assess if we're likely to win an invasion, need a way for ai to abandon system
 */
 
+bool should_send_reinforcements(orbital_system_descriptor& desc)
+{
+    return desc.hostiles_threat_rating * 1.4f > (desc.friendly_threat_rating + desc.my_threat_rating);
+}
+
 void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
 {
     if(e->is_pirate)
@@ -909,6 +939,8 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     {
         i.second.invasion_timer_s += dt_s;
     }
+
+    invasion_cooldown_s += dt_s;
 
     ensure_adequate_defence(*this, e);
 
@@ -997,7 +1029,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
         {
             ///we're not updating threat rating calculation which means we'll send all available ships
-            if(desc.hostiles_threat_rating * 1.4f > (desc.friendly_threat_rating + desc.my_threat_rating))
+            if(should_send_reinforcements(desc))
             {
                 for(int i=((int)free_ships[ship_type::MILITARY].size())-1; i >= 0; i--)
                 {
@@ -1018,10 +1050,15 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
                     o->command_queue.try_warp(path, true);
 
-                    bool high_threat = desc.hostiles_threat_rating * 1.4f > (desc.friendly_threat_rating + desc.my_threat_rating);
+                    bool high_threat = should_send_reinforcements(desc);
 
                     if(!high_threat)
                         break;
+                }
+
+                if(should_send_reinforcements(desc) && at_war_in(owner, desc.os) && may_cancel_invasion(owner, desc.os))
+                {
+                    cancel_invasion(owner, e);
                 }
             }
         }
@@ -1130,7 +1167,8 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
     //if(empire_might_want_to_invade_generally(e, descriptors))
 
-    if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0)
+    //if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0)
+    if(invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max)
     {
         for(orbital_system_descriptor& desc : descriptors)
         {
@@ -1140,10 +1178,10 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             if(!desc.is_owned)
                 continue;
 
-            if(!desc.viewed)
-                continue;
+            /*if(!desc.viewed)
+                continue;*/
 
-            if(empire_could_invade_specific_system(e, desc))
+            //if(empire_could_invade_specific_system(e, desc))
             {
                 int ships_needed = get_ships_needed_to_invade_system(e, desc);
 
@@ -1157,6 +1195,8 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
                 {
                     invasion_info inf;
                     inf.systems.insert(desc.os);
+
+                    invasion_cooldown_s = 0.f;
 
                     invasion_targets[desc.os->get_base()->parent_empire] = inf;
 
