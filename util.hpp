@@ -38,9 +38,9 @@ std::string to_string_with_enforced_variable_dp(T a_value, int forced_dp = 1)
     if(fabs(a_value) <= 0.0999999 && fabs(a_value) >= 0.0001)
         forced_dp++;
 
-    a_value = a_value * pow(10, forced_dp);
+    a_value = a_value * pow(10, forced_dp + 1);
     a_value = round(a_value);
-    a_value = a_value * pow(10, -forced_dp);
+    a_value = a_value * pow(10, -forced_dp - 1);
 
     std::string fstr = std::to_string(a_value);
 
