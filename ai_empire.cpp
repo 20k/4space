@@ -44,6 +44,13 @@ struct orbital_system_descriptor
 
     float friendly_threat_rating = 0.f;
     float my_threat_rating = 0.f;
+
+    float threat_rating_of_most_powerful_empire = 0.f;
+    std::map<empire*, float> power_map;
+    std::map<empire*, float> power_map_including_allies;
+
+    /*empire* most_powerful_empire = nullptr;
+    float most_powerful_empire_power = 0.f;*/
 };
 
 int estimate_number_of_defence_ships_base(orbital_system_descriptor& desc)
@@ -190,6 +197,8 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 desc.hostiles_threat_rating += sm->get_tech_adjusted_military_power();
             }
 
+            desc.power_map[o->parent_empire] += sm->get_tech_adjusted_military_power();
+
             if(e != o->parent_empire && e->is_allied(o->parent_empire))
             {
                 desc.friendly_threat_rating += sm->get_tech_adjusted_military_power();
@@ -238,6 +247,28 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         {
             desc.num_ships_predicted[kk] += desc.num_ships_raw[kk];
         }
+
+        desc.power_map_including_allies = desc.power_map;
+
+        for(auto& i : desc.power_map)
+        {
+            for(auto& kk : desc.power_map_including_allies)
+            {
+                if(i.first->is_allied(kk.first))
+                {
+                    kk.second += i.second;
+                }
+            }
+        }
+
+        /*for(auto& i : desc.power_map_including_allies)
+        {
+            if(i.second > desc.most_powerful_empire_power)
+            {
+                desc.most_powerful_empire_power = i.second;
+                desc.most_powerful_empire = i.first;
+            }
+        }*/
 
         descriptor.push_back(desc);
 
@@ -668,6 +699,130 @@ bool wants_to_expand(empire* e, const std::vector<orbital_system_descriptor>& de
     return false;
 }
 
+///are we in a state where we'll consider invading other empires
+bool empire_might_want_to_invade_generally(empire* e, const std::vector<orbital_system_descriptor>& descriptors)
+{
+    ///if short on resources generally, false
+
+    int num_systems = e->calculated_owned_systems.size();
+
+    if(num_systems >= e->desired_empire_size)
+        return true;
+
+    ///LATER:
+    ///If I cannot expand due to empires around me occupying space, also true
+
+    ///SUPER LATER:
+    ///if above under later is suicidal, become partly spaceborne
+
+    return false;
+}
+
+int get_ships_needed_to_invade_system(empire* e, orbital_system_descriptor& desc)
+{
+    if(desc.os->get_base()->parent_empire == nullptr)
+        return 0;
+
+    float power_level = desc.power_map_including_allies[desc.os->get_base()->parent_empire];
+
+    int num = 0;
+    float my_power_level = 0.f;
+
+    ship* s = get_ship_with_need(ship_type::MILITARY, true);
+
+    int max_num = 0;
+
+    ///this might seeom convoluted, but we can then later pass in an array of ships - eg fleet carriers etc
+    while(max_num < 1000)
+    {
+        my_power_level += s->get_tech_adjusted_military_power();
+
+        max_num++;
+
+        if(my_power_level >= power_level * 1.2f)
+            return max_num;
+    }
+
+    ///Um. Ok. I think this is impossible
+    return 999999;
+}
+
+///assumes might want to invade generally
+///how do we calculate how many ships to build to invade somewhere (from a code structuring perspective)
+bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& desc, int free_military_ships)
+{
+    ///check we have enough free military ships to launch the invasion
+    ///check we have enough money to build enough ships
+    ///check that the invading faction is likely weaker than us (cheat for the moment)
+    ///check that the invading faction is not too small to invade
+    ///check that the invading faction has poor relations with us
+    ///check we aren't already at war with someone who we're trying to defeat
+
+    if(desc.os->get_base()->parent_empire == nullptr)
+        return false;
+
+    int ships_needed = get_ships_needed_to_invade_system(e, desc);
+
+    if(ships_needed > free_military_ships)
+        return false;
+
+    ///make sure we have this much money
+    float partial_replacement_frac = 0.5f;
+
+    ship* s = get_ship_with_need(ship_type::MILITARY, true);
+
+    auto cost = s->resources_cost();
+
+    for(auto& i : cost)
+    {
+        i.second *= partial_replacement_frac * ships_needed;
+    }
+
+    ///won't work for spaceborne empires... have a check for those?
+    ///Maybe assess total stored resources?
+    if(!e->can_fully_dispense(cost))
+    {
+        return false;
+    }
+
+    empire* other_empire = desc.os->get_base()->parent_empire;
+
+    ///CHEAT
+    float my_strength = e->get_military_strength();
+    float their_strength = other_empire->get_military_strength();
+
+    ///don't start invading if much stronger
+    if(my_strength < their_strength * 1.2f)
+        return false;
+
+    ///don't start invading if much weaker
+    if(my_strength > their_strength * 5.f)
+        return false;
+
+    float relations = e->get_culture_modified_friendliness(other_empire);
+
+    if(relations > 0.5f)
+        return false;
+
+    ///check if this is a sane idea
+    float total_hostile_strength = 0.f;
+
+    for(auto& relation : e->relations_map)
+    {
+        if(e->is_hostile(relation.first))
+        {
+            total_hostile_strength += relation.first->get_military_strength();
+        }
+    }
+
+    ///not a sane idea, already at war with too many people
+    if(my_strength < total_hostile_strength + their_strength * 1.2f)
+        return false;
+
+
+    return true;
+}
+
 /**
 Ok, I can do invasion in a fun way now
 Firstly: Only applies to empries who don't like other empires, we're talking < 0.3
@@ -675,6 +830,8 @@ Only applies to empires of roughly the same size or smaller
 Only applies if we've reached max size, or we're unable to reach max size
 Then, if we find a close empire that we think we can defeat
 Do invasion
+
+Need a way to assess if we're likely to win an invasion, need a way for ai to abandon system
 */
 
 void ai_empire::tick(fleet_manager& fleet_manage, system_manager& system_manage, empire* e)
