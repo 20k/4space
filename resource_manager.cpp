@@ -177,11 +177,7 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
             p_str = "0.0";
         }
 
-        if(val < 0)
-        {
-            p_str = "-" + p_str;
-        }
-        else
+        if(val > 0)
         {
             p_str = "+" + p_str;
         }
