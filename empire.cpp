@@ -561,7 +561,7 @@ float empire::available_scanning_power_on(orbital* passed_other)
 
         ship_manager* found_sm = (ship_manager*)o->data;
 
-        if(found_sm->parent_empire != this)
+        if(found_sm->parent_empire != this && !is_allied(found_sm->parent_empire))
             continue;
 
         for(ship* s : found_sm->ships)

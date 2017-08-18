@@ -240,10 +240,10 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         }
 
         //if(desc.contains_hostiles)
-        if(fabs(desc.hostiles_threat_rating) > 0.1f)
+        /*if(fabs(desc.hostiles_threat_rating) > 0.1f)
         {
             printf("%f\n", desc.hostiles_threat_rating);
-        }
+        }*/
 
         for(int kk = 0; kk < ship_type::COUNT; kk++)
         {
@@ -998,8 +998,6 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         ///if a fight becomes too costly, we need to have a way to abandon a system
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
         {
-            printf("ships!\n");
-
             ///we're not updating threat rating calculation which means we'll send all available ships
             if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
@@ -1048,7 +1046,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
                 ship_deficit[i] = 0;
             }
 
-            if(!desc.currently_viewed)
+            if(!e->has_vision(desc.os))
             {
                 ship_deficit[ship_type::SCOUT] = 1 - desc.num_ships_predicted[ship_type::SCOUT];
                 printf("need scout\n");
