@@ -990,10 +990,6 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
         bool invading_system = at_war_in(owner, desc.os);
 
-        //printf("%f host\n", desc.hostiles_threat_rating);
-
-        //printf("%i invde\n", invading_system);
-
         ///part of the problem is we have no vision
         ///if a fight becomes too costly, we need to have a way to abandon a system
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
@@ -1049,7 +1045,6 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             if(!e->has_vision(desc.os))
             {
                 ship_deficit[ship_type::SCOUT] = 1 - desc.num_ships_predicted[ship_type::SCOUT];
-                printf("need scout\n");
             }
         }
 
