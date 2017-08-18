@@ -2275,6 +2275,25 @@ vec3f get_gray_colour(vec3f in)
     return mix(avg_vec, in, 0.2f);
 }
 
+bool within_circle(vec2f point, vec2f pos, float rad)
+{
+    return (pos - point).length() < rad;
+}
+
+bool lies_on_boundary(vec2f point, std::vector<vec2f>& points, std::vector<float>& radiuses)
+{
+    for(int i=0; i<points.size(); i++)
+    {
+        vec2f pos = points[i];
+        float rad = radiuses[i];
+
+        if(within_circle(point, pos, rad - 2))
+            return false;
+    }
+
+    return true;
+}
+
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
 {
     //printf("zoom %f\n", zoom_level);
@@ -2314,7 +2333,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     sf::BlendMode blend(sf::BlendMode::One, sf::BlendMode::One, sf::BlendMode::Add);
 
-    float frad = sun_universe_rad * 60.5f;
+    float frad = sun_universe_rad * 6.5f;
 
     sf::CircleShape nc2;
     nc2.setFillColor({0,0,0,255});
@@ -2400,6 +2419,10 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
     }
 
+    std::vector<vec2f> intersection_points;
+    std::vector<vec2f> centres;
+    std::vector<float> radiuses;
+
     sf::RectangleShape shape;
 
     for(orbital_system* o1 : systems)
@@ -2426,6 +2449,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             vec2f p1 = intersection.first;
             vec2f p2 = intersection.second;
 
+            intersection_points.push_back(p1);
+            intersection_points.push_back(p2);
+
+            centres.push_back(o1->universe_pos * universe_scale);
+            radiuses.push_back(frad);
 
             //shape.setSize({400.f, 400.f});
             shape.setSize({(p2 - p1).length(), sun_universe_rad/15.f});
@@ -2445,6 +2473,34 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             win.draw(shape);
         }
     }
+
+    /*for(vec2f& point : intersection_points)
+    {
+        if(lies_on_boundary(point, centres, radiuses))
+        {
+            sf::CircleShape shape;
+
+            shape.setRadius(5.f * universe_scale);
+            shape.setPosition(point.x(), point.y());
+            shape.setFillColor(sf::Color(255, 255, 255, 255));
+            win.draw(shape);
+        }
+    }*/
+
+    ///need to ensure that empire side stays consistent wrt line as well when tracing
+    std::vector<vec2f> boundary_points;
+
+    for(vec2f& point : intersection_points)
+    {
+        if(lies_on_boundary(point, centres, radiuses))
+        {
+            if(std::find(boundary_points.begin(), boundary_points.end(), point) == boundary_points.end())
+            {
+                boundary_points.push_back(point);
+            }
+        }
+    }
+
 
     sf::CircleShape circle;
     circle.setRadius(sun_universe_rad);
