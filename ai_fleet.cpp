@@ -179,6 +179,11 @@ void try_mine(ship_manager* sm, orbital* my_o)
     }
 }
 
+void clear_ai_state(ai_fleet& fleet)
+{
+    fleet.ai_state = ai_empire_info::IDLE;
+}
+
 ///this takes like 4ms
 void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
 {
@@ -236,7 +241,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     ///split fleets up after we finish basic ai
     if(ship_manage->any_derelict())
     {
-        ai_state = 0;
+        clear_ai_state(*this);
         return;
     }
 
@@ -245,14 +250,14 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     if(!ship_manage->majority_of_type(ship_type::MILITARY))
     {
-        ai_state = 0;
+        clear_ai_state(*this);
         return;
     }
 
     ///fly around?
     if(!ship_manage->can_engage())
     {
-        ai_state = 0;
+        clear_ai_state(*this);
         return;
     }
 
@@ -290,7 +295,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     if(targets.size() == 0)
     {
-        ai_state = 0;
+        clear_ai_state(*this);
         return;
     }
 

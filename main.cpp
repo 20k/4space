@@ -2521,7 +2521,7 @@ int main()
     player_empire->take_ownership(ofleet2);
     //player_empire->take_ownership(fleet5);
 
-    orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
+    /*orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
     ohostile_fleet->orbital_length = 250;
     ohostile_fleet->parent = sun;
@@ -2540,7 +2540,8 @@ int main()
     hostile_empire->take_ownership(fleet4);
     hostile_empire->take_ownership(oderelict_fleet);
 
-    derelict_ship->randomise_make_derelict();
+    derelict_ship->randomise_make_derelict();*/
+
 
     //orbital_system* sys_2 = system_manage.make_new();
     //sys_2->generate_random_system(3, 100, 3, 5);
@@ -2557,6 +2558,7 @@ int main()
     e2->resources.resources[resource::HYDROGEN].amount = 8000.f;
     e2->resources.resources[resource::OXYGEN].amount = 8000.f;
 
+    //hostile_empire->unally(e2);
 
     ship_manager* fleet5 = fleet_manage.make_new();
 

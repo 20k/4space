@@ -16,6 +16,7 @@ namespace ai_empire_info
     {
         IDLE,
         DEFEND,
+        SCOUT_INVASION_PREP,
 
         //DEFENCE,
         //STAGING,

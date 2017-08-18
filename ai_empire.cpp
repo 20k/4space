@@ -233,7 +233,8 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 }
             }
 
-            if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && fin == os)
+            //if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && fin == os)
+            if(fin == os)
             {
                 desc.my_threat_rating += sm->get_tech_adjusted_military_power();
             }
@@ -856,7 +857,7 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
 
     float relations = e->get_culture_modified_friendliness(other_empire);
 
-    float relations_bound = 0.8f;
+    float relations_bound = 0.9f;
     //float relations_bound = 0.3f;
 
     if(relations > relations_bound)
@@ -995,7 +996,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
         {
             ///we're not updating threat rating calculation which means we'll send all available ships
-            if(desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating))
+            if(desc.hostiles_threat_rating * 1.4f > (desc.friendly_threat_rating + desc.my_threat_rating))
             {
                 for(int i=((int)free_ships[ship_type::MILITARY].size())-1; i >= 0; i--)
                 {
@@ -1016,7 +1017,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
                     o->command_queue.try_warp(path, true);
 
-                    bool high_threat = desc.hostiles_threat_rating * 1.5f > (desc.friendly_threat_rating + desc.my_threat_rating);
+                    bool high_threat = desc.hostiles_threat_rating * 1.4f > (desc.friendly_threat_rating + desc.my_threat_rating);
 
                     if(!high_threat)
                         break;
@@ -1073,6 +1074,11 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
                     if(path.size() > 0)
                     {
+                        /*if(i == ship_type::SCOUT && at_war_in(owner, desc.os))
+                        {
+                            ((ship_manager*)o->data)->ai_controller.ai_state = ai_empire_info::SCOUT_INVASION_PREP;
+                        }*/
+
                         free_ships[i].erase(free_ships[i].begin() + jj);
 
                         found = true;
@@ -1149,8 +1155,6 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
                     inf.systems.insert(desc.os);
 
                     invasion_targets[desc.os->get_base()->parent_empire] = inf;
-
-                    printf("invade\n");
 
                     e->become_hostile(desc.os->get_base()->parent_empire);
 
