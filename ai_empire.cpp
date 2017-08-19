@@ -877,7 +877,7 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
 
 
     ///don't start invading if much weaker
-    if(my_strength > their_strength * 5.f)
+    if(my_strength > their_strength * 5.f && !e->is_hostile(other_empire))
         return false;
 
     float relations = e->get_culture_modified_friendliness(other_empire);
