@@ -901,6 +901,10 @@ bool empire_could_invade_specific_system(empire* e, orbital_system_descriptor& d
         if(other->is_derelict)
             continue;
 
+        ///don't double factor in empires we're already at war with if we're considering invading one of their systems
+        if(other == other_empire)
+            continue;
+
         if(e->is_hostile(relation.first))
         {
             total_hostile_strength += relation.first->get_military_strength();
