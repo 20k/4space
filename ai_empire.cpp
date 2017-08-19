@@ -944,6 +944,14 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         i.second.invasion_timer_s += dt_s;
     }
 
+    for(auto it = invasion_targets.begin(); it != invasion_targets.end(); it++)
+    {
+        if(it->second.invasion_timer_s >= it->second.invasion_timer_max_force)
+        {
+            it = invasion_targets.erase(it);
+        }
+    }
+
     invasion_cooldown_s += dt_s;
 
     ensure_adequate_defence(*this, e);

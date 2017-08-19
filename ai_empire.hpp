@@ -53,7 +53,8 @@ struct invasion_info
 {
     std::unordered_set<orbital_system*> systems;
     float invasion_timer_s = 0.f;
-    float invasion_timer_max = 30 * 1;
+    float invasion_timer_max_reconsider = 30 * 1;
+    float invasion_timer_max_force = 60 * 5;
 
     bool invading(orbital_system* sys)
     {
@@ -94,7 +95,15 @@ struct ai_empire
         if(invasion_targets.find(e) == invasion_targets.end())
             return false;
 
-        return invasion_targets[e].invasion_timer_s >= invasion_targets[e].invasion_timer_max;
+        return invasion_targets[e].invasion_timer_s >= invasion_targets[e].invasion_timer_max_reconsider;
+    }
+
+    bool must_cancel_invasion(empire* e, orbital_system* sys)
+    {
+        if(invasion_targets.find(e) == invasion_targets.end())
+            return false;
+
+        return invasion_targets[e].invasion_timer_s >= invasion_targets[e].invasion_timer_max_force;
     }
 
     void cancel_invasion(empire* e, empire* my_empire);
