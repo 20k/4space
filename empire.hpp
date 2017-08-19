@@ -194,6 +194,8 @@ struct empire
     void tick_decolonisation();
     void tick_relation_ship_occupancy_loss(float diff_s, system_manager& system_manage);
     void tick_relation_alliance_changes(empire* player_empire);
+    void tick_relation_border_friction(float dt_s, system_manager& system_manage);
+
     void tick_calculate_owned_systems();
 
     bool has_vision(orbital_system* os);

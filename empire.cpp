@@ -1118,6 +1118,59 @@ void empire::tick_relation_alliance_changes(empire* player_empire)
     }
 }
 
+void empire::tick_relation_border_friction(float dt_s, system_manager& system_manage)
+{
+    std::unordered_set<empire*> borders_touching;
+
+    for(orbital_system* my_sys : calculated_owned_systems)
+    {
+        vec2f my_pos = my_sys->universe_pos * system_manage.universe_scale;
+
+        for(orbital_system* sys : system_manage.systems)
+        {
+            if(sys == my_sys)
+                continue;
+
+            empire* owner = sys->get_base()->parent_empire;
+
+            if(owner == nullptr)
+                continue;
+
+            if(owner == this)
+                continue;
+
+            vec2f their_pos = sys->universe_pos * system_manage.universe_scale;
+
+            float dist = (their_pos - my_pos).length();
+
+            float fudge = 1.2f;
+
+            if(dist < system_manage.border_universe_rad * 2 * fudge)
+            {
+                borders_touching.insert(owner);
+            }
+        }
+    }
+
+    for(empire* touching_empire : borders_touching)
+    {
+        float relation = get_culture_modified_friendliness(touching_empire);
+
+        ///if relations are very poor, degrade very slowly
+        ///in the future, make this a constant offset rather than a degredation
+
+        float loss_bound = 0.2f;
+        float loss_speed_ps = 0.0005f;
+
+        if(relation < loss_bound)
+        {
+            float relation_loss = loss_speed_ps * dt_s;
+
+            negative_relations(touching_empire, relation_loss);
+        }
+    }
+}
+
 void empire::tick_calculate_owned_systems()
 {
     std::unordered_set<orbital_system*> systems;
@@ -1332,6 +1385,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick_high_level_ai(step_s, fleet_manage, system_manage);
         emp->tick_relation_ship_occupancy_loss(step_s, system_manage);
         emp->tick_relation_alliance_changes(player_empire);
+        emp->tick_relation_border_friction(step_s, system_manage);
     }
 
     for(empire* emp : pirate_empires)

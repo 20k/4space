@@ -379,6 +379,7 @@ struct system_manager
     vec2f camera;
     static float universe_scale;
     float sun_universe_rad = 200;
+    float border_universe_rad = sun_universe_rad * 6.5;
 
     ///also generate empires in universe, in a separate function
     void generate_universe(int num);

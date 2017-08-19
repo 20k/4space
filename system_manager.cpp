@@ -2333,7 +2333,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     sf::BlendMode blend(sf::BlendMode::One, sf::BlendMode::One, sf::BlendMode::Add);
 
-    float frad = sun_universe_rad * 6.5f;
+    float frad = border_universe_rad;
 
     sf::CircleShape nc2;
     nc2.setFillColor({0,0,0,255});
