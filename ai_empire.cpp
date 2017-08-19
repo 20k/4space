@@ -1168,43 +1168,69 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     //if(empire_might_want_to_invade_generally(e, descriptors))
 
     //if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0)
+    //if(invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max)
     if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max)
     {
+        std::vector<orbital_system_descriptor> hostile_systems;
+
         for(orbital_system_descriptor& desc : descriptors)
         {
-            if(desc.is_speculatively_owned_by_me)
-                continue;
-
-            if(!desc.is_owned)
-                continue;
-
-            if(!desc.viewed)
-                continue;
-
-            if(empire_could_invade_specific_system(e, desc))
+            if(e->is_hostile(desc.os->get_base()->parent_empire))
             {
-                int ships_needed = get_ships_needed_to_invade_system(e, desc);
+                hostile_systems.push_back(desc);
+            }
+        }
 
-                //printf("hi %i %i\n", ships_needed, (int)free_ships[ship_type::MILITARY].size());
+        std::vector<std::vector<orbital_system_descriptor>*> to_consider;
 
-                global_ship_deficit[ship_type::MILITARY] += ships_needed;
+        to_consider.push_back(&hostile_systems);
+        to_consider.push_back(&descriptors);
 
-                ///WAR WERE DECLARED
-                ///well. not yet, but we're doing it
-                if((int)free_ships[ship_type::MILITARY].size() >= ships_needed)
+        //for(orbital_system_descriptor& desc : descriptors)
+        for(std::vector<orbital_system_descriptor>* current_descriptorset : to_consider)
+        {
+            bool should_break = false;
+
+            for(orbital_system_descriptor& desc : *current_descriptorset)
+            {
+                if(desc.is_speculatively_owned_by_me)
+                    continue;
+
+                if(!desc.is_owned)
+                    continue;
+
+                if(!desc.viewed)
+                    continue;
+
+                if(empire_could_invade_specific_system(e, desc))
                 {
-                    invasion_info inf;
-                    inf.systems.insert(desc.os);
+                    int ships_needed = get_ships_needed_to_invade_system(e, desc);
 
-                    invasion_cooldown_s = 0.f;
+                    //printf("hi %i %i\n", ships_needed, (int)free_ships[ship_type::MILITARY].size());
 
-                    invasion_targets[desc.os->get_base()->parent_empire] = inf;
+                    global_ship_deficit[ship_type::MILITARY] += ships_needed;
 
-                    e->become_hostile(desc.os->get_base()->parent_empire);
+                    ///WAR WERE DECLARED
+                    ///well. not yet, but we're doing it
+                    if((int)free_ships[ship_type::MILITARY].size() >= ships_needed)
+                    {
+                        invasion_info inf;
+                        inf.systems.insert(desc.os);
 
-                    break;
+                        invasion_cooldown_s = 0.f;
+
+                        invasion_targets[desc.os->get_base()->parent_empire] = inf;
+
+                        e->become_hostile(desc.os->get_base()->parent_empire);
+
+                        should_break = true;
+                        break;
+                    }
                 }
             }
+
+            if(should_break)
+                break;
         }
     }
 
