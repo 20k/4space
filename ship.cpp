@@ -3049,7 +3049,7 @@ float ship::get_move_system_speed()
 
     float thruster_amount = get_fully_merged(1.f)[ship_component_elements::ENGINE_POWER].produced_per_s;
 
-    float internal_size = get_total_components_size();
+    float internal_size = get_total_components_size() * current_size;
 
     if(thruster_amount <= FLOAT_BOUND)
         return 0.f;
