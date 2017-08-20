@@ -2647,6 +2647,14 @@ int main()
         }
     }*/
 
+    //#define VIEW_ALL
+    #ifdef VIEW_ALL
+    for(orbital_system* sys : system_manage.systems)
+    {
+        sys->get_base()->viewed_by[player_empire] = true;
+    }
+    #endif // VIEW_ALL
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
