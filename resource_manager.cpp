@@ -174,10 +174,11 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
 
         if(strncmp(p_str.c_str(), "nan", 3) == 0)
         {
-            p_str = "0.0";
+           p_str = to_string_with_enforced_variable_dp(0.f);
+           val = 0.f;
         }
 
-        if(val > 0)
+        if(val >= 0)
         {
             p_str = "+" + p_str;
         }
