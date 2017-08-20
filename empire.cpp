@@ -519,7 +519,16 @@ void empire::tick_high_level_ai(float dt_s, fleet_manager& fm, system_manager& s
     if(!has_ai)
         return;
 
-    ai_empire_controller.tick(dt_s, fm, sm, this);
+    frame_counter++;
+
+    accumulated_dt_s += dt_s;
+
+    if(((frame_counter + team_id) % parent->empires.size()) != 0)
+        return;
+
+    ai_empire_controller.tick(accumulated_dt_s, fm, sm, this);
+
+    accumulated_dt_s = 0.f;
 }
 
 void empire::draw_ui()
@@ -1399,7 +1408,11 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick(step_s);
         emp->tick_system_claim();
         emp->tick_ai(all_battles, system_manage);
+
+
         emp->tick_high_level_ai(step_s, fleet_manage, system_manage);
+
+
         emp->tick_relation_ship_occupancy_loss(step_s, system_manage);
         emp->tick_relation_alliance_changes(player_empire);
         emp->tick_relation_border_friction(step_s, system_manage);

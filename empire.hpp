@@ -7,6 +7,7 @@
 #include <vec/vec.hpp>
 #include "ai_empire.hpp"
 #include <unordered_set>
+#include <unordered_map>
 #include <deque>
 
 struct orbital;
@@ -15,6 +16,7 @@ struct ship_manager;
 struct ship;
 struct system_manager;
 struct all_battles_manager;
+
 
 struct faction_relations
 {
@@ -80,7 +82,7 @@ struct empire
 
     std::unordered_set<orbital_system*> calculated_owned_systems;
 
-    std::map<empire*, faction_relations> relations_map;
+    std::unordered_map<empire*, faction_relations> relations_map;
 
     empire();
 
@@ -217,6 +219,10 @@ struct empire
     uint16_t fleet_name_counter = 0;
 
     int desired_empire_size = 1;
+
+    float accumulated_dt_s = 0.f;
+
+    int frame_counter = 0;
 };
 
 struct fleet_manager;
@@ -277,7 +283,6 @@ struct empire_manager
     bool giving_resources_ui_clicked = false;
     resource_manager offering;
     bool giving_are_you_sure = false;
-
 };
 
 #endif // EMPIRE_HPP_INCLUDED

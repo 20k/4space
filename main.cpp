@@ -2585,8 +2585,8 @@ int main()
 
     system_manage.generate_universe(200);
 
-    //empire_manage.birth_empires_random(fleet_manage, system_manage);
-    //empire_manage.birth_empires_without_ownership(fleet_manage, system_manage);
+    empire_manage.birth_empires_random(fleet_manage, system_manage);
+    empire_manage.birth_empires_without_ownership(fleet_manage, system_manage);
 
     system_manage.set_viewed_system(base);
 
