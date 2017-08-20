@@ -4986,7 +4986,7 @@ void fleet_manager::cull_dead(empire_manager& empire_manage)
 
 void fleet_manager::tick_all(float step_s)
 {
-    int bound = 5;
+    int bound = 6;
 
     for(ship_manager* sm : fleets)
     {
