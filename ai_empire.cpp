@@ -189,7 +189,7 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 desc.num_planets++;
             }
 
-            if(o->type == orbital_info::PLANET && o->parent_empire == e && o->can_construct_ships)
+            if(o->type == orbital_info::PLANET && o->parent_empire == e)
             {
                 desc.owned_planets.push_back(o);
             }
