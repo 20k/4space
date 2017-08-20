@@ -2399,6 +2399,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     //ncircle.setRadius(frad);
     //ncircle.setOutlineThickness(sun_universe_rad / 15.f);
     //ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
+    nc2.setFillColor(sf::Color(20,20,20,255));
     //ncircle.setPointCount(80.f);
     nc2.setOutlineColor(sf::Color(0,0,0,0));
 
@@ -2420,7 +2421,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
     }
 
-    nc2.setFillColor({20, 20, 20, 255});
+    /*nc2.setFillColor({20, 20, 20, 255});
     //ncircle.setRadius(frad);
     //ncircle.setOrigin(ncircle.getLocalBounds().width/2, ncircle.getLocalBounds().height/2);
     //ncircle.setPointCount(80.f);
@@ -2447,7 +2448,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             ///change to add if we want to see overlap
             win.draw(nc2);
         }
-    }
+    }*/
 
     std::vector<vec2f> intersection_points;
     std::vector<vec2f> centres;
