@@ -809,7 +809,8 @@ void empire::update_vision_of_allies(orbital* o)
 {
     for(auto& relations : relations_map)
     {
-        if(is_allied(relations.first))
+        //if(is_allied(relations.first))
+        if(relations.second.allied)
         {
             o->viewed_by[relations.first] = true;
             o->currently_viewed_by[relations.first] = true;
