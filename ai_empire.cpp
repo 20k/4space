@@ -1221,7 +1221,7 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
     bool may_invade_condition = empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max;
 
-    #define SUICIDAL
+    //#define SUICIDAL
     #ifdef SUICIDAL
     may_invade_condition = invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max;
     #endif // SUICIDAL
