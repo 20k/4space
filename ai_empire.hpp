@@ -106,6 +106,17 @@ struct ai_empire
         return invasion_targets[e].invasion_timer_s >= invasion_targets[e].invasion_timer_max_force;
     }
 
+    bool system_being_invaded(orbital_system* sys)
+    {
+        for(auto& i : invasion_targets)
+        {
+            if(i.second.systems.find(sys) != i.second.systems.end())
+                return true;
+        }
+
+        return false;
+    }
+
     void cancel_invasion(empire* e, empire* my_empire);
 
     void tick(float dt_s, fleet_manager& fm, system_manager& sm, empire* e);

@@ -977,6 +977,9 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             }
         }
 
+        if(sm->majority_of_type(ship_type::MILITARY) && system_being_invaded(o->parent_system))
+            continue;
+
         /*if(sm->majority_of_type(ship_type::MILITARY))
         {
             std::cout << o->name << std::endl;
@@ -1040,7 +1043,6 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         ///if a fight becomes too costly, we need to have a way to abandon a system
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
         {
-            ///we're not updating threat rating calculation which means we'll send all available ships
             if(should_send_reinforcements(desc))
             {
                 for(int i=((int)free_ships[ship_type::MILITARY].size())-1; i >= 0; i--)
@@ -1102,6 +1104,12 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         if(mining_deficit <= 0)
         {
             ship_deficit[ship_type::MILITARY] = military_deficit;
+        }
+
+        ///maintain at least one ship
+        if(invading_system)
+        {
+            ship_deficit[ship_type::MILITARY] = 1 - desc.num_ships_predicted[ship_type::MILITARY];
         }
 
         for(int i=0; i<ship_type::COUNT; i++)
@@ -1181,7 +1189,15 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
 
     //if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0)
     //if(invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max)
-    if(empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max)
+
+    bool may_invade_condition = empire_might_want_to_invade_generally(e, descriptors) && invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max;
+
+    #define SUICIDAL
+    #ifdef SUICIDAL
+    may_invade_condition = invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max;
+    #endif // SUICIDAL
+
+    if(may_invade_condition)
     {
         std::vector<orbital_system_descriptor> hostile_systems;
 
@@ -1211,10 +1227,12 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
                 if(!desc.is_owned)
                     continue;
 
+                #ifndef SUICIDAL
                 if(!desc.viewed)
                     continue;
 
                 if(empire_could_invade_specific_system(e, desc))
+                #endif
                 {
                     int ships_needed = get_ships_needed_to_invade_system(e, desc);
 

@@ -429,6 +429,8 @@ void empire::tick_system_claim()
         bool own_uncontested_planet = true;
         bool own_any_planet = false;
 
+        int num_planets = 0;
+
         for(orbital* o : i->orbitals)
         {
             if(o->type == orbital_info::PLANET && o->parent_empire != this && o->parent_empire != nullptr)
@@ -436,10 +438,20 @@ void empire::tick_system_claim()
                 own_uncontested_planet = false;
             }
 
+            if(o->type == orbital_info::PLANET)
+            {
+                num_planets++;
+            }
+
             if(o->type == orbital_info::PLANET && o->parent_empire == this)
             {
                 own_any_planet = true;
             }
+        }
+
+        if(!own_any_planet && i->get_base()->parent_empire == this && num_planets > 0)
+        {
+            i->get_base()->parent_empire = nullptr;
         }
 
         if(!own_uncontested_planet || !own_any_planet)
