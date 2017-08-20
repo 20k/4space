@@ -7,6 +7,7 @@
 #include "resource_manager.hpp"
 #include "object_command_queue.hpp"
 #include <set>
+#include <unordered_map>
 #include "context_menu.hpp"
 
 namespace orbital_info
@@ -237,8 +238,8 @@ struct orbital
 
     vec2f last_viewed_position;
     //bool ever_viewed = false;
-    std::map<empire*, bool> viewed_by;
-    std::map<empire*, bool> currently_viewed_by;
+    std::unordered_map<empire*, bool> viewed_by;
+    std::unordered_map<empire*, bool> currently_viewed_by;
 
     static float calculate_orbital_drift_angle(float orbital_length, float step_s);
     float calculate_orbital_drift_angle(float step_s);
