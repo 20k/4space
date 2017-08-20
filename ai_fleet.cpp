@@ -186,10 +186,26 @@ void try_decolonising(orbital* o)
 {
     ship_manager* sm = (ship_manager*)o->data;
 
+    if(!sm->majority_of_type(ship_type::MILITARY))
+        return;
+
     if(sm->decolonising)
         return;
 
-    if(o->command_queue.)
+    if(sm->any_in_combat())
+        return;
+
+    if(sm->any_derelict())
+        return;
+
+    if(!sm->can_move_in_system())
+        return;
+
+    if(o->command_queue.is_ever(object_command_queue_info::WARP))
+        return;
+
+    if(o->command_queue.is_ever(object_command_queue_info::IN_SYSTEM_PATH))
+        return;
 
     for(orbital* test_orbital : o->parent_system->orbitals)
     {
@@ -202,7 +218,7 @@ void try_decolonising(orbital* o)
         if(o->parent_empire == nullptr || !o->parent_empire->is_hostile(test_orbital->parent_empire))
             continue;
 
-
+        o->command_queue.transfer(test_orbital->absolute_pos, o, o->parent_system, true, false, true);
     }
 }
 
@@ -322,6 +338,8 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     if(targets.size() == 0)
     {
+        try_decolonising(o);
+
         clear_ai_state(*this);
         return;
     }
