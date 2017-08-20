@@ -4,13 +4,13 @@
 	<Project>
 		<Option title="4space" />
 		<Option pch_mode="2" />
-		<Option compiler="mingw64" />
+		<Option compiler="mingw64new" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/4space" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
-				<Option compiler="mingw64" />
+				<Option compiler="mingw64new" />
 				<Compiler>
 					<Add option="-Og" />
 					<Add option="-g" />
@@ -35,7 +35,7 @@
 				<Option output="bin/Profile/4space" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Profile/" />
 				<Option type="1" />
-				<Option compiler="mingw64" />
+				<Option compiler="mingw64new" />
 				<Compiler>
 					<Add option="-pg" />
 				</Compiler>
@@ -47,11 +47,12 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
-			<Add option="-std=gnu++14" />
+			<Add option="-std=gnu++17" />
 			<Add option="-Wno-narrowing" />
 			<Add option="-Wno-sign-compare" />
 			<Add option="-Wno-unused-variable" />
 			<Add option="-Werror=return-type" />
+			<Add option="-flto" />
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32" />
