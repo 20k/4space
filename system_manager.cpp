@@ -2014,7 +2014,9 @@ void repulse(orbital* o1, orbital* o2)
 
     vec2f o1_to_o2 = (o2->absolute_pos - o1->absolute_pos);
 
-    if(approx_equal(o1_to_o2, (vec2f){0.f, 0}, 0.001f))
+    float len_sq = o1_to_o2.squared_length();
+
+    if(len_sq < 0.0001f)
     {
         o1_to_o2 = {1, 0};
     }
