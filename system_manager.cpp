@@ -326,6 +326,11 @@ inline float impl_cos(float x)
 
 void orbital::do_vision_test()
 {
+    vision_test_counter++;
+
+    if(((vision_test_counter + unique_id) % 4) != 0)
+        return;
+
     for(empire* e : parent_system->advertised_empires)
     {
         bool currently_has_vision = e->has_vision(parent_system);
@@ -1154,13 +1159,13 @@ orbital* orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, floa
     return o;
 }
 
-void orbital_system::vision_test_all()
+/*void orbital_system::vision_test_all()
 {
     for(orbital* o : orbitals)
     {
         o->do_vision_test();
     }
-}
+}*/
 
 void orbital_system::tick(float step_s, orbital_system* viewed)
 {

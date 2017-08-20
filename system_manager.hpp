@@ -159,6 +159,7 @@ struct orbital
     void set_orbit(float ang, float len);
     void set_orbit(vec2f pos);
 
+    int vision_test_counter = 0;
     void do_vision_test();
     void tick(float step_s);
 
