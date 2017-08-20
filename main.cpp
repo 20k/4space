@@ -1855,12 +1855,32 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
+            bool can_construct = true;
+
+            for(orbital* test_o : o->parent_system->orbitals)
+            {
+                if(o->parent_empire->is_hostile(test_o->parent_empire))
+                {
+                    can_construct = false;
+                    break;
+                }
+            }
+
             if(o->type == orbital_info::PLANET && o->can_construct_ships && o->parent_empire == player_empire)
             {
-                if(o->construction_ui_open)
-                    ImGui::NeutralText("(Hide Construction Window)");
+                if(!can_construct)
+                {
+                    o->construction_ui_open = false;
+
+                    ImGui::NeutralNoHoverText("(System Under Blockade)");
+                }
                 else
-                    ImGui::NeutralText("(Show Construction Window)");
+                {
+                    if(o->construction_ui_open)
+                        ImGui::NeutralText("(Hide Construction Window)");
+                    else
+                        ImGui::NeutralText("(Show Construction Window)");
+                }
 
                 if(ImGui::IsItemClicked_Registered())
                 {
@@ -1870,6 +1890,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(o->type == orbital_info::FLEET && o->can_construct_ships && o->parent_empire == player_empire)
             {
+                ///ships can always construct
                 if(sm->any_with_element(ship_component_elements::SHIPYARD))
                 {
                     if(o->construction_ui_open)
@@ -2521,7 +2542,7 @@ int main()
     player_empire->take_ownership(ofleet2);
     //player_empire->take_ownership(fleet5);
 
-    /*orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
+    orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
     ohostile_fleet->orbital_length = 250;
     ohostile_fleet->parent = sun;
@@ -2540,7 +2561,7 @@ int main()
     hostile_empire->take_ownership(fleet4);
     hostile_empire->take_ownership(oderelict_fleet);
 
-    derelict_ship->randomise_make_derelict();*/
+    derelict_ship->randomise_make_derelict();
 
 
     //orbital_system* sys_2 = system_manage.make_new();

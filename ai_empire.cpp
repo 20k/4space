@@ -406,7 +406,7 @@ bool could_construct_across_any(empire* e, const std::vector<orbital_system_desc
 
     for(const orbital_system_descriptor& desc : descriptors)
     {
-        if(can_empire_dispense && desc.owned_planets.size() > 0)
+        if(can_empire_dispense && desc.owned_planets.size() > 0 && !desc.contains_hostiles)
         {
             return true;
         }
@@ -449,7 +449,7 @@ orbital* get_constructor_for(empire* e, const std::vector<orbital_system_descrip
 
     for(const orbital_system_descriptor& desc : descriptors)
     {
-        if(can_empire_dispense && desc.owned_planets.size() > 0)
+        if(can_empire_dispense && desc.owned_planets.size() > 0 && !desc.contains_hostiles)
         {
             orbital* o = desc.owned_planets.front();
 
@@ -519,7 +519,7 @@ orbital* try_construct_any(fleet_manager& fleet_manage, const std::vector<orbita
 
     for(const orbital_system_descriptor& desc : descriptors)
     {
-        if(can_empire_dispense && desc.owned_planets.size() > 0)
+        if(can_empire_dispense && desc.owned_planets.size() > 0 && !desc.contains_hostiles)
         {
             orbital* o = desc.owned_planets.front();
 

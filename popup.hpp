@@ -74,6 +74,14 @@ namespace ImGui
     }
 
     inline
+    void NeutralNoHoverText(const std::string& str, vec2f dim_extra = {0,0})
+    {
+        //ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), str.c_str());
+
+        ImGui::OutlineHoverTextAuto(str, {1,1,1}, false, dim_extra);
+    }
+
+    inline
     void ColourHoverText(const std::string& str, vec3f col)
     {
         ImGui::OutlineHoverTextAuto(str, col);
