@@ -1054,10 +1054,10 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
     {
         empire* owner = desc.os->get_base()->parent_empire;
 
-        if(!desc.is_speculatively_owned_by_me && !at_war_in(owner, desc.os))
+        if(!desc.is_speculatively_owned_by_me && !system_being_invaded(desc.os))
             continue;
 
-        bool invading_system = at_war_in(owner, desc.os);
+        bool invading_system = system_being_invaded(desc.os);
 
         if(invading_system && !desc.is_speculatively_owned_by_me && desc.num_unowned_planets == desc.num_planets && desc.hostiles_threat_rating <= FLOAT_BOUND)
         {
