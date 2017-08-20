@@ -2565,9 +2565,10 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         circle.setFillColor(sf::Color(col.x(), col.y(), col.z()));
 
-        float rad = temperature_fraction_to_star_size(os->get_base()->star_temperature_fraction);
+        float star_rad = temperature_fraction_to_star_size(os->get_base()->star_temperature_fraction);
 
-        circle.setRadius(rad);
+        circle.setRadius(star_rad);
+        circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
 
         win.draw(circle);
 
@@ -2641,7 +2642,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         float height = fleet_sprite.getGlobalBounds().height;
         float draw_offset = height + 1.f;
 
-        vec2f fleet_draw_pos = pos + (vec2f){sun_universe_rad, 0.f};
+        vec2f fleet_draw_pos = pos + (vec2f){star_rad, 0.f};
         vec2f screen_offset = {2, 0};
 
         vec3f colours[4] =
@@ -2716,11 +2717,16 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             vec2f pos_1 = p1->universe_pos * universe_scale;
             vec2f pos_2 = p2->universe_pos * universe_scale;
 
+            /*float max_displacement = std::max(temperature_fraction_to_star_size(p1->get_base()->star_temperature_fraction),
+                                              temperature_fraction_to_star_size(p2->get_base()->star_temperature_fraction));*/
+
+            float max_displacement = sun_universe_rad * 1.2f;
+
             vec2f perp = perpendicular(pos_2 - pos_1);
 
             int width = 32;
 
-            float offset_rad = sun_universe_rad * 1.5f;
+            float offset_rad = max_displacement * 1.5f;
 
             float len = (pos_2 - pos_1).length() - offset_rad*2;
 
