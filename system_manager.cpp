@@ -2266,6 +2266,18 @@ vec3f temperature_fraction_to_colour(float temperature_fraction)
     return rcol;
 }
 
+float temperature_fraction_to_size_fraction(float temperature_fraction)
+{
+    float size_fraction = 1.f;
+
+    piecewise_linear(size_fraction, 0.7f, 0.3f, 0.f, 0.05f, temperature_fraction);
+
+    piecewise_linear(size_fraction, 0.3f, 0.6f, 0.05f, 0.8, temperature_fraction);
+    piecewise_linear(size_fraction, 0.6f, 1.f, 0.8f, 1.0f, temperature_fraction);
+
+    return size_fraction;
+}
+
 vec3f get_gray_colour(vec3f in)
 {
     in = in / 2.f;
@@ -2294,6 +2306,17 @@ bool lies_on_boundary(vec2f point, std::vector<vec2f>& points, std::vector<float
     }
 
     return true;
+}
+
+float system_manager::temperature_fraction_to_star_size(float temperature_frac)
+{
+    float my_radius_frac = temperature_fraction_to_size_fraction(temperature_frac);
+
+    float max_deviation = 0.5f;
+
+    float rad = sun_universe_rad - max_deviation * sun_universe_rad + sun_universe_rad * my_radius_frac;
+
+    return rad;
 }
 
 void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_empire, popup_info& popup)
@@ -2516,6 +2539,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     {
         orbital_system* os = systems[i];
 
+
         vec2f pos = os->universe_pos * universe_scale;
 
         auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
@@ -2540,6 +2564,10 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         col = clamp(col, 0.f, 255.f);
 
         circle.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+
+        float rad = temperature_fraction_to_star_size(os->get_base()->star_temperature_fraction);
+
+        circle.setRadius(rad);
 
         win.draw(circle);
 

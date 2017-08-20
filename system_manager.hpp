@@ -381,6 +381,8 @@ struct system_manager
     float sun_universe_rad = 200;
     float border_universe_rad = sun_universe_rad * 6.5;
 
+    float temperature_fraction_to_star_size(float temperature_frac);
+
     ///also generate empires in universe, in a separate function
     void generate_universe(int num);
 
