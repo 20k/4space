@@ -179,6 +179,23 @@ void try_mine(ship_manager* sm, orbital* my_o)
     }
 }
 
+void try_decolonising(orbital* o)
+{
+    for(orbital* test_orbital : o->parent_system->orbitals)
+    {
+        if(test_orbital->type != orbital_info::PLANET)
+            continue;
+
+        if(test_orbital->parent_empire == o->parent_empire)
+            continue;
+
+        if(o->parent_empire == nullptr || !o->parent_empire->is_hostile(test_orbital->parent_empire))
+            continue;
+
+
+    }
+}
+
 void clear_ai_state(ai_fleet& fleet)
 {
     fleet.ai_state = ai_empire_info::IDLE;
