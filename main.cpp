@@ -1859,7 +1859,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             for(orbital* test_o : o->parent_system->orbitals)
             {
-                if(o->parent_empire->is_hostile(test_o->parent_empire))
+                if(o->parent_empire != nullptr && o->parent_empire->is_hostile(test_o->parent_empire))
                 {
                     can_construct = false;
                     break;
@@ -2542,7 +2542,7 @@ int main()
     player_empire->take_ownership(ofleet2);
     //player_empire->take_ownership(fleet5);
 
-    orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
+    /*orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
     ohostile_fleet->orbital_length = 250;
     ohostile_fleet->parent = sun;
@@ -2561,7 +2561,7 @@ int main()
     hostile_empire->take_ownership(fleet4);
     hostile_empire->take_ownership(oderelict_fleet);
 
-    derelict_ship->randomise_make_derelict();
+    derelict_ship->randomise_make_derelict();*/
 
 
     //orbital_system* sys_2 = system_manage.make_new();
