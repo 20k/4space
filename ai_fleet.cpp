@@ -42,6 +42,9 @@ void try_colonise(ship_manager* sm, orbital* my_o)
     if(!sm->any_with_element(ship_component_elements::COLONISER))
         return;
 
+    if(my_o->command_queue.is_ever(object_command_queue_info::WARP))
+        return;
+
     ///if hostiles in system, flee!
     ///set ai state to request flee
 
@@ -181,6 +184,13 @@ void try_mine(ship_manager* sm, orbital* my_o)
 
 void try_decolonising(orbital* o)
 {
+    ship_manager* sm = (ship_manager*)o->data;
+
+    if(sm->decolonising)
+        return;
+
+    if(o->command_queue.)
+
     for(orbital* test_orbital : o->parent_system->orbitals)
     {
         if(test_orbital->type != orbital_info::PLANET)
