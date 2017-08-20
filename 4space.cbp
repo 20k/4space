@@ -45,16 +45,17 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-flto" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
-			<Add option="-std=gnu++17" />
+			<Add option="-std=gnu++1z" />
 			<Add option="-Wno-narrowing" />
 			<Add option="-Wno-sign-compare" />
 			<Add option="-Wno-unused-variable" />
 			<Add option="-Werror=return-type" />
-			<Add option="-flto" />
 		</Compiler>
 		<Linker>
+			<Add option="-flto" />
 			<Add option="-lmingw32" />
 			<Add option="-limgui" />
 			<Add option="-lsfml-graphics" />
