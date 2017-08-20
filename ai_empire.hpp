@@ -118,6 +118,7 @@ struct ai_empire
     }
 
     void cancel_invasion(empire* e, empire* my_empire);
+    void cancel_invasion_system(orbital_system* sys);
 
     void tick(float dt_s, fleet_manager& fm, system_manager& sm, empire* e);
 

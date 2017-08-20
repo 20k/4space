@@ -29,6 +29,17 @@ void ai_empire::cancel_invasion(empire* e, empire* my_empire)
     }
 }
 
+void ai_empire::cancel_invasion_system(orbital_system* sys)
+{
+    for(auto& i : invasion_targets)
+    {
+        if(i.second.systems.find(sys) != i.second.systems.end())
+        {
+            i.second.systems.erase(i.second.systems.find(sys));
+        }
+    }
+}
+
 struct orbital_system_descriptor
 {
     int position = -1;
@@ -47,6 +58,7 @@ struct orbital_system_descriptor
     bool currently_viewed = false;
 
     int num_unowned_planets = 0;
+    int num_planets = 0;
 
     std::vector<orbital*> owned_planets;
     std::vector<orbital*> constructor_ships;
@@ -170,6 +182,11 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             if(o->type == orbital_info::PLANET && o->parent_empire == nullptr)
             {
                 desc.num_unowned_planets++;
+            }
+
+            if(o->type == orbital_info::PLANET)
+            {
+                desc.num_planets++;
             }
 
             if(o->type == orbital_info::PLANET && o->parent_empire == e && o->can_construct_ships)
@@ -944,11 +961,15 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
         i.second.invasion_timer_s += dt_s;
     }
 
-    for(auto it = invasion_targets.begin(); it != invasion_targets.end(); it++)
+    for(auto it = invasion_targets.begin(); it != invasion_targets.end();)
     {
         if(it->second.invasion_timer_s >= it->second.invasion_timer_max_force)
         {
             it = invasion_targets.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 
@@ -1037,6 +1058,14 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             continue;
 
         bool invading_system = at_war_in(owner, desc.os);
+
+        if(invading_system && !desc.is_speculatively_owned_by_me && desc.num_unowned_planets == desc.num_planets && desc.hostiles_threat_rating <= FLOAT_BOUND)
+        {
+            desc.is_speculatively_owned_by_me = true;
+
+            cancel_invasion_system(desc.os);
+            speculatively_owned.insert(desc.os);
+        }
 
         ///part of the problem is we have no vision
 
