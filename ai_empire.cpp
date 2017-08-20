@@ -1067,8 +1067,6 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             speculatively_owned.insert(desc.os);
         }
 
-        ///part of the problem is we have no vision
-
         ///if a fight becomes too costly, we need to have a way to abandon a system
         if(fabs(desc.hostiles_threat_rating) >= FLOAT_BOUND && (desc.is_speculatively_owned_by_me || invading_system))
         {
