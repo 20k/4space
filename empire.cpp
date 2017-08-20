@@ -1012,6 +1012,11 @@ void empire::tick_decolonisation()
         if(sm->all_derelict())
             continue;
 
+        ///prevent ships that have chickened out of combat
+        ///from being able to decolonise planets
+        if(!sm->can_engage())
+            continue;
+
         vec2f my_pos = o->absolute_pos;
 
         orbital_system* parent = o->parent_system;
