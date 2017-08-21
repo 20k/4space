@@ -4394,7 +4394,7 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     float fuel_red_alert = 0.1f;
 
     vec3f rcol = {1, 0.1, 0};
-    vec3f ycol = {1, 0.9, 0};
+    //vec3f ycol = {1, 0.9, 0};
 
     vec3f fuel_bad_col = {1, 1, 1};
     vec3f fuel_poor_col = {0.4, 0.4, 0.4};
