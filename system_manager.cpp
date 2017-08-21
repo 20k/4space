@@ -58,7 +58,7 @@ bool operator<(const empire_popup& e1, const empire_popup& e2)
         return e1.e->team_id < e2.e->team_id;
     }
 
-    if(e1.type != e2.type);
+    if(e1.type != e2.type)
     {
         return e1.type < e2.type;
     }
