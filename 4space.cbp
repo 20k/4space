@@ -45,7 +45,6 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-flto" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add option="-std=gnu++1z" />
@@ -55,7 +54,6 @@
 			<Add option="-Werror=return-type" />
 		</Compiler>
 		<Linker>
-			<Add option="-flto" />
 			<Add option="-lmingw32" />
 			<Add option="-limgui" />
 			<Add option="-lsfml-graphics" />
@@ -64,16 +62,11 @@
 			<Add option="-lsfml-window" />
 			<Add option="-lsfml-system" />
 			<Add option="-lfreetype" />
-			<Add option="-ljpeg" />
 			<Add option="-lopengl32" />
-			<Add option="-lglew64.dll" />
 			<Add option="-lws2_32" />
-			<Add option="-lwinmm" />
-			<Add option="-lgdi32" />
 			<Add option="-lflac" />
 			<Add option="-lopenal32" />
 			<Add option="-logg" />
-			<Add option="-limm32" />
 		</Linker>
 		<Unit filename="ai_empire.cpp" />
 		<Unit filename="ai_empire.hpp" />
