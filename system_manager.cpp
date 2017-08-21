@@ -2542,7 +2542,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     bool change_colour = true;
 
     sf::CircleShape tc;
-    tc.setRadius(sun_universe_rad / 10.f);
+    tc.setRadius(sun_universe_rad / 6.f);
     tc.setOrigin(tc.getLocalBounds().width/2, tc.getLocalBounds().height/2);
     tc.setFillColor(sf::Color(255,255,255,255));
 
@@ -2593,9 +2593,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 planets.push_back(o);
         }
 
-        //float halfway = planets.size() / 2.f;
-
-        //if(os->get_base()->viewed_by[viewer_empire])
+        if(os->get_base()->viewed_by[viewer_empire])
         {
             for(int kk=0; kk<planets.size(); kk++)
             {
