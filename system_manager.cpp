@@ -2552,7 +2552,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     sf::Keyboard key;
 
-    float blip_size = sun_universe_rad / 6.f;
+    float blip_size = sun_universe_rad / 5.5f;
 
     sf::CircleShape planet_blip;
     planet_blip.setRadius(blip_size);
