@@ -72,7 +72,6 @@ struct empire_popup
     bool is_allied;
 };
 
-inline
 bool operator<(const empire_popup& e1, const empire_popup& e2);
 
 namespace sf

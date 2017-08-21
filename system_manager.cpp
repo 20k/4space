@@ -2591,9 +2591,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 planets.push_back(o);
 
             if(o->type == orbital_info::ASTEROID && o->is_resource_object)
-            {
                 resource_asteroids.push_back(o);
-            }
         }
 
         if(os->get_base()->viewed_by[viewer_empire])

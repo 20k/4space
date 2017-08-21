@@ -3435,7 +3435,7 @@ int ship::number_of_times_can_fully_dispense(const std::map<resource::types, flo
 {
     auto res = get_fully_merged(1.f);
 
-    int min_num = 99999999999;
+    int min_num = 9999999;
     bool has_any = false;
 
     for(int i=0; i<(int)ship_component_elements::NONE; i++)
