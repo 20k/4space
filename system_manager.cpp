@@ -90,6 +90,19 @@ sf::Vector2f mapCoordsToPixel_float(float x, float y, const sf::View& view, cons
     return pixel;
 }
 
+vec2f map_coords_to_pixel(vec2f pos, const sf::RenderTarget& target)
+{
+    sf::Vector2f normalized = target.getView().getTransform().transformPoint(pos.x(), pos.y());
+
+    // Then convert to viewport coordinates
+    sf::Vector2f pixel;
+    sf::IntRect viewport = target.getViewport(target.getView());
+    pixel.x = (( normalized.x + 1.f) / 2.f * viewport.width  + viewport.left);
+    pixel.y = ((-normalized.y + 1.f) / 2.f * viewport.height + viewport.top);
+
+    return {pixel.x, pixel.y};
+}
+
 void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col, bool show_detail, orbital* o)
 {
     col = col * 255.f;
@@ -148,8 +161,8 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
         int cur = i;
         int next = (i + 1) % vert_dist.size();
 
-        float d1 = vert_dist[cur] * scale;
-        float d2 = vert_dist[next] * scale;
+        float d1 = vert_dist[cur];
+        float d2 = vert_dist[next];
 
         float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
         float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
@@ -157,8 +170,8 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
         a1 += rotation;
         a2 += rotation;
 
-        vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)};
-        vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)};
+        vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)} * scale;
+        vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)} * scale;
 
         l1 += absolute_pos;
         l2 += absolute_pos;
@@ -169,8 +182,8 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
 
         v[0].position = sf::Vector2f(l1.x(), l1.y());
         v[1].position = sf::Vector2f(l2.x(), l2.y());
-        v[2].position = sf::Vector2f(l2.x() + perp.x(), l2.y() + perp.y());
-        v[3].position = sf::Vector2f(l1.x() + perp.x(), l1.y() + perp.y());
+        v[2].position = sf::Vector2f(l2.x() + perp.x() * scale, l2.y() + perp.y() * scale);
+        v[3].position = sf::Vector2f(l1.x() + perp.x() * scale, l1.y() + perp.y() * scale);
 
         sf::Color scol = sf::Color(col.x(), col.y(), col.z());
 
@@ -2539,8 +2552,10 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     sf::Keyboard key;
 
+    float blip_size = sun_universe_rad / 6.f;
+
     sf::CircleShape planet_blip;
-    planet_blip.setRadius(sun_universe_rad / 6.f);
+    planet_blip.setRadius(blip_size);
     planet_blip.setOrigin(planet_blip.getLocalBounds().width/2, planet_blip.getLocalBounds().height/2);
 
     for(int i=0; i<systems.size(); i++)
@@ -2622,6 +2637,107 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 win.draw(planet_blip);
             }
+
+            if(planets.size() > 0)
+            {
+                bottom.y() += star_rad * 0.8f + blip_size/2.f;
+                //bottom.y() += star_rad * 0.8f + blip_size; ///for perfect separation
+            }
+
+            for(int kk=0; kk<resource_asteroids.size(); kk++)
+            {
+                float xwidth = resource_asteroids.size() * sun_universe_rad / 4.f;//sun_universe_rad;
+
+                float xoffset = 0.f;
+
+                if(resource_asteroids.size() > 1)
+                    xoffset = (((float)kk / (resource_asteroids.size() - 1.f)) - 0.5f) * xwidth * 2;
+
+                //planet_blip.setPosition(bottom.x() + xoffset, bottom.y());
+
+                orbital* o = resource_asteroids[kk];
+
+                vec3f col = o->col * 255.f;
+
+                orbital_simple_renderable& renderable = o->simple_renderable;
+
+                renderable.main_rendering(win, 0.f, {bottom.x() + xoffset, bottom.y()}, blip_size/2.f, col);
+
+                //planet_blip.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+
+                //win.draw(planet_blip);
+            }
+
+            //printf("resour %i\n", resource_asteroids.size());
+
+            #if 0
+            if(resource_asteroids.size() > 0)
+            {
+                orbital* any_asteroid = resource_asteroids.front();
+
+                std::string num_str = std::to_string(resource_asteroids.size()) + " ";
+
+                text_manager::load();
+                sf::Text text(num_str, text_manager::font);
+
+                text.setCharacterSize(24);
+                text.setScale(0.5f, 0.5f);
+                //text.setScale(sun_universe_rad/60.f, sun_universe_rad/60.f);
+                //text.setScale(1.f/4.f, 1.f/4.f);
+                text.setColor(sf::Color(255, 255, 255, 255));
+
+                vec2f tpos = round(bottom);
+
+                /*auto proj = mapCoordsToPixel_float(bottom.x(), bottom.y(), win.getView(), win);
+
+                proj.x = round(proj.x);
+                proj.y = round(proj.y);*/
+
+                vec2f proj = map_coords_to_pixel(bottom, win);
+
+                proj = round(proj);
+
+                vec2f dim = (vec2f){text.getLocalBounds().width, text.getLocalBounds().height};
+
+                text.setPosition(proj.x() - dim.x()/2.f, proj.y() - dim.y()/2.f);
+
+                auto backup = win.getView();
+                win.setView(win.getDefaultView());
+                win.draw(text);
+
+                orbital_simple_renderable& renderable = any_asteroid->simple_renderable;
+
+                renderable.main_rendering(win, 0.f, proj, 1.f, any_asteroid->col * 255.f);
+
+                win.setView(backup);
+
+                /*auto proj = mapCoordsToPixel_float(bottom.x(), bottom.x(), win.getView(), win);
+
+                //ImGui::SetNextWindowPos(ImVec2(proj.x, proj.y));
+
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0));
+
+                ImGui::SkipFrosting("AWIN");
+
+                ImGui::Begin("AWIN", nullptr, IMGUI_JUST_TEXT_WINDOW);
+
+                auto dim = ImGui::GetWindowSize();
+
+                ImGui::SetWindowPos(ImVec2(proj.x - dim.x/2, proj.y));
+
+                ImGui::Text(num_str.c_str());
+
+                ImGui::End();
+
+                ImGui::PopStyleColor(1);*/
+
+                /*printf("%f %f\n", bottom.x(), bottom.y());
+
+                text_manager::render_without_zoom(win, "TEST", bottom, {1,1,1}, true, 1);*/
+
+                //text_manager::render(win, "TEST", bottom, {1,1,1}, true, 48, sun_universe_rad / 50.f);
+            }
+            #endif
         }
 
 
