@@ -2598,7 +2598,7 @@ int main()
 
     e2->desired_empire_size = 5;
 
-    //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);
+    //empire* e2 = empire_manage.birth_empire_without_system_ownership(fleet_manage, sys_2, 2, 2);f
 
     //player_empire->become_hostile(e2);
     //player_empire->ally(e2);

@@ -2541,6 +2541,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     bool change_colour = true;
 
+    sf::CircleShape tc;
+    tc.setRadius(sun_universe_rad / 10.f);
+    tc.setOrigin(tc.getLocalBounds().width/2, tc.getLocalBounds().height/2);
+    tc.setFillColor(sf::Color(255,255,255,255));
+
     for(int i=0; i<systems.size(); i++)
     {
         orbital_system* os = systems[i];
@@ -2577,6 +2582,49 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         circle.setOrigin(circle.getLocalBounds().width/2, circle.getLocalBounds().height/2);
 
         win.draw(circle);
+
+        vec2f bottom = {pos.x(), pos.y() + star_rad * 1.8f};
+
+        std::vector<orbital*> planets;
+
+        for(orbital* o : os->orbitals)
+        {
+            if(o->type == orbital_info::PLANET)
+                planets.push_back(o);
+        }
+
+        //float halfway = planets.size() / 2.f;
+
+        //if(os->get_base()->viewed_by[viewer_empire])
+        {
+            for(int kk=0; kk<planets.size(); kk++)
+            {
+                float xwidth = planets.size() * sun_universe_rad / 4.f;//sun_universe_rad;
+
+                float xoffset = 0.f;
+
+                if(planets.size() > 1)
+                    xoffset = (((float)kk / (planets.size() - 1.f)) - 0.5f) * xwidth * 2;
+
+                tc.setPosition(bottom.x() + xoffset, bottom.y());
+
+                orbital* o = planets[kk];
+
+                vec3f col = viewer_empire->get_relations_colour(o->parent_empire);
+
+                if(o->parent_empire == viewer_empire)
+                {
+                    col = relations_info::alt_owned_col;
+                }
+
+                col = col * 255.f;
+
+                tc.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+
+                win.draw(tc);
+            }
+        }
+
 
         /*if(key.isKeyPressed(sf::Keyboard::LAlt))
         {

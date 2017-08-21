@@ -50,6 +50,7 @@ namespace relations_info
     constexpr vec3f hostile_col = {1, 0.15f, 0.15f};
     constexpr vec3f friendly_col = {0.5, 1, 0.5};
     constexpr vec3f neutral_col = {1, 0.5, 0};
+    constexpr vec3f alt_owned_col = {0.4f, 0.4f, 1.f};
 }
 
 struct empire
