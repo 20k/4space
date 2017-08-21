@@ -1242,6 +1242,22 @@ bool empire::has_vision(orbital_system* os)
     return false;
 }
 
+bool empire::has_direct_vision(orbital_system* os)
+{
+    empire* them = os->get_base()->parent_empire;
+
+    if(them == this)
+        return true;
+
+    for(orbital* o : os->orbitals)
+    {
+        if(o->parent_empire == this)
+            return true;
+    }
+
+    return false;
+}
+
 std::vector<orbital_system*> empire::get_unowned_system_with_my_fleets_in()
 {
     std::set<orbital_system*> systems;

@@ -3116,6 +3116,11 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                     do_obfuscate = true;
                 }
 
+                if(!viewing_empire->has_direct_vision(sys))
+                {
+                    continue;
+                }
+
                 empire_popup pop;
                 pop.e = o->parent_empire;
                 pop.id = o->unique_id;

@@ -201,6 +201,7 @@ struct empire
     void tick_calculate_owned_systems();
 
     bool has_vision(orbital_system* os);
+    bool has_direct_vision(orbital_system* os); ///no allies
 
     empire_manager* parent = nullptr;
 
