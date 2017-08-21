@@ -2539,12 +2539,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     sf::Keyboard key;
 
-    bool change_colour = true;
-
-    sf::CircleShape tc;
-    tc.setRadius(sun_universe_rad / 6.f);
-    tc.setOrigin(tc.getLocalBounds().width/2, tc.getLocalBounds().height/2);
-    tc.setFillColor(sf::Color(255,255,255,255));
+    sf::CircleShape planet_blip;
+    planet_blip.setRadius(sun_universe_rad / 6.f);
+    planet_blip.setOrigin(planet_blip.getLocalBounds().width/2, planet_blip.getLocalBounds().height/2);
 
     for(int i=0; i<systems.size(); i++)
     {
@@ -2604,7 +2601,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 if(planets.size() > 1)
                     xoffset = (((float)kk / (planets.size() - 1.f)) - 0.5f) * xwidth * 2;
 
-                tc.setPosition(bottom.x() + xoffset, bottom.y());
+                planet_blip.setPosition(bottom.x() + xoffset, bottom.y());
 
                 orbital* o = planets[kk];
 
@@ -2617,9 +2614,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 col = col * 255.f;
 
-                tc.setFillColor(sf::Color(col.x(), col.y(), col.z()));
+                planet_blip.setFillColor(sf::Color(col.x(), col.y(), col.z()));
 
-                win.draw(tc);
+                win.draw(planet_blip);
             }
         }
 
