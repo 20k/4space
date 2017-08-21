@@ -2640,7 +2640,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             if(planets.size() > 0)
             {
-                bottom.y() += sun_universe_rad * 0.8f + blip_size/2.f;
+                bottom.y() += sun_universe_rad * 0.6f + blip_size/2.f;
                 //bottom.y() += star_rad * 0.8f + blip_size; ///for perfect separation
             }
 
