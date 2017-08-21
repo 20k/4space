@@ -959,7 +959,7 @@ void try_invade(empire* e, std::vector<orbital_system_descriptor>& descriptors, 
 
     //#define SUICIDAL
     #ifdef SUICIDAL
-    may_invade_condition = invasion_targets.size() == 0 && invasion_cooldown_s >= invasion_cooldown_max;
+    may_invade_condition = ai.invasion_targets.size() == 0 && ai.invasion_cooldown_s >= ai.invasion_cooldown_max;
     #endif // SUICIDAL
 
     if(may_invade_condition)
