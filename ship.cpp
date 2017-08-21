@@ -3830,7 +3830,7 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 
     float diff = res[ship_component_elements::SCANNING_POWER].produced_per_s + their_power_excess;
 
-    float total_scanning_power = (diff / 100.f) + empire_culture_distance + disabled_bonus;
+    float total_scanning_power = (diff / 100.f) + empire_culture_distance + disabled_bonus + culture_distance_mod;
 
 
     ///so. Say we produce 90 power and have 30 stealth
