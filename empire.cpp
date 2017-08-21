@@ -1655,16 +1655,29 @@ void empire_manager::setup_relations()
     }
 }
 
-void empire_manager::birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage)
+void empire_manager::birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage, float sys_frac)
 {
-    for(int i=0; i<system_manage.systems.size(); i++)
+    float max_empire_size = 10.f;
+    float min_empire_size = 1.f;
+
+    float avg = (max_empire_size + min_empire_size)/2.f;
+
+    int num = ceil(sys_frac * system_manage.systems.size() / avg);
+
+    std::minstd_rand random;
+    random.seed(rand());
+
+    auto shuffled = system_manage.systems;
+
+    std::shuffle(shuffled.begin(), shuffled.end(), random);
+
+    shuffled.resize(num);
+
+    for(int i=0; i<num; i++)
     {
         orbital_system* os = system_manage.systems[i];
 
         if(os->is_owned())
-            continue;
-
-        if(randf_s(0.f, 1.f) < 0.9f)
             continue;
 
         birth_empire(system_manage, fleet_manage, os, randf_s(1.f, 10.f));

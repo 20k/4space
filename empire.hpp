@@ -266,7 +266,7 @@ struct empire_manager
     void setup_relations();
 
 
-    void birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage);
+    void birth_empires_random(fleet_manager& fleet_manage, system_manager& system_manage, float sys_frac);
     void birth_empires_without_ownership(fleet_manager& fleet_manage, system_manager& system_manage);
 
     void draw_diplomacy_ui(empire* viewer_empire, system_manager& system_manage);
