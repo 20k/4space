@@ -97,6 +97,8 @@ struct battle_manager
     static uint32_t gid;
     uint32_t unique_battle_id = gid++;
     uint32_t frame_counter = 0;
+
+    bool is_ui_opened = false;
 };
 
 struct orbital;
@@ -122,6 +124,9 @@ struct all_battles_manager
     void end_battle_peacefully(battle_manager* bm);
 
     battle_manager* get_battle_involving(ship_manager* ship_manage);
+
+    bool request_enter_battle_view = false;
+    bool request_leave_battle_view = false;
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

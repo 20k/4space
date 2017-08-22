@@ -30,6 +30,8 @@ namespace popup_colour_info
     static vec3f bad_ui_colour{1, 0.5, 0.5};
 }
 
+#define SCOPED_INDENT(name) auto name = ImGui::ScopedIndent()
+
 namespace ImGui
 {
     struct ScopedIndent

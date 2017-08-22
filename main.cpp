@@ -781,12 +781,12 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         ///will be incorrect for a frame when combat changes
         std::string jump_to_str = "(Jump To)";
 
-        ImGui::PushID((jump_to_str + id_str).c_str());
-        ImGui::Text(jump_to_str.c_str());
-        ImGui::PopID();
+        ImGui::NeutralText(jump_to_str);
 
         if(ImGui::IsItemClicked_Registered())
         {
+            all_battles.request_enter_battle_view = true;
+
             all_battles.set_viewing(bm, system_manage);
         }
 
@@ -834,6 +834,13 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 all_battles.end_battle_peacefully(bm);
             }
         }
+    }
+
+    ImGui::NeutralText("(Leave Battle View)");
+
+    if(ImGui::IsItemClicked_Registered())
+    {
+        all_battles.request_leave_battle_view = true;
     }
 
     ImGui::End();
@@ -2809,11 +2816,36 @@ int main()
         if(system_manage.currently_viewed != nullptr)
         {
             system_manage.backup_system = system_manage.currently_viewed;
+
+            if(state == 1)
+            {
+                all_battles.request_leave_battle_view = true;
+            }
         }
 
-        if(ONCE_MACRO(sf::Keyboard::F1))
+        /*if(all_battles.request_leave_battle_view)
         {
-            state = (state + 1) % 2;
+            state = 0;
+        }*/
+
+        //if(ONCE_MACRO(sf::Keyboard::F1))
+
+        if(all_battles.request_leave_battle_view || all_battles.request_enter_battle_view)
+        {
+            //state = (state + 1) % 2;
+
+            if(all_battles.request_leave_battle_view)
+            {
+                state = 0;
+            }
+
+            if(all_battles.request_enter_battle_view)
+            {
+                state = 1;
+            }
+
+            all_battles.request_enter_battle_view = false;
+            all_battles.request_leave_battle_view = false;
 
             if(state == 0)
             {
