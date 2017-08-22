@@ -20,6 +20,7 @@ struct projectile_options
 };
 
 void tonemap(sf::Image& image, tonemap_options options = {{4, 4, 0.5}});
+void premultiply(sf::Image& image);
 
 struct projectile : positional
 {

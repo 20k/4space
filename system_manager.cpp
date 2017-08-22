@@ -197,11 +197,14 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
     #endif
 }
 
+void premultiply(sf::Image& image);
+
 void sprite_renderable::load(const std::string& str)
 {
     img.loadFromFile(str);
+    premultiply(img);
     tex.loadFromImage(img);
-    //tex.setSmooth(true);
+    tex.setSmooth(true);
     ///smooth rendering causes issues, we'll have to go high res or constructive
     ///also looks hideous
 }
@@ -241,7 +244,29 @@ void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolu
 
     spr.setPosition(absolute_pos.x(), absolute_pos.y());
 
-    win.draw(spr);
+    sf::BlendMode mode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
+
+    vec2f spos = map_coords_to_pixel(absolute_pos, win);
+    vec2f wspos = map_coords_to_pixel(absolute_pos + (vec2f){tex.getSize().x, 0.f}, win);
+
+    float scale_approx = (wspos.x() - spos.x()) / (tex.getSize().x);
+
+    if(scale_approx > 1)
+    {
+        tex.setSmooth(false);
+    }
+    else
+    {
+        tex.setSmooth(true);
+    }
+
+    spos = round(spos);
+
+    auto new_pos = win.mapPixelToCoords({spos.x(), spos.y()});
+
+    spr.setPosition(new_pos);
+
+    win.draw(spr, mode);
 }
 
 void orbital::set_orbit(float ang, float len)
