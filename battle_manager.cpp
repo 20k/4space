@@ -11,17 +11,35 @@ void tonemap(sf::Image& image)
 {
     auto dim = image.getSize();
 
+    vec2f center = {(dim.x - 1)/2.f, (dim.y - 1)/2.f};
+
+    float radius = center.x();
+
     for(int y=0; y<dim.y; y++)
     {
         for(int x=0; x<dim.x; x++)
         {
+            vec2f pos = {x, y};
+
             sf::Color col = image.getPixel(x, y);
 
-            float intensity = col.a / 255.f;
+            //float intensity = col.a / 255.f;
+
+            vec2f vintensity = (pos - center) / (vec2f){radius, radius};
+
+            float intensity = 1.f - vintensity.length();
+
+            intensity = clamp(intensity, 0.f, 1.f);
+
+            intensity = pow(intensity, 0.15f);
 
             vec3f intensity_weights = {1.f, 1.f, 1.f};
 
+            vec3f power_weights = {4, 4, 0.5};
+
             vec3f test_col = mix((vec3f){0,0,0}, (vec3f){1,1,1}, intensity * intensity_weights);
+
+            test_col = pow(test_col, power_weights);
 
             sf::Color ncol(test_col.x() * 255, test_col.y() * 255, test_col.z() * 255, intensity * 255);
 
