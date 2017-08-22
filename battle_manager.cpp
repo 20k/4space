@@ -5,7 +5,6 @@
 #include "util.hpp"
 #include <set>
 
-
 uint32_t battle_manager::gid = 0;
 
 void projectile::load(int type)
@@ -716,6 +715,35 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
     {
         all_battles.currently_viewing = this;
     }
+}
+
+orbital_system* battle_manager::get_system_in(system_manager& system_manage)
+{
+    ship_manager* sm = nullptr;
+
+    for(auto& i : ships)
+    {
+        bool should_break = false;
+
+        for(auto& s : i.second)
+        {
+            sm = s->owned_by;
+
+            should_break = true;
+        }
+
+        if(should_break)
+            break;
+    }
+
+    if(sm == nullptr)
+        return nullptr;
+
+    ///sm is any fleet in the battle
+
+    orbital_system* sys = system_manage.get_by_element(sm);
+
+    return sys;
 }
 
 battle_manager* all_battles_manager::make_new()

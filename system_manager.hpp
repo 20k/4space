@@ -328,6 +328,10 @@ struct system_manager
     std::vector<std::vector<orbital_system*>> to_draw_pathfinding;
 
     std::vector<orbital_system*> systems;
+
+    ///for when we go into battle view, bit of a hack
+    orbital_system* backup_system = nullptr;
+
     orbital_system* currently_viewed = nullptr;
     orbital_system* hovered_system = nullptr;
 

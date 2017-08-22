@@ -49,6 +49,8 @@ struct projectile_manager
 };
 
 struct all_battles_manager;
+struct orbital_system;
+struct system_manage;
 
 struct battle_manager
 {
@@ -87,6 +89,8 @@ struct battle_manager
     bool any_in_empire_involved(empire* e);
 
     void destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles);
+
+    orbital_system* get_system_in(system_manager& system_manage);
 
     ///to show the player why they can't disengage
 

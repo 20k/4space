@@ -2804,13 +2804,20 @@ int main()
             system_manage.enter_universe_view();
         }
 
+        ///this hack is very temporary, after this make it so that the backup system is the
+        ///system in which the battle takes place that we're viewing
+        if(system_manage.currently_viewed != nullptr)
+        {
+            system_manage.backup_system = system_manage.currently_viewed;
+        }
+
         if(ONCE_MACRO(sf::Keyboard::F1))
         {
             state = (state + 1) % 2;
 
             if(state == 0)
             {
-                system_manage.set_viewed_system(base);
+                system_manage.set_viewed_system(system_manage.backup_system);
             }
             if(state == 1)
             {
