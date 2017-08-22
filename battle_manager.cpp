@@ -11,6 +11,10 @@ void tonemap(sf::Image& image)
 {
     auto dim = image.getSize();
 
+    vec2f image_center_bias = {0.0f, -0.2f};
+
+    vec2f bias_factor = image_center_bias * (vec2f){dim.x, dim.y};
+
     vec2f center = {(dim.x - 1)/2.f, (dim.y - 1)/2.f};
 
     float radius = center.x();
@@ -26,10 +30,15 @@ void tonemap(sf::Image& image)
             //float intensity = col.a / 255.f;
 
             vec2f vintensity = (pos - center) / (vec2f){radius, radius};
-
             float intensity = 1.f - vintensity.length();
 
+            vec2f vbiased_intensity = (pos - center - bias_factor) / (vec2f){radius, radius};
+            float biased_intensity = 1.f - vbiased_intensity.length();
+
             intensity = clamp(intensity, 0.f, 1.f);
+            biased_intensity = clamp(biased_intensity, 0.f, 1.f);
+
+            intensity = mix(intensity, biased_intensity, intensity);
 
             intensity = pow(intensity, 0.15f);
 

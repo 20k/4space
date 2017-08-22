@@ -3083,6 +3083,8 @@ int main()
 
         sf::Sprite spr(tex);
 
+        spr.setScale(1.f, 5.f);
+
         window.draw(spr);
 
         //playing_music.debug(window);
