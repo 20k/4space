@@ -799,11 +799,24 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         if(!bm->any_in_empire_involved(player_empire))
             continue;
 
+        std::vector<std::string> names;
+
         for(auto& i : bm->ships)
         {
             for(ship* kk : i.second)
             {
-                std::string name = kk->name;
+                for(ship* kk : i.second)
+                {
+                    names.push_back(kk->name);
+                }
+            }
+        }
+
+        for(auto& i : bm->ships)
+        {
+            for(ship* kk : i.second)
+            {
+                std::string name = format(kk->name, names);
                 std::string team = player_empire->get_single_digit_relations_str(kk->owned_by->parent_empire);
 
                 auto fully_merged = kk->get_fully_merged(1.f);
@@ -811,7 +824,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 float damage = fully_merged[ship_component_elements::HP].cur_amount;
                 float damage_max = fully_merged[ship_component_elements::HP].max_amount;
 
-                std::string damage_str = "(" + to_string_with_enforced_variable_dp(damage) + "/" + to_string_with_enforced_variable_dp(damage_max) + ")";
+                std::string damage_str = to_string_with_enforced_variable_dp(damage) + "/" + to_string_with_enforced_variable_dp(damage_max);
 
                 ImGui::TextColored(team, player_empire->get_relations_colour(kk->owned_by->parent_empire, true));
 
@@ -826,7 +839,23 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
                 ImGui::SameLine();
 
-                ImGui::Text((name + " " + damage_str).c_str());
+                vec3f text_col = {1,1,1};
+
+                if(kk->fully_disabled())
+                {
+                    damage_str = "Derelict";
+                    text_col = popup_colour_info::bad_ui_colour;
+                }
+
+                ImGui::Text(name.c_str());
+
+                ImGui::SameLine();
+
+                ImGui::Text("|");
+
+                ImGui::SameLine();
+
+                ImGui::TextColored(damage_str, text_col);
 
                 if(ImGui::IsItemClicked_Registered())
                 {
@@ -3098,6 +3127,7 @@ int main()
         player_empire->resources.draw_ui(window, player_empire->last_income);
         //printf("Pregen\n");
 
+        //std::cout << player_empire->culture_similarity << std::endl;
 
         empire_manage.generate_resources_from_owned(diff_s);
         empire_manage.draw_diplomacy_ui(player_empire, system_manage);

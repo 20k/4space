@@ -187,7 +187,12 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
             {
                 if(projectile_within_ship(p, found_ship))
                 {
-                    //printf("hi\n");
+                    auto fully_merged = found_ship->get_fully_merged(1.f);
+
+                    bool hp_condition = fully_merged[ship_component_element::HP].cur_amount < 1.f && fully_merged[ship_component_element::HP].max_amount > 1.f;
+
+                    if(hp_condition)
+                        continue;
 
                     found_ship->hit(p, system_manage);
 
