@@ -5011,7 +5011,8 @@ void fleet_manager::tick_all(float step_s)
 
         sm->accumulated_dt = 0;
 
-        bool is_ai = false;
+        ///all ships now have ai
+        /*bool is_ai = false;
 
         if(sm->parent_empire != nullptr && sm->parent_empire->has_ai)
         {
@@ -5021,7 +5022,7 @@ void fleet_manager::tick_all(float step_s)
         if(!in_combat && !is_ai && sm->auto_resupply && sm->should_resupply() && sm->parent_empire)
         {
             sm->resupply(sm->parent_empire, false);
-        }
+        }*/
 
         tcount++;
     }

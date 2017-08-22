@@ -42,6 +42,9 @@ void try_colonise(ship_manager* sm, orbital* my_o)
     if(!sm->any_with_element(ship_component_elements::COLONISER))
         return;
 
+    if(my_o->command_queue.is_ever(object_command_queue_info::IN_SYSTEM_PATH))
+        return;
+
     if(my_o->command_queue.is_ever(object_command_queue_info::WARP))
         return;
 
@@ -126,6 +129,9 @@ void try_mine(ship_manager* sm, orbital* my_o)
         my_o->mining_target = nullptr;
         return;
     }
+
+    if(my_o->command_queue.is_ever(object_command_queue_info::IN_SYSTEM_PATH))
+        return;
 
     if(my_o->command_queue.is_ever(object_command_queue_info::ANCHOR))
         return;
@@ -228,7 +234,7 @@ void clear_ai_state(ai_fleet& fleet)
 }
 
 ///this takes like 4ms
-void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage)
+void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage, bool has_full_ai)
 {
     ///change this whole function to work with idle state and defend state
 
@@ -247,15 +253,18 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     timer.start();
 
-    battle_manager* bm = all_battles.get_battle_involving(ship_manage);
-
-    if(bm != nullptr)
+    if(has_full_ai)
     {
-        //printf("in battle\n");
+        battle_manager* bm = all_battles.get_battle_involving(ship_manage);
 
-        if(bm->can_end_battle_peacefully(ship_manage->parent_empire))
+        if(bm != nullptr)
         {
-            all_battles.end_battle_peacefully(bm);
+            //printf("in battle\n");
+
+            if(bm->can_end_battle_peacefully(ship_manage->parent_empire))
+            {
+                all_battles.end_battle_peacefully(bm);
+            }
         }
     }
 
@@ -269,15 +278,19 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
     ///we're not in combat here
 
-    ///spread resupply check across this many frames
-    uint32_t resupply_frames = 10;
-
-    if(((current_resupply_frame + resupply_offset) % resupply_frames) == 0 && ship_manage->should_resupply())
+    if(ship_manage->auto_resupply)
     {
-        ship_manage->resupply(ship_manage->parent_empire);
+        ///spread resupply check across this many frames
+        uint32_t resupply_frames = 10;
 
-        //printf("ai resupply\n");
+        if(((current_resupply_frame + resupply_offset) % resupply_frames) == 0 && ship_manage->should_resupply())
+        {
+            ship_manage->resupply(ship_manage->parent_empire, false);
+
+            //printf("ai resupply\n");
+        }
     }
+
 
     current_resupply_frame++;
 
@@ -288,8 +301,21 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
         return;
     }
 
-    try_colonise(ship_manage, o);
-    try_mine(ship_manage, o);
+    if(ship_manage->auto_colonise)
+    {
+        try_colonise(ship_manage, o);
+    }
+
+    if(ship_manage->auto_harvest_ore)
+    {
+        try_mine(ship_manage, o);
+    }
+
+    ///AI ONLY PAST THIS POINT
+    if(!has_full_ai)
+    {
+        return;
+    }
 
     if(!ship_manage->majority_of_type(ship_type::MILITARY))
     {

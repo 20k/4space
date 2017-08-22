@@ -31,7 +31,7 @@ struct ai_fleet
     int ai_state = 0;
     orbital_system* on_route_to = nullptr;
 
-    void tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage);
+    void tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_manager& all_battles, system_manager& system_manage, bool has_full_ai);
 };
 
 #endif // AI_FLEET_HPP_INCLUDED

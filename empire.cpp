@@ -494,8 +494,8 @@ void empire::tick(float step_s)
 
 void empire::tick_ai(all_battles_manager& all_battles, system_manager& system_manage)
 {
-    if(!has_ai)
-        return;
+    //if(!has_ai)
+    //    return;
 
     for(orbital* o : owned)
     {
@@ -504,7 +504,7 @@ void empire::tick_ai(all_battles_manager& all_battles, system_manager& system_ma
 
         ship_manager* sm = (ship_manager*)o->data;
 
-        sm->ai_controller.tick_fleet(sm, o, all_battles, system_manage);
+        sm->ai_controller.tick_fleet(sm, o, all_battles, system_manage, has_ai);
     }
 }
 
