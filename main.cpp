@@ -2817,7 +2817,16 @@ int main()
 
             if(state == 0)
             {
-                system_manage.set_viewed_system(system_manage.backup_system);
+                orbital_system* found_system = system_manage.backup_system;
+
+                #ifdef JUMP_TO_SYSTEM_AFTER_VIEWING_BATTLE
+                if(all_battles.currently_viewing != nullptr)
+                {
+                    found_system = all_battles.currently_viewing->get_system_in(system_manage);
+                }
+                #endif // JUMP_TO_SYSTEM_AFTER_VIEWING_BATTLE
+
+                system_manage.set_viewed_system(found_system);
             }
             if(state == 1)
             {
