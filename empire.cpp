@@ -1680,7 +1680,7 @@ void empire_manager::birth_empires_random(fleet_manager& fleet_manage, system_ma
         if(os->is_owned())
             continue;
 
-        birth_empire(system_manage, fleet_manage, os, randf_s(1.f, 10.f));
+        birth_empire(system_manage, fleet_manage, os, randf_s(min_empire_size, max_empire_size));
     }
 
     assign_colours_non_randomly();
