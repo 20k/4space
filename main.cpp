@@ -749,6 +749,21 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
 
             ImGui::TextColored("Derelict", popup_colour_info::bad_ui_colour);
         }
+        else
+        {
+            ImGui::SameLine();
+
+            auto fully_merged = s->get_fully_merged(1.f);
+
+            float hp = fully_merged[ship_component_element::HP].cur_amount;
+            float hp_max = fully_merged[ship_component_element::HP].max_amount;
+
+            ImGui::Text("|");
+
+            ImGui::SameLine();
+
+            ImGui::Text((to_string_with_enforced_variable_dp(hp) + "/" + to_string_with_enforced_variable_dp(hp_max)).c_str());
+        }
 
         ImGui::EndTooltip();
 
