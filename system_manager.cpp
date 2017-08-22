@@ -139,7 +139,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
     pixel_rad.x -= win.getSize().x/2;
 
-    if(draw_outline)
+    if((draw_outline && !o->rendered_asteroid_window) || o->force_draw_expanded_window)
     {
         if(!show_detail)
             ImGui::SkipFrosting(tag);
@@ -148,20 +148,37 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
-        ImGui::Begin(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+        ImGuiWindowFlags_ extra = (ImGuiWindowFlags_)0;
+
+        if(!o->force_draw_expanded_window)
+        {
+            extra = ImGuiWindowFlags_NoInputs;
+        }
+
+        ImGui::Begin(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS | extra);
 
         ImGui::Text(tag.c_str());
 
-        if(show_detail && o && o->is_resource_object)
+        if((show_detail && o && o->is_resource_object) || o->force_draw_expanded_window)
         {
             auto info = o->produced_resources_ps.get_formatted_str();
 
             ImGui::Text(info.c_str());
         }
 
+        o->expanded_window_clicked = false;
+
+        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
+        {
+            o->expanded_window_clicked = true;
+        }
+
         ImGui::End();
 
+
         ImGui::PopStyleColor();
+
+        o->force_draw_expanded_window = false;
     }
 
     main_rendering(win, rotation, absolute_pos, 1.f, col);

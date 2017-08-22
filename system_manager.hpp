@@ -247,6 +247,9 @@ struct orbital
     int last_num_harvesting = 0;
     int current_num_harvesting = 0;
 
+    bool force_draw_expanded_window = false;
+    bool expanded_window_clicked = false;
+
     virtual ~orbital(){}
 };
 

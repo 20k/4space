@@ -1064,8 +1064,8 @@ void empire::tick_cleanup_colonising()
                 }
                 else
                 {
-                    ///this needs to be pushed to the front of the queue
-                    o->transfer(s->colonise_target->absolute_pos, o->parent_system, false);
+                    ///we're pushing this to the front, bear in mind this may cancel later queue items down the line
+                    o->command_queue.transfer(s->colonise_target->absolute_pos, o, o->parent_system, false, false, true, false);
                 }
             }
         }

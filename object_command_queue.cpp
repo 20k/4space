@@ -370,15 +370,17 @@ bool do_colonising_ui(orbital* o, queue_type& type)
         //if(test_orbital->parent_empire != nullptr)
         //    continue;
 
-        test_orbital->begin_render_asteroid_window();
+        //test_orbital->begin_render_asteroid_window();
 
-        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
+        test_orbital->force_draw_expanded_window = true;
+
+        if(test_orbital->expanded_window_clicked)
         {
             success = true;
             o->command_queue.colonise(test_orbital, type.data.colony_ship_id, false);
         }
 
-        test_orbital->end_render_asteroid_window();
+        //test_orbital->end_render_asteroid_window();
 
         if(success)
             return true;
