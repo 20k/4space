@@ -1866,12 +1866,31 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(o->type == orbital_info::FLEET && sm->any_with_element(ship_component_elements::MASS_ANCHOR) && o->parent_empire == player_empire)
             {
-                ImGui::NeutralText("(Harvest Ore From)");
+                //ImGui::NeutralText("(Harvest Ore From)");
+
+                ImGui::OutlineHoverTextAuto("(Harvest Ore)", popup_colour_info::good_ui_colour, true, {0,0}, 1, sm->auto_harvest_ore);
 
                 if(ImGui::IsItemClicked_Registered())
                 {
                     //o->command_queue.anchor(o->parent_system->get_base());
                     o->command_queue.anchor_ui_state(lshift);
+                }
+
+                if(ImGui::IsItemHovered())
+                {
+                    if(sm->auto_harvest_ore)
+                    {
+                        tooltip::add("Right click to disable auto mine");
+                    }
+                    else
+                    {
+                        tooltip::add("Right click to enable auto mine");
+                    }
+                }
+
+                if(ImGui::IsItemClicked_Registered(1))
+                {
+                    sm->auto_harvest_ore = !sm->auto_harvest_ore;
                 }
             }
 
