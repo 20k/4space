@@ -697,15 +697,21 @@ bool battle_manager::can_disengage(empire* disengaging_empire)
             //    continue;
 
             ///above check is WRONG
-            if(s->owned_by->parent_empire == disengaging_empire)
+            /*if(s->owned_by->parent_empire == disengaging_empire)
                 continue;
 
             ///below check is true for parent empire, but checking anyway for robustness in the future
             if(!s->owned_by->parent_empire->is_hostile(disengaging_empire))
-                continue;
+                continue;*/
 
-            if(!s->can_disengage())
-                return false;
+            //if(!s->fully_disabled() && disengaging_empire->is_hostile(s->owned_by->parent_empire))
+            //    return false;
+
+            if(s->owned_by->parent_empire == disengaging_empire)
+            {
+                if(!s->can_disengage())
+                    return false;
+            }
         }
     }
 
@@ -743,6 +749,9 @@ std::string battle_manager::get_disengage_str(empire* disengaging_empire)
     {
         for(ship* s : i.second)
         {
+            if(s->owned_by->parent_empire != disengaging_empire)
+                continue;
+
             time_remaining = std::max(time_remaining, combat_variables::mandatory_combat_time_s - s->time_in_combat_s);
         }
     }
