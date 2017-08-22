@@ -705,7 +705,7 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }*/
 
-void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, system_manager& system_manage)
+void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* viewing_empire)
 {
     if(battle == nullptr)
         return;
@@ -722,6 +722,35 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
     if(s)
     {
         s->highlight = true;
+
+        ImGui::BeginTooltip();
+
+        vec3f relations_col = viewing_empire->get_relations_colour(s->owned_by->parent_empire, true);
+
+        std::string relations_str = viewing_empire->get_short_relations_str(s->owned_by->parent_empire);
+
+        std::string sname = s->name;
+
+        ImGui::TextColored(relations_str, relations_col);
+
+        ImGui::SameLine();
+        ImGui::Text("|");
+        ImGui::SameLine();
+
+        ImGui::Text(sname.c_str());
+
+        if(s->fully_disabled())
+        {
+            ImGui::SameLine();
+
+            ImGui::Text("|");
+
+            ImGui::SameLine();
+
+            ImGui::TextColored("Derelict", popup_colour_info::bad_ui_colour);
+        }
+
+        ImGui::EndTooltip();
 
         if(lclick)
         {
@@ -854,7 +883,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
     ImGui::End();
 
-    debug_battle(all_battles.currently_viewing, win, lclick, system_manage);
+    debug_battle(all_battles.currently_viewing, win, lclick, system_manage, player_empire);
 }
 
 ///mostly working except we cant rebox select if we have something selected
