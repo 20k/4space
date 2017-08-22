@@ -744,7 +744,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     if(!top_bar::get_active(top_bar_info::BATTLES))
         return;
 
-    ImGui::Begin("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS);
+    ImGui::Begin("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<all_battles.battles.size(); i++)
     {
@@ -760,7 +760,9 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             for(ship* kk : i.second)
             {
                 std::string name = kk->name;
-                std::string team = std::to_string(kk->team);
+                //std::string team = std::to_string(kk->team);
+
+                std::string team = player_empire->get_single_digit_relations_str(kk->owned_by->parent_empire);
 
                 auto fully_merged = kk->get_fully_merged(1.f);
 
@@ -769,7 +771,22 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
                 std::string damage_str = "(" + to_string_with_enforced_variable_dp(damage) + "/" + to_string_with_enforced_variable_dp(damage_max) + ")";
 
-                ImGui::Text((team + " | " + name + " " + damage_str).c_str());
+                //ImGui::Text((team + " | " + name + " " + damage_str).c_str());
+
+                ImGui::TextColored(team, player_empire->get_relations_colour(kk->owned_by->parent_empire, true));
+
+                if(ImGui::IsItemHovered())
+                {
+                    tooltip::add(player_empire->get_short_relations_str(kk->owned_by->parent_empire));
+                }
+
+                ImGui::SameLine();
+
+                ImGui::Text("|");
+
+                ImGui::SameLine();
+
+                ImGui::Text((name + " " + damage_str).c_str());
 
                 if(ImGui::IsItemClicked_Registered())
                 {
@@ -799,9 +816,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 disengage_str = "(Emergency Disengage!)";
             }
 
-            ImGui::PushID((disengage_str + id_str).c_str());
-            ImGui::Text(disengage_str.c_str());
-            ImGui::PopID();
+            ImGui::NeutralText(disengage_str);
 
             if(ImGui::IsItemClicked_Registered())
             {
@@ -825,9 +840,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         {
             std::string leave_str = "(Leave Battle)";
 
-            ImGui::PushID((leave_str + id_str).c_str());
-            ImGui::Text(leave_str.c_str());
-            ImGui::PopID();
+            ImGui::NeutralText(leave_str);
 
             if(ImGui::IsItemClicked_Registered())
             {
@@ -2813,6 +2826,9 @@ int main()
 
         ///this hack is very temporary, after this make it so that the backup system is the
         ///system in which the battle takes place that we're viewing
+        ///Ok so. If any system sets currently viewed to not be nullptr, but we're in the combat state
+        ///it means terminate the combat state. This is actually pretty neat, and not too much of a hack
+        ///backup system still feels pretty undesirable though
         if(system_manage.currently_viewed != nullptr)
         {
             system_manage.backup_system = system_manage.currently_viewed;
@@ -2822,11 +2838,6 @@ int main()
                 all_battles.request_leave_battle_view = true;
             }
         }
-
-        /*if(all_battles.request_leave_battle_view)
-        {
-            state = 0;
-        }*/
 
         //if(ONCE_MACRO(sf::Keyboard::F1))
 

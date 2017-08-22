@@ -902,13 +902,18 @@ std::string empire::get_relations_string(empire* e)
     }
 }
 
-vec3f empire::get_relations_colour(empire* e)
+vec3f empire::get_relations_colour(empire* e, bool use_alt_owned_colour)
 {
     if(e == nullptr)
         return relations_info::hidden_col;
 
     if(e == this)
-        return relations_info::base_col;
+    {
+        if(!use_alt_owned_colour)
+            return relations_info::base_col;
+        else
+            return relations_info::alt_owned_col;
+    }
 
     vec3f found_col = relations_info::hostile_col;
 
@@ -924,6 +929,56 @@ vec3f empire::get_relations_colour(empire* e)
     }
 
     return found_col;
+}
+
+std::string empire::get_short_relations_str(empire* e)
+{
+    if(e == nullptr)
+    {
+        return "Unknown";
+    }
+
+    if(e == this)
+    {
+        return "Owned";
+    }
+
+    if(is_hostile(e))
+    {
+        return "Hostile";
+    }
+
+    if(is_allied(e))
+    {
+        return "Allied";
+    }
+
+    return "Neutral";
+}
+
+std::string empire::get_single_digit_relations_str(empire* e)
+{
+    if(e == nullptr)
+    {
+        return "?";
+    }
+
+    if(e == this)
+    {
+        return "O";
+    }
+
+    if(is_hostile(e))
+    {
+        return "H";
+    }
+
+    if(is_allied(e))
+    {
+        return "A";
+    }
+
+    return "N";
 }
 
 void empire::negative_interaction(empire* e)

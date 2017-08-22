@@ -169,7 +169,10 @@ struct empire
     float get_relation_constraint_offset_lower(empire* e, float lower);
 
     std::string get_relations_string(empire* e);
-    vec3f get_relations_colour(empire* e);
+    ///alt owned colour is when we specifically don't want white as the owned colour
+    vec3f get_relations_colour(empire* e, bool use_alt_owned_colour = false);
+    std::string get_short_relations_str(empire* e);
+    std::string get_single_digit_relations_str(empire* e);
 
     ///invasion mechanics conceptually
     ///find all spare ships leftover for invasions, group together and launch invasion
