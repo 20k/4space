@@ -17,6 +17,7 @@ namespace object_command_queue_info
         IN_SYSTEM_PATH,
         WARP,
         COLONISE,
+        COLONISE_UI,
         FIGHT,
         ANCHOR,
         ANCHOR_UI,
@@ -85,6 +86,8 @@ struct object_command_queue
     void try_warp(orbital_system* fin, bool queue_to_back = false, bool lshift = false);
 
     void colonise(orbital* target, ship* colony_ship, bool lshift = false);
+    void colonise(orbital* target, int colony_id, bool lshift = false);
+    void colonise_ui_state(ship* colony_ship, bool lshift = false);
 
     void anchor(orbital* target, bool lshift = false);
     void anchor_ui_state(bool lshift = false);

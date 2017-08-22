@@ -230,6 +230,29 @@ void object_command_queue::colonise(orbital* target, ship* colony_ship, bool lsh
     add(next, true, false, lshift);
 }
 
+void object_command_queue::colonise(orbital* target, int colony_ship_id, bool lshift)
+{
+    queue_type next;
+
+    next.data.colony_ship_id = colony_ship_id;
+    next.data.colony_target = target;
+
+    next.type = object_command_queue_info::COLONISE;
+
+    add(next, true, false, lshift);
+}
+
+void object_command_queue::colonise_ui_state(ship* colony_ship, bool lshift)
+{
+    queue_type next;
+
+    next.data.colony_ship_id = colony_ship->id;
+
+    next.type = object_command_queue_info::COLONISE_UI;
+
+    add(next, true, false, lshift);
+}
+
 void object_command_queue::anchor(orbital* target, bool lshift)
 {
     queue_type next;
@@ -319,6 +342,41 @@ bool do_colonising(orbital* o, queue_type& type)
     colony->colonise_target = data.colony_target;
 
     return !sm->any_colonising();
+}
+
+bool do_colonising_ui(orbital* o, queue_type& type)
+{
+    orbital_system* sys = o->parent_system;
+
+    int id = 0;
+
+    bool success = false;
+
+    for(orbital* test_orbital : sys->orbitals)
+    {
+        if(test_orbital->type != orbital_info::PLANET)
+            continue;
+
+        //if(test_orbital->parent_empire != nullptr)
+        //    continue;
+
+        test_orbital->begin_render_asteroid_window();
+
+        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
+        {
+            success = true;
+            o->command_queue.colonise(test_orbital, type.data.colony_ship_id, false);
+        }
+
+        test_orbital->end_render_asteroid_window();
+
+        if(success)
+            return true;
+
+        id++;
+    }
+
+    return false;
 }
 
 bool do_anchor(orbital* o, queue_type& type)
@@ -462,6 +520,14 @@ void object_command_queue::tick(orbital* o, float step_s)
     if(cur == object_command_queue_info::COLONISE)
     {
         if(do_colonising(o, next))
+        {
+            next.data.should_pop = true;
+        }
+    }
+
+    if(cur == object_command_queue_info::COLONISE_UI)
+    {
+        if(do_colonising_ui(o, next))
         {
             next.data.should_pop = true;
         }

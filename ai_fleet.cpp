@@ -48,6 +48,9 @@ void try_colonise(ship_manager* sm, orbital* my_o)
     if(my_o->command_queue.is_ever(object_command_queue_info::WARP))
         return;
 
+    if(my_o->command_queue.is_ever(object_command_queue_info::COLONISE_UI))
+        return;
+
     ///if hostiles in system, flee!
     ///set ai state to request flee
 
@@ -137,6 +140,9 @@ void try_mine(ship_manager* sm, orbital* my_o)
         return;
 
     if(my_o->command_queue.is_ever(object_command_queue_info::WARP))
+        return;
+
+    if(my_o->command_queue.is_ever(object_command_queue_info::ANCHOR_UI))
         return;
 
     std::unordered_set<orbital*> free_asteroids;

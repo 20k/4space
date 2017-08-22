@@ -12,6 +12,7 @@ void popup_info::cleanup(void* element)
         return;
 
     o->command_queue.remove_any_of(object_command_queue_info::ANCHOR_UI);
+    o->command_queue.remove_any_of(object_command_queue_info::COLONISE_UI);
 
     ship_manager* sm = (ship_manager*)o->data;
 

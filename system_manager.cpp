@@ -1671,7 +1671,7 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
 
 void orbital_system::generate_full_random_system(bool force_planet)
 {
-    int min_planets = 0;
+    int min_planets = 1;
     int max_planets = 5;
 
     if(force_planet)

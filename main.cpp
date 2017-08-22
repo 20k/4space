@@ -1844,7 +1844,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(this_fleet_is_coloniser)
             {
-                for(orbital* system_orbital : orb->parent_system->orbitals)
+                /*for(orbital* system_orbital : orb->parent_system->orbitals)
                 {
                     if(system_orbital->type != orbital_info::PLANET)
                         continue;
@@ -1861,6 +1861,13 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                         o->command_queue.colonise(system_orbital, colony_ship, lshift);
                     }
+                }*/
+
+                ImGui::NeutralText("(Colonise Planet)");
+
+                if(ImGui::IsItemClicked_Registered())
+                {
+                    o->command_queue.colonise_ui_state(colony_ship, lshift);
                 }
             }
 
@@ -2440,9 +2447,8 @@ int main()
 
     default_ships_list = get_default_ships_list();
 
-    srand(100);
+    srand(102);
 
-    randf_s();
     randf_s();
 
     top_bar::active[top_bar_info::ECONOMY] = true;
