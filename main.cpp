@@ -836,7 +836,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         }
 
         ///will be incorrect for a frame when combat changes
-        std::string jump_to_str = "(Jump To)";
+        std::string jump_to_str = "(Jump To Battle)";
 
         ImGui::NeutralText(jump_to_str);
 
@@ -845,6 +845,17 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             all_battles.request_enter_battle_view = true;
 
             all_battles.set_viewing(bm, system_manage);
+        }
+
+        std::string jump_to_sys_str = "(Jump To System)";
+
+        ImGui::NeutralText(jump_to_sys_str);
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            all_battles.request_leave_battle_view = true;
+            all_battles.request_stay_in_battle_system = true;
+            all_battles.request_stay_id = i;
         }
 
         if(!bm->can_end_battle_peacefully(player_empire))
@@ -2902,10 +2913,25 @@ int main()
                 state = 1;
             }
 
+            if(all_battles.request_stay_in_battle_system && state == 0)
+            {
+                if(all_battles.request_stay_id < all_battles.battles.size() && all_battles.request_stay_id >= 0)
+                {
+                    battle_manager* bm = all_battles.battles[all_battles.request_stay_id];
+
+                    if(bm != nullptr)
+                    {
+                        orbital_system* to_view = bm->get_system_in(system_manage);
+
+                        system_manage.set_viewed_system(to_view);
+                    }
+                }
+            }
+
             all_battles.request_enter_battle_view = false;
             all_battles.request_leave_battle_view = false;
 
-            if(state == 0)
+            if(state == 0 && !all_battles.request_stay_in_battle_system)
             {
                 orbital_system* found_system = system_manage.backup_system;
 
@@ -2927,6 +2953,9 @@ int main()
 
                 system_manage.set_viewed_system(nullptr);
             }
+
+            all_battles.request_stay_in_battle_system = false;
+
         }
 
         if(ONCE_MACRO(sf::Keyboard::F3))

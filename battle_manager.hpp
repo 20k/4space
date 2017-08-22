@@ -142,6 +142,8 @@ struct all_battles_manager
 
     battle_manager* get_battle_involving(ship_manager* ship_manage);
 
+    int request_stay_id = -1;
+    bool request_stay_in_battle_system = false;
     bool request_enter_battle_view = false;
     bool request_leave_battle_view = false;
 };
