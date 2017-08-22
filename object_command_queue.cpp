@@ -346,6 +346,16 @@ bool do_colonising(orbital* o, queue_type& type)
 
 bool do_colonising_ui(orbital* o, queue_type& type)
 {
+    if(o->type != orbital_info::FLEET)
+        return true;
+
+    ship_manager* sm = (ship_manager*)o->data;
+
+    for(ship* s : sm->ships)
+    {
+        s->colonising = false;
+    }
+
     orbital_system* sys = o->parent_system;
 
     int id = 0;
@@ -551,6 +561,17 @@ void object_command_queue::tick(orbital* o, float step_s)
         if(do_anchor_ui(o, next))
         {
             next.data.should_pop = true;
+        }
+    }
+
+    if(cur != object_command_queue_info::COLONISE && o->type == orbital_info::FLEET)
+    {
+        ship_manager* sm = (ship_manager*)o->data;
+
+        for(ship* s : sm->ships)
+        {
+            s->colonising = false;
+            s->colonise_target = nullptr;
         }
     }
 
