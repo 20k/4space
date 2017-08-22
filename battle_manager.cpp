@@ -7,15 +7,43 @@
 
 uint32_t battle_manager::gid = 0;
 
+void tonemap(sf::Image& image)
+{
+    auto dim = image.getSize();
+
+    for(int y=0; y<dim.y; y++)
+    {
+        for(int x=0; x<dim.x; x++)
+        {
+            sf::Color col = image.getPixel(x, y);
+
+            float intensity = col.a / 255.f;
+
+            vec3f intensity_weights = {1.f, 1.f, 1.f};
+
+            vec3f test_col = mix((vec3f){0,0,0}, (vec3f){1,1,1}, intensity * intensity_weights);
+
+            sf::Color ncol(test_col.x() * 255, test_col.y() * 255, test_col.z() * 255, intensity * 255);
+
+            image.setPixel(x, y, ncol);
+        }
+    }
+}
+
 void projectile::load(int type)
 {
     using namespace ship_component_elements;
 
     std::string str = "./pics/";
 
+    bool experimental_particle = false;
+
     if(type == RAILGUN)
     {
-        str += "railgun.png";
+        //str += "railgun.png";
+        str += "particle_base.png";
+
+        experimental_particle = true;
     }
 
     if(type == TORPEDO)
@@ -34,6 +62,10 @@ void projectile::load(int type)
     }
 
     img.loadFromFile(str);
+
+    if(experimental_particle)
+        tonemap(img);
+
     tex.loadFromImage(img);
 
     tex.setSmooth(true);
@@ -161,6 +193,8 @@ void projectile_manager::draw(sf::RenderWindow& win)
         win.draw(rect);
     }*/
 
+    sf::BlendMode mode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
+
     for(projectile* p : projectiles)
     {
         sf::Sprite spr(p->tex);
@@ -178,7 +212,7 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
         spr.setScale(scale, scale);
 
-        win.draw(spr);
+        win.draw(spr, mode);
     }
 }
 

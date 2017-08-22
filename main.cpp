@@ -2692,6 +2692,16 @@ int main()
     }
     #endif // VIEW_ALL
 
+    sf::Image img;
+    img.loadFromFile("pics/particle_base.png");
+
+    tonemap(img);
+
+    sf::Texture tex;
+
+    tex.loadFromImage(img);
+    tex.setSmooth(true);
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
@@ -3070,6 +3080,10 @@ int main()
         ImGui::DoFrosting(window);
 
         ImGui::Render();
+
+        sf::Sprite spr(tex);
+
+        window.draw(spr);
 
         //playing_music.debug(window);
         window.display();

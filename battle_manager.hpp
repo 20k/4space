@@ -7,6 +7,8 @@
 struct empire;
 struct ship;
 
+void tonemap(sf::Image& image);
+
 struct projectile : positional
 {
     int type = 0;
