@@ -2389,8 +2389,8 @@ int main()
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
-    //hostile_empire->has_ai = true;
-    hostile_empire->has_ai = false;
+    hostile_empire->has_ai = true;
+    //hostile_empire->has_ai = false;
 
     hostile_empire->research_tech_level.categories[research_info::MATERIALS].amount = 3.f;
     hostile_empire->trade_space_access(player_empire, true);
@@ -2542,7 +2542,7 @@ int main()
     player_empire->take_ownership(ofleet2);
     //player_empire->take_ownership(fleet5);
 
-    /*orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
+    orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
     ohostile_fleet->orbital_length = 250;
     ohostile_fleet->parent = sun;
@@ -2561,7 +2561,7 @@ int main()
     hostile_empire->take_ownership(fleet4);
     hostile_empire->take_ownership(oderelict_fleet);
 
-    derelict_ship->randomise_make_derelict();*/
+    derelict_ship->randomise_make_derelict();
 
 
     //orbital_system* sys_2 = system_manage.make_new();
