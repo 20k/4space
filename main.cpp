@@ -3081,11 +3081,9 @@ int main()
 
         ImGui::Render();
 
-        sf::Sprite spr(tex);
-
+        /*sf::Sprite spr(tex);
         spr.setScale(1.f, 5.f);
-
-        window.draw(spr);
+        window.draw(spr);*/
 
         //playing_music.debug(window);
         window.display();
