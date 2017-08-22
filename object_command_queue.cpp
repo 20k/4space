@@ -367,10 +367,8 @@ bool do_colonising_ui(orbital* o, queue_type& type)
         if(test_orbital->type != orbital_info::PLANET)
             continue;
 
-        //if(test_orbital->parent_empire != nullptr)
-        //    continue;
-
-        //test_orbital->begin_render_asteroid_window();
+        if(test_orbital->parent_empire != nullptr)
+            continue;
 
         test_orbital->force_draw_expanded_window = true;
 
@@ -379,8 +377,6 @@ bool do_colonising_ui(orbital* o, queue_type& type)
             success = true;
             o->command_queue.colonise(test_orbital, type.data.colony_ship_id, false);
         }
-
-        //test_orbital->end_render_asteroid_window();
 
         if(success)
             return true;
