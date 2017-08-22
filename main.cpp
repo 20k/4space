@@ -729,14 +729,14 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
         }
     }
 
-    ImGui::Begin("Battle DBG");
+    /*ImGui::Begin("Battle DBG");
 
     if(ImGui::Button("Step Battle 1s"))
     {
         battle->tick(1.f, system_manage);
     }
 
-    ImGui::End();
+    ImGui::End();*/
 }
 
 void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire)
@@ -760,8 +760,6 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
             for(ship* kk : i.second)
             {
                 std::string name = kk->name;
-                //std::string team = std::to_string(kk->team);
-
                 std::string team = player_empire->get_single_digit_relations_str(kk->owned_by->parent_empire);
 
                 auto fully_merged = kk->get_fully_merged(1.f);
@@ -770,8 +768,6 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 float damage_max = fully_merged[ship_component_elements::HP].max_amount;
 
                 std::string damage_str = "(" + to_string_with_enforced_variable_dp(damage) + "/" + to_string_with_enforced_variable_dp(damage_max) + ")";
-
-                //ImGui::Text((team + " | " + name + " " + damage_str).c_str());
 
                 ImGui::TextColored(team, player_empire->get_relations_colour(kk->owned_by->parent_empire, true));
 
@@ -838,7 +834,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         }
         else
         {
-            std::string leave_str = "(Leave Battle)";
+            std::string leave_str = "(Terminate Battle Peacefully)";
 
             ImGui::NeutralText(leave_str);
 
