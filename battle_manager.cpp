@@ -78,6 +78,7 @@ void projectile::load(int type)
 
         options.scale = {1, 5};
         options.overall_scale = 1/5.f;
+        options.blur = true;
     }
 
     if(type == TORPEDO)
@@ -210,6 +211,20 @@ void projectile_manager::destroy_all()
 
 void projectile_manager::draw(sf::RenderWindow& win)
 {
+    static sf::Shader shader;
+    static bool has_shader;
+
+    if(!has_shader)
+    {
+        shader.loadFromFile("gauss.fglsl", sf::Shader::Type::Fragment);
+        shader.setUniform("texture", sf::Shader::CurrentTexture);
+
+        has_shader = true;
+    }
+
+    sf::RenderStates states;
+    states.shader = &shader;
+
     /*sf::RectangleShape rect;
 
     rect.setFillColor(sf::Color(255, 128, 100));
@@ -228,6 +243,7 @@ void projectile_manager::draw(sf::RenderWindow& win)
     }*/
 
     sf::BlendMode mode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
+    states.blendMode = mode;
 
     for(projectile* p : projectiles)
     {
@@ -246,7 +262,10 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
         spr.setScale(scale * p->options.scale.x() * p->options.overall_scale, scale * p->options.scale.y() * p->options.overall_scale);
 
-        win.draw(spr, mode);
+        if(!p->options.blur)
+            win.draw(spr, mode);
+        else
+            win.draw(spr, states);
     }
 }
 

@@ -16,6 +16,7 @@ struct projectile_options
 {
     vec2f scale = {1,1};
     float overall_scale = 1.f;
+    bool blur = false;
 };
 
 void tonemap(sf::Image& image, tonemap_options options = {{4, 4, 0.5}});
