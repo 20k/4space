@@ -586,12 +586,12 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
             if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
                 continue;
 
-            desc.num_ships_predicted[ship_type::SCOUT]++;
-
             auto path = system_manage.pathfind(o, desc.os);
 
             if(path.size() > 0)
             {
+                desc.num_ships_predicted[ship_type::SCOUT]++;
+
                 //o->command_queue.try_warp(path, true);
 
                 to_explore.push_back(desc.os);
@@ -627,8 +627,13 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
             }
         }
 
-        if(it != to_explore.end())
-            to_explore.erase(it);
+        if(found != nullptr)
+        {
+            auto nfind = std::find(to_explore.begin(), to_explore.end(), found);
+
+            if(nfind != to_explore.end())
+                to_explore.erase(nfind);
+        }
 
         if(found == nullptr)
             continue;
