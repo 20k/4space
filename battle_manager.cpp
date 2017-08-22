@@ -7,7 +7,7 @@
 
 uint32_t battle_manager::gid = 0;
 
-void tonemap(sf::Image& image)
+void tonemap(sf::Image& image, tonemap_options options)
 {
     auto dim = image.getSize();
 
@@ -44,7 +44,8 @@ void tonemap(sf::Image& image)
 
             vec3f intensity_weights = {1.f, 1.f, 1.f};
 
-            vec3f power_weights = {4, 4, 0.5};
+            vec3f power_weights = options.power_weights;
+            //vec3f power_weights = {4, 4, 0.5};
 
             vec3f test_col = mix((vec3f){0,0,0}, (vec3f){1,1,1}, intensity * intensity_weights);
 
@@ -64,6 +65,7 @@ void projectile::load(int type)
     std::string str = "./pics/";
 
     bool experimental_particle = false;
+    tonemap_options tone_options;
 
     if(type == RAILGUN)
     {
@@ -71,6 +73,11 @@ void projectile::load(int type)
         str += "particle_base.png";
 
         experimental_particle = true;
+
+        tone_options.power_weights = {4, 4, 0.5};
+
+        options.scale = {1, 5};
+        options.overall_scale = 1/5.f;
     }
 
     if(type == TORPEDO)
@@ -91,7 +98,7 @@ void projectile::load(int type)
     img.loadFromFile(str);
 
     if(experimental_particle)
-        tonemap(img);
+        tonemap(img, tone_options);
 
     tex.loadFromImage(img);
 
@@ -237,7 +244,7 @@ void projectile_manager::draw(sf::RenderWindow& win)
         if(p->base.has_tag(component_tag::SCALE))
             scale = p->base.get_tag(component_tag::SCALE);
 
-        spr.setScale(scale, scale);
+        spr.setScale(scale * p->options.scale.x() * p->options.overall_scale, scale * p->options.scale.y() * p->options.overall_scale);
 
         win.draw(spr, mode);
     }

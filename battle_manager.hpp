@@ -7,10 +7,23 @@
 struct empire;
 struct ship;
 
-void tonemap(sf::Image& image);
+struct tonemap_options
+{
+    vec3f power_weights = {1, 1, 1};
+};
+
+struct projectile_options
+{
+    vec2f scale = {1,1};
+    float overall_scale = 1.f;
+};
+
+void tonemap(sf::Image& image, tonemap_options options = {{4, 4, 0.5}});
 
 struct projectile : positional
 {
+    projectile_options options;
+
     int type = 0;
 
     vec2f velocity;
