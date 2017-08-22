@@ -103,6 +103,20 @@ vec2f map_coords_to_pixel(vec2f pos, const sf::RenderTarget& target)
     return {pixel.x, pixel.y};
 }
 
+vec2f map_pixel_to_coords(vec2f pos, const sf::RenderTarget& target)
+{
+    // First, convert from viewport coordinates to homogeneous coordinates
+    sf::Vector2f normalized;
+    sf::IntRect viewport = target.getViewport(target.getView());
+    normalized.x = -1.f + 2.f * (pos.x() - viewport.left) / viewport.width;
+    normalized.y =  1.f - 2.f * (pos.y() - viewport.top)  / viewport.height;
+
+    // Then transform by the inverse of the view matrix
+    auto ret =  target.getView().getInverseTransform().transformPoint(normalized);
+
+    return {ret.x, ret.y};
+}
+
 void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col, bool show_detail, orbital* o)
 {
     col = col * 255.f;
@@ -251,20 +265,20 @@ void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolu
 
     float scale_approx = (wspos.x() - spos.x()) / (tex.getSize().x);
 
-    if(scale_approx > 1)
+    if(scale_approx >= 1 - 0.1f)
     {
         tex.setSmooth(false);
+
+        spos = round(spos);
     }
     else
     {
         tex.setSmooth(true);
     }
 
-    spos = round(spos);
+    vec2f new_pos = map_pixel_to_coords(spos, win);
 
-    auto new_pos = win.mapPixelToCoords({spos.x(), spos.y()});
-
-    spr.setPosition(new_pos);
+    spr.setPosition({new_pos.x(), new_pos.y()});
 
     win.draw(spr, mode);
 }

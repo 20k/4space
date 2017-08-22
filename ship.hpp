@@ -670,6 +670,8 @@ struct ship_manager
     std::vector<ship*> ships;
 
     bool auto_resupply = true;
+    bool auto_harvest_ore = true;
+    bool auto_colonise = true;
 
     //ship* make_new(int team);
     //ship* make_new_from(int team, const ship& s);
