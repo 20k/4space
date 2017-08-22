@@ -1798,28 +1798,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
-            bool can_colonise = orb->type == orbital_info::PLANET && player_empire->can_colonise(orb) && fleet_manage.nearest_free_colony_ship_of_empire(orb, player_empire) != nullptr;
-
-            if(can_colonise)
-            {
-                ImGui::GoodText("(Colonise)");
-
-                ImGui::SameLine();
-
-                if(ImGui::IsItemClicked_Registered())
-                {
-                    assert(o);
-
-                    ship* nearest = fleet_manage.nearest_free_colony_ship_of_empire(o, player_empire);
-
-                    if(nearest)
-                    {
-                        nearest->colonising = true;
-                        nearest->colonise_target = o;
-                    }
-                }
-            }
-
             ImGui::SameLine();
 
             ImGui::Text("");
@@ -1844,30 +1822,28 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
             if(this_fleet_is_coloniser)
             {
-                /*for(orbital* system_orbital : orb->parent_system->orbitals)
-                {
-                    if(system_orbital->type != orbital_info::PLANET)
-                        continue;
-
-                    if(!player_empire->can_colonise(system_orbital))
-                        continue;
-
-                    ImGui::NeutralText("(Colonise " + system_orbital->name + ")");
-
-                    if(ImGui::IsItemClicked_Registered())
-                    {
-                        //colony_ship->colonising = true;
-                        //colony_ship->colonise_target = system_orbital;
-
-                        o->command_queue.colonise(system_orbital, colony_ship, lshift);
-                    }
-                }*/
-
-                ImGui::NeutralText("(Colonise Planet)");
+                ImGui::OutlineHoverTextAuto("(Colonise Planet)", popup_colour_info::good_ui_colour, true, {0,0}, 1, sm->auto_colonise);
 
                 if(ImGui::IsItemClicked_Registered())
                 {
                     o->command_queue.colonise_ui_state(colony_ship, lshift);
+                }
+
+                if(ImGui::IsItemHovered())
+                {
+                    if(sm->auto_colonise)
+                    {
+                        tooltip::add("Right click to disable auto colonise");
+                    }
+                    else
+                    {
+                        tooltip::add("Right click to enable auto colonise");
+                    }
+                }
+
+                if(ImGui::IsItemClicked_Registered(1))
+                {
+                    sm->auto_colonise = !sm->auto_colonise;
                 }
             }
 
