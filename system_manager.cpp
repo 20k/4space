@@ -3223,7 +3223,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
                 ship_map[pop].push_back(o);
             }
 
-            if(ship_map.size() == 0)
+            if(ship_map.size() == 0 && sys->get_base()->parent_empire != viewing_empire)
                 continue;
 
             if(snum != 0 && first_of_empire)
