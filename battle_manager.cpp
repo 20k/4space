@@ -58,6 +58,25 @@ void tonemap(sf::Image& image, tonemap_options options)
     }
 }
 
+void premultiply(sf::Image& image)
+{
+    auto dim = image.getSize();
+
+    for(int y=0; y<dim.y; y++)
+    {
+        for(int x=0; x<dim.x; x++)
+        {
+            sf::Color col = image.getPixel(x, y);
+
+            col.r *= col.a / 255.f;
+            col.g *= col.a / 255.f;
+            col.b *= col.a / 255.f;
+
+            image.setPixel(x, y, col);
+        }
+    }
+}
+
 void projectile::load(int type)
 {
     using namespace ship_component_elements;
@@ -100,6 +119,8 @@ void projectile::load(int type)
 
     if(experimental_particle)
         tonemap(img, tone_options);
+    else
+        premultiply(img);
 
     tex.loadFromImage(img);
 
