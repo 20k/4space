@@ -43,16 +43,6 @@
 
 void do_popout(ship& s, float known_information, empire* player_empire)
 {
-    /*if(!s.display_popout)
-    {
-        ImGui::NeutralText(">\n>\n>\n>\n>\n>\n>\n>", {4, 4});
-
-        if(ImGui::IsItemClicked_Registered())
-        {
-            s.display_popout = !s.display_popout;
-        }
-    }*/
-
     if(s.display_popout)
     {
         ///ships need ids so the ui can work
@@ -106,11 +96,7 @@ void do_popout(ship& s, float known_information, empire* player_empire)
 
             c_id++;
         }
-
-        //win_size = ImGui::GetWindowSize();
-        //win_pos = ImGui::GetWindowPos();
     }
-
 }
 
 ///claiming_empire for salvage, can be nullptr
@@ -173,71 +159,13 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             primary_obfuscated[c.primary_attribute] = true;
     }
 
-    auto col = ImGui::GetStyleCol(ImGuiCol_TitleBgActive);
-    auto col_inactive = ImGui::GetStyleCol(ImGuiCol_TitleBg);
-    vec3f hover_col = {col.x, col.y, col.z};
+    auto bg_col = ImGui::GetStyleCol(ImGuiCol_TitleBg);
 
-    hover_col = hover_col / 2.f;
-
-    //auto hover_col = ImVec4(0,0,0,0);
-
-    auto render_col = ImVec4(0,0,0,0);
-
-    render_col = col;
-    render_col = col_inactive;
-
-    //col = ImVec4(0,0,0,0);
-
-    ImGui::PushStyleColor(ImGuiCol_TitleBg, render_col);
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, render_col);
-    ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, render_col);
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, bg_col);
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, bg_col);
+    ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, bg_col);
 
     ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
-
-    //auto last_cpos = ImGui::GetCursorPos();
-
-    //auto win_size = ImGui::GetWindowSize();
-
-    /*ImGui::PushStyleColor(ImGuiCol_Button, col);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, col);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, col);
-
-    ImGui::Button("", ImVec2(win_size.x - 20, 0));
-
-    ImGui::PopStyleColor(3);
-
-    ImGui::SetCursorPos(last_cpos);*/
-
-    /*if(!s.display_popout)
-    {
-        ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
-
-        ImGui::SameLine();
-
-        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, false);
-
-        if(ImGui::IsItemClicked_Registered())
-            s.display_popout = !s.display_popout;
-    }
-    else
-    {
-        ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, false);
-
-        if(ImGui::IsItemClicked_Registered())
-            s.display_popout = !s.display_popout;
-
-        ImGui::SameLine();
-
-        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
-    }*/
-
-
-    /*ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
-
-    if(ImGui::IsItemClicked_Registered())
-        s.display_popout = false;
-
-    ImGui::SameLine();*/
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -723,21 +651,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     ImGui::End();
 
     ImGui::PopStyleColor(3);
-
-    /*if(s.display_popout)
-    {
-        popout_button button;
-        button.start(win_pos, win_size, false, "###POP2" + s.name + std::to_string(s.id));
-
-        ImGui::NeutralText("<\n<\n<\n<\n<\n<\n<\n<", {4, 4});
-
-        if(ImGui::IsItemClicked_Registered())
-        {
-            s.display_popout = !s.display_popout;
-        }
-
-        button.finish();
-    }*/
 }
 
 void display_ship_info_old(ship& s, float step_s)
