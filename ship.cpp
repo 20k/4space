@@ -670,7 +670,14 @@ float component_attribute::get_efficiency(float step_s)
     if(drained_per_s * step_s < FLOAT_BOUND)
         return 1.f;
 
-    return currently_drained / (drained_per_s * step_s);
+    float eff = currently_drained / (drained_per_s * step_s);
+
+    ///stops small floating point errors causing jitter if efficiency almost precisely 1
+    eff = eff * 1000.f;
+    eff = round(eff);
+    eff = eff / 1000.f;
+
+    return eff;
 }
 
 void component_attribute::upgrade_tech_level(int type, float from, float to)
@@ -1214,7 +1221,7 @@ float component::calculate_total_efficiency(float step_s)
 
     float frac = 1.f;
 
-    if(max_hp > 0)
+    if(max_hp > FLOAT_BOUND)
     {
         frac = cur_hp / max_hp;
     }
@@ -1937,9 +1944,10 @@ void ship::tick_all_components(float step_s)
 
     for(auto& i : fully_merge)
     {
-        if(i.produced_per_s < -0.0001f)
+        //if(i.produced_per_s < -0.0001f)
+        if(i.produced_per_s < 0)
         {
-            printf("Logic error somewhere\n");
+            //printf("Logic error somewhere\n");
 
             i.produced_per_s = 0;
         }
