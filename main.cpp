@@ -700,6 +700,53 @@ void display_ship_info_old(ship& s, float step_s)
     ImGui::End();
 }*/
 
+/*void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* viewing_empire)
+{
+    if(battle == nullptr)
+        return;
+
+    sf::Mouse mouse;
+
+    int x = mouse.getPosition(win).x;
+    int y = mouse.getPosition(win).y;
+
+    auto transformed = win.mapPixelToCoords({x, y});
+
+    for(const auto& ship_map : battle->ships)
+    {
+        for(ship* s : ship_map.second)
+        {
+            auto fully_merged = s->get_fully_merged(1.f);
+
+            vec2f spos = s->local_pos;
+
+            auto transformed = win.mapCoordsToPixel({spos.x(), spos.y()});
+
+            ImGui::SetNextWindowPos(ImVec2(transformed.x, transformed.y));
+
+            ImGui::Begin((s->name + "##" + std::to_string(s->id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+
+            ImGui::Text(s->name);
+
+            //for(const component_attribute& attr : fully_merged)
+            for(int type = 0; type < (int)ship_component_elements::NONE; type++)
+            {
+                const component_attribute& attr = fully_merged[type];
+
+                float stored = attr.cur_amount;
+                float stored_max = attr.max_amount;
+
+                if(s->get_component_with((ship_component_element)type) == nullptr)
+                    continue;
+
+
+            }
+
+            ImGui::End();
+        }
+    }
+}*/
+
 void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* viewing_empire)
 {
     if(battle == nullptr)
