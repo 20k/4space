@@ -440,12 +440,12 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(!s.display_popout)
     {
-        ImGui::OutlineHoverText("+Systems", hover_col, {1,1,1}, true, {2,2}, 1, false);
+        ImGui::Text("+Systems");
 
     }
     else
     {
-        ImGui::OutlineHoverText("-Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+        ImGui::Text("-Systems");
     }
 
     if(ImGui::IsItemClicked_Registered())
