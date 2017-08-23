@@ -208,7 +208,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     ImGui::SetCursorPos(last_cpos);*/
 
-    if(!s.display_popout)
+    /*if(!s.display_popout)
     {
         ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
 
@@ -229,16 +229,30 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         ImGui::SameLine();
 
         ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+    }*/
 
-        //do_popout(s, known_information, player_empire);
 
-        /*ImGui::End();
+    ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
 
-        ImGui::PopStyleColor(3);
+    if(ImGui::IsItemClicked_Registered())
+        s.display_popout = false;
 
-        return;*/
+    ImGui::SameLine();
+
+    if(!s.display_popout)
+    {
+        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, false);
+
+        if(ImGui::IsItemClicked_Registered())
+            s.display_popout = !s.display_popout;
     }
+    else
+    {
+        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
 
+        if(ImGui::IsItemClicked_Registered())
+            s.display_popout = !s.display_popout;
+    }
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
