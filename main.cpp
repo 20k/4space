@@ -232,27 +232,12 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }*/
 
 
-    ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+    /*ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
 
     if(ImGui::IsItemClicked_Registered())
         s.display_popout = false;
 
-    ImGui::SameLine();
-
-    if(!s.display_popout)
-    {
-        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, false);
-
-        if(ImGui::IsItemClicked_Registered())
-            s.display_popout = !s.display_popout;
-    }
-    else
-    {
-        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
-
-        if(ImGui::IsItemClicked_Registered())
-            s.display_popout = !s.display_popout;
-    }
+    ImGui::SameLine();*/
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -452,6 +437,19 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     {
         ImGui::Unindent();
     }
+
+    if(!s.display_popout)
+    {
+        ImGui::OutlineHoverText("+Systems", hover_col, {1,1,1}, true, {2,2}, 1, false);
+
+    }
+    else
+    {
+        ImGui::OutlineHoverText("-Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+    }
+
+    if(ImGui::IsItemClicked_Registered())
+        s.display_popout = !s.display_popout;
 
 
     float scanning_power = player_empire->available_scanning_power_on(&s, system_manage);
