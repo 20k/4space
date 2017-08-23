@@ -159,7 +159,7 @@ void empire::generate_resource_from_owned(float step_s)
 
     backup_income_list.push_back(diff_res);
 
-    while(backup_income_list.size() > 80)
+    while(backup_income_list.size() > 200)
     {
         backup_income_list.pop_front();
     }

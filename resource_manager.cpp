@@ -170,6 +170,10 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
     {
         float val = produced_ps.resources[i].amount;
 
+        val = val * 100.f;
+        val = round(val);
+        val = val / 100.f;
+
         std::string p_str = to_string_with_enforced_variable_dp(val);
 
         if(strncmp(p_str.c_str(), "nan", 3) == 0)
