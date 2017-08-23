@@ -107,6 +107,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     auto stored = s.get_stored_resources();
     auto max_res = s.get_max_resources();
 
+    auto fully_merged = s.get_fully_merged(1.f);
+
     float known_information = player_empire->available_scanning_power_on(&s, system_manage);
 
     //bool knows_prod = known_information >= 0.4f;
@@ -176,14 +178,10 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     for(const ship_component_element& id : elements)
     {
-        float prod = produced[id];
-        float cons = consumed[id];
-        float store = stored[id];
-        float maximum = max_res[id];
-
-        //std::string display_str;
-
-        //display_str += "+" + to_string_with_precision(prod, 3) + " | -" + to_string_with_precision(cons, 3) + " | ";
+        float prod = fully_merged[id].produced_per_s;
+        float cons = fully_merged[id].drained_per_s;
+        float store = fully_merged[id].cur_amount;
+        float maximum = fully_merged[id].max_amount;
 
         std::string prod_str = "+" + to_string_with_enforced_variable_dp(prod, 1);
         std::string cons_str = "-" + to_string_with_enforced_variable_dp(cons, 1);
