@@ -3356,7 +3356,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
             if(viewing)
             {
-                std::string view_str = "| viewing";
+                std::string view_str = "| Viewing";
 
                 ImGui::SameLine();
 
