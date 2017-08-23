@@ -41,6 +41,78 @@
 }*/
 
 
+void do_popout(ship& s, float known_information, empire* player_empire)
+{
+    /*if(!s.display_popout)
+    {
+        ImGui::NeutralText(">\n>\n>\n>\n>\n>\n>\n>", {4, 4});
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            s.display_popout = !s.display_popout;
+        }
+    }*/
+
+    if(s.display_popout)
+    {
+        ///ships need ids so the ui can work
+        int c_id = 0;
+
+        for(component& c : s.entity_list)
+        {
+            float hp = 1.f;
+
+            if(c.has_element(ship_component_element::HP))
+                hp = c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP];
+
+            vec3f ccol = hp_frac_to_col(hp);
+
+            std::string name = c.name;
+
+            if(c.clicked)
+            {
+                name = "-" + name;
+            }
+            else
+            {
+                name = "+" + name;
+            }
+
+            bool knows = known_information >= c.scanning_difficulty;
+
+            if(s.owned_by->parent_empire->is_allied(player_empire))
+            {
+                knows = true;
+            }
+
+            name = obfuscate(name, !knows);
+
+            ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                c.clicked = !c.clicked;
+            }
+
+            if(c.clicked)
+            {
+                ImGui::Indent();
+
+                std::string str = get_component_display_string(c);
+
+                ImGui::Text(obfuscate(str, !knows).c_str());
+                ImGui::Unindent();
+            }
+
+            c_id++;
+        }
+
+        //win_size = ImGui::GetWindowSize();
+        //win_pos = ImGui::GetWindowPos();
+    }
+
+}
+
 ///claiming_empire for salvage, can be nullptr
 void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
 {
@@ -101,8 +173,59 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             primary_obfuscated[c.primary_attribute] = true;
     }
 
+    auto col = ImGui::GetStyleCol(ImGuiCol_TitleBgActive);
 
-    ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0,0,0,0));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0,0,0,0));
+    ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(0,0,0,0));
+
+    ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    auto last_cpos = ImGui::GetCursorPos();
+
+    auto win_size = ImGui::GetWindowSize();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, col);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, col);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, col);
+
+    ImGui::Button("", ImVec2(win_size.x - 20, 0));
+
+    ImGui::PopStyleColor(3);
+
+    ImGui::SetCursorPos(last_cpos);
+
+    if(!s.display_popout)
+    {
+        ImGui::OutlineHoverText(s.name, {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+
+        ImGui::SameLine();
+
+        ImGui::OutlineHoverText("Extra", {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true);
+
+        if(ImGui::IsItemClicked_Registered())
+            s.display_popout = !s.display_popout;
+    }
+    else
+    {
+        ImGui::OutlineHoverText(s.name, {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true);
+
+        if(ImGui::IsItemClicked_Registered())
+            s.display_popout = !s.display_popout;
+
+        ImGui::SameLine();
+
+        ImGui::OutlineHoverText("Extra", {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+
+        do_popout(s, known_information, player_empire);
+
+        ImGui::End();
+
+        ImGui::PopStyleColor(3);
+
+        return;
+    }
+
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -561,86 +684,22 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
 
-    auto win_size = ImGui::GetWindowSize();
-    auto win_pos = ImGui::GetWindowPos();
+    //auto win_size = ImGui::GetWindowSize();
+    //auto win_pos = ImGui::GetWindowPos();
 
     ImGui::End();
 
-    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + get_title_bar_height()));
+    /*ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + get_title_bar_height()));
 
     ImGui::Begin(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
-    if(!s.display_popout)
-    {
-        ImGui::NeutralText(">\n>\n>\n>\n>\n>\n>\n>", {4, 4});
+    do_popout(s);
 
-        if(ImGui::IsItemClicked_Registered())
-        {
-            s.display_popout = !s.display_popout;
-        }
-    }
+    ImGui::End();*/
 
-    if(s.display_popout)
-    {
-        ///ships need ids so the ui can work
-        int c_id = 0;
+    ImGui::PopStyleColor(3);
 
-        for(component& c : s.entity_list)
-        {
-            float hp = 1.f;
-
-            if(c.has_element(ship_component_element::HP))
-                hp = c.get_stored()[ship_component_element::HP] / c.get_stored_max()[ship_component_element::HP];
-
-            vec3f ccol = hp_frac_to_col(hp);
-
-            std::string name = c.name;
-
-            if(c.clicked)
-            {
-                name = "-" + name;
-            }
-            else
-            {
-                name = "+" + name;
-            }
-
-            bool knows = known_information >= c.scanning_difficulty;
-
-            if(s.owned_by->parent_empire->is_allied(player_empire))
-            {
-                knows = true;
-            }
-
-            name = obfuscate(name, !knows);
-
-            ImGui::TextColored({ccol.x(), ccol.y(), ccol.z(), 1.f}, name.c_str());
-
-            if(ImGui::IsItemClicked_Registered())
-            {
-                c.clicked = !c.clicked;
-            }
-
-            if(c.clicked)
-            {
-                ImGui::Indent();
-
-                std::string str = get_component_display_string(c);
-
-                ImGui::Text(obfuscate(str, !knows).c_str());
-                ImGui::Unindent();
-            }
-
-            c_id++;
-        }
-
-        win_size = ImGui::GetWindowSize();
-        win_pos = ImGui::GetWindowPos();
-    }
-
-    ImGui::End();
-
-    if(s.display_popout)
+    /*if(s.display_popout)
     {
         popout_button button;
         button.start(win_pos, win_size, false, "###POP2" + s.name + std::to_string(s.id));
@@ -653,7 +712,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
 
         button.finish();
-    }
+    }*/
 }
 
 void display_ship_info_old(ship& s, float step_s)
@@ -783,7 +842,7 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
     ImGui::End();*/
 }
 
-void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire)
+void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire, bool in_battle_view)
 {
     if(!top_bar::get_active(top_bar_info::BATTLES))
         return;
@@ -938,7 +997,8 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
     ImGui::End();
 
-    debug_battle(all_battles.currently_viewing, win, lclick, system_manage, player_empire);
+    if(in_battle_view)
+        debug_battle(all_battles.currently_viewing, win, lclick, system_manage, player_empire);
 }
 
 ///mostly working except we cant rebox select if we have something selected
@@ -3015,7 +3075,7 @@ int main()
 
         handle_camera(window, system_manage);
 
-        debug_all_battles(all_battles, window, lclick, system_manage, player_empire);
+        debug_all_battles(all_battles, window, lclick, system_manage, player_empire, state == 1);
 
         if(state == 1)
         {
