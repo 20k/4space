@@ -174,18 +174,31 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }
 
     auto col = ImGui::GetStyleCol(ImGuiCol_TitleBgActive);
+    auto col_inactive = ImGui::GetStyleCol(ImGuiCol_TitleBg);
+    vec3f hover_col = {col.x, col.y, col.z};
 
-    ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0,0,0,0));
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0,0,0,0));
-    ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, ImVec4(0,0,0,0));
+    hover_col = hover_col / 2.f;
 
-    ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    //auto hover_col = ImVec4(0,0,0,0);
 
-    auto last_cpos = ImGui::GetCursorPos();
+    auto render_col = ImVec4(0,0,0,0);
 
-    auto win_size = ImGui::GetWindowSize();
+    render_col = col;
+    render_col = col_inactive;
 
-    ImGui::PushStyleColor(ImGuiCol_Button, col);
+    //col = ImVec4(0,0,0,0);
+
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, render_col);
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, render_col);
+    ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, render_col);
+
+    ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    //auto last_cpos = ImGui::GetCursorPos();
+
+    //auto win_size = ImGui::GetWindowSize();
+
+    /*ImGui::PushStyleColor(ImGuiCol_Button, col);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, col);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, col);
 
@@ -193,37 +206,37 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     ImGui::PopStyleColor(3);
 
-    ImGui::SetCursorPos(last_cpos);
+    ImGui::SetCursorPos(last_cpos);*/
 
     if(!s.display_popout)
     {
-        ImGui::OutlineHoverText(s.name, {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+        ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
 
         ImGui::SameLine();
 
-        ImGui::OutlineHoverText("Extra", {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true);
+        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, false);
 
         if(ImGui::IsItemClicked_Registered())
             s.display_popout = !s.display_popout;
     }
     else
     {
-        ImGui::OutlineHoverText(s.name, {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true);
+        ImGui::OutlineHoverText("Systems", hover_col, {1,1,1}, true, {2,2}, 1, false);
 
         if(ImGui::IsItemClicked_Registered())
             s.display_popout = !s.display_popout;
 
         ImGui::SameLine();
 
-        ImGui::OutlineHoverText("Extra", {col.x, col.y, col.z}, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
+        ImGui::OutlineHoverText("Extra", hover_col, {1,1,1}, true, {2,2}, 1, true, {col.x, col.y, col.z});
 
-        do_popout(s, known_information, player_empire);
+        //do_popout(s, known_information, player_empire);
 
-        ImGui::End();
+        /*ImGui::End();
 
         ImGui::PopStyleColor(3);
 
-        return;
+        return;*/
     }
 
 
@@ -684,18 +697,18 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
 
-    //auto win_size = ImGui::GetWindowSize();
-    //auto win_pos = ImGui::GetWindowPos();
+    auto win_size = ImGui::GetWindowSize();
+    auto win_pos = ImGui::GetWindowPos();
 
     ImGui::End();
 
-    /*ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + get_title_bar_height()));
+    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + get_title_bar_height()));
 
     ImGui::Begin(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
-    do_popout(s);
+    do_popout(s, known_information, player_empire);
 
-    ImGui::End();*/
+    ImGui::End();
 
     ImGui::PopStyleColor(3);
 
