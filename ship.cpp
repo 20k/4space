@@ -137,6 +137,7 @@ void ship_component_elements::generate_element_infos()
     ei[OXYGEN].allowed_skip_in_repair = true;
     ei[OXYGEN].negative_is_bad = true;
     ei[OXYGEN].resource_type = resource::OXYGEN;
+    ei[OXYGEN].combat_view_if_not_full = true;
 
 
 
@@ -150,19 +151,23 @@ void ship_component_elements::generate_element_infos()
 
     ei[CARGO].display_name = "Cargo";
     ei[CARGO].research_type = research_info::MATERIALS;
+    ei[CARGO].combat_view_if_damaged = false;
 
 
     ei[SHIELD_POWER].display_name = "Shields";
     ei[SHIELD_POWER].research_type = research_info::MATERIALS;
+    ei[SHIELD_POWER].combat_view_mandatory = true;
 
 
     ei[ARMOUR].display_name = "Armour";
     ei[ARMOUR].research_type = research_info::MATERIALS;
+    ei[ARMOUR].combat_view_mandatory = true;
 
 
     ei[HP].display_name = "HP";
     ei[HP].research_type = research_info::MATERIALS;
     ei[HP].negative_is_bad = true;
+    ei[HP].combat_view_mandatory = true;
 
 
 
@@ -172,10 +177,12 @@ void ship_component_elements::generate_element_infos()
 
     ei[WARP_POWER].display_name = "Warp";
     ei[WARP_POWER].research_type = research_info::PROPULSION;
+    ei[WARP_POWER].combat_view_if_damaged = false;
 
 
     ei[SCANNING_POWER].display_name = "Scanning";
     ei[SCANNING_POWER].research_type = research_info::SCANNERS;
+    ei[SCANNING_POWER].combat_view_if_damaged = false;
 
 
     ei[COMMAND].display_name = "Command";
@@ -190,46 +197,62 @@ void ship_component_elements::generate_element_infos()
 
     ei[COLONISER].display_name = "Habitation Systems";
     ei[COLONISER].research_type = research_info::MATERIALS;
+    ei[COLONISER].combat_view_if_damaged = false;
 
 
     ei[RAILGUN].display_name = "Railgun";
     ei[RAILGUN].research_type = research_info::WEAPONS;
+    ei[RAILGUN].combat_view_mandatory = true;
 
 
     ei[TORPEDO].display_name = "Torpedo";
     ei[TORPEDO].research_type = research_info::WEAPONS;
+    ei[TORPEDO].combat_view_mandatory = true;
 
 
     ei[PLASMAGUN].display_name = "Plasmagun";
     ei[PLASMAGUN].research_type = research_info::WEAPONS;
+    ei[PLASMAGUN].combat_view_mandatory = true;
 
 
     ei[COILGUN].display_name = "Coilgun";
     ei[COILGUN].research_type = research_info::WEAPONS;
+    ei[COILGUN].combat_view_mandatory = true;
 
 
     ei[RESOURCE_PRODUCTION].display_name = "Resource Producer";
     ei[RESOURCE_PRODUCTION].research_type = research_info::MATERIALS;
+    ei[RESOURCE_PRODUCTION].combat_view_if_damaged = false;
 
 
     ei[RESOURCE_STORAGE].display_name = "Storage";
     ei[RESOURCE_STORAGE].research_type = research_info::MATERIALS;
+    ei[RESOURCE_STORAGE].combat_view_if_damaged = false;
 
 
     ei[SHIPYARD].display_name = "Shipyard";
     ei[SHIPYARD].research_type = research_info::MATERIALS;
+    ei[SHIPYARD].combat_view_if_damaged = false;
 
     ei[MASS_ANCHOR].display_name = "Mass Anchor";
     ei[MASS_ANCHOR].research_type = research_info::MATERIALS;
+    ei[MASS_ANCHOR].combat_view_if_damaged = false;
 
     ei[ORE_HARVESTER].display_name = "Ore Harvester";
     ei[ORE_HARVESTER].research_type = research_info::MATERIALS;
+    ei[ORE_HARVESTER].combat_view_if_damaged = false;
 
     ei[RESOURCE_PULLER].display_name = "Resource Requester";
     ei[RESOURCE_PULLER].research_type = research_info::MATERIALS;
+    ei[RESOURCE_PULLER].combat_view_if_damaged = false;
 
-
-    #define DEFINE_RESOURCE(name, rarity) ei[name].display_name = #name; ei[name].resource_rarity = rarity; ei[name].research_type = research_info::MATERIALS; ei[name].resource_type = resource::name;
+    ///why is this a macro?
+    #define DEFINE_RESOURCE(name, rarity) \
+                                        ei[name].display_name = #name; \
+                                        ei[name].combat_view_if_damaged = false; \
+                                        ei[name].resource_rarity = rarity; \
+                                        ei[name].research_type = research_info::MATERIALS; \
+                                        ei[name].resource_type = resource::name;
 
     DEFINE_RESOURCE(COPPER, 0.5);
     DEFINE_RESOURCE(HYDROGEN, 1);

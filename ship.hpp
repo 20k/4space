@@ -102,6 +102,10 @@ namespace ship_component_elements
         bool skippable_in_display_defence = false;
         bool allowed_skip_in_repair = false;
 
+        bool combat_view_mandatory = false;
+        bool combat_view_if_damaged = true;
+        bool combat_view_if_not_full = false;
+
         std::string display_name;
 
         //float base_cost = 1.f;
