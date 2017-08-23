@@ -475,6 +475,9 @@ void object_command_queue::tick(orbital* o, float step_s)
     if(command_queue.size() == 0)
         return;
 
+    if(step_s <= 0.f)
+        return;
+
     drift_applicable_transfer_targets(step_s);
 
     bool first_warp = true;
