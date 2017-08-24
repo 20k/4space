@@ -2339,6 +2339,31 @@ std::vector<component_attribute> ship::get_fully_merged(float step_s)
     return ret;
 }
 
+component_attribute ship::get_fully_merged_single(const ship_component_element& type, float step_s)
+{
+    component_attribute ret;
+
+    for(const auto& i : entity_list)
+    {
+        const component_attribute& attr = i.components[type];
+
+        if(!attr.present)
+            continue;
+
+        component_attribute& which = ret;
+
+        const component_attribute& other = attr;
+
+        which.cur_amount += other.cur_amount;
+        which.max_amount += other.max_amount;
+
+        which.produced_per_s += other.produced_per_s * step_s * other.cur_efficiency;
+        which.drained_per_s += other.drained_per_s * step_s;
+    }
+
+    return ret;
+}
+
 std::vector<component_attribute> ship::get_fully_merged_no_efficiency_with_hpfrac(float step_s)
 {
     std::vector<component_attribute> ret;
@@ -3245,7 +3270,7 @@ bool ship::can_move_in_system()
 
 float ship::get_move_system_speed()
 {
-    float thruster_amount = get_fully_merged(1.f)[ship_component_elements::ENGINE_POWER].produced_per_s;
+    float thruster_amount = get_fully_merged_single(ship_component_elements::ENGINE_POWER, 1.f).produced_per_s;
 
     float internal_size = get_total_components_size() * current_size;
 
