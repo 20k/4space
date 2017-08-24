@@ -490,7 +490,7 @@ struct ship : positional
 
     int team = 0;
 
-    std::map<ship_component_element, std::vector<int>> type_to_component_offsets;
+    std::vector<std::vector<int>> type_to_component_offsets;
 
     std::vector<component> entity_list;
 

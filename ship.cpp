@@ -1706,6 +1706,7 @@ ship ship::duplicate()
 ship::ship()
 {
     has_element.resize(ship_component_elements::NONE + 1);
+    type_to_component_offsets.resize(ship_component_elements::NONE + 1);
 }
 
 void ship::tick_all_components(float step_s)
