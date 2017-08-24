@@ -101,7 +101,7 @@ void do_popout(ship& s, float known_information, empire* player_empire)
     }
 }
 
-void do_title_colouring_preparation(ship& s, empire* player_empire)
+void do_title_colouring_preparation(ship& s, empire* player_empire, float info_available)
 {
     auto default_bg_col = ImGui::GetStyleCol(ImGuiCol_TitleBg);
     vec3f vdefault = xyz_to_vec(default_bg_col);
@@ -109,7 +109,12 @@ void do_title_colouring_preparation(ship& s, empire* player_empire)
     ///this will make a perceptual colour scientist cry
     float intensity_approx = vdefault.length();
 
-    vec3f vbg_col = player_empire->get_relations_colour(s.owned_by->parent_empire, true);
+    vec3f vbg_col;
+
+    if(info_available > ship_info::accessory_information_obfuscation_level)
+        vbg_col = player_empire->get_relations_colour(s.owned_by->parent_empire, true);
+    else
+        vbg_col = player_empire->get_relations_colour(nullptr, true);
 
     vbg_col = vbg_col * intensity_approx / vbg_col.length();
 
@@ -200,7 +205,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             primary_obfuscated[c.primary_attribute] = true;
     }
 
-    do_title_colouring_preparation(s, player_empire);
+    do_title_colouring_preparation(s, player_empire, known_information);
 
     ImGui::BeginOverride((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
