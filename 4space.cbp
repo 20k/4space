@@ -83,6 +83,8 @@
 		<Unit filename="event_system.cpp" />
 		<Unit filename="event_system.hpp" />
 		<Unit filename="gauss.fglsl" />
+		<Unit filename="imgui_customisation.cpp" />
+		<Unit filename="imgui_customisation.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />
