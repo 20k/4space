@@ -4852,12 +4852,6 @@ bool ship_manager::any_with_element(ship_component_element elem)
 {
     for(ship* s : ships)
     {
-        /*for(component& c : s->entity_list)
-        {
-            if(c.has_element(elem))
-                return true;
-        }*/
-
         if(s->has_element[(int)elem])
             return true;
     }
