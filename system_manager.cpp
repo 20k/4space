@@ -563,17 +563,17 @@ float orbital::calculate_orbital_drift_angle(float orbital_length, float step_s)
     constexpr double distance_from_earth_to_sun = 149000000000;
     constexpr double g_const = 6.674 * pow(10., -11.);
 
-    constexpr float mu = mass_of_sun * g_const;
+    constexpr double mu = mass_of_sun * g_const;
 
     constexpr double default_scale = (365*24*60*60.) / 50.;
 
     constexpr double dist_div_default_scale = distance_from_earth_to_sun / default_scale;
 
-    double scaled_real_dist = orbital_length * dist_div_default_scale;
+    constexpr double mu_div = mu / (dist_div_default_scale * dist_div_default_scale * dist_div_default_scale);
 
-    double vspeed_sq = mu / scaled_real_dist;
+    float res = mu_div / (orbital_length * orbital_length * orbital_length);
 
-    float calculated_angular_velocity_ps = sqrtf(vspeed_sq / (scaled_real_dist * scaled_real_dist));
+    float calculated_angular_velocity_ps = sqrtf(res);
 
     return calculated_angular_velocity_ps * step_s;
 }

@@ -1485,6 +1485,8 @@ void component::set_max_tech_level_from_empire_and_component(empire* e)
     }
 }
 
+///TODO: OBSOLETE THIS
+///use upgrade value for size scaling though
 void component::set_tech_level_from_research(research& r)
 {
     if(primary_attribute == ship_component_elements::WARP_POWER)
@@ -1522,8 +1524,8 @@ void component::set_tech_level_from_research(research& r)
 
 float component::get_tech_level_of_element(ship_component_elements::types type)
 {
-    if(!has_element(type))
-        return -1;
+    //if(!has_element(type))
+    //    return -1;
 
     return components[type].get_tech_level();
 }
