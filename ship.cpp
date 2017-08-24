@@ -1708,6 +1708,7 @@ void ship::tick_all_components(float step_s)
         }
     }
 
+
     for(auto& i : to_repair_sorted)
     {
         for(auto& kk : i)
@@ -1856,18 +1857,10 @@ void ship::tick_all_components(float step_s)
         type++;
     }
 
-    //printf("%f\n", to_apply_prop[ship_component_element::ENERGY]);
-
-    //printf("%f need\n", needed[ship_component_element::OXYGEN]);
-
-    //printf("%f stap\n", produced[ship_component_elements::OXYGEN]);
-    //printf("%f %f stap\n", stored_and_produced[ship_component_elements::OXYGEN], to_apply_prop[ship_component_elements::OXYGEN]);
-
     ///change to take first from production, then from storage instead of weird proportional
     ///optimise this bit. Take out the n^2 if we can!
     ///if we reduce each list down to linear first, then the n^2 might be much smaller, then apply the linear result to all the components
     ///would also have the added side effect that all production would be eated proportionally
-
     for(int i=0; i<attributes.size(); i++)
     {
         const std::vector<component_attribute*>& current_set = attributes[i];
@@ -1908,78 +1901,6 @@ void ship::tick_all_components(float step_s)
             }
         }
     }
-
-    #if 0
-    for(auto& i : entity_list)
-    {
-        for(auto& c : i.components)
-        {
-            float my_proportion_of_total = to_apply_prop[(int)c.first];
-
-            component_attribute& me = c.second;
-
-            float frac = my_proportion_of_total;
-
-            ///dis broken
-            //if(c.first == ship_component_element::ENERGY)
-            //    printf("Dfrac %f\n", frac);
-
-            #ifdef NON_FRACTION_DRAINAGE
-            //if(frac > 1)
-            //    frac = 1;
-            #endif
-
-            float extra = 0;
-
-            for(auto& k : entity_list)
-            {
-                auto it = k.components.find(c.first);
-
-                if(it == k.components.end())
-                    continue;
-
-                component_attribute& other = it->second;
-
-                //component_attribute& other = c2.second;
-
-                float take_amount = frac * other.get_produced_amount(step_s) + extra;
-
-                ///for fractional drainage
-                if(frac > 1)
-                {
-                    take_amount = (1.f / frac) * me.get_drain_capacity(step_s) + extra;
-                }
-
-                if(take_amount > me.get_total_capacity(step_s))
-                    take_amount = me.get_total_capacity(step_s);
-
-                /*if(c.first == ship_component_element::OXYGEN)
-                {
-                    printf("%f atake\n", take_amount);
-                }*/
-
-                ///ie the amount we actually took from other
-                float drained = me.consume_from_amount_available(other, take_amount, step_s);
-
-                /*if(c.first == ship_component_element::OXYGEN)
-                {
-                    printf("%f ataken\n", drained);
-                }*/
-
-                //produced[c.first] -= drained;
-                //needed[c.first] -= drained;
-
-                fully_merge[c.first].produced_per_s -= drained;
-                fully_merge[c.first].drained_per_s -= drained;
-
-                ///the conditional fixes specifically fractional drainage
-                if(frac <= 1)
-                    extra += (take_amount - drained);
-
-            }
-        }
-    }
-    #endif
 
     for(auto& i : to_apply_prop)
     {
@@ -2049,65 +1970,6 @@ void ship::tick_all_components(float step_s)
             }
         }
     }
-
-    #if 0
-    for(auto& i : entity_list)
-    {
-        for(auto& c : i.components)
-        {
-            float my_proportion_of_total = to_apply_prop[(int)c.first];
-
-            component_attribute& me = c.second;
-
-            float frac = my_proportion_of_total;
-
-            ///dis broken
-            //if(c.first == ship_component_element::ENERGY)
-            //    printf("Dfrac %f\n", frac);
-
-            if(frac > 1)
-                frac = 1;
-
-            float extra = 0;
-
-            for(auto& k : entity_list)
-            {
-                auto it = k.components.find(c.first);
-
-                if(it == k.components.end())
-                    continue;
-
-                component_attribute& other = it->second;
-
-                //component_attribute& other = c2.second;
-
-                float take_amount = frac * other.cur_amount + extra;
-
-                if(take_amount > me.get_total_capacity(step_s))
-                    take_amount = me.get_total_capacity(step_s);
-
-                /*if(c2.first == ship_component_element::OXYGEN)
-                {
-                    printf("%f taking from %s\n", take_amount, k.name.c_str());
-                }*/
-
-                ///ie the amount we actually took from other
-                float drained = me.consume_from_amount_stored(other, take_amount, step_s);
-
-                /*if(c2.first == ship_component_element::OXYGEN)
-                {
-                    printf("%f taken\n", drained);
-                }*/
-
-                ///incorrect, this is taken from STORAGE not PRODUCED
-                //produced[c.first] -= drained;
-                //needed[c.first] -= drained;
-
-                extra += (take_amount - drained);
-            }
-        }
-    }
-    #endif
 
     t2.finish();
 
