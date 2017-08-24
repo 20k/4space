@@ -171,12 +171,35 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     vbg_col = vbg_col * intensity_approx / vbg_col.length();
 
+    //vec3f default_background_colour = xyz_to_vec(ImGui::GetStyleCol(ImGuiCol_TitleBg));
+
+    vbg_col = mix(vbg_col, vdefault, 0.1f);
 
     ImVec4 bg_col = ImVec4(vbg_col.x(), vbg_col.y(), vbg_col.z(), default_bg_col.w);
 
     ImGui::PushStyleColor(ImGuiCol_TitleBg, bg_col);
     ImGui::PushStyleColor(ImGuiCol_TitleBgActive, bg_col);
     ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, bg_col);
+
+    vec4f close_col = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
+    vec4f close_col_active = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
+    vec4f close_col_hovered = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
+
+    float i1 = close_col.xyz().length();
+    float i2 = close_col_active.xyz().length();
+    float i3 = close_col_hovered.xyz().length();
+
+    vec3f s1 = i1 * vbg_col.norm();
+    vec3f s2 = i2 * vbg_col.norm();
+    vec3f s3 = i3 * vbg_col.norm();
+
+    ImGui::PushStyleColor(ImGuiCol_CloseButton, ImVec4(s1.x(), s1.y(), s1.z(), close_col.w()));
+    ImGui::PushStyleColor(ImGuiCol_CloseButtonActive, ImVec4(s2.x(), s2.y(), s2.z(), close_col_active.w()));
+    ImGui::PushStyleColor(ImGuiCol_CloseButtonHovered, ImVec4(s3.x(), s3.y(), s3.z(), close_col_hovered.w()));
+
+    /*ImGui::PushStyleColor(ImGuiCol_WindowBg, bg_col);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, bg_col);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, bg_col);*/
 
     ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
@@ -661,7 +684,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         ImGui::End();
     }
 
-    ImGui::PopStyleColor(3);
+    ImGui::PopStyleColor(6);
 }
 
 void display_ship_info_old(ship& s, float step_s)
