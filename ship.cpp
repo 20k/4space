@@ -1281,27 +1281,66 @@ ship_component_element component::get_weapon_type()
     return NONE;
 }
 
+int component::get_tag_offset(component_tag::tag tag)
+{
+    for(int i=0; i<tag_list.size(); i++)
+    {
+        if(tag_list[i].first == tag)
+            return i;
+    }
+
+    return -1;
+}
+
+
 bool component::has_tag(component_tag::tag tag)
 {
-    return tag_list.find(tag) != tag_list.end();
+    //return tag_list.find(tag) != tag_list.end();
+
+    for(auto& i : tag_list)
+    {
+        if(i.first == tag)
+            return true;
+    }
+
+    return false;
 }
 
 float component::get_tag(component_tag::tag tag)
 {
+    int tag_id = get_tag_offset(tag);
+
     ///preserve integrity of map?
-    if(!has_tag(tag))
+    if(tag_id == -1)
     {
         printf("warning: Tag fuckup in get_tag %i %s\n", tag, name.c_str());
 
         return 0.f;
     }
 
-    return tag_list[tag];
+    return tag_list[tag_id].second;
 }
 
 void component::set_tag(component_tag::tag tag, float val)
 {
-    tag_list[tag] = val;
+    //tag_list[tag] = val;
+
+    int offset = get_tag_offset(tag);
+
+    std::pair<component_tag::tag, float>* cur_tag = nullptr;
+
+    if(offset == -1)
+    {
+        tag_list.resize(tag_list.size() + 1);
+        cur_tag = &tag_list.back();
+    }
+    else
+    {
+        cur_tag = &tag_list[offset];
+    }
+
+    *cur_tag = {tag, val};
+
 }
 
 bool component::is_weapon()

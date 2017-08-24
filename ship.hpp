@@ -346,7 +346,8 @@ struct component
     std::string name = "";
 
     std::map<ship_component_element, component_attribute> components;
-    std::map<component_tag::tag, float> tag_list;
+    //std::map<component_tag::tag, float> tag_list;
+    std::vector<std::pair<component_tag::tag, float>> tag_list;
 
     bool has_element(const ship_component_element& type);
     component_attribute get_element(const ship_component_element& type);
@@ -383,6 +384,7 @@ struct component
 
     ship_component_element get_weapon_type();
 
+    int get_tag_offset(component_tag::tag tag);
     bool has_tag(component_tag::tag tag);
 
     float get_tag(component_tag::tag tag);
