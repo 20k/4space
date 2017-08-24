@@ -1791,7 +1791,10 @@ void ship::tick_all_components(float step_s)
 
     ///DIRTY HACK ALERT
 
-    std::map<ship_component_element, float> to_apply_prop;
+    //std::map<ship_component_element, float> to_apply_prop;
+
+    std::vector<float> to_apply_prop;
+    to_apply_prop.resize(ship_component_elements::NONE + 1);
 
     //for(auto& i : needed)
 
@@ -1821,7 +1824,7 @@ void ship::tick_all_components(float step_s)
 
         float frac = i.drained_per_s / i.produced_per_s;
 
-        to_apply_prop[(ship_component_element)type] = frac;
+        to_apply_prop[type] = frac;
 
         type++;
     }
@@ -1841,7 +1844,7 @@ void ship::tick_all_components(float step_s)
     {
         for(auto& c : i.components)
         {
-            float my_proportion_of_total = to_apply_prop[c.first];
+            float my_proportion_of_total = to_apply_prop[(int)c.first];
 
             component_attribute& me = c.second;
 
@@ -1907,7 +1910,10 @@ void ship::tick_all_components(float step_s)
         }
     }
 
-    to_apply_prop.clear();
+    for(auto& i : to_apply_prop)
+    {
+        i = 0;
+    }
 
     int cur = 0;
 
@@ -1932,7 +1938,7 @@ void ship::tick_all_components(float step_s)
         ///because we're taking proportionally
         float frac = i.drained_per_s / i.cur_amount;
 
-        to_apply_prop[(ship_component_element)cur] = frac;
+        to_apply_prop[cur] = frac;
 
         cur++;
     }
@@ -1944,7 +1950,7 @@ void ship::tick_all_components(float step_s)
     {
         for(auto& c : i.components)
         {
-            float my_proportion_of_total = to_apply_prop[c.first];
+            float my_proportion_of_total = to_apply_prop[(int)c.first];
 
             component_attribute& me = c.second;
 
