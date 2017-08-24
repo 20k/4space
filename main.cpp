@@ -172,7 +172,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     vbg_col = vbg_col * intensity_approx / vbg_col.length();
 
 
-    ImVec4 bg_col = ImVec4(vbg_col.x(), vbg_col.y(), vbg_col.z(), 1);
+    ImVec4 bg_col = ImVec4(vbg_col.x(), vbg_col.y(), vbg_col.z(), default_bg_col.w);
 
     ImGui::PushStyleColor(ImGuiCol_TitleBg, bg_col);
     ImGui::PushStyleColor(ImGuiCol_TitleBgActive, bg_col);
