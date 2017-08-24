@@ -246,13 +246,16 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         bool obfuscd = primary_obfuscated[id];
 
+        bool is_resource = ship_component_elements::element_infos[id].resource_type != resource::COUNT;
+
         ///none of these systems have a component with them as a primary
         ///weird and hardcoded. Armour will when ships carry armour
         ///ammo too, hp and fuel only real special case
         if(id == ship_component_element::AMMO ||
            id == ship_component_element::ARMOUR ||
            id == ship_component_element::HP ||
-           id == ship_component_element::FUEL)
+           id == ship_component_element::FUEL ||
+           is_resource)
         {
             if(known_information < ship_info::misc_resources_obfuscation_level)
             {
