@@ -373,6 +373,7 @@ struct component
     ///how much *more* we can take
     std::map<ship_component_element, float> get_available_capacities();
     std::vector<std::pair<ship_component_element, float>> get_available_capacities_vec();
+    std::vector<float> get_available_capacities_linear_vec();
 
     //std::map<ship_component_element, float> get_needed_resources(float time_s);
     std::map<ship_component_element, float> get_stored_and_produced_resources(float time_s);
@@ -497,6 +498,7 @@ struct ship : positional
 
     std::map<ship_component_element, float> get_available_capacities();
     std::vector<std::pair<ship_component_element, float>> get_available_capacities_vec();
+    std::vector<float> get_available_capacities_linear_vec();
     /*std::map<ship_component_element, float> get_needed_resources();*/
     std::map<ship_component_element, float> get_produced_resources(float time_s);
 

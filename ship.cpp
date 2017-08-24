@@ -1178,6 +1178,7 @@ std::map<ship_component_element, float> component::get_available_capacities()
 
     return ret;
 }
+
 std::vector<std::pair<ship_component_element, float>> component::get_available_capacities_vec()
 {
     std::vector<std::pair<ship_component_element, float>> ret;
@@ -1185,6 +1186,19 @@ std::vector<std::pair<ship_component_element, float>> component::get_available_c
     for(auto& i : components)
     {
         ret.push_back({i.first, i.second.get_available_capacity()});
+    }
+
+    return ret;
+}
+
+std::vector<float> component::get_available_capacities_linear_vec()
+{
+    std::vector<float> ret;
+    ret.reserve(components.size());
+
+    for(auto& i : components)
+    {
+        ret.push_back(i.second.get_available_capacity());
     }
 
     return ret;
@@ -2030,28 +2044,29 @@ void ship::tick_all_components(float step_s)
 
     auto left_after_storage = fully_merge;
 
-    auto available_capacities = get_available_capacities_vec();
+    auto available_capacities = get_available_capacities_linear_vec();
 
     ///how to apply the output to systems fairly? Try and distribute evenly? Proportionally?
     ///proportional seems reasonable atm
     ///ok so this step distributes to all the individual storage
     for(component& c : entity_list)
     {
-        const auto& this_entity_available = c.get_available_capacities_vec();
+        auto this_entity_available = c.get_available_capacities_linear_vec();
 
-        for(auto& i : this_entity_available)
+        //for(auto& i : this_entity_available)
+        for(int kk=0; kk < this_entity_available.size(); kk++)
         {
-            if(available_capacities[i.first].second <= FLOAT_BOUND)
+            if(available_capacities[kk] <= FLOAT_BOUND)
                 continue;
 
-            float proportion = i.second / available_capacities[i.first].second;
+            float proportion = this_entity_available[kk] / available_capacities[kk];
 
-            float applying_to_this = proportion * fully_merge[i.first].produced_per_s;
+            float applying_to_this = proportion * fully_merge[kk].produced_per_s;
 
 
-            left_after_storage[(int)i.first].produced_per_s -= applying_to_this;
+            left_after_storage[kk].produced_per_s -= applying_to_this;
 
-            left_after_storage[(int)i.first].produced_per_s = std::max(left_after_storage[(int)i.first].produced_per_s, 0.f);
+            left_after_storage[kk].produced_per_s = std::max(left_after_storage[kk].produced_per_s, 0.f);
 
             ///this is slow
             //std::map<ship_component_element, float> tmap;
@@ -2065,7 +2080,7 @@ void ship::tick_all_components(float step_s)
 
             //auto r = c.apply_diff(tmap);
 
-            c.apply_diff_single(i.first, applying_to_this);
+            c.apply_diff_single((ship_component_element)kk, applying_to_this);
 
             ///can be none left over as we're using available capacities
             //auto left_over = r;
@@ -2323,6 +2338,29 @@ std::vector<std::pair<ship_component_element, float>> ship::get_available_capaci
             ret[i].second += c.max_amount - c.cur_amount;
 
             //ret.push_back({(ship_component_elements::types)i, c.max_amount - c.cur_amount});
+        }
+    }
+
+    return ret;
+}
+
+std::vector<float> ship::get_available_capacities_linear_vec()
+{
+    std::vector<float> ret;
+    ret.resize(ship_component_elements::NONE);
+
+    for(component& c : entity_list)
+    {
+        for(int i=0; i<(int)ship_component_elements::NONE; i++)
+        {
+            auto it = c.components.find((ship_component_elements::types)i);
+
+            if(it == c.components.end())
+                continue;
+
+            component_attribute& c = it->second;
+
+            ret[i] += c.max_amount - c.cur_amount;
         }
     }
 
