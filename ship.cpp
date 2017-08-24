@@ -1874,7 +1874,7 @@ void ship::tick_all_components(float step_s)
         for(component& c : entity_list)
         //for(component_attribute* p_cattr : attributes[ship_component_elements::RESOURCE_PULLER])
         {
-            if(!c.has_element(ship_component_elements::RESOURCE_PULLER))
+            if(!c.components[(int)ship_component_elements::RESOURCE_PULLER].present)
                 continue;
 
             component_attribute& cattr = c.components[ship_component_elements::RESOURCE_PULLER];
