@@ -455,10 +455,12 @@ void check_for_resources(orbital* me)
             if(num_harvest == 0)
                 return;
 
-            for(auto& item : primary->components)
+            for(int type = 0; type < primary->components.size(); type++)
             {
-                const ship_component_element& type = item.first;
-                component_attribute& attr = item.second;
+                component_attribute& attr = primary->components[type];
+
+                if(!attr.present)
+                    continue;
 
                 auto res_type = ship_component_elements::element_infos[(int)type].resource_type;
 

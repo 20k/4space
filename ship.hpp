@@ -264,10 +264,12 @@ struct component_attribute
 
     float tech_level = 0.f;
 
+    bool present = false;
+
     float add_amount(float amount);
     bool can_use();
     void use();
-    float get_available_capacity();
+    float get_available_capacity() const;
     float get_total_capacity(float step_s); ///including drain
     float get_drain_capacity(float step_s); ///not including storage
 
@@ -347,7 +349,11 @@ struct component
 
     std::string name = "";
 
-    std::map<ship_component_element, component_attribute> components;
+    component();
+
+    std::vector<component_attribute> components;
+
+    //std::map<ship_component_element, component_attribute> components;
     //std::map<component_tag::tag, float> tag_list;
     std::vector<std::pair<component_tag::tag, float>> tag_list;
 
@@ -362,7 +368,7 @@ struct component
     std::map<ship_component_element, float> get_stored_max();
     std::map<ship_component_element, float> get_use_diff();
 
-    //float get_use_frac();
+    float get_use_frac();
 
     ///returns a pair of new component, extra resources left over
     //std::pair<component, std::map<ship_component_element, float>> apply_diff(const std::map<ship_component_element, float>& diff);
@@ -373,7 +379,7 @@ struct component
     void update_time(float step_s);
 
     ///how much *more* we can take
-    std::map<ship_component_element, float> get_available_capacities();
+    //std::map<ship_component_element, float> get_available_capacities();
     std::vector<std::pair<ship_component_element, float>> get_available_capacities_vec();
     std::vector<float> get_available_capacities_linear_vec();
 

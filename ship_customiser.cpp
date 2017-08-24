@@ -296,13 +296,15 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
             auto fully_merged = current.get_fully_merged(1.f);
 
-            for(auto& item : c.components)
+            //for(auto& item : c.components)
+            for(int type = 0; type < c.components.size(); type++)
             {
-                component_attribute& attr = item.second;
+                component_attribute& attr = c.components[type];
+
+                if(!attr.present)
+                    continue;
 
                 float diff = attr.produced_per_use - attr.drained_per_use;
-
-                auto type = item.first;
 
                 if(-diff > fully_merged[type].max_amount)
                 {
@@ -393,10 +395,12 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
         float tech_level = c.get_tech_level_of_primary();
 
-        for(auto& i : c.components)
+        for(int type = 0; type < c.components.size(); type++)
         {
-            auto type = i.first;
-            component_attribute attr = i.second;
+            const component_attribute& attr = c.components[type];
+
+            if(!attr.present)
+                continue;
 
             std::string header = ship_component_elements::display_strings[type];
 

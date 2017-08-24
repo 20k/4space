@@ -29,8 +29,16 @@ std::string get_component_display_string(component& c)
 
     float efficiency = 1.f;
 
-    if(c.components.begin() != c.components.end())
-        efficiency = c.components.begin()->second.cur_efficiency * 100.f;
+    /*if(c.components.begin() != c.components.end())
+        efficiency = c.components.begin()->cur_efficiency * 100.f;*/
+
+    for(auto& i : c.components)
+    {
+        if(i.present)
+        {
+            efficiency = i.cur_efficiency;
+        }
+    }
 
     if(efficiency < 0.001f)
         efficiency = 0.f;
@@ -40,10 +48,14 @@ std::string get_component_display_string(component& c)
 
     component_str += eff;
 
-    for(auto& i : c.components)
+    //for(auto& i : c.components)
+    for(int kk = 0; kk < c.components.size(); kk++)
     {
-        auto type = i.first;
-        component_attribute attr = i.second;
+        auto type = kk;
+        const component_attribute& attr = c.components[kk];
+
+        if(!attr.present)
+            continue;
 
         std::string header = ship_component_elements::display_strings[type];
 

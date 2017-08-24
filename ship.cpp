@@ -582,7 +582,7 @@ void component_attribute::use()
     time_last_used_s = current_time_s;
 }
 
-float component_attribute::get_available_capacity()
+float component_attribute::get_available_capacity() const
 {
     return max_amount - cur_amount;
 }
@@ -877,9 +877,11 @@ void component::upgrade_size(float old_size, float new_size)
     if(new_size <= 0.f)
         return;
 
-    for(auto& elem : components)
+    //for(auto& elem : components)
+    for(auto& attr : components)
     {
-        component_attribute& attr = elem.second;
+        if(!attr.present)
+            continue;
 
         attr.upgrade_size(old_size, new_size);
     }
@@ -918,11 +920,16 @@ component component::with_size(float new_size)
     component c = *this;
     c.set_size(new_size);
 
-    for(auto& item : c.components)
+    //for(auto& item : c.components)
+
+    for(int type = 0; type < c.components.size(); type++)
     {
-        if(item.first == ship_component_elements::HP)
+        if(type == (int)ship_component_elements::HP)
         {
-            component_attribute& attr = item.second;
+            component_attribute& attr = c.components[type];
+
+            if(!attr.present)
+                continue;
 
             attr.cur_amount = attr.max_amount;
         }
@@ -931,9 +938,14 @@ component component::with_size(float new_size)
     return c;
 }
 
+component::component()
+{
+    components.resize(ship_component_elements::NONE);
+}
+
 bool component::has_element(const ship_component_element& type)
 {
-    return components.find(type) != components.end();
+    return components[type].present;
 }
 
 component_attribute component::get_element(const ship_component_element& type)
@@ -977,14 +989,16 @@ std::map<ship_component_element, float> component::get_timestep_production_diff(
 {
     std::map<ship_component_element, float> ret;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        auto type = i.first;
-        auto attr = i.second;
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
 
         float net = attr.get_produced_amount(step_s);
 
-        ret[type] = net;
+        ret[(ship_component_element)type] = net;
     }
 
     return ret;
@@ -994,14 +1008,16 @@ std::map<ship_component_element, float> component::get_timestep_consumption_diff
 {
     std::map<ship_component_element, float> ret;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        auto type = i.first;
-        auto attr = i.second;
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
 
         float net = (attr.drained_per_s) * step_s;
 
-        ret[type] = net;
+        ret[(ship_component_element)type] = net;
     }
 
     return ret;
@@ -1011,14 +1027,16 @@ std::map<ship_component_element, float> component::get_stored()
 {
     std::map<ship_component_element, float> ret;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        auto type = i.first;
-        auto attr = i.second;
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
 
         float val = attr.cur_amount;
 
-        ret[type] = val;
+        ret[(ship_component_element)type] = val;
     }
 
     return ret;
@@ -1028,14 +1046,16 @@ std::map<ship_component_element, float> component::get_stored_max()
 {
     std::map<ship_component_element, float> ret;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        auto type = i.first;
-        auto attr = i.second;
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
 
         float val = attr.max_amount;
 
-        ret[type] = val;
+        ret[(ship_component_element)type] = val;
     }
 
     return ret;
@@ -1047,23 +1067,25 @@ std::map<ship_component_element, float> component::get_use_diff()
 {
     std::map<ship_component_element, float> ret;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        auto type = i.first;
-        auto attr = i.second;
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
 
         float net = 0.f;
 
         if(attr.can_use())
             net = (attr.produced_per_use - attr.drained_per_use);
 
-        ret[type] = net;
+        ret[(ship_component_element)type] = net;
     }
 
     return ret;
 }
 
-/*float component::get_use_frac()
+float component::get_use_frac()
 {
     std::map<ship_component_element, float> use_diff = get_use_diff();
     std::map<ship_component_element, float> available_diff = get_stored();
@@ -1073,7 +1095,7 @@ std::map<ship_component_element, float> component::get_use_diff()
 
     for(auto& i : use_diff)
     {
-        printf("%f %f %i\n", i.second, available_diff[i.first], i.first);
+        //printf("%f %f %i\n", i.second, available_diff[i.first], i.first);
 
         if(fabs(i.second) < FLOAT_BOUND)
             continue;
@@ -1087,7 +1109,7 @@ std::map<ship_component_element, float> component::get_use_diff()
         accum /= num;
 
     return accum;
-}*/
+}
 
 /*std::pair<component, std::map<ship_component_element, float>> component::apply_diff(const std::map<ship_component_element, float>& diff)
 {
@@ -1161,31 +1183,46 @@ void component::apply_diff_single(const ship_component_element& type, float amou
 
 void component::update_time(float step_s)
 {
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        i.second.update_time(step_s);
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        attr.update_time(step_s);
     }
 }
 
-std::map<ship_component_element, float> component::get_available_capacities()
+/*std::map<ship_component_element, float> component::get_available_capacities()
 {
     std::map<ship_component_element, float> ret;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        ret[i.first] = i.second.get_available_capacity();
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        ret[i.first] = attr.get_available_capacity();
     }
 
     return ret;
-}
+}*/
 
 std::vector<std::pair<ship_component_element, float>> component::get_available_capacities_vec()
 {
     std::vector<std::pair<ship_component_element, float>> ret;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        ret.push_back({i.first, i.second.get_available_capacity()});
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        ret.push_back({(ship_component_element)type, attr.get_available_capacity()});
     }
 
     return ret;
@@ -1196,9 +1233,14 @@ std::vector<float> component::get_available_capacities_linear_vec()
     std::vector<float> ret;
     ret.resize(ship_component_elements::NONE);
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        ret[(int)i.first] = i.second.get_available_capacity();
+        const component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        ret[type] = attr.get_available_capacity();
     }
 
     return ret;
@@ -1208,9 +1250,14 @@ std::map<ship_component_element, float> component::get_stored_and_produced_resou
 {
     std::map<ship_component_element, float> ret = get_timestep_production_diff(time_s);
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        ret[i.first] += i.second.cur_amount;
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        ret[(ship_component_element)type] += attr.cur_amount;
     }
 
     return ret;
@@ -1243,13 +1290,18 @@ float component::calculate_total_efficiency(float step_s)
 {
     float min_eff = 1.f;
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        i.second.calculate_efficiency(step_s);
+        component_attribute& attr = components[type];
 
-        if(i.second.cur_efficiency < min_eff)
+        if(!attr.present)
+            continue;
+
+        attr.calculate_efficiency(step_s);
+
+        if(attr.cur_efficiency < min_eff)
         {
-            min_eff = i.second.cur_efficiency;
+            min_eff = attr.cur_efficiency;
         }
     }
 
@@ -1270,9 +1322,14 @@ void component::propagate_total_efficiency(float step_s)
 {
     float min_eff = calculate_total_efficiency(step_s);
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        i.second.cur_efficiency = min_eff;
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        attr.cur_efficiency = min_eff;
     }
 }
 
@@ -1386,9 +1443,14 @@ void component::set_tech_level_from_empire(empire* e)
         set_tag(component_tag::WARP_DISTANCE, new_value);
     }
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        i.second.set_tech_level_from_empire(i.first, e);
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        attr.set_tech_level_from_empire(type, e);
     }
 }
 
@@ -1411,9 +1473,14 @@ void component::set_max_tech_level_from_empire_and_component(empire* e)
         }
     }
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        i.second.set_max_tech_level_from_empire_and_component_attribute(i.first, e);
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        attr.set_max_tech_level_from_empire_and_component_attribute(type, e);
     }
 }
 
@@ -1433,9 +1500,14 @@ void component::set_tech_level_from_research(research& r)
         set_tag(component_tag::WARP_DISTANCE, new_value);
     }
 
-    for(auto& i : components)
+    for(int type = 0; type < components.size(); type++)
     {
-        i.second.set_tech_level_from_research(i.first, r);
+        component_attribute& attr = components[type];
+
+        if(!attr.present)
+            continue;
+
+        attr.set_tech_level_from_research(type, r);
     }
 }
 
@@ -1691,9 +1763,14 @@ void ship::tick_all_components(float step_s)
 
     for(auto& i : entity_list)
     {
-        for(auto& c : i.components)
+        for(int type = 0; type < i.components.size(); type++)
         {
-            attributes[c.first].push_back(&c.second);
+            component_attribute& attr = i.components[type];
+
+            if(!attr.present)
+                continue;
+
+            attributes[type].push_back(&attr);
         }
     }
 
@@ -1801,11 +1878,12 @@ void ship::tick_all_components(float step_s)
 
             float resources_to_dispense = cattr.get_produced_amount(step_s);
 
-            for(auto& item : c.components)
-            //for(auto& item : cattr.parent->components)
+            for(int type = 0; type < c.components.size(); type++)
             {
-                ship_component_element type = item.first;
-                component_attribute& attr = item.second;
+                component_attribute& attr = c.components[type];
+
+                if(!attr.present)
+                    continue;
 
                 auto res_type = ship_component_elements::element_infos[(int)type].resource_type;
 
@@ -2229,11 +2307,16 @@ std::vector<component_attribute> ship::get_fully_merged(float step_s)
 
     for(auto& i : entity_list)
     {
-        for(auto& attr : i.components)
+        for(int type = 0; type < i.components.size(); type++)
         {
-            component_attribute& which = ret[attr.first];
+            component_attribute& attr = i.components[type];
 
-            const component_attribute& other = attr.second;
+            if(!attr.present)
+                continue;
+
+            component_attribute& which = ret[type];
+
+            const component_attribute& other = attr;
 
             which.cur_amount += other.cur_amount;
             which.max_amount += other.max_amount;
@@ -2263,11 +2346,16 @@ std::vector<component_attribute> ship::get_fully_merged_no_efficiency_with_hpfra
             hp_eff = elem.cur_amount / elem.max_amount;
         }
 
-        for(auto& attr : i.components)
+        for(int type = 0; type < i.components.size(); type++)
         {
-            component_attribute& which = ret[attr.first];
+            component_attribute& attr = i.components[type];
 
-            component_attribute& other = attr.second;
+            if(!attr.present)
+                continue;
+
+            component_attribute& which = ret[type];
+
+            component_attribute& other = attr;
 
             which.cur_amount += other.cur_amount;
             which.max_amount += other.max_amount;
@@ -2280,7 +2368,7 @@ std::vector<component_attribute> ship::get_fully_merged_no_efficiency_with_hpfra
     return ret;
 }
 
-std::map<ship_component_element, float> ship::get_available_capacities()
+/*std::map<ship_component_element, float> ship::get_available_capacities()
 {
     std::map<ship_component_element, float> ret;
 
@@ -2290,7 +2378,7 @@ std::map<ship_component_element, float> ship::get_available_capacities()
     }
 
     return ret;
-}
+}*/
 
 std::vector<std::pair<ship_component_element, float>> ship::get_available_capacities_vec()
 {
@@ -2305,14 +2393,12 @@ std::vector<std::pair<ship_component_element, float>> ship::get_available_capaci
     {
         for(int i=0; i<(int)ship_component_elements::NONE; i++)
         {
-            auto it = c.components.find((ship_component_elements::types)i);
-
-            if(it == c.components.end())
+            if(!c.components[i].present)
                 continue;
 
-            component_attribute& c = it->second;
+            component_attribute& attr = c.components[i];
 
-            ret[i].second += c.max_amount - c.cur_amount;
+            ret[i].second += attr.max_amount - attr.cur_amount;
 
             //ret.push_back({(ship_component_elements::types)i, c.max_amount - c.cur_amount});
         }
@@ -2330,14 +2416,12 @@ std::vector<float> ship::get_available_capacities_linear_vec()
     {
         for(int i=0; i<(int)ship_component_elements::NONE; i++)
         {
-            auto it = c.components.find((ship_component_elements::types)i);
-
-            if(it == c.components.end())
+            if(!c.components[i].present)
                 continue;
 
-            component_attribute& c = it->second;
+            component_attribute& attr = c.components[i];
 
-            ret[i] += c.max_amount - c.cur_amount;
+            ret[i] += attr.max_amount - attr.cur_amount;
         }
     }
 
@@ -2438,9 +2522,12 @@ void ship::refill_all_components()
 {
     for(component& c : entity_list)
     {
-        for(auto& item : c.components)
+        for(int type = 0; type < c.components.size(); type++)
         {
-            component_attribute& attr = item.second;
+            component_attribute& attr = c.components[type];
+
+            if(!attr.present)
+                continue;
 
             attr.cur_amount = attr.max_amount;
             attr.time_last_used_s = 0.f;
@@ -2516,11 +2603,14 @@ bool ship::can_use(component& c)
     std::map<ship_component_element, float> requirements;
 
     ///+ve means we need input from the ship to power it
-    for(auto& celem : c.components)
+    for(int type = 0; type < c.components.size(); type++)
     {
-        component_attribute& attr = celem.second;
+        component_attribute& attr = c.components[type];
 
-        requirements[celem.first] = attr.drained_per_use - attr.produced_per_use;
+        if(!attr.present)
+            continue;
+
+        requirements[(ship_component_element)type] = attr.drained_per_use - attr.produced_per_use;
 
         if(!attr.can_use())
             return false;
@@ -2546,9 +2636,14 @@ void ship::use(component& c)
 
     auto diff = c.get_use_diff();
 
-    for(auto& elems : c.components)
+    for(int type = 0; type < c.components.size(); type++)
     {
-        elems.second.use();
+        component_attribute& attr = c.components[type];
+
+        if(!attr.present)
+            continue;
+
+        attr.use();
     }
 
     //add_negative_resources(diff);
@@ -2750,11 +2845,14 @@ void ship::add(const component& c)
 {
     //primary_to_component_offsets[c.primary_attribute].push_back(entity_list.size());
 
-    for(auto& e : c.components)
+    for(int type = 0; type < c.components.size(); type++)
     {
-        auto type = e.first;
+        const component_attribute& attr = c.components[type];
 
-        type_to_component_offsets[type].push_back(entity_list.size());
+        if(!attr.present)
+            continue;
+
+        type_to_component_offsets[(ship_component_element)type].push_back(entity_list.size());
     }
 
     entity_list.push_back(c);
@@ -3269,7 +3367,7 @@ void ship::test_set_disabled()
 
         if(c.components.size() > 0)
         {
-            component_attribute& attr = c.components.begin()->second;
+            component_attribute& attr = *c.components.begin();
 
             ceff += attr.cur_efficiency;
             cnum++;
@@ -3620,11 +3718,16 @@ void ship::empty_resources()
 {
     for(component& c : entity_list)
     {
-        for(auto& item : c.components)
+        for(int type = 0; type < c.components.size(); type++)
         {
-            if(ship_component_elements::element_infos[(int)item.first].resource_type != resource::COUNT)
+            component_attribute& attr = c.components[type];
+
+            if(!attr.present)
+                continue;
+
+            if(ship_component_elements::element_infos[type].resource_type != resource::COUNT)
             {
-                item.second.cur_amount = 0;
+                attr.cur_amount = 0;
             }
         }
     }
