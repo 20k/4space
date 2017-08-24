@@ -846,14 +846,14 @@ bool ImGui::BeginOverride(const char* name, bool* p_open, const ImVec2& size_on_
             }
 
             const ImVec2 text_size = CalcTextSize(name, NULL, true);
-            if (!(flags & ImGuiWindowFlags_NoCollapse))
-                RenderCollapseTriangle(window->Pos + style.FramePadding, !window->Collapsed, 1.0f);
+            //if (!(flags & ImGuiWindowFlags_NoCollapse))
+            //    RenderCollapseTriangle(window->Pos + style.FramePadding, !window->Collapsed, 1.0f);
 
             ImVec2 text_min = window->Pos;
             ImVec2 text_max = window->Pos + ImVec2(window->Size.x, style.FramePadding.y*2 + text_size.y);
             ImRect clip_rect;
             clip_rect.Max = ImVec2(window->Pos.x + window->Size.x - (p_open ? title_bar_rect.GetHeight() - 3 : style.FramePadding.x), text_max.y); // Match the size of CloseWindowButton()
-            float pad_left = (flags & ImGuiWindowFlags_NoCollapse) == 0 ? (style.FramePadding.x + g.FontSize + style.ItemInnerSpacing.x) : style.FramePadding.x;
+            float pad_left = (flags & ImGuiWindowFlags_NoCollapse) == 0 ? (style.FramePadding.x) : style.FramePadding.x;
             float pad_right = (p_open != NULL) ? (style.FramePadding.x + g.FontSize + style.ItemInnerSpacing.x) : style.FramePadding.x;
             if (style.WindowTitleAlign.x > 0.0f) pad_right = ImLerp(pad_right, pad_left, style.WindowTitleAlign.x);
             text_min.x += pad_left;

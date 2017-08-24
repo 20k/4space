@@ -30,6 +30,7 @@
 #include "context_menu.hpp"
 #include "profile.hpp"
 #include "ship_customiser.hpp"
+#include "imgui_customisation.hpp"
 
 
 /*std::string obfuscate(const std::string& str, bool should_obfuscate)
@@ -200,7 +201,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     do_title_colouring_preparation(s, player_empire);
 
-    ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    ImGui::BeginOverride((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
