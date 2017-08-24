@@ -1801,15 +1801,11 @@ void ship::tick_all_components(float step_s)
 
                 to_dispense = std::min(to_dispense, available[(int)type]);
 
-                std::map<resource::types, float> res;
-
-                res[res_type] = to_dispense;
-
                 bool valid = owned_by->in_friendly_territory && !owned_by->any_in_combat();
 
-                if(valid && owned_by->parent_empire->can_fully_dispense(res))
+                if(valid && owned_by->parent_empire->can_fully_dispense(res_type, to_dispense))
                 {
-                    owned_by->parent_empire->dispense_resources(res);
+                    owned_by->parent_empire->dispense_resource(res_type, to_dispense);
 
                     attr.produced_per_s = to_dispense / step_s;
                 }

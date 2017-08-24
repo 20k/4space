@@ -104,8 +104,10 @@ struct empire
     resource_manager backup_income;
     std::deque<resource_manager> backup_income_list;
 
+    bool can_fully_dispense(resource::types type, float amount);
     bool can_fully_dispense(const resource_manager& res);
     bool can_fully_dispense(const std::map<resource::types, float>& res);
+    void dispense_resources(resource::types type, float amount);
     void dispense_resources(const std::map<resource::types, float>& res);
 
     void add_resource(const resource_manager& res);

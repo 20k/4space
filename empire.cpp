@@ -200,6 +200,12 @@ void empire::generate_resource_from_owned(float step_s)
     }
 }
 
+bool empire::can_fully_dispense(resource::types type, float amount)
+{
+    return resources.resources[type].amount >= amount;
+}
+
+
 bool empire::can_fully_dispense(const std::map<resource::types, float>& res)
 {
     for(auto& i : res)
