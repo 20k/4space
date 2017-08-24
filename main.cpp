@@ -2897,7 +2897,7 @@ int main()
             ///Ok. Changing this to accept only one scrollwheel event because
             ///multiple in one frame can cause issues
             if(event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-                scrollwheel_delta = event.mouseWheelScroll.delta;
+                scrollwheel_delta += event.mouseWheelScroll.delta;
 
             if(event.type == sf::Event::Resized)
             {
@@ -2915,6 +2915,11 @@ int main()
                 window.setView(view);*/
             }
         }
+
+        if(scrollwheel_delta < 0)
+            scrollwheel_delta = -1;
+        if(scrollwheel_delta > 0)
+            scrollwheel_delta = 1;
 
         if(focused && key.isKeyPressed(sf::Keyboard::LAlt) && ONCE_MACRO(sf::Keyboard::Return))
         {
