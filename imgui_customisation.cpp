@@ -360,6 +360,35 @@ static void Scrollbar(ImGuiWindow* window, bool horizontal)
         window->DrawList->AddRectFilled(ImVec2(bb.Min.x, ImLerp(bb.Min.y, bb.Max.y, grab_v_norm)), ImVec2(bb.Max.x, ImLerp(bb.Min.y, bb.Max.y, grab_v_norm) + grab_h_pixels), grab_col, style.ScrollbarRounding);
 }
 
+// Upper-right button to close a window.
+bool ImGui::CloseButtonOverride(ImGuiID id, const ImVec2& pos, float radius)
+{
+    ImGuiWindow* window = GetCurrentWindow();
+
+    const ImRect bb(pos - ImVec2(radius,radius), pos + ImVec2(radius,radius));
+
+    bool hovered, held;
+    bool pressed = ButtonBehavior(bb, id, &hovered, &held);
+
+    // Render
+    const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_CloseButtonActive : hovered ? ImGuiCol_CloseButtonHovered : ImGuiCol_CloseButton);
+    const ImVec2 center = bb.GetCenter();
+    //window->DrawList->AddCircleFilled(center, ImMax(2.0f, radius), col, 12);
+
+    ImVec2 offset = ImVec2(ImMax(2.f, radius), ImMax(2.f, radius));
+
+    window->DrawList->AddRectFilled(center - offset, center + offset, col, ImGui::GetStyle().WindowRounding);
+
+    const float cross_extent = (radius * 0.7071f) - 1.0f;
+    if (hovered)
+    {
+        window->DrawList->AddLine(center + ImVec2(+cross_extent,+cross_extent), center + ImVec2(-cross_extent,-cross_extent), GetColorU32(ImGuiCol_Text));
+        window->DrawList->AddLine(center + ImVec2(+cross_extent,-cross_extent), center + ImVec2(-cross_extent,+cross_extent), GetColorU32(ImGuiCol_Text));
+    }
+
+    return pressed;
+}
+
 bool ImGui::BeginOverride(const char* name, bool* p_open, const ImVec2& size_on_first_use, float bg_alpha, ImGuiWindowFlags flags)
 {
     ImGuiContext& g = *GImGui;
@@ -841,7 +870,8 @@ bool ImGui::BeginOverride(const char* name, bool* p_open, const ImVec2& size_on_
             {
                 const float pad = 2.0f;
                 const float rad = (window->TitleBarHeight() - pad*2.0f) * 0.5f;
-                if (CloseButton(window->GetID("#CLOSE"), window->Rect().GetTR() + ImVec2(-pad - rad, pad + rad), rad))
+
+                if (CloseButtonOverride(window->GetID("#CLOSE"), window->Rect().GetTR() + ImVec2(-pad - rad, pad + rad), rad))
                     *p_open = false;
             }
 
