@@ -99,6 +99,43 @@ void do_popout(ship& s, float known_information, empire* player_empire)
     }
 }
 
+void do_title_colouring_preparation(ship& s, empire* player_empire)
+{
+    auto default_bg_col = ImGui::GetStyleCol(ImGuiCol_TitleBg);
+    vec3f vdefault = xyz_to_vec(default_bg_col);
+
+    ///this will make a perceptual colour scientist cry
+    float intensity_approx = vdefault.length();
+
+    vec3f vbg_col = player_empire->get_relations_colour(s.owned_by->parent_empire, true);
+
+    vbg_col = vbg_col * intensity_approx / vbg_col.length();
+
+    vbg_col = mix(vbg_col, vdefault, 0.1f);
+
+    ImVec4 bg_col = ImVec4(vbg_col.x(), vbg_col.y(), vbg_col.z(), default_bg_col.w);
+
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, bg_col);
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, bg_col);
+    ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, bg_col);
+
+    vec4f close_col = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
+    vec4f close_col_active = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
+    vec4f close_col_hovered = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
+
+    float i1 = close_col.xyz().length();
+    float i2 = close_col_active.xyz().length();
+    float i3 = close_col_hovered.xyz().length();
+
+    vec3f s1 = i1 * vbg_col.norm();
+    vec3f s2 = i2 * vbg_col.norm();
+    vec3f s3 = i3 * vbg_col.norm();
+
+    ImGui::PushStyleColor(ImGuiCol_CloseButton, ImVec4(s1.x(), s1.y(), s1.z(), close_col.w()));
+    ImGui::PushStyleColor(ImGuiCol_CloseButtonActive, ImVec4(s2.x(), s2.y(), s2.z(), close_col_active.w()));
+    ImGui::PushStyleColor(ImGuiCol_CloseButtonHovered, ImVec4(s3.x(), s3.y(), s3.z(), close_col_hovered.w()));
+}
+
 ///claiming_empire for salvage, can be nullptr
 void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
 {
@@ -161,41 +198,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             primary_obfuscated[c.primary_attribute] = true;
     }
 
-    {
-        auto default_bg_col = ImGui::GetStyleCol(ImGuiCol_TitleBg);
-        vec3f vdefault = xyz_to_vec(default_bg_col);
-
-        ///this will make a perceptual colour scientist cry
-        float intensity_approx = vdefault.length();
-
-        vec3f vbg_col = player_empire->get_relations_colour(s.owned_by->parent_empire, true);
-
-        vbg_col = vbg_col * intensity_approx / vbg_col.length();
-
-        vbg_col = mix(vbg_col, vdefault, 0.1f);
-
-        ImVec4 bg_col = ImVec4(vbg_col.x(), vbg_col.y(), vbg_col.z(), default_bg_col.w);
-
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, bg_col);
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, bg_col);
-        ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, bg_col);
-
-        vec4f close_col = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
-        vec4f close_col_active = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
-        vec4f close_col_hovered = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
-
-        float i1 = close_col.xyz().length();
-        float i2 = close_col_active.xyz().length();
-        float i3 = close_col_hovered.xyz().length();
-
-        vec3f s1 = i1 * vbg_col.norm();
-        vec3f s2 = i2 * vbg_col.norm();
-        vec3f s3 = i3 * vbg_col.norm();
-
-        ImGui::PushStyleColor(ImGuiCol_CloseButton, ImVec4(s1.x(), s1.y(), s1.z(), close_col.w()));
-        ImGui::PushStyleColor(ImGuiCol_CloseButtonActive, ImVec4(s2.x(), s2.y(), s2.z(), close_col_active.w()));
-        ImGui::PushStyleColor(ImGuiCol_CloseButtonHovered, ImVec4(s3.x(), s3.y(), s3.z(), close_col_hovered.w()));
-    }
+    do_title_colouring_preparation(s, player_empire);
 
     ImGui::Begin((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
