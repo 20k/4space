@@ -640,13 +640,15 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     ImGui::End();
 
-    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + get_title_bar_height()));
+    if(s.display_popout)
+    {
+        ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + get_title_bar_height()));
+        ImGui::Begin(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
-    ImGui::Begin(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+        do_popout(s, known_information, player_empire);
 
-    do_popout(s, known_information, player_empire);
-
-    ImGui::End();
+        ImGui::End();
+    }
 
     ImGui::PopStyleColor(3);
 }
