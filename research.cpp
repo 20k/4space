@@ -64,7 +64,7 @@ void research::draw_ui(empire* emp)
         amounts.push_back(to_string_with_variable_prec(i.amount));
     }
 
-    ImGui::Begin("Research", &top_bar::active[top_bar_info::RESEARCH], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginOverride("Research", &top_bar::active[top_bar_info::RESEARCH], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<fnames.size(); i++)
     {

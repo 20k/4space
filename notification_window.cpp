@@ -7,7 +7,7 @@
 
 void notification_window::tick_draw()
 {
-    ImGui::Begin(title.c_str());
+    ImGui::BeginOverride(title.c_str());
 
     for(int id = 0; id < (int)elements.size(); id++)
     {

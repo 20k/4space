@@ -44,7 +44,7 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
 
-    ImGui::Begin((current.name + "###SHIPSTATSCUSTOMISE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginOverride((current.name + "###SHIPSTATSCUSTOMISE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     auto produced = current.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = current.get_needed_resources(1.f); ///not actually consumed, but requested
@@ -184,8 +184,8 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
 
-    ImGui::Begin((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
-    //ImGui::Begin((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::BeginOverride((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
+    //ImGui::BeginOverride((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
     std::vector<std::string> names;
     std::vector<std::string> sizes;
@@ -356,7 +356,7 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_2");
 
-    ImGui::Begin("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginOverride("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<full_component_list.size(); i++)
     {
@@ -480,7 +480,7 @@ void ship_customiser::save()
 
 void ship_customiser::do_save_window()
 {
-    ImGui::Begin("Ship Design Manager", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginOverride("Ship Design Manager", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<saved.size(); i++)
     {

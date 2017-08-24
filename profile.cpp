@@ -100,7 +100,7 @@ void auto_timer::dump_imgui()
     if(info.size() == 0)
         return;
 
-    ImGui::Begin("Perf");
+    ImGui::BeginOverride("Perf");
 
     for(const std::pair<timer_info, timer_data>& dat : info)
     {

@@ -12,7 +12,7 @@ bool top_bar::get_active(top_bar_info::types type)
 
 void top_bar::display()
 {
-    ImGui::Begin("###TOP_BAR", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::BeginOverride("###TOP_BAR", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
     int num = 0;
 

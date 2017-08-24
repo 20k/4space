@@ -1,6 +1,7 @@
 #ifndef UI_UTIL_HPP_INCLUDED
 #define UI_UTIL_HPP_INCLUDED
 
+#include "imgui_customisation.hpp"
 #include <imgui/imgui.h>
 #include "drag_and_drop.hpp"
 
@@ -254,7 +255,7 @@ struct popout_button
 
         ImGui::SetNextWindowPos(ImVec2(pos.x + dim.x - ImGui::GetStyle().FramePadding.x, pos.y + ypad));
 
-        ImGui::Begin(name.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+        ImGui::BeginOverride(name.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
         //ImGui::Button(">\n>\n>\n>\n>\n>\n>\n>");
 

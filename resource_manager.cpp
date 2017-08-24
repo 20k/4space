@@ -1,5 +1,7 @@
 #include "resource_manager.hpp"
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
+#include "imgui_customisation.hpp"
+
 
 #include "util.hpp"
 #include <vec/vec.hpp>
@@ -75,7 +77,7 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
     if(!top_bar::get_active(top_bar_info::ECONOMY))
         return;
 
-    ImGui::Begin("Resources", &top_bar::active[top_bar_info::ECONOMY], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginOverride("Resources", &top_bar::active[top_bar_info::ECONOMY], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     /*std::vector<std::string> names_up;
     std::vector<std::string> vals_up;

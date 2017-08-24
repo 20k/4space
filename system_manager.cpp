@@ -155,7 +155,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
             extra = ImGuiWindowFlags_NoInputs;
         }
 
-        ImGui::Begin(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS | extra);
+        ImGui::BeginOverride(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS | extra);
 
         ImGui::Text(tag.c_str());
 
@@ -585,7 +585,7 @@ void orbital::begin_render_asteroid_window()
 {
     ImGui::SetNextWindowPos(ImVec2(last_screen_pos.x(), last_screen_pos.y()));
 
-    ImGui::Begin((name + "##" + std::to_string(unique_id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+    ImGui::BeginOverride((name + "##" + std::to_string(unique_id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
     if(rendered_asteroid_window == false)
     {
@@ -719,7 +719,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
-        ImGui::Begin(nname.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+        ImGui::BeginOverride(nname.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
 
         ImGui::Text(get_name_with_info_warfare(viewer_empire).c_str());
 
@@ -2728,7 +2728,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             ImGui::SetNextWindowPos(ImVec2(projected.x, projected.y));
 
-            ImGui::Begin(use_name.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+            ImGui::BeginOverride(use_name.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
 
             ImGui::Text(os->get_base()->name.c_str());
 
@@ -3175,7 +3175,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
     bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
     bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
 
-    ImGui::Begin("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    ImGui::BeginOverride("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     std::map<empire_popup, std::vector<orbital_system*>> empire_to_systems;
 

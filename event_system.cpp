@@ -931,7 +931,7 @@ void game_event::draw_ui()
 
     std::string header_str = dialogue.header + " (" + alert_location->name + ")";
 
-    ImGui::Begin((header_str + "###DLOGUE" + alert_location->name).c_str(), &dialogue.is_open);
+    ImGui::BeginOverride((header_str + "###DLOGUE" + alert_location->name).c_str(), &dialogue.is_open);
 
     std::vector<std::string> dialogue_options = {dialogue.text};
 

@@ -677,7 +677,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     if(s.display_popout)
     {
         ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x - ImGui::GetStyle().FramePadding.x, win_pos.y + get_title_bar_height()));
-        ImGui::Begin(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
+        ImGui::BeginOverride(("###SIDE" + s.name + std::to_string(s.id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
         do_popout(s, known_information, player_empire);
 
@@ -691,7 +691,7 @@ void display_ship_info_old(ship& s, float step_s)
 {
     auto display_strs = get_components_display_string(s);
 
-    ImGui::Begin(s.name.c_str());
+    ImGui::BeginOverride(s.name.c_str());
 
     int num = 0;
 
@@ -723,7 +723,7 @@ void display_ship_info_old(ship& s, float step_s)
 
 /*void debug_menu(const std::vector<ship*>& ships)
 {
-    ImGui::Begin("Debug");
+    ImGui::BeginOverride("Debug");
 
     if(ImGui::Button("Tick 1s"))
     {
@@ -760,7 +760,7 @@ void display_ship_info_old(ship& s, float step_s)
 
             ImGui::SetNextWindowPos(ImVec2(transformed.x, transformed.y));
 
-            ImGui::Begin((s->name + "##" + std::to_string(s->id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
+            ImGui::BeginOverride((s->name + "##" + std::to_string(s->id)).c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW);
 
             ImGui::Text(s->name);
 
@@ -851,7 +851,7 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
         }
     }
 
-    /*ImGui::Begin("Battle DBG");
+    /*ImGui::BeginOverride("Battle DBG");
 
     if(ImGui::Button("Step Battle 1s"))
     {
@@ -866,7 +866,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     if(!top_bar::get_active(top_bar_info::BATTLES))
         return;
 
-    ImGui::Begin("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginOverride("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<all_battles.battles.size(); i++)
     {
@@ -1348,7 +1348,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     global_drag_and_drop.begin_drag_section("INFO_PANEL");
 
-    ImGui::Begin(("Selected###INFO_PANEL"), &popup.going, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+    ImGui::BeginOverride(("Selected###INFO_PANEL"), &popup.going, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
     //global_drag_and_drop.begin_dragging(nullptr, drag_and_drop_info::ORBITAL);
 
@@ -2375,7 +2375,7 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     bool built = false;
 
-    ImGui::Begin(("Ship Construction (" + o->name + ")").c_str(), &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginOverride(("Ship Construction (" + o->name + ")").c_str(), &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
 
     for(int i=0; i<window_state.picked_research_levels.categories.size(); i++)
     {

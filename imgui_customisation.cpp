@@ -868,7 +868,7 @@ bool ImGui::BeginOverride(const char* name, bool* p_open, const ImVec2& size_on_
         {
             if (p_open != NULL)
             {
-                const float pad = 2.0f;
+                const float pad = 3.0f;
                 const float rad = (window->TitleBarHeight() - pad*2.0f) * 0.5f;
 
                 if (CloseButtonOverride(window->GetID("#CLOSE"), window->Rect().GetTR() + ImVec2(-pad - rad, pad + rad), rad))
