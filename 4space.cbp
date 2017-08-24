@@ -67,6 +67,11 @@
 			<Add option="-lflac" />
 			<Add option="-lopenal32" />
 			<Add option="-logg" />
+			<Add option="-lole32" />
+			<Add option="-lboost_stacktrace_windbg-mgw72-mt-1_65" />
+			<Add option="-lDbgEng" />
+			<Add option="-ldl" />
+			<Add option="-lbacktrace" />
 		</Linker>
 		<Unit filename="ai_empire.cpp" />
 		<Unit filename="ai_empire.hpp" />
@@ -106,6 +111,7 @@
 		<Unit filename="ship_customiser.hpp" />
 		<Unit filename="ship_definitions.cpp" />
 		<Unit filename="ship_definitions.hpp" />
+		<Unit filename="stacktrace_helper.hpp" />
 		<Unit filename="system_manager.cpp" />
 		<Unit filename="system_manager.hpp" />
 		<Unit filename="text.cpp" />
