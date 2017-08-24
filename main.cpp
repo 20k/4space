@@ -2530,26 +2530,11 @@ void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 
     window.setView(view);
 }
-void hello()
-{
-    std::cout << boost::stacktrace::stacktrace();
-
-    //raise(SIGSEGV);
-}
-
-void test()
-{
-    //std::terminate();
-
-    hello();
-}
 
 int main()
 {
     //register_signal_handlers();
     //check_stacktrace();
-
-    test();
 
     ship_component_elements::generate_element_infos();
 
