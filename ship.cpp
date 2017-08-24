@@ -1284,6 +1284,7 @@ void component::add(ship_component_element element, const component_attribute& a
     }
 
     components[element] = attr;
+    components[element].present = true;
 }
 
 float component::calculate_total_efficiency(float step_s)
