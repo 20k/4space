@@ -120,8 +120,8 @@ void do_title_colouring_preparation(ship& s, empire* player_empire)
     ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, bg_col);
 
     vec4f close_col = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
-    vec4f close_col_active = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
-    vec4f close_col_hovered = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButton));
+    vec4f close_col_active = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButtonActive));
+    vec4f close_col_hovered = xyzw_to_vec(ImGui::GetStyleCol(ImGuiCol_CloseButtonHovered));
 
     float i1 = close_col.xyz().length();
     float i2 = close_col_active.xyz().length();
