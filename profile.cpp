@@ -2,6 +2,7 @@
 #include <chrono>
 #include <imgui/imgui.h>
 #include <iostream>
+#include "imgui_customisation.hpp"
 
 #ifdef ENABLE_PROFILING
 

@@ -1682,6 +1682,9 @@ void ship::tick_all_components(float step_s)
 
     }*/
 
+    auto timer_initial = MAKE_AUTO_TIMER();
+    timer_initial.start();
+
     std::vector<std::vector<component*>> to_repair_sorted;
 
     std::vector<int>* ref_vec;
@@ -1708,6 +1711,10 @@ void ship::tick_all_components(float step_s)
         }
     }
 
+    timer_initial.finish();
+
+    auto timer_breakdown = MAKE_AUTO_TIMER();
+    timer_breakdown.start();
 
     for(auto& i : to_repair_sorted)
     {
@@ -1758,10 +1765,16 @@ void ship::tick_all_components(float step_s)
         }
     }
 
+    timer_breakdown.finish();
+
+    auto timer_owned = MAKE_AUTO_TIMER();
+    timer_owned.start();
+
     ///do resource pulling from empire
     if(owned_by != nullptr && owned_by->parent_empire != nullptr)
     {
-        auto available = get_available_capacities_vec();
+        //auto available = get_available_capacities_vec();
+        auto available = get_available_capacities_linear_vec();
 
         for(component& c : entity_list)
         {
@@ -1786,7 +1799,7 @@ void ship::tick_all_components(float step_s)
 
                 float to_dispense = resources_to_dispense;
 
-                to_dispense = std::min(to_dispense, available[(int)type].second);
+                to_dispense = std::min(to_dispense, available[(int)type]);
 
                 std::map<resource::types, float> res;
 
@@ -1816,6 +1829,11 @@ void ship::tick_all_components(float step_s)
             attributes[c.first].push_back(&c.second);
         }
     }
+
+    timer_owned.finish();
+
+    auto timer_toapply = MAKE_AUTO_TIMER();
+    timer_toapply.start();
 
     ///DIRTY HACK ALERT
 
@@ -1935,6 +1953,8 @@ void ship::tick_all_components(float step_s)
         cur++;
     }
 
+    timer_toapply.finish();
+
     auto t2 = MAKE_AUTO_TIMER();
     t2.start();
 
@@ -1971,7 +1991,6 @@ void ship::tick_all_components(float step_s)
         }
     }
 
-    t2.finish();
 
     /*for(auto& i : needed)
     {
@@ -1988,6 +2007,8 @@ void ship::tick_all_components(float step_s)
             i.produced_per_s = 0;
         }
     }
+
+    t2.finish();
 
     //printf("leftover %f\n", produced[ship_component_element::ENERGY]);
 
@@ -2041,7 +2062,6 @@ void ship::tick_all_components(float step_s)
         }
     }
 
-    t3.finish();
 
     for(component& c : entity_list)
     {
@@ -2097,6 +2117,9 @@ void ship::tick_all_components(float step_s)
             c.components[(ship_component_elements::types)i].produced_per_s = 0.f;
         }
     }
+
+    t3.finish();
+
 
     /*for(component& c : entity_list)
     {

@@ -28,7 +28,7 @@ bool operator<(const timer_info& t1, const timer_info& t2)
     return t1.line < t2.line;
 }
 
-//#define ENABLE_PROFILING
+#define ENABLE_PROFILING
 
 #ifdef ENABLE_PROFILING
 
