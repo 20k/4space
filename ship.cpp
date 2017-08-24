@@ -1703,6 +1703,11 @@ ship ship::duplicate()
     return s;
 }
 
+ship::ship()
+{
+    has_element.resize(ship_component_elements::NONE + 1);
+}
+
 void ship::tick_all_components(float step_s)
 {
     auto timer = MAKE_AUTO_TIMER();
@@ -2858,6 +2863,7 @@ void ship::add(const component& c)
             continue;
 
         type_to_component_offsets[(ship_component_element)type].push_back(entity_list.size());
+        has_element[type] = 1;
     }
 
     entity_list.push_back(c);
@@ -3239,8 +3245,6 @@ bool ship::can_move_in_system()
 
 float ship::get_move_system_speed()
 {
-    auto produced = get_produced_resources(1.f);
-
     float thruster_amount = get_fully_merged(1.f)[ship_component_elements::ENGINE_POWER].produced_per_s;
 
     float internal_size = get_total_components_size() * current_size;
@@ -4848,11 +4852,14 @@ bool ship_manager::any_with_element(ship_component_element elem)
 {
     for(ship* s : ships)
     {
-        for(component& c : s->entity_list)
+        /*for(component& c : s->entity_list)
         {
             if(c.has_element(elem))
                 return true;
-        }
+        }*/
+
+        if(s->has_element[(int)elem])
+            return true;
     }
 
     return false;

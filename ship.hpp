@@ -486,6 +486,8 @@ struct ship : positional
 
     ship duplicate();
 
+    ship();
+
     int team = 0;
 
     std::map<ship_component_element, std::vector<int>> type_to_component_offsets;
@@ -540,6 +542,8 @@ struct ship : positional
     float get_warp_distance(); ///ignores practicalities, purely base distance
 
     void add(const component& c);
+
+    std::vector<int> has_element;
 
     //std::map<empire*, float> damage_taken;
 
