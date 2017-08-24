@@ -161,7 +161,18 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             primary_obfuscated[c.primary_attribute] = true;
     }
 
-    auto bg_col = ImGui::GetStyleCol(ImGuiCol_TitleBg);
+    auto default_bg_col = ImGui::GetStyleCol(ImGuiCol_TitleBg);
+    vec3f vdefault = xyz_to_vec(default_bg_col);
+
+    ///this will make a perceptual colour scientist cry
+    float intensity_approx = vdefault.length();
+
+    vec3f vbg_col = player_empire->get_relations_colour(s.owned_by->parent_empire, true);
+
+    vbg_col = vbg_col * intensity_approx / vbg_col.length();
+
+
+    ImVec4 bg_col = ImVec4(vbg_col.x(), vbg_col.y(), vbg_col.z(), 1);
 
     ImGui::PushStyleColor(ImGuiCol_TitleBg, bg_col);
     ImGui::PushStyleColor(ImGuiCol_TitleBgActive, bg_col);
