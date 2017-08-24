@@ -357,7 +357,12 @@ struct component
     //std::map<component_tag::tag, float> tag_list;
     std::vector<std::pair<component_tag::tag, float>> tag_list;
 
-    bool has_element(const ship_component_element& type);
+    inline
+    bool has_element(const ship_component_element& type)
+    {
+        return components[type].present;
+    }
+
     component_attribute get_element(const ship_component_element& type);
 
     ///ie calculate all offsets

@@ -943,10 +943,10 @@ component::component()
     components.resize(ship_component_elements::NONE);
 }
 
-bool component::has_element(const ship_component_element& type)
+/*bool component::has_element(const ship_component_element& type)
 {
     return components[type].present;
-}
+}*/
 
 component_attribute component::get_element(const ship_component_element& type)
 {
