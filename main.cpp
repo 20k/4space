@@ -31,6 +31,7 @@
 #include "profile.hpp"
 #include "ship_customiser.hpp"
 #include "imgui_customisation.hpp"
+#include "stacktrace_helper.hpp"
 
 
 /*std::string obfuscate(const std::string& str, bool should_obfuscate)

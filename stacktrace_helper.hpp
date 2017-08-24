@@ -1,0 +1,9 @@
+#ifndef STACKTRACE_HELPER_HPP_INCLUDED
+#define STACKTRACE_HELPER_HPP_INCLUDED
+
+#define BOOST_STACKTRACE_LINK
+#define BOOST_STACKTRACE_USE_WINDBG
+
+#include <boost/stacktrace/stacktrace.hpp>
+
+#endif // STACKTRACE_HELPER_HPP_INCLUDED
