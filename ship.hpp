@@ -240,6 +240,8 @@ namespace component_tag
 
 using ship_component_element = ship_component_elements::types;
 
+struct component;
+
 ///tech level?
 ///use recharge time?
 ///need burst fire and group fire just because it looks sweet

@@ -1685,6 +1685,19 @@ void ship::tick_all_components(float step_s)
     auto timer_initial = MAKE_AUTO_TIMER();
     timer_initial.start();
 
+    std::vector<std::vector<component_attribute*>> attributes;
+
+    attributes.resize(ship_component_elements::NONE);
+
+    for(auto& i : entity_list)
+    {
+        for(auto& c : i.components)
+        {
+            attributes[c.first].push_back(&c.second);
+        }
+    }
+
+
     std::vector<std::vector<component*>> to_repair_sorted;
 
     std::vector<int>* ref_vec;
@@ -1777,15 +1790,19 @@ void ship::tick_all_components(float step_s)
         auto available = get_available_capacities_linear_vec();
 
         for(component& c : entity_list)
+        //for(component_attribute* p_cattr : attributes[ship_component_elements::RESOURCE_PULLER])
         {
             if(!c.has_element(ship_component_elements::RESOURCE_PULLER))
                 continue;
 
             component_attribute& cattr = c.components[ship_component_elements::RESOURCE_PULLER];
 
+            //component_attribute& cattr = *p_cattr;//c.components[ship_component_elements::RESOURCE_PULLER];
+
             float resources_to_dispense = cattr.get_produced_amount(step_s);
 
             for(auto& item : c.components)
+            //for(auto& item : cattr.parent->components)
             {
                 ship_component_element type = item.first;
                 component_attribute& attr = item.second;
@@ -1810,19 +1827,6 @@ void ship::tick_all_components(float step_s)
                     attr.produced_per_s = to_dispense / step_s;
                 }
             }
-        }
-    }
-
-
-    std::vector<std::vector<component_attribute*>> attributes;
-
-    attributes.resize(ship_component_elements::NONE);
-
-    for(auto& i : entity_list)
-    {
-        for(auto& c : i.components)
-        {
-            attributes[c.first].push_back(&c.second);
         }
     }
 
