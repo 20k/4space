@@ -242,6 +242,7 @@ using ship_component_element = ship_component_elements::types;
 
 ///tech level?
 ///use recharge time?
+///need burst fire and group fire just because it looks sweet
 struct component_attribute
 {
     float produced_per_s = 0;
