@@ -2894,8 +2894,10 @@ int main()
             if(event.type == sf::Event::LostFocus)
                 focused = false;
 
+            ///Ok. Changing this to accept only one scrollwheel event because
+            ///multiple in one frame can cause issues
             if(event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-                scrollwheel_delta += event.mouseWheelScroll.delta;
+                scrollwheel_delta = event.mouseWheelScroll.delta;
 
             if(event.type == sf::Event::Resized)
             {
