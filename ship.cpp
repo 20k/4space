@@ -1775,6 +1775,10 @@ void ship::tick_all_components(float step_s)
         }
     }
 
+    timer_initial.finish();
+
+    auto timer_repair2 = MAKE_AUTO_TIMER();
+    timer_repair2.start();
 
     std::vector<std::vector<component*>> to_repair_sorted;
 
@@ -1802,7 +1806,7 @@ void ship::tick_all_components(float step_s)
         }
     }
 
-    timer_initial.finish();
+    timer_repair2.finish();
 
     auto timer_breakdown = MAKE_AUTO_TIMER();
     timer_breakdown.start();
@@ -3415,7 +3419,7 @@ void ship::test_set_disabled()
         full_disabled = true;
     }*/
 
-    float available_command = get_produced_resources(1.f)[ship_component_elements::COMMAND];
+    float available_command = full_merge[ship_component_elements::COMMAND].produced_per_s;
 
     if(available_command <= 0.001f)
     {
