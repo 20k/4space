@@ -4454,7 +4454,7 @@ bool ship_manager::should_resupply_base(const std::vector<ship_component_element
             if(fully_merged[i].max_amount < 0.0001f)
                 continue;
 
-            if((fully_merged[i].cur_amount / fully_merged[i].max_amount) < 0.8f)
+            if(fully_merged[i].cur_amount < 0.8f * fully_merged[i].max_amount)
             {
                 return true;
             }
