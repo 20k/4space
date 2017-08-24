@@ -1194,11 +1194,11 @@ std::vector<std::pair<ship_component_element, float>> component::get_available_c
 std::vector<float> component::get_available_capacities_linear_vec()
 {
     std::vector<float> ret;
-    ret.reserve(components.size());
+    ret.resize(ship_component_elements::NONE);
 
     for(auto& i : components)
     {
-        ret.push_back(i.second.get_available_capacity());
+        ret[(int)i.first] = i.second.get_available_capacity();
     }
 
     return ret;
