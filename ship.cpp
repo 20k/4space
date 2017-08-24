@@ -2310,11 +2310,11 @@ std::vector<component_attribute> ship::get_fully_merged(float step_s)
 
     ret.resize((int)ship_component_elements::NONE);
 
-    for(auto& i : entity_list)
+    for(const auto& i : entity_list)
     {
         for(int type = 0; type < i.components.size(); type++)
         {
-            component_attribute& attr = i.components[type];
+            const component_attribute& attr = i.components[type];
 
             if(!attr.present)
                 continue;
