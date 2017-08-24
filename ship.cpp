@@ -1960,6 +1960,52 @@ void ship::tick_all_components(float step_s)
     auto t2 = MAKE_AUTO_TIMER();
     t2.start();
 
+    std::vector<std::vector<component_attribute*>> attributes;
+
+    attributes.resize(ship_component_elements::NONE);
+
+    for(auto& i : entity_list)
+    {
+        for(auto& c : i.components)
+        {
+            attributes[c.first].push_back(&c.second);
+        }
+    }
+
+    for(int i=0; i<attributes.size(); i++)
+    {
+        const std::vector<component_attribute*>& current_set = attributes[i];
+
+        for(int kk = 0; kk < current_set.size(); kk++)
+        {
+            float my_proportion_of_total = to_apply_prop[i];
+            float frac = my_proportion_of_total;
+
+            if(frac > 1)
+                frac = 1;
+
+            component_attribute& me = *current_set[kk];
+
+            float extra = 0;
+
+            for(int jj = 0; jj < current_set.size(); jj++)
+            {
+                component_attribute& other = *current_set[jj];
+
+                float take_amount = frac * other.cur_amount + extra;
+
+                if(take_amount > me.get_total_capacity(step_s))
+                    take_amount = me.get_total_capacity(step_s);
+
+                ///ie the amount we actually took from other
+                float drained = me.consume_from_amount_stored(other, take_amount, step_s);
+
+                extra += (take_amount - drained);
+            }
+        }
+    }
+
+    #if 0
     for(auto& i : entity_list)
     {
         for(auto& c : i.components)
@@ -2016,6 +2062,7 @@ void ship::tick_all_components(float step_s)
             }
         }
     }
+    #endif
 
     t2.finish();
 
