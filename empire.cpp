@@ -126,18 +126,6 @@ void empire::generate_resource_from_owned(float step_s)
     std::vector<float> res;
     res.resize(resource::COUNT);
 
-    /*for(int i=0; i<backup_income.resources.size(); i++)
-    {
-        float cur_res = last_income.resources[i].amount;
-
-        if(std::isnan(cur_res))
-        {
-            cur_res = 0;
-        }
-
-        last_income.resources[i].amount = mix(cur_res, (resources.resources[i].amount - backup_income.resources[i].amount) / step_s, 0.3f);
-    }*/
-
     static float last_step_s = 1.f;
 
     resource_manager diff_res;
@@ -151,10 +139,8 @@ void empire::generate_resource_from_owned(float step_s)
             cur_res = 0;
         }
 
-        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount);// / last_step_s;
+        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount);
     }
-
-
 
     backup_income_list.push_back(diff_res);
     backup_dt_s.push_back(step_s);
@@ -169,7 +155,7 @@ void empire::generate_resource_from_owned(float step_s)
 
     last_income = resource_manager();
 
-    float max_time_s = 1.f;
+    float max_time_s = 2.f;
     float dt_accum = 0;
 
     for(int kk=0; kk<backup_income_list.size() && dt_accum < max_time_s; kk++)
@@ -178,7 +164,7 @@ void empire::generate_resource_from_owned(float step_s)
 
         for(int i=0; i<res_manage.resources.size(); i++)
         {
-            last_income.resources[i].amount += res_manage.resources[i].amount;// / backup_income_list.size();
+            last_income.resources[i].amount += res_manage.resources[i].amount;
         }
 
         dt_accum += backup_dt_s[backup_dt_s.size() - 1 - kk];
@@ -206,15 +192,6 @@ void empire::generate_resource_from_owned(float step_s)
         for(int i=0; i<manager.resources.size(); i++)
         {
             res[i] += manager.resources[i].amount * step_s;
-
-            /*if(i == resource::IRON && team_id == 1)
-            {
-                //printf(" %f ", manager.resources[i].amount);
-
-                //printf("%f\n", step_s);
-            }*/
-
-            //last_income.resources[i].amount += res[i] / step_s;
         }
     }
 
