@@ -1766,9 +1766,7 @@ void ship::tick_all_components(float step_s)
     auto timer_initial = MAKE_AUTO_TIMER();
     timer_initial.start();
 
-    std::vector<std::vector<component_attribute*>> attributes;
-
-    attributes.resize(ship_component_elements::NONE);
+    std::vector<component_attribute*> attributes[ship_component_elements::NONE];
 
     for(auto& i : entity_list)
     {
@@ -1930,8 +1928,10 @@ void ship::tick_all_components(float step_s)
 
     //std::map<ship_component_element, float> to_apply_prop;
 
-    std::vector<float> to_apply_prop;
-    to_apply_prop.resize(ship_component_elements::NONE + 1);
+    /*std::vector<float> to_apply_prop;
+    to_apply_prop.resize(ship_component_elements::NONE + 1);*/
+
+    float to_apply_prop[ship_component_elements::NONE + 1] = {};
 
     //for(auto& i : needed)
 
@@ -1970,7 +1970,7 @@ void ship::tick_all_components(float step_s)
     ///optimise this bit. Take out the n^2 if we can!
     ///if we reduce each list down to linear first, then the n^2 might be much smaller, then apply the linear result to all the components
     ///would also have the added side effect that all production would be eated proportionally
-    for(int i=0; i<attributes.size(); i++)
+    for(int i=0; i<ship_component_elements::NONE; i++)
     {
         const std::vector<component_attribute*>& current_set = attributes[i];
 
@@ -2054,7 +2054,7 @@ void ship::tick_all_components(float step_s)
     auto t2 = MAKE_AUTO_TIMER();
     t2.start();
 
-    for(int i=0; i<attributes.size(); i++)
+    for(int i=0; i<ship_component_elements::NONE; i++)
     {
         const std::vector<component_attribute*>& current_set = attributes[i];
 
