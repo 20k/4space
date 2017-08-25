@@ -1943,7 +1943,7 @@ void ship::tick_all_components(float step_s)
     ///based on how much is used. Straightforward, minimal hackiness
     ///we'll need to play it into storage somehow as well
     ///Ignore my brain when it says drain, is unncessary faff
-    for(auto& i : fully_merge)
+    /*for(auto& i : fully_merge)
     {
         if(i.produced_per_s <= FLOAT_BOUND || i.drained_per_s <= FLOAT_BOUND)
         {
@@ -1964,6 +1964,17 @@ void ship::tick_all_components(float step_s)
         to_apply_prop[type] = frac;
 
         type++;
+    }*/
+
+    int fm_size = fully_merge.size();
+    for(int type = 0; type < fm_size; type++)
+    {
+        if(fully_merge[type].produced_per_s <= FLOAT_BOUND || fully_merge[type].drained_per_s <= FLOAT_BOUND)
+            continue;
+
+        float frac = fully_merge[type].drained_per_s / fully_merge[type].produced_per_s;
+
+        to_apply_prop[type] = frac;
     }
 
     ///change to take first from production, then from storage instead of weird proportional
