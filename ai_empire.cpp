@@ -139,12 +139,9 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
         orbital_system_descriptor desc;
         desc.os = os;
 
-        for(orbital_system* other_os : ai_emp.speculatively_owned)
+        if(ai_emp.speculatively_owned.find(os) != ai_emp.speculatively_owned.end())
         {
-            if(os == other_os)
-            {
-                desc.is_speculatively_owned_by_me = true;
-            }
+            desc.is_speculatively_owned_by_me = true;
         }
 
         desc.viewed = base->viewed_by[e];
