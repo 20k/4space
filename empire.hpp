@@ -290,6 +290,8 @@ struct empire_manager
     bool giving_resources_ui_clicked = false;
     resource_manager offering;
     bool giving_are_you_sure = false;
+
+    int frame_counter = 0;
 };
 
 #endif // EMPIRE_HPP_INCLUDED

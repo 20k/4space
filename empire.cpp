@@ -525,16 +525,7 @@ void empire::tick_high_level_ai(float dt_s, fleet_manager& fm, system_manager& s
     if(!has_ai)
         return;
 
-    frame_counter++;
-
-    accumulated_dt_s += dt_s;
-
-    if(((frame_counter + team_id) % parent->empires.size()) != 0)
-        return;
-
     ai_empire_controller.tick(accumulated_dt_s, fm, sm, this);
-
-    accumulated_dt_s = 0.f;
 }
 
 void empire::draw_ui()
@@ -1480,6 +1471,8 @@ void empire_manager::notify_removal(ship_manager* s)
 
 void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage, empire* player_empire)
 {
+    int e_id = 0;
+
     for(empire* emp : empires)
     {
         emp->tick_calculate_owned_systems();
@@ -1487,19 +1480,30 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick_system_claim();
         emp->tick_ai(all_battles, system_manage);
 
+        emp->accumulated_dt_s += step_s;
 
-        emp->tick_high_level_ai(step_s, fleet_manage, system_manage);
-
+        if(e_id == frame_counter)
+        {
+            emp->tick_high_level_ai(step_s, fleet_manage, system_manage);
+        }
 
         emp->tick_relation_ship_occupancy_loss(step_s, system_manage);
         emp->tick_relation_alliance_changes(player_empire);
         emp->tick_relation_border_friction(step_s, system_manage);
+
+        if(emp->has_ai && !emp->is_pirate)
+        {
+            e_id++;
+        }
     }
 
     for(empire* emp : pirate_empires)
     {
         emp->tick_invasion_timer(step_s, system_manage, fleet_manage);
     }
+
+    frame_counter++;
+    frame_counter %= e_id;
 
     tick_name_fleets();
 }
@@ -1541,7 +1545,7 @@ void empire_manager::tick_name_fleets()
 
 void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
-    /*for(int i=0; i<10; i++)
+    for(int i=0; i<10; i++)
     {
     ship_manager* fleet1 = fleet_manage.make_new();
 
@@ -1574,7 +1578,7 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     e->take_ownership(ofleet2);
     e->take_ownership(fleet2);
 
-    }*/
+    }
 
     e->take_ownership_of_all(os);
 
