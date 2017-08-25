@@ -1317,7 +1317,12 @@ void ai_empire::tick(float dt_s, fleet_manager& fleet_manage, system_manager& sy
             continue;
 
         for(int kk = 0; kk < deficit; kk++)
-            try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
+        {
+            orbital* o = try_construct_any(fleet_manage, descriptors, (ship_type::types)i, e, true);
+
+            if(o == nullptr)
+                break;
+        }
     }
 
     scout_explore(free_ships, descriptors, system_manage);
