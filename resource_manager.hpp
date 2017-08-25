@@ -77,7 +77,7 @@ namespace resource
 struct resource_element
 {
     resource::types type = resource::COUNT;
-    float amount = 0.f;
+    double amount = 0.f;
 };
 
 namespace sf

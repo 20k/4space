@@ -151,30 +151,48 @@ void empire::generate_resource_from_owned(float step_s)
             cur_res = 0;
         }
 
-        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount) / last_step_s;
+        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount);// / last_step_s;
     }
 
-    last_step_s = step_s;
 
 
     backup_income_list.push_back(diff_res);
+    backup_dt_s.push_back(step_s);
+
+    last_step_s = step_s;
 
     while(backup_income_list.size() > 200)
     {
         backup_income_list.pop_front();
+        backup_dt_s.pop_front();
     }
 
     last_income = resource_manager();
 
-    for(int kk=0; kk<backup_income_list.size(); kk++)
+    float max_time_s = 1.f;
+    float dt_accum = 0;
+
+    for(int kk=0; kk<backup_income_list.size() && dt_accum < max_time_s; kk++)
     {
-        resource_manager& res_manage = backup_income_list[kk];
+        resource_manager& res_manage = backup_income_list[backup_income_list.size() - 1 - kk];
 
         for(int i=0; i<res_manage.resources.size(); i++)
         {
-            last_income.resources[i].amount += res_manage.resources[i].amount / backup_income_list.size();
+            last_income.resources[i].amount += res_manage.resources[i].amount;// / backup_income_list.size();
+        }
+
+        dt_accum += backup_dt_s[backup_dt_s.size() - 1 - kk];
+    }
+
+    if(dt_accum > FLOAT_BOUND)
+    {
+        for(int i=0; i<last_income.resources.size(); i++)
+        {
+            last_income.resources[i].amount /= dt_accum;
         }
     }
+
+    //printf("res_manage %f\n", last_income.resources[0].amount);
 
     backup_income = resources;
 
@@ -189,10 +207,16 @@ void empire::generate_resource_from_owned(float step_s)
         {
             res[i] += manager.resources[i].amount * step_s;
 
+            /*if(i == resource::IRON && team_id == 1)
+            {
+                //printf(" %f ", manager.resources[i].amount);
+
+                //printf("%f\n", step_s);
+            }*/
+
             //last_income.resources[i].amount += res[i] / step_s;
         }
     }
-
 
     for(int i=0; i<res.size(); i++)
     {
@@ -360,7 +384,7 @@ float empire::dispense_resource(resource::types type, float requested)
         real = available;
     }
 
-    float& ramount = resources.resources[(int)type].amount;
+    auto& ramount = resources.resources[(int)type].amount;
 
     ramount -= real;
 
@@ -1998,9 +2022,13 @@ void empire_manager::draw_resource_donation_ui(empire* viewer_empire)
         ImGui::SetTooltip("Click and drag, shift for faster, alt for slower");
     }
 
+    static float drag_res[resource::COUNT] = {0};
+
     for(int i=0; i<(int)resource::COUNT; i++)
     {
-        ImGui::DragFloat(resource::short_names[i].c_str(), &offering.resources[i].amount, 1.f, 0.f, viewer_empire->resources.resources[i].amount);
+        ImGui::DragFloat(resource::short_names[i].c_str(), &drag_res[i], 1.f, 0.f, viewer_empire->resources.resources[i].amount);
+
+        offering.resources[i].amount = drag_res[i];
     }
 
     ImGui::Text("(Offer Resource)");

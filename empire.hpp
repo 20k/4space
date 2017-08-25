@@ -103,6 +103,7 @@ struct empire
     resource_manager last_income;
     resource_manager backup_income;
     std::deque<resource_manager> backup_income_list;
+    std::deque<float> backup_dt_s;
 
     bool can_fully_dispense(resource::types type, float amount);
     bool can_fully_dispense(const resource_manager& res);
