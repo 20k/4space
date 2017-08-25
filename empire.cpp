@@ -1545,7 +1545,7 @@ void empire_manager::tick_name_fleets()
 
 void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
 {
-    for(int i=0; i<10; i++)
+    /*for(int i=0; i<10; i++)
     {
     ship_manager* fleet1 = fleet_manage.make_new();
 
@@ -1578,7 +1578,7 @@ void claim_system(empire* e, orbital_system* os, fleet_manager& fleet_manage)
     e->take_ownership(ofleet2);
     e->take_ownership(fleet2);
 
-    }
+    }*/
 
     e->take_ownership_of_all(os);
 
