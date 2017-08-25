@@ -36,7 +36,8 @@ std::string get_component_display_string(component& c)
     {
         if(i.present)
         {
-            efficiency = i.cur_efficiency;
+            efficiency = i.cur_efficiency * 100.f;
+            break;
         }
     }
 
