@@ -1877,15 +1877,13 @@ void ship::tick_all_components(float step_s)
         //auto available = get_available_capacities_vec();
         auto available = get_available_capacities_linear_vec();
 
-        for(component& c : entity_list)
-        //for(component_attribute* p_cattr : attributes[ship_component_elements::RESOURCE_PULLER])
+        const std::vector<int>& component_offsets = type_to_component_offsets[ship_component_elements::RESOURCE_PULLER];
+
+        for(int component_offset : component_offsets)
         {
-            if(!c.components[(int)ship_component_elements::RESOURCE_PULLER].present)
-                continue;
+            component& c = entity_list[component_offset];
 
             component_attribute& cattr = c.components[ship_component_elements::RESOURCE_PULLER];
-
-            //component_attribute& cattr = *p_cattr;//c.components[ship_component_elements::RESOURCE_PULLER];
 
             float resources_to_dispense = cattr.get_produced_amount(step_s);
 
@@ -1943,29 +1941,6 @@ void ship::tick_all_components(float step_s)
     ///based on how much is used. Straightforward, minimal hackiness
     ///we'll need to play it into storage somehow as well
     ///Ignore my brain when it says drain, is unncessary faff
-    /*for(auto& i : fully_merge)
-    {
-        if(i.produced_per_s <= FLOAT_BOUND || i.drained_per_s <= FLOAT_BOUND)
-        {
-            type++;
-            continue;
-        }
-
-        //float available_to_take_now = i.produced_per_s;
-        //float total_resource = i.produced_per_s + i.cur_amount;
-
-        //float valid_to_take_frac = available_to_take_now / total_resource;
-
-        ///so this is the overall proportion of whats to be drained vs what needs to be drained
-        //float frac = produced[i.first] / i.second;
-
-        float frac = i.drained_per_s / i.produced_per_s;
-
-        to_apply_prop[type] = frac;
-
-        type++;
-    }*/
-
     int fm_size = fully_merge.size();
     for(int type = 0; type < fm_size; type++)
     {
