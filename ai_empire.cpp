@@ -125,7 +125,9 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
     }
 
     const std::vector<orbital_system*>& systems = sm.systems;
+
     std::vector<orbital_system_descriptor> descriptor;
+    descriptor.reserve(systems.size());
 
     std::unordered_map<orbital_system*, int> system_to_desc;
 
@@ -217,6 +219,8 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 }
             }
 
+            float tech_power = sm->get_tech_adjusted_military_power();
+
             /*if(sm->majority_of_type(ship_type::MILITARY))
             {
                 std::cout << "hi\n";
@@ -237,19 +241,19 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
                 desc.contains_hostiles = true;
 
                 ///WARNING NEED TO WORK IN STEALTH
-                desc.hostiles_threat_rating += sm->get_tech_adjusted_military_power();
+                desc.hostiles_threat_rating += tech_power;
             }
 
-            desc.power_map[o->parent_empire] += sm->get_tech_adjusted_military_power();
+            desc.power_map[o->parent_empire] += tech_power;
 
             if(e != o->parent_empire && e->is_allied(o->parent_empire))
             {
-                desc.friendly_threat_rating += sm->get_tech_adjusted_military_power();
+                desc.friendly_threat_rating += tech_power;
             }
 
             if(o->parent_empire == e)
             {
-                desc.my_threat_rating += sm->get_tech_adjusted_military_power();
+                desc.my_threat_rating += tech_power;
             }
         }
 
