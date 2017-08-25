@@ -397,7 +397,11 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
                 float cur_hp = c.get_stored()[ship_component_element::HP];
                 float max_hp = c.get_stored_max()[ship_component_element::HP];
 
-                tooltip::add(to_string_with_enforced_variable_dp(cur_hp) + "/" + to_string_with_enforced_variable_dp(max_hp) + " HP");
+                std::string hp_str = to_string_with_enforced_variable_dp(cur_hp) + "/" + to_string_with_enforced_variable_dp(max_hp);
+
+                hp_str = obfuscate(hp_str, known_information < c.scanning_difficulty);
+
+                tooltip::add(hp_str + " HP");
             }
         }
     }
@@ -810,13 +814,15 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
     {
         s->highlight = true;
 
+        float available_information = viewing_empire->available_scanning_power_on(s, system_manage);
+
         ImGui::BeginTooltip();
 
         vec3f relations_col = viewing_empire->get_relations_colour(s->owned_by->parent_empire, true);
 
         std::string relations_str = viewing_empire->get_short_relations_str(s->owned_by->parent_empire);
 
-        std::string sname = s->name;
+        std::string sname = obfuscate(s->name, available_information < ship_info::ship_obfuscation_level);
 
         ImGui::TextColored(relations_str, relations_col);
 
@@ -849,7 +855,11 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
 
             ImGui::SameLine();
 
-            ImGui::Text((to_string_with_enforced_variable_dp(hp) + "/" + to_string_with_enforced_variable_dp(hp_max)).c_str());
+            std::string hp_str = to_string_with_enforced_variable_dp(hp) + "/" + to_string_with_enforced_variable_dp(hp_max);
+
+            hp_str = obfuscate(hp_str, available_information < ship_info::misc_resources_obfuscation_level);
+
+            ImGui::Text(hp_str);
         }
 
         ImGui::EndTooltip();
