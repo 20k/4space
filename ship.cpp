@@ -1987,7 +1987,12 @@ void ship::tick_all_components(float step_s)
             {
                 component_attribute& other = *current_set[jj];
 
-                float take_amount = frac * other.get_produced_amount(step_s) + extra;
+                float other_production = other.get_produced_amount(step_s);
+
+                if(other_production == 0)
+                    continue;
+
+                float take_amount = frac * other_production + extra;
 
                 ///for fractional drainage
                 if(frac > 1)
