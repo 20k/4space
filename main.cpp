@@ -627,9 +627,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             rm.resources[i.first].amount = i.second;
         }
 
-        std::string text = "(Scrap for resources)";
+        std::string text = "(Scrap Ship)";
 
-        ImGui::NeutralText(text.c_str());
+        ImGui::BadText(text.c_str());
 
         std::string rstr = rm.get_formatted_str(true);
 
@@ -638,16 +638,28 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             ImGui::SetTooltip(rstr.c_str());
         }
 
-        if(ImGui::IsItemClicked_Registered())
+        if(ImGui::IsItemClicked_Registered() && !s.confirming_scrap)
         {
-            ///destroy ship?
+            s.confirming_scrap = true;
+        }
 
-            for(auto& i : res)
+        if(s.confirming_scrap)
+        {
+            ImGui::BadText("(Are you sure?)");
+
+            if(ImGui::IsItemClicked())
             {
-                claiming_empire->add_resource(i.first, i.second);
-            }
+                s.confirming_scrap = false;
 
-            s.cleanup = true;
+                ///destroy ship?
+
+                for(auto& i : res)
+                {
+                    claiming_empire->add_resource(i.first, i.second);
+                }
+
+                s.cleanup = true;
+            }
         }
     }
 
