@@ -127,6 +127,8 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
     const std::vector<orbital_system*>& systems = sm.systems;
     std::vector<orbital_system_descriptor> descriptor;
 
+    std::unordered_map<orbital_system*, int> system_to_desc;
+
     int id = 0;
 
     for(orbital_system* os : systems)
@@ -251,34 +253,6 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             }
         }
 
-        for(orbital* o : e->owned)
-        {
-            if(o->type != orbital_info::FLEET)
-                continue;
-
-            auto fin = o->command_queue.get_warp_destination();
-
-            ship_manager* sm = (ship_manager*)o->data;
-
-            if(fin == os)
-            {
-                for(int i=0; i<ship_type::COUNT; i++)
-                {
-                    if(sm->majority_of_type((ship_type::types)i))
-                    {
-                        desc.num_ships_predicted[i]++;
-                        break;
-                    }
-                }
-            }
-
-            //if(sm->ai_controller.ai_state == ai_empire_info::DEFEND && fin == os)
-            if(fin == os)
-            {
-                desc.my_threat_rating += sm->get_tech_adjusted_military_power();
-            }
-        }
-
         //if(desc.contains_hostiles)
         /*if(fabs(desc.hostiles_threat_rating) > 0.1f)
         {
@@ -312,9 +286,39 @@ std::vector<orbital_system_descriptor> process_orbitals(system_manager& sm, empi
             }
         }*/
 
+        system_to_desc[os] = id;
+
         descriptor.push_back(desc);
 
         id++;
+    }
+
+    for(orbital* o : e->owned)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        auto fin = o->command_queue.get_warp_destination();
+
+        ship_manager* sm = (ship_manager*)o->data;
+
+        auto found_it = system_to_desc.find(fin);
+
+        if(found_it == system_to_desc.end())
+            continue;
+
+        orbital_system_descriptor& desc = descriptor[found_it->second];
+
+        for(int i=0; i<ship_type::COUNT; i++)
+        {
+            if(sm->majority_of_type((ship_type::types)i))
+            {
+                desc.num_ships_predicted[i]++;
+                break;
+            }
+        }
+
+        desc.my_threat_rating += sm->get_tech_adjusted_military_power();
     }
 
     //printf("end\n");
