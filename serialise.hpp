@@ -7,13 +7,15 @@
 #include <iostream>
 #include <map>
 
-struct serialise_data_helper
-{
-    static std::map<int32_t, std::map<uint64_t, void*>> owner_to_id_to_pointer;
-};
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
+
+
+struct serialise_data_helper
+{
+    static std::map<serialise_owner_type, std::map<serialise_data_type, void*>> owner_to_id_to_pointer;
+};
 
 //#define serialise_owner_type int32_t
 //#define serialise_data_type uint64_t
@@ -77,11 +79,11 @@ struct serialise_helper<T*>
         serialise_helper<serialise_owner_type> helper_owner_id;
         serialise_helper<serialise_data_type> helper1;
 
+        ///this is fairly expensive
+        serialise_data_helper::owner_to_id_to_pointer[v->owner_id][v->serialise_id] = v;
+
         helper_owner_id.add(v->owner_id, s, data);
         helper1.add(v->serialise_id, s, data);
-
-        //serialise_helper<T> helper2;
-        //helper2.add(*v, data);
 
         v->do_serialise(s, true);
     }
@@ -95,15 +97,17 @@ struct serialise_helper<T*>
         int32_t owner_id = helper_owner_id.get(s, internal_counter, data);
 
         serialise_helper<serialise_data_type> helper1;
-        uint64_t id = helper1.get(s, internal_counter, data);
+        uint64_t serialise_id = helper1.get(s, internal_counter, data);
 
-        T* ptr = (T*)serialise_data_helper::owner_to_id_to_pointer[owner_id][id];
+        T* ptr = (T*)serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id];
 
         bool was_nullptr = ptr == nullptr;
 
         if(was_nullptr)
         {
             ptr = new T();
+
+            serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id] = ptr;
         }
 
         serialise_helper<T> data_fetcher;
@@ -115,7 +119,7 @@ struct serialise_helper<T*>
         {
             ptr->handled_by_client = false;
             ptr->owned = false;
-            ptr->owner = owner_id;
+            ptr->owner_id = owner_id;
         }
 
         return ptr;
