@@ -105,6 +105,8 @@
 		<Unit filename="research.hpp" />
 		<Unit filename="resource_manager.cpp" />
 		<Unit filename="resource_manager.hpp" />
+		<Unit filename="serialise.cpp" />
+		<Unit filename="serialise.hpp" />
 		<Unit filename="ship.cpp" />
 		<Unit filename="ship.hpp" />
 		<Unit filename="ship_customiser.cpp" />

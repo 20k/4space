@@ -9,6 +9,7 @@
 #include "research.hpp"
 #include "ai_fleet.hpp"
 #include "ai_empire.hpp"
+#include "serialise.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -240,8 +241,6 @@ namespace component_tag
 
 using ship_component_element = ship_component_elements::types;
 
-struct component;
-
 ///tech level?
 ///use recharge time?
 ///need burst fire and group fire just because it looks sweet
@@ -321,41 +320,37 @@ std::map<ship_component_element, float> merge_diffs(std::map<ship_component_elem
 ///this is a ship entity for the moment.. but could likely describe a character as well
 ///float get_current_functionality
 ///maybe component attributes should not have a tech level, but components overall
-struct component
+struct component : serialisable
 {
-    /*component_attribute heat;
-    component_attribute energy;
-    component_attribute oxygen;
-    component_attribute scanning_power;
-    component_attribute engine_power;
-    component_attribute damage;
-    component_attribute */
-
     ship_component_elements::tech_type tech_type = ship_component_elements::NONE_TECH;
+    float current_size = 1;
+    float ship_size = 1;
+
+    std::string name = "";
+
+    std::vector<component_attribute> components;
+
+    std::vector<std::pair<component_tag::tag, float>> tag_list;
+
+    ///for ui stuff. Its better to keep this internally in case we add new components
+    bool clicked = false;
+
+    float scanning_difficulty = randf_s(0.f, 1.f);
+
+    bool skip_in_derelict_calculations = false;
+    bool repair_this_when_recrewing = false; ///when you recrew a ship, repair this component
+    float cost_mult = 1.f;
 
     void set_tech_type(int tt);
 
     float get_hp_frac();
-
-    float current_size = 1;
-    float ship_size = 1;
 
     void upgrade_size(float old_size, float new_size);
     void set_size(float new_size);
     void set_ship_size(float ship_size);
     component with_size(float new_size);
 
-    float scanning_difficulty = randf_s(0.f, 1.f);
-
-    std::string name = "";
-
     component();
-
-    std::vector<component_attribute> components;
-
-    //std::map<ship_component_element, component_attribute> components;
-    //std::map<component_tag::tag, float> tag_list;
-    std::vector<std::pair<component_tag::tag, float>> tag_list;
 
     inline
     bool has_element(const ship_component_element& type)
@@ -436,20 +431,14 @@ struct component
     research_category get_research_base_for_empire(empire* owner, empire* claiming_empire);
     research_category get_research_real_for_empire(empire* owner, empire* claiming_empire);
 
-    ///for ui stuff. Its better to keep this internally in case we add new components
-    bool clicked = false;
-
-    bool skip_in_derelict_calculations = false;
-    bool repair_this_when_recrewing = false; ///when you recrew a ship, repair this component
-
     ship_component_elements::types primary_attribute = ship_component_elements::NONE;
 
     ///does in * hp_cur / hp_max safely
     float safe_hp_frac_modify(float in);
 
-    float cost_mult = 1.f;
-
     bool test_if_can_use_in_ship_customisation = false;
+
+    void do_serialise(serialise& s, bool ser);
 };
 
 struct projectile;
@@ -470,7 +459,7 @@ namespace ship_info
     int attribute_offset = 0;
 };*/
 
-struct ship : positional
+struct ship : positional, serialisable
 {
     ship_type::types ai_fleet_type = ship_type::COUNT;
 
@@ -682,6 +671,8 @@ struct ship : positional
 
     float editor_size_storage = current_size;
 
+    //void do_serialise(serialise& s, bool ser);
+
     ///?
     //void fire();
 };
@@ -690,7 +681,7 @@ struct orbital_system;
 struct orbital;
 
 ///can be used as a fleet
-struct ship_manager
+struct ship_manager : serialisable
 {
     ai_fleet ai_controller;
 
@@ -795,12 +786,15 @@ struct ship_manager
 
     static int gid;
     int my_id = gid++;
+
+    ///need to differentiate disk and network serialisation
+    //void do_serialise(serialise& s, bool ser);
 };
 
 struct empire_manager;
 
 ///manages fleets
-struct fleet_manager
+struct fleet_manager : serialisable
 {
     std::vector<ship_manager*> fleets;
 
@@ -821,6 +815,8 @@ struct fleet_manager
     //void draw_ui(empire* viewing_empire, system_manager& system_manage);
 
     int internal_counter = 0;
+
+    //void do_serialise(serialise& s, bool ser);
 };
 
 #endif // SHIP_HPP_INCLUDED

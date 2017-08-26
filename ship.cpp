@@ -1697,6 +1697,20 @@ float component::safe_hp_frac_modify(float in)
     return in * (cur_val / max_val);
 }
 
+void component::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(cost_mult, ser);
+        s.handle_serialise(repair_this_when_recrewing, ser);
+        s.handle_serialise(skip_in_derelict_calculations, ser);
+        s.handle_serialise(scanning_difficulty, ser);
+        s.handle_serialise(clicked, ser);
+
+
+    }
+}
+
 ship ship::duplicate()
 {
     ship s = *this;

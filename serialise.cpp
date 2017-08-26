@@ -4,6 +4,7 @@
 
 uint64_t serialisable::gserialise_id;
 
+bool serialise_data_helper::disk_mode = true;
 std::map<int32_t, std::map<uint64_t, void*>> serialise_data_helper::owner_to_id_to_pointer;
 
 struct test_object : serialisable
@@ -115,5 +116,59 @@ void test_serialisation()
 
         assert(test->v1 == received->v1);
         assert(test->v2 == received->v2);
+    }
+
+    {
+        std::vector<test_object> objects;
+
+        objects.resize(5);
+
+        objects[1].v1 = 3434;
+
+        serialise ser;
+        ser.handle_serialise(objects, true);
+
+        std::vector<test_object> found;
+
+        ser.handle_serialise(found, false);
+
+        assert(found.size() == objects.size());
+
+        for(int i=0; i<found.size(); i++)
+        {
+            assert(objects[i].v1 == found[i].v1);
+            assert(objects[i].v2 == found[i].v2);
+        }
+    }
+
+    {
+        std::vector<test_object*> objects;
+        objects.resize(5);
+
+        for(int i=0; i<5; i++)
+        {
+            objects[i] = new test_object();
+        }
+
+        objects[2]->v1 = 993939;
+
+        serialise ser;
+        ser.handle_serialise(objects, true);
+
+        serialise_data_helper::owner_to_id_to_pointer.clear();
+
+        std::vector<test_object*> found;
+
+        ser.handle_serialise(found, false);
+
+        assert(found.size() == objects.size());
+
+        for(int i=0; i<found.size(); i++)
+        {
+            assert(objects[i]->v1 == found[i]->v1);
+            assert(objects[i]->v2 == found[i]->v2);
+
+            assert(found[i]->handled_by_client == false);
+        }
     }
 }

@@ -14,6 +14,8 @@ using serialise_data_type = uint64_t;
 
 struct serialise_data_helper
 {
+    static bool disk_mode;
+
     static std::map<serialise_owner_type, std::map<serialise_data_type, void*>> owner_to_id_to_pointer;
 };
 
@@ -46,7 +48,7 @@ struct serialise;
 template<typename T>
 struct serialise_helper
 {
-    void add(T v, serialise& s, std::vector<char>& data)
+    void add(const T& v, serialise& s, std::vector<char>& data)
     {
         char* pv = std::launder((char*)&v);
 
@@ -128,6 +130,51 @@ struct serialise_helper<T*>
     }
 };
 
+template<typename T>
+struct serialise_helper<std::vector<T>>
+{
+    void add(const std::vector<T>& v, serialise& s, std::vector<char>& data)
+    {
+        //char* pv = std::launder((char*)&v);
+
+        serialise_helper<int32_t> helper;
+        helper.add((int32_t)v.size(), s, data);
+
+        for(uint32_t i=0; i<v.size(); i++)
+        {
+            //data.push_back(v[i]);
+            serialise_helper<T> helper;
+            helper.add(v[i], s, data);
+        }
+    }
+
+    std::vector<T> get(serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        int prev = internal_counter;
+
+        serialise_helper<int32_t> helper;
+        int32_t length = helper.get(s, internal_counter, data);
+
+        if(internal_counter + length * sizeof(T) > (int)data.size())
+        {
+            std::cout << "Error, invalid bytefetch" << std::endl;
+
+            return std::vector<T>();
+        }
+
+        std::vector<T> ret;
+
+        for(int i=0; i<length; i++)
+        {
+            serialise_helper<T> type;
+
+            ret.push_back(type.get(s, internal_counter, data));
+        }
+
+        return ret;
+    }
+};
+
 struct serialise
 {
     std::vector<char> data;
@@ -135,7 +182,7 @@ struct serialise
     int internal_counter = 0;
 
     template<typename T>
-    void push_back(T v)
+    void push_back(const T& v)
     {
         serialise_helper<T> helper;
 
