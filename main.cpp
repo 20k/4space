@@ -710,7 +710,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
-    serialise ser;
+    /*serialise ser;
 
     ImGui::NeutralText("Save Ship");
 
@@ -734,8 +734,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         ser.handle_serialise(sp, false);
 
         s = sp->duplicate();
-    }
-
+    }*/
 
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems

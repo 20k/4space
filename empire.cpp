@@ -607,6 +607,9 @@ float empire::available_scanning_power_on(ship* s, system_manager& system_manage
 
     orbital_system* os = system_manage.get_by_element(sm);
 
+    ///if os == nullptr, no orbital is associated
+    ///ie bug bug bug
+
     float max_scanning_power = 0.f;
 
     for(orbital* o : os->orbitals)
@@ -628,6 +631,7 @@ float empire::available_scanning_power_on(ship* s, system_manager& system_manage
     return max_scanning_power;
 }
 
+///available scanning power on ship does this already, we're basically duplicating stuff
 float empire::available_scanning_power_on(ship_manager* sm, system_manager& system_manage)
 {
     if(sm == nullptr)
