@@ -478,7 +478,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(s.owned_by->parent_empire == player_empire && !s.owned_by->any_in_combat() && o != nullptr && o->in_friendly_territory_and_not_busy())
     {
-        ImGui::NeutralText("(Upgrade to latest Tech)");
 
         ship c_cpy = s;
 
@@ -506,16 +505,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             res_remaining[i.first] -= i.second;
         }
 
-        ///setting tech level currently does not have a cost associated with it
-        if(ImGui::IsItemClicked_Registered())
-        {
-            if(owner->can_fully_dispense(res_remaining))
-            {
-                owner->dispense_resources(res_remaining);
-
-                s.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
-            }
-        }
 
         resource_manager rm;
         rm.add(res_remaining);
@@ -525,16 +514,27 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             i.amount = -i.amount;
         }
 
-        if(ImGui::IsItemHovered())
-        {
-            std::string str = rm.get_formatted_str(true);
+        std::string str = rm.get_formatted_str(true);
 
-            if(str == "")
+        if(str != "")
+        {
+            ImGui::NeutralText("(Upgrade to latest Tech)");
+
+            ///setting tech level currently does not have a cost associated with it
+            if(ImGui::IsItemClicked_Registered())
             {
-                str = "Already meets or exceeds empire tech";
+                if(owner->can_fully_dispense(res_remaining))
+                {
+                    owner->dispense_resources(res_remaining);
+
+                    s.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
+                }
             }
 
-            ImGui::SetTooltip(str.c_str());
+            if(ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip(str.c_str());
+            }
         }
     }
 
