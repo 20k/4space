@@ -185,8 +185,6 @@ void try_mine(ship_manager* sm, orbital* my_o)
         if(c == nullptr)
             continue;
 
-        std::cout << "p6" << std::endl;
-
         //my_o->command_queue.cancel();
         my_o->command_queue.anchor(*free_asteroids.begin());
 

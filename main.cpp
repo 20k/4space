@@ -738,6 +738,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         //next_o->parent_system = o->parent_system;
         //next_o->parent_empire = o->parent_empire;
 
+        next_o->parent = o->parent_system->get_base();
         o->parent_system->make_in_place(next_o);
 
         std::cout << (next_o->type == orbital_info::FLEET) << std::endl;
@@ -751,7 +752,11 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         std::cout << o->data << " " << next_o->data << " " << next_o->data->ships[0]->owned_by << std::endl;
 
+        ///removing this fixes the crash
+        ///is next_o->data bad?
         fleet_manage.fleets.push_back(next_o->data);
+
+        //std::cout << fleet_manage.fleets.size() << std::endl;
 
         //s = sp->duplicate();
     }
