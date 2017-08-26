@@ -36,6 +36,8 @@ struct serialisable
     {
 
     }
+
+    virtual ~serialisable(){}
 };
 
 

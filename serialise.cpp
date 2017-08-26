@@ -16,6 +16,8 @@ struct test_object : serialisable
         s.handle_serialise(v1, ser);
         s.handle_serialise(v2, ser);
     }
+
+    virtual ~test_object(){}
 };
 
 void test_serialisation()
@@ -91,6 +93,27 @@ void test_serialisation()
     ///ok. Final test:
     ///Can we ping data from a to b, modify b, then ping it back to a
     {
+        test_object* test = new test_object;
 
+        serialise ser;
+        ser.handle_serialise(test, true);
+
+        serialise_data_helper::owner_to_id_to_pointer.clear();
+
+        test_object* received;
+        ser.handle_serialise(received, false);
+
+        received->v1 = 99;
+        received->v2 = 22;
+
+        serialise s2;
+        s2.handle_serialise(received, true);
+
+        serialise_data_helper::owner_to_id_to_pointer[test->owner_id][test->serialise_id] = test;
+
+        s2.handle_serialise(test, false);
+
+        assert(test->v1 == received->v1);
+        assert(test->v2 == received->v2);
     }
 }
