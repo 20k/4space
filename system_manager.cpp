@@ -1120,7 +1120,57 @@ bool orbital::in_friendly_territory()
 
 void orbital::do_serialise(serialise& s, bool ser)
 {
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(expanded_window_clicked, ser);
+        s.handle_serialise(force_draw_expanded_window, ser);
+        s.handle_serialise(current_num_harvesting, ser);
+        s.handle_serialise(last_num_harvesting, ser);
+        ///VIEWED_BY
+        ///CURRENTLY VIEWED BY
+        s.handle_serialise(last_viewed_position, ser);
+        s.handle_serialise(last_screen_pos, ser);
+        s.handle_serialise(in_anchor_ui_state, ser);
+        s.handle_serialise(being_decolonised, ser);
+        s.handle_serialise(decolonise_timer_s, ser);
+        s.handle_serialise(mining_target, ser);
+        s.handle_serialise(is_mining, ser);
+        s.handle_serialise(construction_ui_open, ser);
+        s.handle_serialise(can_construct_ships, ser);
+        s.handle_serialise(dialogue_open, ser);
+        s.handle_serialise(clicked, ser);
+        s.handle_serialise(has_quest_alert, ser);
+        ///PARENT_SYSTEM
+        ///PARENT EMPIRE
+        ///PRODUCED_RESOURCES_PS
+        s.handle_serialise(is_resource_object, ser);
+        s.handle_serialise(col, ser);
+        s.handle_serialise(vision_test_counter, ser);
+        s.handle_serialise(type, ser);
+        s.handle_serialise(parent, ser);
+        s.handle_serialise(rad, ser);
+        s.handle_serialise(orbital_length, ser);
+        s.handle_serialise(orbital_angle, ser);
+        s.handle_serialise(rotation, ser);
+        s.handle_serialise(rotation_velocity_ps, ser);
+        s.handle_serialise(universe_view_pos, ser);
+        s.handle_serialise(absolute_pos, ser);
+        s.handle_serialise(num_moons, ser);
 
+        s.handle_serialise(data, ser);
+        s.handle_serialise(render_type, ser);
+        s.handle_serialise(was_hovered, ser);
+        s.handle_serialise(was_highlight, ser);
+        s.handle_serialise(highlight, ser);
+        s.handle_serialise(internal_time_s, ser);
+        s.handle_serialise(resource_type_for_flavour_text, ser);
+        s.handle_serialise(star_temperature_fraction, ser);
+        s.handle_serialise(description, ser);
+        s.handle_serialise(name, ser);
+        s.handle_serialise(num_verts, ser);
+
+        ///OBJECT COMMAND QUEUE
+    }
 }
 
 /*void orbital::process_context_ui()
@@ -1191,14 +1241,40 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     }
 
     n->render_type = orbital_info::render_type[type];
+    n->num_verts = num_verts;
 
     if(n->render_type == 0)
     {
-        n->simple_renderable.init(num_verts, n->rad * 0.85f, n->rad * 1.2f);
+        n->simple_renderable.init(n->num_verts, n->rad * 0.85f, n->rad * 1.2f);
     }
     else if(n->render_type == 1)
     {
         n->sprite.load(orbital_info::load_strs[type]);
+    }
+
+    if(n->type == orbital_info::ASTEROID)
+    {
+        asteroids.push_back(n);
+    }
+    else
+    {
+        orbitals.push_back(n);
+    }
+
+    return n;
+}
+
+orbital* orbital_system::make_in_place(orbital* n)
+{
+    n->parent_system = this;
+
+    if(n->render_type == 0)
+    {
+        n->simple_renderable.init(n->num_verts, n->rad * 0.85f, n->rad * 1.2f);
+    }
+    else if(n->render_type == 1)
+    {
+        n->sprite.load(orbital_info::load_strs[n->type]);
     }
 
     if(n->type == orbital_info::ASTEROID)

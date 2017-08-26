@@ -710,15 +710,15 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
-    /*serialise ser;
+    serialise ser;
 
     ImGui::NeutralText("Save Ship");
 
     if(ImGui::IsItemClicked_Registered())
     {
-        ship* sp = &s;
+        //ship* sp = &s;
 
-        ser.handle_serialise(sp, true);
+        ser.handle_serialise(o, true);
 
         ser.save("Test.txt");
     }
@@ -727,14 +727,24 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(ImGui::IsItemClicked_Registered())
     {
-        ship* sp = &s;
+        //ship* sp = &s;
 
         ser.load("Test.txt");
 
-        ser.handle_serialise(sp, false);
+        orbital* next_o;
 
-        s = sp->duplicate();
-    }*/
+        ser.handle_serialise(next_o, false);
+
+        //next_o->parent_system = o->parent_system;
+        //next_o->parent_empire = o->parent_empire;
+
+        o->parent_system->make_in_place(next_o);
+
+        //o->parent_system->orbitals.push_back(next_o);
+        o->parent_empire->take_ownership(next_o);
+
+        //s = sp->duplicate();
+    }
 
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
