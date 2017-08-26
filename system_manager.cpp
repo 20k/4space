@@ -1293,7 +1293,7 @@ void orbital_system::destroy(orbital* o)
             orbitals.erase(orbitals.begin() + i);
             delete o;
             i--;
-            break;
+            return;
         }
     }
 
@@ -1304,7 +1304,7 @@ void orbital_system::destroy(orbital* o)
             asteroids.erase(asteroids.begin() + i);
             delete o;
             i--;
-            break;
+            return;
         }
     }
 }
@@ -1847,10 +1847,10 @@ resource_manager orbital_system::get_potential_resources()
     return resources;
 }
 
-void orbital_system::do_serialise(serialise& s, bool ser)
+/*void orbital_system::do_serialise(serialise& s, bool ser)
 {
 
-}
+}*/
 
 system_manager::system_manager()
 {

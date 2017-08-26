@@ -325,6 +325,10 @@ struct serialise_helper<T>
 };
 #endif
 
+///at the moment serialisation will cause essentially a chain reaction and serialise anything related to an object
+///ie pretty much everything
+///this is great for disk mode, but in network mode I need to make sure that it never serialises references unless
+///we actually need to
 struct serialise
 {
     std::vector<char> data;

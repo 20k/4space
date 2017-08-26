@@ -259,7 +259,7 @@ struct orbital : serialisable
 struct popup_info;
 struct fleet_manager;
 
-struct orbital_system : serialisable
+struct orbital_system
 {
     vec2f universe_pos = {0,0};
 
@@ -321,7 +321,7 @@ struct orbital_system : serialisable
     static int gid;
     int unique_id = gid++;
 
-    void do_serialise(serialise& s, bool ser) override;
+    //void do_serialise(serialise& s, bool ser) override;
 };
 
 struct popup_info;

@@ -4223,11 +4223,11 @@ void ship::do_serialise(serialise& s, bool ser)
     if(serialise_data_helper::disk_mode)
     {
         s.handle_serialise(editor_size_storage, ser);
-        s.handle_serialise(colonise_target, ser);
+        //s.handle_serialise(colonise_target, ser);
         s.handle_serialise(colonising, ser);
 
         ///PAST OWNERS
-        s.handle_serialise(original_owning_race, ser);
+        //s.handle_serialise(original_owning_race, ser);
         s.handle_serialise(crew_effectiveness, ser);
         s.handle_serialise(is_alien, ser);
 
@@ -5212,6 +5212,24 @@ float ship_manager::get_min_fuel_frac()
     }
 
     return fuel_frac;
+}
+
+void ship_manager::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(in_friendly_territory, ser);
+        s.handle_serialise(can_merge, ser);
+        s.handle_serialise(to_close_ui, ser);
+        s.handle_serialise(toggle_fleet_ui, ser);
+        s.handle_serialise(decolonising, ser);
+        s.handle_serialise(accumulated_dt, ser);
+        //s.handle_serialise(parent_empire, ser);
+        s.handle_serialise(auto_colonise, ser);
+        s.handle_serialise(auto_harvest_ore, ser);
+        s.handle_serialise(auto_resupply, ser);
+        s.handle_serialise(ships, ser);
+    }
 }
 
 ship_manager* fleet_manager::make_new()

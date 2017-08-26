@@ -788,7 +788,7 @@ struct ship_manager : serialisable
     int my_id = gid++;
 
     ///need to differentiate disk and network serialisation
-    //void do_serialise(serialise& s, bool ser);
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct empire_manager;
