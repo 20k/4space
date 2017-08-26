@@ -982,6 +982,11 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                     kk->display_ui = !kk->display_ui;
                 }
 
+                if(ImGui::IsItemHoveredRect())
+                {
+                    kk->highlight = true;
+                }
+
                 ImGui::SameLine();
 
                 ImGui::Text("|");
