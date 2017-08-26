@@ -716,7 +716,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(ImGui::IsItemClicked_Registered())
     {
-        ser.handle_serialise(s, true);
+        ship* sp = &s;
+
+        ser.handle_serialise(sp, true);
 
         ser.save("Test.txt");
     }
@@ -725,9 +727,13 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(ImGui::IsItemClicked_Registered())
     {
+        ship* sp = &s;
+
         ser.load("Test.txt");
 
-        ser.handle_serialise(s, false);
+        ser.handle_serialise(sp, false);
+
+        s = sp->duplicate();
     }
 
 
