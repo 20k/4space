@@ -609,9 +609,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
             parent_fleet->toggle_fleet_ui = false;
 
-            /*popup.going = false;
-            popup.elements.clear();*/
-
             popup.schedule_rem(o);
         }
     }
