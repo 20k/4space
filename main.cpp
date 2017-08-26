@@ -956,7 +956,12 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                     text_col = popup_colour_info::bad_ui_colour;
                 }
 
-                ImGui::Text(name.c_str());
+                ImGui::NeutralText(name.c_str());
+
+                if(ImGui::IsItemClicked_Registered())
+                {
+                    kk->display_ui = !kk->display_ui;
+                }
 
                 ImGui::SameLine();
 
@@ -965,11 +970,6 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 ImGui::SameLine();
 
                 ImGui::TextColored(damage_str, text_col);
-
-                if(ImGui::IsItemClicked_Registered())
-                {
-                    kk->display_ui = !kk->display_ui;
-                }
             }
         }
 
