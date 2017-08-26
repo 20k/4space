@@ -717,12 +717,16 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     if(ImGui::IsItemClicked_Registered())
     {
         ser.handle_serialise(s, true);
+
+        ser.save("Test.txt");
     }
 
     ImGui::NeutralText("Load Ship");
 
     if(ImGui::IsItemClicked_Registered())
     {
+        ser.load("Test.txt");
+
         ser.handle_serialise(s, false);
     }
 

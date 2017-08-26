@@ -202,4 +202,19 @@ void test_serialisation()
 
         assert(ret == name);
     }
+
+    {
+        std::vector<test_object*> objects;
+
+        objects.resize(5);
+
+        serialise ser;
+        ser.handle_serialise(objects, true);
+
+        std::vector<test_object*> test;
+
+        ser.handle_serialise(test, false);
+
+        assert(test.size() == objects.size());
+    }
 }

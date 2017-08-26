@@ -110,6 +110,17 @@ struct serialise_helper<T*>
         serialise_helper<serialise_owner_type> helper_owner_id;
         serialise_helper<serialise_data_type> helper1;
 
+        if(v == nullptr)
+        {
+            serialise_owner_type bad_owner = -1;
+            serialise_data_type bad_data = -1; ///overflows
+
+            helper_owner_id.add(bad_owner, s, data);
+            helper1.add(bad_data, s, data);
+
+            return;
+        }
+
         ///this is fairly expensive
         serialise_data_helper::owner_to_id_to_pointer[v->owner_id][v->serialise_id] = v;
 
@@ -126,13 +137,19 @@ struct serialise_helper<T*>
     {
         serialise_helper<serialise_owner_type> helper_owner_id;
 
-        int32_t owner_id;
+        serialise_owner_type owner_id;
         helper_owner_id.get(owner_id, s, internal_counter, data);
 
         serialise_helper<serialise_data_type> helper1;
 
-        uint64_t serialise_id;
+        serialise_data_type serialise_id;
         helper1.get(serialise_id, s, internal_counter, data);
+
+        if(owner_id == -1)
+        {
+            v = nullptr;
+            return;
+        }
 
         T* ptr = (T*)serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id];
 
