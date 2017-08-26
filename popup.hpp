@@ -138,6 +138,14 @@ struct popup_info
         return nullptr;
     }
 
+    void schedule_rem_all()
+    {
+        for(popup_element& elem : elements)
+        {
+            elem.schedule_erase = true;
+        }
+    }
+
     void schedule_rem(void* element)
     {
         for(popup_element& elem : elements)

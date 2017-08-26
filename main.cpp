@@ -146,6 +146,8 @@ void do_title_colouring_preparation(ship& s, empire* player_empire, float info_a
 ///claiming_empire for salvage, can be nullptr
 void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
 {
+    sf::Keyboard key;
+
     auto produced = s.get_produced_resources(1.f); ///modified by efficiency, ie real amount consumed
     auto consumed = s.get_needed_resources(1.f); ///not actually consumed, but requested
     auto stored = s.get_stored_resources();
@@ -461,6 +463,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         if(ImGui::IsItemClicked_Registered())
         {
+            if(!key.isKeyPressed(sf::Keyboard::LShift))
+                popup.schedule_rem_all();
+
             popup_element elem;
             elem.element = o;
 
@@ -604,8 +609,10 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
             parent_fleet->toggle_fleet_ui = false;
 
-            popup.going = false;
-            popup.elements.clear();
+            /*popup.going = false;
+            popup.elements.clear();*/
+
+            popup.schedule_rem(o);
         }
     }
 
