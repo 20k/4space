@@ -135,14 +135,11 @@ struct serialise_helper<std::vector<T>>
 {
     void add(const std::vector<T>& v, serialise& s, std::vector<char>& data)
     {
-        //char* pv = std::launder((char*)&v);
-
         serialise_helper<int32_t> helper;
         helper.add((int32_t)v.size(), s, data);
 
         for(uint32_t i=0; i<v.size(); i++)
         {
-            //data.push_back(v[i]);
             serialise_helper<T> helper;
             helper.add(v[i], s, data);
         }
