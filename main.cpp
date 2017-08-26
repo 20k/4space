@@ -1609,9 +1609,15 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                                     tooltip::add(ship_component_elements::display_strings[type] + " " + to_string_with_enforced_variable_dp(amount * 100.f, 1) + "%%");
                                 }
 
-                                if(!any)
+                                if(!any && s->can_use_warp_drives())
                                 {
                                     tooltip::add("Ready to warp");
+                                }
+
+                                ///Not a resource issue, ie damage
+                                if(!any && !s->can_use_warp_drives())
+                                {
+                                    tooltip::add("Cannot Warp");
                                 }
                             }
 
