@@ -1118,6 +1118,11 @@ bool orbital::in_friendly_territory()
     return (owning_system_empire == parent_empire || owning_system_empire->is_allied(parent_empire)) && in_good_state;
 }
 
+void orbital::do_serialise(serialise& s, bool ser)
+{
+
+}
+
 /*void orbital::process_context_ui()
 {
     if(type == orbital_info::FLEET)
@@ -1840,6 +1845,11 @@ resource_manager orbital_system::get_potential_resources()
     }
 
     return resources;
+}
+
+void orbital_system::do_serialise(serialise& s, bool ser)
+{
+
 }
 
 system_manager::system_manager()

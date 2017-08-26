@@ -6,6 +6,7 @@ uint64_t serialisable::gserialise_id;
 
 bool serialise_data_helper::disk_mode = true;
 std::map<int32_t, std::map<uint64_t, void*>> serialise_data_helper::owner_to_id_to_pointer;
+//int serialise_data_helper::pass = 0;
 
 struct test_object : serialisable
 {
@@ -71,7 +72,7 @@ void test_serialisation()
         assert(received != nullptr);
 
         assert(received->handled_by_client == false);
-        assert(received->owned == false);
+        assert(received->owned_by_host == false);
 
         assert(received->v1 == test->v1);
         assert(received->v2 == test->v2);
@@ -95,7 +96,7 @@ void test_serialisation()
         assert(received != nullptr);
 
         assert(received->handled_by_client == true);
-        assert(received->owned == true);
+        assert(received->owned_by_host == true);
 
         assert(received->v1 == test->v1);
         assert(received->v2 == test->v2);

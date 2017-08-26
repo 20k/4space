@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <deque>
+#include "serialise.hpp"
 
 struct orbital;
 struct orbital_system;
@@ -53,7 +54,7 @@ namespace relations_info
     constexpr vec3f alt_owned_col = {0.4f, 0.4f, 1.f};
 }
 
-struct empire
+struct empire : serialisable
 {
     ai_empire ai_empire_controller;
 
@@ -231,6 +232,8 @@ struct empire
     float accumulated_dt_s = 0.f;
 
     int frame_counter = 0;
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct fleet_manager;

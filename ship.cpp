@@ -4219,7 +4219,7 @@ void ship::set_size(float new_size)
 
 void ship::do_serialise(serialise& s, bool ser)
 {
-    #if 0
+    #if 1
     if(serialise_data_helper::disk_mode)
     {
         s.handle_serialise(editor_size_storage, ser);
@@ -4247,24 +4247,7 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(highlight, ser);
         s.handle_serialise(has_element, ser);
 
-        /*int32_t num_components = entity_list.size();
-
-        s.handle_serialise(num_components, ser);
-
-        if(ser)
-        {
-            for(int i=0; i<num_components; i++)
-            {
-                s.handle_serialise(&entity_list[i]);
-            }
-        }
-        else
-        {
-            for(int i=0; i<num_components; i++)
-            {
-
-            }
-        }*/
+        s.handle_serialise(entity_list, ser);
 
         s.handle_serialise(type_to_component_offsets, ser);
         s.handle_serialise(team, ser);

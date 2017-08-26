@@ -9,6 +9,7 @@
 #include <set>
 #include <unordered_map>
 #include "context_menu.hpp"
+#include "serialise.hpp"
 
 namespace orbital_info
 {
@@ -105,7 +106,7 @@ struct empire_manager;
 struct system_manager;
 struct orbital_system;
 
-struct orbital
+struct orbital : serialisable
 {
     object_command_queue command_queue;
 
@@ -251,12 +252,14 @@ struct orbital
     bool expanded_window_clicked = false;
 
     virtual ~orbital(){}
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct popup_info;
 struct fleet_manager;
 
-struct orbital_system
+struct orbital_system : serialisable
 {
     vec2f universe_pos = {0,0};
 
@@ -317,6 +320,8 @@ struct orbital_system
 
     static int gid;
     int unique_id = gid++;
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct popup_info;

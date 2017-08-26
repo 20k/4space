@@ -15,6 +15,7 @@ using serialise_data_type = uint64_t;
 struct serialise_data_helper
 {
     static bool disk_mode;
+    //static int pass;
 
     static std::map<serialise_owner_type, std::map<serialise_data_type, void*>> owner_to_id_to_pointer;
 };
@@ -29,7 +30,7 @@ struct serialisable
     static serialise_data_type gserialise_id;
     serialise_data_type serialise_id = gserialise_id++;
 
-    bool owned = true;
+    bool owned_by_host = true;
     serialise_owner_type owner_id = 0;
 
     bool handled_by_client = true;
@@ -151,7 +152,7 @@ struct serialise_helper<T*>
         if(was_nullptr)
         {
             ptr->handled_by_client = false;
-            ptr->owned = false;
+            ptr->owned_by_host = false;
             ptr->owner_id = owner_id;
         }
 

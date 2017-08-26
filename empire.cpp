@@ -1432,6 +1432,11 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
     //printf("INVADE\n");
 }
 
+void empire::do_serialise(serialise& s, bool ser)
+{
+
+}
+
 empire* empire_manager::make_new()
 {
     empire* e = new empire;
