@@ -20,6 +20,7 @@ struct test_object : serialisable
 
 void test_serialisation()
 {
+    ///test serialisation sanity for basic data types
     {
         uint64_t val = 5343424;
 
@@ -33,6 +34,7 @@ void test_serialisation()
         assert(rval == val);
     }
 
+    ///test receiving new data
     {
         test_object* test = new test_object;
 
@@ -60,6 +62,7 @@ void test_serialisation()
         delete received;
     }
 
+    ///test receiving data from/about ourselves to check ownership semantics work
     {
         test_object* test = new test_object;
 
@@ -82,5 +85,12 @@ void test_serialisation()
         assert(test == received);
 
         delete test;
+    }
+
+
+    ///ok. Final test:
+    ///Can we ping data from a to b, modify b, then ping it back to a
+    {
+
     }
 }
