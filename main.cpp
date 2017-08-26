@@ -710,6 +710,23 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
+    serialise ser;
+
+    ImGui::NeutralText("Save Ship");
+
+    if(ImGui::IsItemClicked_Registered())
+    {
+        ser.handle_serialise(s, true);
+    }
+
+    ImGui::NeutralText("Load Ship");
+
+    if(ImGui::IsItemClicked_Registered())
+    {
+        ser.handle_serialise(s, false);
+    }
+
+
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
