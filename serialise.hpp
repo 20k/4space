@@ -7,24 +7,42 @@
 #include <iostream>
 #include <map>
 
+struct serialise_data_helper
+{
+    static std::map<int32_t, std::map<uint64_t, void*>> owner_to_id_to_pointer;
+};
+
+using serialise_owner_type = int32_t;
+using serialise_data_type = uint64_t;
+
+//#define serialise_owner_type int32_t
+//#define serialise_data_type uint64_t
+
+struct serialise;
+
 struct serialisable
 {
-    static uint64_t gserialise_id;
-    uint64_t serialise_id = gserialise_id++;
+    static serialise_data_type gserialise_id;
+    serialise_data_type serialise_id = gserialise_id++;
 
     bool owned = true;
-    int32_t owner_id = 0;
+    serialise_owner_type owner_id = 0;
 
     bool handled_by_client = true;
 
-    ///recieving
-    static std::map<int32_t, std::map<uint64_t, void*>> owner_to_id_to_pointer;
+    virtual void do_serialise(serialise& s, bool ser)
+    {
+
+    }
 };
+
+
+struct serialise;
 
 template<typename T>
 struct serialise_helper
 {
-    void add(T v, std::vector<char>& data)
+    void add(T v, serialise& s, std::vector<char>& data)
     {
         char* pv = std::launder((char*)&v);
 
@@ -34,7 +52,7 @@ struct serialise_helper
         }
     }
 
-    T get(int& internal_counter, std::vector<char>& data)
+    T get(serialise& s, int& internal_counter, std::vector<char>& data)
     {
         int prev = internal_counter;
 
@@ -54,33 +72,32 @@ struct serialise_helper
 template<typename T>
 struct serialise_helper<T*>
 {
-    void add(T* v, std::vector<char>& data)
+    void add(T* v, serialise& s, std::vector<char>& data)
     {
-        serialise_helper<decltype(serialisable::owner_id)> helper_owner_id;
-        serialise_helper<decltype(serialisable::serialise_id)> helper1;
+        serialise_helper<serialise_owner_type> helper_owner_id;
+        serialise_helper<serialise_data_type> helper1;
 
-        helper_owner_id.add(v->owner_id, data);
-        helper1.add(v->serialise_id, data);
+        helper_owner_id.add(v->owner_id, s, data);
+        helper1.add(v->serialise_id, s, data);
 
+        //serialise_helper<T> helper2;
+        //helper2.add(*v, data);
 
-        serialise_helper<T> helper2;
-        helper2.add(*v, data);
+        v->do_serialise(s, true);
     }
 
     ///ok. So. we're specialsied on a pointer which means we're requesting a pointer
     ///but in reality when we serialise, we're going to get our 64bit id followed by the data of the pointer
 
-    T* get(int& internal_counter, std::vector<char>& data)
+    T* get(serialise& s, int& internal_counter, std::vector<char>& data)
     {
-        serialise_helper<decltype(serialisable::owner_id)> helper_owner_id;
-        int32_t owner_id = helper_owner_id.get(internal_counter, data);
+        serialise_helper<serialise_owner_type> helper_owner_id;
+        int32_t owner_id = helper_owner_id.get(s, internal_counter, data);
 
-        serialise_helper<decltype(serialisable::serialise_id)> helper1;
-        uint64_t id = helper1.get(internal_counter, data);
+        serialise_helper<serialise_data_type> helper1;
+        uint64_t id = helper1.get(s, internal_counter, data);
 
-        //T* ptr = (T*)serialisable::id_to_pointer[id];
-
-        T* ptr = (T*)serialisable::owner_to_id_to_pointer[owner_id][id];
+        T* ptr = (T*)serialise_data_helper::owner_to_id_to_pointer[owner_id][id];
 
         bool was_nullptr = ptr == nullptr;
 
@@ -90,7 +107,9 @@ struct serialise_helper<T*>
         }
 
         serialise_helper<T> data_fetcher;
-        *ptr = data_fetcher.get(internal_counter, data);
+        //*ptr = data_fetcher.get(internal_counter, data);
+
+        ptr->do_serialise(s, false);
 
         if(was_nullptr)
         {
@@ -114,7 +133,7 @@ struct serialise
     {
         serialise_helper<T> helper;
 
-        helper.add(v, data);
+        helper.add(v, *this, data);
     }
 
     ///if pointer, look up in pointer map
@@ -123,13 +142,13 @@ struct serialise
     {
         serialise_helper<T> helper;
 
-        return helper.get(internal_counter, data);
+        return helper.get(*this, internal_counter, data);
     }
 
     template<typename T>
-    void handle_serialise(T& v, bool serialise)
+    void handle_serialise(T& v, bool ser)
     {
-        if(serialise)
+        if(ser)
         {
             push_back(v);
         }
@@ -145,5 +164,6 @@ struct serialise
     }
 };
 
+void test_serialisation();
 
 #endif // SERIALISE_HPP_INCLUDED
