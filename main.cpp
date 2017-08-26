@@ -427,10 +427,12 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     float scanning_power = player_empire->available_scanning_power_on(&s, system_manage);
 
-    std::string scanning_str = "Scanning Power: " + std::to_string((int)(scanning_power * 100.f)) + "%%";
+    if(scanning_power < 1)
+    {
+        std::string scanning_str = "Scanning Power: " + std::to_string((int)(scanning_power * 100.f)) + "%%";
 
-    ImGui::Text(scanning_str.c_str());
-
+        ImGui::Text(scanning_str.c_str());
+    }
 
     float research_left = s.research_left_from_crewing.units_to_currency(false);
 
