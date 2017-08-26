@@ -8,6 +8,7 @@
 #include <map>
 #include <utility>
 #include <type_traits>
+#include <fstream>
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
@@ -351,6 +352,36 @@ struct serialise
     bool finished_deserialising()
     {
         return internal_counter >= (int)data.size();
+    }
+
+    void save(const std::string& file)
+    {
+        if(data.size() == 0)
+            return;
+
+        auto myfile = std::fstream("save.game", std::ios::out | std::ios::binary);
+        myfile.write((char*)&data[0], (int)data.size());
+        myfile.close();
+    }
+
+    void load(const std::string& file)
+    {
+        internal_counter = 0;
+
+        auto myfile = std::fstream("save.game", std::ios::in | std::ios::out | std::ios::binary);
+
+        myfile.seekg (0, myfile.end);
+        int length = myfile.tellg();
+        myfile.seekg (0, myfile.beg);
+
+        data.resize(length);
+
+        if(length == 0)
+            return;
+
+        data.resize(length);
+
+        myfile.read(data.data(), length);
     }
 };
 
