@@ -2603,6 +2603,8 @@ int main()
 
     default_ships_list = get_default_ships_list();
 
+    test_serialisation();
+
     srand(102);
 
     randf_s();
