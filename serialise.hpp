@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <iostream>
 #include <map>
+#include <utility>
+#include <type_traits>
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
@@ -42,9 +44,9 @@ struct serialisable
 
 struct serialise;
 
-template<typename T>
+template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value>>
 inline
-void lowest_add(const T& v, serialise& s, std::vector<char>& data)
+void lowest_add(T& v, serialise& s, std::vector<char>& data)
 {
     char* pv = std::launder((char*)&v);
 
@@ -54,7 +56,7 @@ void lowest_add(const T& v, serialise& s, std::vector<char>& data)
     }
 }
 
-template<typename T>
+template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value>>
 inline
 void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
 {
@@ -87,14 +89,14 @@ void lowest_get(serialisable& v, serialise& s, int& internal_counter, std::vecto
 template<typename T>
 struct serialise_helper
 {
-    void add(const T& v, serialise& s, std::vector<char>& data)
+    void add(T& v, serialise& s, std::vector<char>& data)
     {
-        lowest_add<T>(v, s, data);
+        lowest_add(v, s, data);
     }
 
     void get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
     {
-        lowest_get<T>(v, s, internal_counter, data);
+        lowest_get(v, s, internal_counter, data);
     }
 };
 
@@ -160,10 +162,12 @@ struct serialise_helper<T*>
 template<typename T>
 struct serialise_helper<std::vector<T>>
 {
-    void add(const std::vector<T>& v, serialise& s, std::vector<char>& data)
+    void add(std::vector<T>& v, serialise& s, std::vector<char>& data)
     {
         serialise_helper<int32_t> helper;
-        helper.add((int32_t)v.size(), s, data);
+
+        int32_t len = v.size();
+        helper.add(len, s, data);
 
         for(uint32_t i=0; i<v.size(); i++)
         {
@@ -178,12 +182,12 @@ struct serialise_helper<std::vector<T>>
         int32_t length;
         helper.get(length, s, internal_counter, data);
 
-        if(internal_counter + length * sizeof(T) > (int)data.size())
+        /*if(internal_counter + length * sizeof(T) > (int)data.size())
         {
             std::cout << "Error, invalid bytefetch" << std::endl;
 
             v = std::vector<T>();
-        }
+        }*/
 
         for(int i=0; i<length; i++)
         {
@@ -200,10 +204,11 @@ struct serialise_helper<std::vector<T>>
 template<>
 struct serialise_helper<std::string>
 {
-    void add(const std::string& v, serialise& s, std::vector<char>& data)
+    void add(std::string& v, serialise& s, std::vector<char>& data)
     {
         serialise_helper<int32_t> helper;
-        helper.add((int32_t)v.size(), s, data);
+        int32_t len = v.size();
+        helper.add(len, s, data);
 
         for(uint32_t i=0; i<v.size(); i++)
         {
@@ -301,7 +306,7 @@ struct serialise
     int internal_counter = 0;
 
     template<typename T>
-    void push_back(const T& v)
+    void push_back(T& v)
     {
         serialise_helper<T> helper;
 

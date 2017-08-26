@@ -37,6 +37,21 @@ void test_serialisation()
         assert(rval == val);
     }
 
+    {
+        test_object obj;
+
+        obj.v1 = -99;
+
+        serialise ser;
+        ser.handle_serialise(obj, true);
+
+        test_object ret;
+
+        ser.handle_serialise(ret, false);
+
+        assert(obj.v1 == ret.v1);
+    }
+
     ///test receiving new data
     {
         test_object* test = new test_object;
