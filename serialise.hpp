@@ -167,7 +167,7 @@ struct serialise_helper<T*>
             serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id] = ptr;
         }
 
-        serialise_helper<T> data_fetcher;
+        //serialise_helper<T> data_fetcher;
         //*ptr = data_fetcher.get(internal_counter, data);
 
 
