@@ -634,7 +634,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         if(ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip(rstr.c_str());
+            tooltip::add(rstr);
         }
 
         if(ImGui::IsItemClicked_Registered() && !s.confirming_scrap)
@@ -665,6 +665,22 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     if(s.owned_by != nullptr && s.owned_by->parent_empire == player_empire && o != nullptr && o->in_friendly_territory_and_not_busy())
     {
         ImGui::BadText("(Scrap Ship)");
+
+        auto res = s.resources_received_when_scrapped();
+
+        resource_manager rm;
+
+        for(auto& i : res)
+        {
+            rm.resources[i.first].amount = i.second;
+        }
+
+        std::string rstr = rm.get_formatted_str(true);
+
+        if(ImGui::IsItemHovered())
+        {
+            tooltip::add(rstr);
+        }
 
         if(ImGui::IsItemClicked_Registered())
         {
