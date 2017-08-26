@@ -238,7 +238,7 @@ void ship_component_elements::generate_element_infos()
     ei[MASS_ANCHOR].research_type = research_info::MATERIALS;
     ei[MASS_ANCHOR].combat_view_if_damaged = false;
 
-    ei[ORE_HARVESTER].display_name = "Ore Harvester";
+    ei[ORE_HARVESTER].display_name = "Ore Miner";
     ei[ORE_HARVESTER].research_type = research_info::MATERIALS;
     ei[ORE_HARVESTER].combat_view_if_damaged = false;
 

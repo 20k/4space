@@ -453,14 +453,14 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }
     ///have a recovery cost display
 
-    if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr)
+    orbital* o = system_manage.get_by_element_orbital(s.owned_by);
+
+    if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr && popup.fetch(o) == nullptr)
     {
         ImGui::NeutralText("(Select Fleet)");
 
         if(ImGui::IsItemClicked_Registered())
         {
-            orbital* o = system_manage.get_by_element_orbital(s.owned_by);
-
             popup_element elem;
             elem.element = o;
 
@@ -476,11 +476,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
-    orbital* o = system_manage.get_by_element_orbital(s.owned_by);
-
     if(s.owned_by->parent_empire == player_empire && !s.owned_by->any_in_combat() && o != nullptr && o->in_friendly_territory_and_not_busy())
     {
-
         ship c_cpy = s;
 
         if(s.owned_by->parent_empire != nullptr)
