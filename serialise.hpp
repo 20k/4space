@@ -147,8 +147,6 @@ struct serialise_helper<std::vector<T>>
 
     std::vector<T> get(serialise& s, int& internal_counter, std::vector<char>& data)
     {
-        int prev = internal_counter;
-
         serialise_helper<int32_t> helper;
         int32_t length = helper.get(s, internal_counter, data);
 
@@ -164,6 +162,46 @@ struct serialise_helper<std::vector<T>>
         for(int i=0; i<length; i++)
         {
             serialise_helper<T> type;
+
+            ret.push_back(type.get(s, internal_counter, data));
+        }
+
+        return ret;
+    }
+};
+
+template<>
+struct serialise_helper<std::string>
+{
+    void add(const std::string& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        helper.add((int32_t)v.size(), s, data);
+
+        for(uint32_t i=0; i<v.size(); i++)
+        {
+            serialise_helper<decltype(v[i])> helper;
+            helper.add(v[i], s, data);
+        }
+    }
+
+    std::string get(serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        int32_t length = helper.get(s, internal_counter, data);
+
+        if(internal_counter + length * sizeof(char) > (int)data.size())
+        {
+            std::cout << "Error, invalid bytefetch" << std::endl;
+
+            return std::string();
+        }
+
+        std::string ret;
+
+        for(int i=0; i<length; i++)
+        {
+            serialise_helper<char> type;
 
             ret.push_back(type.get(s, internal_counter, data));
         }

@@ -173,4 +173,17 @@ void test_serialisation()
             delete found[i];
         }
     }
+
+    {
+        std::string name = "oooh weee\ndfdf0";
+
+        serialise ser;
+        ser.handle_serialise(name, true);
+
+        std::string ret;
+
+        ser.handle_serialise(ret, false);
+
+        assert(ret == name);
+    }
 }
