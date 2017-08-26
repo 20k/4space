@@ -7,10 +7,8 @@
 #include <iostream>
 #include <map>
 
-
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
-
 
 struct serialise_data_helper
 {
@@ -42,36 +40,61 @@ struct serialisable
     virtual ~serialisable(){}
 };
 
-
 struct serialise;
+
+template<typename T>
+inline
+void lowest_add(const T& v, serialise& s, std::vector<char>& data)
+{
+    char* pv = std::launder((char*)&v);
+
+    for(uint32_t i=0; i<sizeof(T); i++)
+    {
+        data.push_back(pv[i]);
+    }
+}
+
+template<typename T>
+inline
+void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
+{
+    int prev = internal_counter;
+
+    internal_counter += sizeof(T);
+
+    if(internal_counter > (int)data.size())
+    {
+        std::cout << "Error, invalid bytefetch" << std::endl;
+
+        v = T();
+    }
+
+    v = *std::launder((T*)&data[prev]);
+}
+
+inline
+void lowest_add(serialisable& v, serialise& s, std::vector<char>& data)
+{
+    v.do_serialise(s, true);
+}
+
+inline
+void lowest_get(serialisable& v, serialise& s, int& internal_counter, std::vector<char>& data)
+{
+    v.do_serialise(s, false);
+}
 
 template<typename T>
 struct serialise_helper
 {
     void add(const T& v, serialise& s, std::vector<char>& data)
     {
-        char* pv = std::launder((char*)&v);
-
-        for(uint32_t i=0; i<sizeof(T); i++)
-        {
-            data.push_back(pv[i]);
-        }
+        lowest_add<T>(v, s, data);
     }
 
-    T get(serialise& s, int& internal_counter, std::vector<char>& data)
+    void get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
     {
-        int prev = internal_counter;
-
-        internal_counter += sizeof(T);
-
-        if(internal_counter > (int)data.size())
-        {
-            std::cout << "Error, invalid bytefetch" << std::endl;
-
-            return T();
-        }
-
-        return *std::launder((T*)&data[prev]);
+        lowest_get<T>(v, s, internal_counter, data);
     }
 };
 
@@ -95,13 +118,17 @@ struct serialise_helper<T*>
     ///ok. So. we're specialsied on a pointer which means we're requesting a pointer
     ///but in reality when we serialise, we're going to get our 64bit id followed by the data of the pointer
 
-    T* get(serialise& s, int& internal_counter, std::vector<char>& data)
+    void get(T*& v, serialise& s, int& internal_counter, std::vector<char>& data)
     {
         serialise_helper<serialise_owner_type> helper_owner_id;
-        int32_t owner_id = helper_owner_id.get(s, internal_counter, data);
+
+        int32_t owner_id;
+        helper_owner_id.get(owner_id, s, internal_counter, data);
 
         serialise_helper<serialise_data_type> helper1;
-        uint64_t serialise_id = helper1.get(s, internal_counter, data);
+
+        uint64_t serialise_id;
+        helper1.get(serialise_id, s, internal_counter, data);
 
         T* ptr = (T*)serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id];
 
@@ -126,7 +153,7 @@ struct serialise_helper<T*>
             ptr->owner_id = owner_id;
         }
 
-        return ptr;
+        v = ptr;
     }
 };
 
@@ -145,28 +172,28 @@ struct serialise_helper<std::vector<T>>
         }
     }
 
-    std::vector<T> get(serialise& s, int& internal_counter, std::vector<char>& data)
+    void get(std::vector<T>& v, serialise& s, int& internal_counter, std::vector<char>& data)
     {
         serialise_helper<int32_t> helper;
-        int32_t length = helper.get(s, internal_counter, data);
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
 
         if(internal_counter + length * sizeof(T) > (int)data.size())
         {
             std::cout << "Error, invalid bytefetch" << std::endl;
 
-            return std::vector<T>();
+            v = std::vector<T>();
         }
-
-        std::vector<T> ret;
 
         for(int i=0; i<length; i++)
         {
             serialise_helper<T> type;
 
-            ret.push_back(type.get(s, internal_counter, data));
-        }
+            T t;
+            type.get(t, s, internal_counter, data);
 
-        return ret;
+            v.push_back(t);
+        }
     }
 };
 
@@ -185,7 +212,63 @@ struct serialise_helper<std::string>
         }
     }
 
-    std::string get(serialise& s, int& internal_counter, std::vector<char>& data)
+    void get(std::string& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
+
+        if(internal_counter + length * sizeof(char) > (int)data.size())
+        {
+            std::cout << "Error, invalid bytefetch" << std::endl;
+
+            v = std::string();
+        }
+
+        for(int i=0; i<length; i++)
+        {
+            serialise_helper<char> type;
+
+            char c;
+            type.get(c, s, internal_counter, data);
+
+            v.push_back(c);
+        }
+    }
+};
+
+#if 0
+template<typename T>
+struct serialise_helper<T>
+{
+    /*void add(const T& v, serialise& s)
+    {
+        v.do_serialise(s, true);
+    }
+
+    void get(const T& v, serialise& s)
+    {
+        v.do_serialise(s, false);
+    }*/
+
+    /*void do_method(T& v, serialise& s, bool ser)
+    {
+        v.do_serialise(s, ser);
+    }*/
+
+    void add(const std::string& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        helper.add((int32_t)v.size(), s, data);
+
+        for(uint32_t i=0; i<v.size(); i++)
+        {
+            serialise_helper<decltype(v[i])> helper;
+            helper.add(v[i], s, data);
+        }
+    }
+
+    T get(serialise& s, int& internal_counter, std::vector<char>& data)
     {
         serialise_helper<int32_t> helper;
         int32_t length = helper.get(s, internal_counter, data);
@@ -209,6 +292,7 @@ struct serialise_helper<std::string>
         return ret;
     }
 };
+#endif
 
 struct serialise
 {
@@ -230,7 +314,11 @@ struct serialise
     {
         serialise_helper<T> helper;
 
-        return helper.get(*this, internal_counter, data);
+        T val;
+
+        helper.get(val, *this, internal_counter, data);
+
+        return val;
     }
 
     template<typename T>
@@ -245,6 +333,14 @@ struct serialise
             v = get<T>();
         }
     }
+
+    /*template<typename T>
+    void handle_has_method(T& v, bool ser)
+    {
+        serialise_helper_has_method<T> helper;
+
+        helper.do_method(v, *this, ser);
+    }*/
 
     bool finished_deserialising()
     {

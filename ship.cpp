@@ -4217,6 +4217,63 @@ void ship::set_size(float new_size)
     current_size = new_size;
 }
 
+void ship::do_serialise(serialise& s, bool ser)
+{
+    #if 0
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(editor_size_storage, ser);
+        s.handle_serialise(colonise_target, ser);
+        s.handle_serialise(colonising, ser);
+
+        ///PAST OWNERS
+        s.handle_serialise(original_owning_race, ser);
+        s.handle_serialise(crew_effectiveness, ser);
+        s.handle_serialise(is_alien, ser);
+
+        ///RESEARCH
+        s.handle_serialise(cleanup, ser);
+        s.handle_serialise(is_fully_disabled, ser);
+        s.handle_serialise(currently_in_combat, ser);
+
+        s.handle_serialise(currently_in_combat, ser);
+        s.handle_serialise(time_in_combat_s, ser);
+        s.handle_serialise(is_disengaging, ser);
+        s.handle_serialise(disengage_clock_s, ser);
+        s.handle_serialise(display_weapon, ser);
+        s.handle_serialise(display_popout, ser);
+        s.handle_serialise(display_ui, ser);
+        s.handle_serialise(owned_by, ser);
+        s.handle_serialise(highlight, ser);
+        s.handle_serialise(has_element, ser);
+
+        /*int32_t num_components = entity_list.size();
+
+        s.handle_serialise(num_components, ser);
+
+        if(ser)
+        {
+            for(int i=0; i<num_components; i++)
+            {
+                s.handle_serialise(&entity_list[i]);
+            }
+        }
+        else
+        {
+            for(int i=0; i<num_components; i++)
+            {
+
+            }
+        }*/
+
+        s.handle_serialise(type_to_component_offsets, ser);
+        s.handle_serialise(team, ser);
+        s.handle_serialise(name, ser);
+        s.handle_serialise(ai_fleet_type, ser);
+    }
+    #endif
+}
+
 /*ship* ship_manager::make_new(int team)
 {
     ship* s = new ship;

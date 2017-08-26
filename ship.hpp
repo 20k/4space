@@ -671,7 +671,7 @@ struct ship : positional, serialisable
 
     float editor_size_storage = current_size;
 
-    //void do_serialise(serialise& s, bool ser);
+    void do_serialise(serialise& s, bool ser);
 
     ///?
     //void fire();
