@@ -121,13 +121,18 @@ struct serialise_helper<T*>
             return;
         }
 
+        ///we need to clear this every disk save atm
+        auto last_ptr = serialise_data_helper::owner_to_id_to_pointer[v->owner_id][v->serialise_id];
+
         ///this is fairly expensive
         serialise_data_helper::owner_to_id_to_pointer[v->owner_id][v->serialise_id] = v;
 
         helper_owner_id.add(v->owner_id, s, data);
         helper1.add(v->serialise_id, s, data);
 
-        v->do_serialise(s, true);
+        ///we're writing out this element for the first time
+        if(last_ptr == nullptr)
+            v->do_serialise(s, true);
     }
 
     ///ok. So. we're specialsied on a pointer which means we're requesting a pointer
@@ -165,10 +170,12 @@ struct serialise_helper<T*>
         serialise_helper<T> data_fetcher;
         //*ptr = data_fetcher.get(internal_counter, data);
 
-        ptr->do_serialise(s, false);
 
         if(was_nullptr)
         {
+            ///we're reading this element for the first time
+            ptr->do_serialise(s, false);
+
             ptr->handled_by_client = false;
             ptr->owned_by_host = false;
             ptr->owner_id = owner_id;
@@ -371,8 +378,12 @@ struct serialise
         return internal_counter >= (int)data.size();
     }
 
+    ///need to use differetn serialise_data_helper::owner_to_id_to_pointer.clear() strategy for network
+    ///and disk mode. Ie two separate tables
     void save(const std::string& file)
     {
+        serialise_data_helper::owner_to_id_to_pointer.clear();
+
         if(data.size() == 0)
             return;
 
@@ -383,6 +394,8 @@ struct serialise
 
     void load(const std::string& file)
     {
+        serialise_data_helper::owner_to_id_to_pointer.clear();
+
         internal_counter = 0;
 
         auto myfile = std::fstream("save.game", std::ios::in | std::ios::out | std::ios::binary);
