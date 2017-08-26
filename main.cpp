@@ -740,8 +740,18 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         o->parent_system->make_in_place(next_o);
 
+        std::cout << (next_o->type == orbital_info::FLEET) << std::endl;
+
         //o->parent_system->orbitals.push_back(next_o);
         o->parent_empire->take_ownership(next_o);
+        o->parent_empire->take_ownership(next_o->data);
+        next_o->command_queue.cancel();
+
+        std::cout << (o->parent_empire->owns(next_o)) << std::endl;
+
+        std::cout << o->data << " " << next_o->data << " " << next_o->data->ships[0]->owned_by << std::endl;
+
+        fleet_manage.fleets.push_back(next_o->data);
 
         //s = sp->duplicate();
     }
@@ -2666,6 +2676,10 @@ int main()
     player_empire->resources.resources[resource::HYDROGEN].amount = 8000.f;
     player_empire->resources.resources[resource::OXYGEN].amount = 8000.f;
 
+    fleet_manager fleet_manage;
+
+    #if 0
+
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
     hostile_empire->has_ai = true;
@@ -2694,7 +2708,6 @@ int main()
     ///this is fine. This is a global thing, the highest level of storage for FLEETS of ships
     ///FLEEEEETS
     ///Should have named this something better
-    fleet_manager fleet_manage;
 
     ship_manager* fleet1 = fleet_manage.make_new();
     ship_manager* fleet2 = fleet_manage.make_new();
@@ -2727,6 +2740,8 @@ int main()
 
     scout_ship->name = "SS Scout";
     //scout_ship2->name = "SS Scout2";
+
+    #endif
 
     /*test_ship.tick_all_components(1.f);
     test_ship.tick_all_components(1.f);
@@ -2784,6 +2799,7 @@ int main()
     planet->orbital_length = 150.f;
     planet->rotation_velocity_ps = 2*M_PI / 200.f;
 
+    #if 0
     orbital* ofleet = base->make_new(orbital_info::FLEET, 5.f);
 
     ofleet->orbital_angle = M_PI/13.f;
@@ -2797,6 +2813,7 @@ int main()
     ofleet2->orbital_length = randf_s(50.f, 300.f);
     ofleet2->parent = sun;
     ofleet2->data = fleet3;
+    #endif
 
     orbital* tplanet = base->make_new(orbital_info::PLANET, 3.f);
     tplanet->orbital_length = 50.f;
@@ -2814,13 +2831,16 @@ int main()
 
 
     player_empire->take_ownership_of_all(base);
+    #if 0
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
 
     player_empire->take_ownership(ofleet);
     player_empire->take_ownership(ofleet2);
+    #endif
     //player_empire->take_ownership(fleet5);
 
+    #if 0
     orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
     ohostile_fleet->orbital_length = 250;
@@ -2841,11 +2861,13 @@ int main()
     hostile_empire->take_ownership(oderelict_fleet);
 
     derelict_ship->randomise_make_derelict();
+    #endif
 
 
     //orbital_system* sys_2 = system_manage.make_new();
     //sys_2->generate_random_system(3, 100, 3, 5);
 
+    #if 0
 
     empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
     e2->take_ownership_of_all(sys_3);
@@ -2887,6 +2909,7 @@ int main()
 
     empire_manage.birth_empires_random(fleet_manage, system_manage, 0.3f);
     empire_manage.birth_empires_without_ownership(fleet_manage, system_manage);
+    #endif
 
     system_manage.set_viewed_system(base);
 
@@ -2896,6 +2919,7 @@ int main()
 
     all_events_manager all_events;
 
+    #if 0
     game_event_manager* test_event = all_events.make_new(game_event_info::ANCIENT_PRECURSOR, tplanet, fleet_manage, system_manage);
 
     test_event->set_faction(derelict_empire);
@@ -2903,7 +2927,7 @@ int main()
     game_event_manager* test_event2 = all_events.make_new(game_event_info::LONE_DERELICT, sun, fleet_manage, system_manage);
 
     test_event2->set_faction(derelict_empire);
-
+    #endif
 
     ///If empire colours are getting messed up on loading from a file (eventually) itll be this
     empire_manage.assign_colours_non_randomly();
@@ -3239,6 +3263,11 @@ int main()
         //if(system_manage.in_system_view())
             box_selector.tick(system_manage, system_manage.currently_viewed, window, popup, player_empire);
 
+
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
+        fleet_manage.cull_dead(empire_manage);
+        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
+        fleet_manage.cull_dead(empire_manage);
 
         //printf("ui\n");
 

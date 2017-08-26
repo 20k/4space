@@ -341,6 +341,8 @@ struct component : serialisable
     bool repair_this_when_recrewing = false; ///when you recrew a ship, repair this component
     float cost_mult = 1.f;
 
+    ship_component_elements::types primary_attribute = ship_component_elements::NONE;
+
     void set_tech_type(int tt);
 
     float get_hp_frac();
@@ -430,8 +432,6 @@ struct component : serialisable
     ///how much research would empire emp get if they could
     research_category get_research_base_for_empire(empire* owner, empire* claiming_empire);
     research_category get_research_real_for_empire(empire* owner, empire* claiming_empire);
-
-    ship_component_elements::types primary_attribute = ship_component_elements::NONE;
 
     ///does in * hp_cur / hp_max safely
     float safe_hp_frac_modify(float in);

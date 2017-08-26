@@ -1513,7 +1513,9 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
     }
 
     frame_counter++;
-    frame_counter %= e_id;
+
+    if(e_id != 0)
+        frame_counter %= e_id;
 
     tick_name_fleets();
 }

@@ -1712,6 +1712,7 @@ void component::do_serialise(serialise& s, bool ser)
         s.handle_serialise(ship_size, ser);
         s.handle_serialise(current_size, ser);
         s.handle_serialise(tech_type, ser);
+        s.handle_serialise(primary_attribute, ser);
     }
 }
 
@@ -4223,7 +4224,7 @@ void ship::do_serialise(serialise& s, bool ser)
     if(serialise_data_helper::disk_mode)
     {
         s.handle_serialise(editor_size_storage, ser);
-        //s.handle_serialise(colonise_target, ser);
+        s.handle_serialise(colonise_target, ser);
         s.handle_serialise(colonising, ser);
 
         ///PAST OWNERS
