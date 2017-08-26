@@ -1706,8 +1706,12 @@ void component::do_serialise(serialise& s, bool ser)
         s.handle_serialise(skip_in_derelict_calculations, ser);
         s.handle_serialise(scanning_difficulty, ser);
         s.handle_serialise(clicked, ser);
-
-
+        s.handle_serialise(tag_list, ser);
+        s.handle_serialise(components, ser);
+        s.handle_serialise(name, ser);
+        s.handle_serialise(ship_size, ser);
+        s.handle_serialise(current_size, ser);
+        s.handle_serialise(tech_type, ser);
     }
 }
 
