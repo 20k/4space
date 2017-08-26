@@ -169,6 +169,8 @@ void test_serialisation()
             assert(objects[i]->v2 == found[i]->v2);
 
             assert(found[i]->handled_by_client == false);
+
+            delete found[i];
         }
     }
 }
