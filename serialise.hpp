@@ -242,13 +242,6 @@ struct serialise_helper<std::vector<T>>
         int32_t length;
         helper.get(length, s, internal_counter, data);
 
-        /*if(internal_counter + length * sizeof(T) > (int)data.size())
-        {
-            std::cout << "Error, invalid bytefetch" << std::endl;
-
-            v = std::vector<T>();
-        }*/
-
         for(int i=0; i<length; i++)
         {
             serialise_helper<T> type;
