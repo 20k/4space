@@ -3352,7 +3352,33 @@ int main()
             next_o->command_queue.cancel();*/
 
             serialise ser;
+            ///textfile names are currently discarded!
             ser.load("Game.save");
+
+            for(empire* e : empire_manage.empires)
+            {
+                delete e;
+            }
+
+            for(orbital_system* sys : system_manage.systems)
+            {
+                for(orbital* o : sys->orbitals)
+                {
+                    delete o;
+                }
+
+                delete sys;
+            }
+
+            for(ship_manager* sm : fleet_manage.fleets)
+            {
+                for(ship* s : sm->ships)
+                {
+                    delete s;
+                }
+
+                delete sm;
+            }
 
             empire_manage = empire_manager();
             system_manage = system_manager();
