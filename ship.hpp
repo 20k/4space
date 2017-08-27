@@ -822,7 +822,7 @@ struct fleet_manager : serialisable
 
     int internal_counter = 0;
 
-    //void do_serialise(serialise& s, bool ser);
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 #endif // SHIP_HPP_INCLUDED

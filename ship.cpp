@@ -5408,4 +5408,11 @@ ship* fleet_manager::nearest_free_colony_ship_of_empire(orbital* o, empire* e)
     return min_ship;
 }
 
-
+void fleet_manager::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(internal_counter, ser);
+        s.handle_serialise(fleets, ser);
+    }
+}
