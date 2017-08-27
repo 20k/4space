@@ -9,6 +9,9 @@
 #include <utility>
 #include <type_traits>
 #include <fstream>
+#include <set>
+#include <unordered_set>
+#include <unordered_map>
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
@@ -250,6 +253,168 @@ struct serialise_helper<std::vector<T>>
             type.get(t, s, internal_counter, data);
 
             v.push_back(t);
+        }
+    }
+};
+
+template<typename T, typename U>
+struct serialise_helper<std::map<T, U>>
+{
+    void add(std::map<T, U>& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+
+        int32_t len = v.size();
+        helper.add(len, s, data);
+
+        for(auto& i : v)
+        {
+            serialise_helper<T> h1;
+            serialise_helper<U> h2;
+
+            T f_id = i.first;
+
+            h1.add(f_id, s, data);
+            h2.add(i.second, s, data);
+        }
+    }
+
+    void get(std::map<T, U>& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
+
+        for(int i=0; i<length; i++)
+        {
+            T first;
+            U second;
+
+            serialise_helper<T> h1;
+            serialise_helper<U> h2;
+
+            h1.get(first, s, internal_counter, data);
+            h2.get(second, s, internal_counter, data);
+
+            v[first] = second;
+        }
+    }
+};
+
+template<typename T, typename U>
+struct serialise_helper<std::unordered_map<T, U>>
+{
+    void add(std::unordered_map<T, U>& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+
+        int32_t len = v.size();
+        helper.add(len, s, data);
+
+        for(auto& i : v)
+        {
+            serialise_helper<T> h1;
+            serialise_helper<U> h2;
+
+            T f_id = i.first;
+
+            h1.add(f_id, s, data);
+            h2.add(i.second, s, data);
+        }
+    }
+
+    void get(std::unordered_map<T, U>& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
+
+        for(int i=0; i<length; i++)
+        {
+            T first;
+            U second;
+
+            serialise_helper<T> h1;
+            serialise_helper<U> h2;
+
+            h1.get(first, s, internal_counter, data);
+            h2.get(second, s, internal_counter, data);
+
+            v[first] = second;
+        }
+    }
+};
+
+template<typename T>
+struct serialise_helper<std::set<T>>
+{
+    void add(std::set<T>& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+
+        int32_t len = v.size();
+        helper.add(len, s, data);
+
+        for(auto& i : v)
+        {
+            auto elem = i;
+
+            serialise_helper<T> helper;
+            helper.add(elem, s, data);
+        }
+    }
+
+    void get(std::set<T>& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
+
+        for(int i=0; i<length; i++)
+        {
+            serialise_helper<T> type;
+
+            T t;
+            type.get(t, s, internal_counter, data);
+
+            v.insert(t);
+        }
+    }
+};
+
+template<typename T>
+struct serialise_helper<std::unordered_set<T>>
+{
+    void add(std::unordered_set<T>& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+
+        int32_t len = v.size();
+        helper.add(len, s, data);
+
+        for(auto& i : v)
+        {
+            auto elem = i;
+
+            serialise_helper<T> helper;
+            helper.add(elem, s, data);
+        }
+    }
+
+    void get(std::unordered_set<T>& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
+
+        for(int i=0; i<length; i++)
+        {
+            serialise_helper<T> type;
+
+            T t;
+            type.get(t, s, internal_counter, data);
+
+            v.insert(t);
         }
     }
 };

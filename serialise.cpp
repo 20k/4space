@@ -219,4 +219,98 @@ void test_serialisation()
 
         assert(test.size() == objects.size());
     }
+
+    {
+        std::map<int, float> test_map;
+
+        test_map[0] = 12;
+        test_map[10] = 3;
+        test_map[2] = -323;
+
+        serialise ser;
+        ser.handle_serialise(test_map, true);
+
+        std::map<int, float> received_map;
+
+        ser.handle_serialise(received_map, false);
+
+        assert(received_map.size() == test_map.size());
+
+        for(auto& i : received_map)
+        {
+            assert(i.second == test_map[i.first]);
+        }
+    }
+
+    {
+        std::unordered_map<int, float> test_map;
+
+        test_map[0] = 12;
+        test_map[10] = 3;
+        test_map[2] = -323;
+
+        serialise ser;
+        ser.handle_serialise(test_map, true);
+
+        std::unordered_map<int, float> received_map;
+
+        ser.handle_serialise(received_map, false);
+
+        assert(received_map.size() == test_map.size());
+
+        for(auto& i : received_map)
+        {
+            assert(i.second == test_map[i.first]);
+        }
+    }
+
+    {
+        std::set<int> test_map;
+
+        test_map.insert(23);
+        test_map.insert(44);
+        test_map.insert(66);
+        test_map.insert(-12);
+
+        serialise ser;
+        ser.handle_serialise(test_map, true);
+
+        std::set<int> received_map;
+
+        ser.handle_serialise(received_map, false);
+
+        assert(received_map.size() == test_map.size());
+
+        for(auto& i : received_map)
+        {
+            assert(received_map.find(i) != received_map.end());
+        }
+    }
+
+    {
+        std::unordered_set<int> test_map;
+
+        test_map.insert(23);
+        test_map.insert(44);
+        test_map.insert(66);
+        test_map.insert(-12);
+
+        serialise ser;
+        ser.handle_serialise(test_map, true);
+
+        std::unordered_set<int> received_map;
+
+        ser.handle_serialise(received_map, false);
+
+        assert(received_map.size() == test_map.size());
+
+        for(auto& i : received_map)
+        {
+            assert(received_map.find(i) != received_map.end());
+        }
+    }
+
+    ///ensure tests don't interfere with global state. It shouldn't affect it even without this call
+    ///but it may make debugging easier
+    serialise_data_helper::owner_to_id_to_pointer.clear();
 }
