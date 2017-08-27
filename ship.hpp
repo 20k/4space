@@ -310,11 +310,17 @@ struct component_attribute
     std::map<resource::types, float> resources_ratio_stored;
     std::map<resource::types, float> resources_cur_stored;*/
 
-private:
+//private:
     float currently_drained = 0.f;
 };
 
 std::map<ship_component_element, float> merge_diffs(std::map<ship_component_element, float> one, const std::map<ship_component_element, float>& two);
+
+struct component_tag_type
+{
+    component_tag::tag first = (component_tag::tag)0;
+    float second = 0.f;
+};
 
 ///ie what can things do
 ///this is a ship entity for the moment.. but could likely describe a character as well
@@ -330,7 +336,7 @@ struct component : serialisable
 
     std::vector<component_attribute> components;
 
-    std::vector<std::pair<component_tag::tag, float>> tag_list;
+    std::vector<component_tag_type> tag_list;
 
     ///for ui stuff. Its better to keep this internally in case we add new components
     bool clicked = false;

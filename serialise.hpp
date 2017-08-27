@@ -46,7 +46,19 @@ struct serialisable
 
 struct serialise;
 
-template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value>>
+/*template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value && std::is_arithmetic<typename std::remove_reference<T>::type>::type>>
+inline
+void lowest_add(T& v, serialise& s, std::vector<char>& data)
+{
+    char* pv = std::launder((char*)&v);
+
+    for(uint32_t i=0; i<sizeof(T); i++)
+    {
+        data.push_back(pv[i]);
+    }
+}*/
+
+template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable, T> && std::is_standard_layout_v<std::remove_reference_t<T>>>>
 inline
 void lowest_add(T& v, serialise& s, std::vector<char>& data)
 {
@@ -58,7 +70,7 @@ void lowest_add(T& v, serialise& s, std::vector<char>& data)
     }
 }
 
-template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value>>
+template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable, T> && std::is_standard_layout_v<std::remove_reference_t<T>>>>
 inline
 void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
 {
@@ -75,6 +87,26 @@ void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& da
 
     v = *std::launder((T*)&data[prev]);
 }
+
+/*template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value>>
+inline
+void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
+{
+    int prev = internal_counter;
+
+    internal_counter += sizeof(T);
+
+    if(internal_counter > (int)data.size())
+    {
+        std::cout << "Error, invalid bytefetch" << std::endl;
+
+        v = T();
+    }
+
+    v = *std::launder((T*)&data[prev]);
+}*/
+
+
 
 inline
 void lowest_add(serialisable& v, serialise& s, std::vector<char>& data)

@@ -1399,7 +1399,7 @@ void component::set_tag(component_tag::tag tag, float val)
 
     int offset = get_tag_offset(tag);
 
-    std::pair<component_tag::tag, float>* cur_tag = nullptr;
+    component_tag_type* cur_tag = nullptr;
 
     if(offset == -1)
     {
