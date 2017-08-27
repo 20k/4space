@@ -2675,6 +2675,7 @@ int main()
     empire_manager empire_manage;
 
     empire* player_empire = empire_manage.make_new();
+    player_empire->is_player = true;
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
     player_empire->ship_prefix = "SS";
 
@@ -3324,6 +3325,7 @@ int main()
         {
             serialise ser;
 
+            ser.handle_serialise(empire_manage, true);
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);
 
@@ -3352,13 +3354,24 @@ int main()
             serialise ser;
             ser.load("Game.save");
 
-            system_manage.systems.clear();
-            fleet_manage.fleets.clear();
+            empire_manage = empire_manager();
+            system_manage = system_manager();
+            fleet_manage = fleet_manager();
 
+            ser.handle_serialise(empire_manage, false);
             ser.handle_serialise(system_manage, false);
             ser.handle_serialise(fleet_manage, false);
 
+            for(empire* e : empire_manage.empires)
+            {
+                if(e->is_player)
+                {
+                    player_empire = e;
+                    break;
+                }
+            }
 
+            system_manage.ensure_found_orbitals_handled();
         }
 
         ImGui::End();

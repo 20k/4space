@@ -4227,8 +4227,8 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(colonise_target, ser);
         s.handle_serialise(colonising, ser);
 
-        ///PAST OWNERS
-        //s.handle_serialise(original_owning_race, ser);
+        ///PAST OWNERS RESEARCH
+        s.handle_serialise(original_owning_race, ser);
         s.handle_serialise(crew_effectiveness, ser);
         s.handle_serialise(is_alien, ser);
 
@@ -5225,7 +5225,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(toggle_fleet_ui, ser);
         s.handle_serialise(decolonising, ser);
         s.handle_serialise(accumulated_dt, ser);
-        //s.handle_serialise(parent_empire, ser);
+        s.handle_serialise(parent_empire, ser);
         s.handle_serialise(auto_colonise, ser);
         s.handle_serialise(auto_harvest_ore, ser);
         s.handle_serialise(auto_resupply, ser);

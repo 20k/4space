@@ -1438,7 +1438,40 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
 
 void empire::do_serialise(serialise& s, bool ser)
 {
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(frame_counter, ser);
+        s.handle_serialise(accumulated_dt_s, ser);
+        s.handle_serialise(desired_empire_size, ser);
+        s.handle_serialise(fleet_name_counter, ser);
+        s.handle_serialise(toggle_systems_ui, ser);
+        s.handle_serialise(is_derelict, ser);
+        s.handle_serialise(toggle_ui, ser);
+        s.handle_serialise(is_pirate, ser);
+        s.handle_serialise(pirate_invasion_timer_s, ser);
+        s.handle_serialise(parent, ser);
 
+
+        ///BACKUP_DT_S
+        ///BACKUP_INCOME_LIST
+        ///LAST_INCOME
+        ///BACKUP_INCOME
+
+        s.handle_serialise(relations_map, ser);
+        s.handle_serialise(owned_fleets, ser);
+        s.handle_serialise(owned, ser);
+        s.handle_serialise(ship_prefix, ser);
+        s.handle_serialise(name, ser);
+
+        s.handle_serialise(culture_similarity, ser);
+        s.handle_serialise(given_colour, ser);
+        s.handle_serialise(colour, ser);
+        s.handle_serialise(has_ai, ser);
+
+        s.handle_serialise(is_player, ser);
+
+        ///AI EMPIRE CONTROLLER
+    }
 }
 
 empire* empire_manager::make_new()
@@ -2196,4 +2229,23 @@ float empire_manager::get_spawn_empire_distance(empire* e1, empire* e2)
     vec2f their_pos = their_os->universe_pos;
 
     return (their_pos - my_pos).length();
+}
+
+void empire_manager::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(frame_counter, ser);
+        s.handle_serialise(giving_are_you_sure, ser);
+        ///OFFERING
+        s.handle_serialise(giving_resources_ui_clicked, ser);
+        s.handle_serialise(offer_resources_ui, ser);
+        s.handle_serialise(offering_resources, ser);
+        s.handle_serialise(confirm_declare_war, ser);
+        s.handle_serialise(confirm_break_alliance, ser);
+        s.handle_serialise(unknown_empire, ser); ///???
+        s.handle_serialise(initial_spawn_reference, ser);
+        s.handle_serialise(pirate_empires, ser);
+        s.handle_serialise(empires, ser);
+    }
 }

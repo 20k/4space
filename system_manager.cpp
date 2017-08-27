@@ -1126,7 +1126,8 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(force_draw_expanded_window, ser);
         s.handle_serialise(current_num_harvesting, ser);
         s.handle_serialise(last_num_harvesting, ser);
-        ///VIEWED_BY
+        s.handle_serialise(viewed_by, ser);
+        // ///VIEWED BY
         ///CURRENTLY VIEWED BY
         s.handle_serialise(last_viewed_position, ser);
         s.handle_serialise(last_screen_pos, ser);
@@ -1141,7 +1142,8 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(clicked, ser);
         s.handle_serialise(has_quest_alert, ser);
         s.handle_serialise(parent_system, ser);
-        ///PARENT EMPIRE
+        s.handle_serialise(parent_empire, ser);
+        // ///PARENT EMPIRE
         ///PRODUCED_RESOURCES_PS
         s.handle_serialise(is_resource_object, ser);
         s.handle_serialise(col, ser);
@@ -1971,10 +1973,10 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         s.handle_serialise(orbitals, ser);
         s.handle_serialise(universe_pos, ser);
 
-        if(ser == false)
+        /*if(ser == false)
         {
             ensure_found_orbitals_handled();
-        }
+        }*/
 
         ///ADVERTISED EMPIRES?
     }
@@ -3729,5 +3731,13 @@ void system_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(backup_system, ser);
         s.handle_serialise(currently_viewed, ser);
         s.handle_serialise(hovered_system, ser);
+    }
+}
+
+void system_manager::ensure_found_orbitals_handled()
+{
+    for(orbital_system* sys : systems)
+    {
+        sys->ensure_found_orbitals_handled();
     }
 }

@@ -407,13 +407,15 @@ struct system_manager : serialisable
 
     void draw_ship_ui(empire* viewing_empire, popup_info& popup);
 
-    sf::RenderTexture temp;
+    //sf::RenderTexture temp;
 
     bool suppress_click_away_fleet = false;
     std::vector<orbital*> hovered_orbitals;
     std::vector<orbital*> advertised_universe_orbitals;
 
     void do_serialise(serialise& s, bool ser) override;
+
+    void ensure_found_orbitals_handled();
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

@@ -56,6 +56,8 @@ namespace relations_info
 
 struct empire : serialisable
 {
+    bool is_player = false;
+
     ai_empire ai_empire_controller;
 
     bool has_ai = false;
@@ -238,7 +240,7 @@ struct empire : serialisable
 
 struct fleet_manager;
 
-struct empire_manager
+struct empire_manager : serialisable
 {
     std::vector<empire*> empires;
     std::vector<empire*> pirate_empires;
@@ -296,6 +298,8 @@ struct empire_manager
     bool giving_are_you_sure = false;
 
     int frame_counter = 0;
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 #endif // EMPIRE_HPP_INCLUDED
