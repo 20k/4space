@@ -3320,9 +3320,19 @@ int main()
             ser.save
         }*/
 
-        if(ImGui::Button("Load"))
+        if(ImGui::Button("Save"))
         {
             serialise ser;
+
+            ser.handle_serialise(system_manage, true);
+            ser.handle_serialise(fleet_manage, true);
+
+            ser.save("Game.save");
+        }
+
+        if(ImGui::Button("Load"))
+        {
+            /*serialise ser;
 
             ser.load("Test.txt");
 
@@ -3337,7 +3347,18 @@ int main()
 
             player_empire->take_ownership(next_o);
             player_empire->take_ownership(next_o->data);
-            next_o->command_queue.cancel();
+            next_o->command_queue.cancel();*/
+
+            serialise ser;
+            ser.load("Game.save");
+
+            system_manage.systems.clear();
+            fleet_manage.fleets.clear();
+
+            ser.handle_serialise(system_manage, false);
+            ser.handle_serialise(fleet_manage, false);
+
+
         }
 
         ImGui::End();

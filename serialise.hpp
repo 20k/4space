@@ -379,15 +379,11 @@ struct serialise
 
     ///if pointer, look up in pointer map
     template<typename T>
-    T get()
+    void get(T& v)
     {
         serialise_helper<T> helper;
 
-        T val;
-
-        helper.get(val, *this, internal_counter, data);
-
-        return val;
+        helper.get(v, *this, internal_counter, data);
     }
 
     template<typename T>
@@ -399,7 +395,7 @@ struct serialise
         }
         else
         {
-            v = get<T>();
+            get<T>(v);
         }
     }
 

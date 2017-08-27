@@ -261,7 +261,7 @@ struct orbital : serialisable
 struct popup_info;
 struct fleet_manager;
 
-struct orbital_system
+struct orbital_system : serialisable
 {
     vec2f universe_pos = {0,0};
 
@@ -274,7 +274,9 @@ struct orbital_system
 
     orbital* make_new(orbital_info::type type, float rad, int num_verts = 5);
 
-    orbital* make_in_place(orbital* o);
+    //orbital* make_in_place(orbital* o);
+
+    void ensure_found_orbitals_handled();
 
     ///with 0 ships
     orbital* make_fleet(fleet_manager& fm, float rad, float angle, empire* e = nullptr);
@@ -325,12 +327,12 @@ struct orbital_system
     static int gid;
     int unique_id = gid++;
 
-    //void do_serialise(serialise& s, bool ser) override;
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct popup_info;
 
-struct system_manager
+struct system_manager : serialisable
 {
     sf::Texture fleet_tex;
     sf::Sprite fleet_sprite;
@@ -410,6 +412,8 @@ struct system_manager
     bool suppress_click_away_fleet = false;
     std::vector<orbital*> hovered_orbitals;
     std::vector<orbital*> advertised_universe_orbitals;
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

@@ -1140,7 +1140,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(dialogue_open, ser);
         s.handle_serialise(clicked, ser);
         s.handle_serialise(has_quest_alert, ser);
-        ///PARENT_SYSTEM
+        s.handle_serialise(parent_system, ser);
         ///PARENT EMPIRE
         ///PRODUCED_RESOURCES_PS
         s.handle_serialise(is_resource_object, ser);
@@ -1264,7 +1264,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     return n;
 }
 
-orbital* orbital_system::make_in_place(orbital* n)
+/*orbital* orbital_system::make_in_place(orbital* n)
 {
     n->parent_system = this;
 
@@ -1287,6 +1287,43 @@ orbital* orbital_system::make_in_place(orbital* n)
     }
 
     return n;
+}*/
+
+void orbital_system::ensure_found_orbitals_handled()
+{
+    for(orbital* o : orbitals)
+    {
+        if(o->handled_by_client == false)
+        {
+            o->handled_by_client = true;
+
+            if(o->render_type == 0)
+            {
+                o->simple_renderable.init(o->num_verts, o->rad * 0.85f, o->rad * 1.2f);
+            }
+            else if(o->render_type == 1)
+            {
+                o->sprite.load(orbital_info::load_strs[o->type]);
+            }
+        }
+    }
+
+    for(orbital* o : asteroids)
+    {
+        if(o->handled_by_client == false)
+        {
+            o->handled_by_client = true;
+
+            if(o->render_type == 0)
+            {
+                o->simple_renderable.init(o->num_verts, o->rad * 0.85f, o->rad * 1.2f);
+            }
+            else if(o->render_type == 1)
+            {
+                o->sprite.load(orbital_info::load_strs[o->type]);
+            }
+        }
+    }
 }
 
 orbital* orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, float angle, empire* e)
@@ -1923,10 +1960,25 @@ resource_manager orbital_system::get_potential_resources()
     return resources;
 }
 
-/*void orbital_system::do_serialise(serialise& s, bool ser)
+void orbital_system::do_serialise(serialise& s, bool ser)
 {
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(toggle_fleet_ui, ser);
+        s.handle_serialise(accumulated_nonviewed_time, ser);
+        s.handle_serialise(highlight, ser);
+        s.handle_serialise(asteroids, ser);
+        s.handle_serialise(orbitals, ser);
+        s.handle_serialise(universe_pos, ser);
 
-}*/
+        if(ser == false)
+        {
+            ensure_found_orbitals_handled();
+        }
+
+        ///ADVERTISED EMPIRES?
+    }
+}
 
 system_manager::system_manager()
 {
@@ -3663,4 +3715,19 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
     }
 
     ImGui::End();
+}
+
+void system_manager::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(camera, ser);
+        s.handle_serialise(zoom_level, ser);
+        ///deliberately out of order. Not important tremendously but it means that
+        ///all the orbital systems will be grouped in the binary file
+        s.handle_serialise(systems, ser);
+        s.handle_serialise(backup_system, ser);
+        s.handle_serialise(currently_viewed, ser);
+        s.handle_serialise(hovered_system, ser);
+    }
 }
