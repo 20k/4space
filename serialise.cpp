@@ -211,6 +211,8 @@ void test_serialisation()
         serialise ser;
         ser.handle_serialise(objects, true);
 
+        serialise_data_helper::owner_to_id_to_pointer.clear();
+
         std::vector<test_object*> test;
 
         ser.handle_serialise(test, false);

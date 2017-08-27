@@ -196,7 +196,7 @@ struct serialise_helper<T*>
         {
             ptr = new T();
 
-            //std::cout << typeid(T).name() << std::endl;
+            //std::cout << typeid(T).name() << " " << ptr << std::endl;
 
             serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id] = ptr;
         }

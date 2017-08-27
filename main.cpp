@@ -725,18 +725,18 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     ImGui::NeutralText("Load Ship");
 
+    ///ok, it crashes because we modify the fleet list while iterating through it
     if(ImGui::IsItemClicked_Registered())
     {
         //ship* sp = &s;
 
-        ser.load("Test.txt");
+        //ser.load("Test.txt");
 
-        orbital* next_o;
+        /*orbital* next_o;
 
         ser.handle_serialise(next_o, false);
 
-        //next_o->parent_system = o->parent_system;
-        //next_o->parent_empire = o->parent_empire;
+        fleet_manage.fleets.push_back(next_o->data);
 
         next_o->parent = o->parent_system->get_base();
         o->parent_system->make_in_place(next_o);
@@ -752,9 +752,14 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         std::cout << o->data << " " << next_o->data << " " << next_o->data->ships[0]->owned_by << std::endl;
 
+        for(ship* s : next_o->data->ships)
+        {
+            std::cout << s->name << std::endl;
+        }*/
+
+
         ///removing this fixes the crash
         ///is next_o->data bad?
-        fleet_manage.fleets.push_back(next_o->data);
 
         //std::cout << fleet_manage.fleets.size() << std::endl;
 
@@ -3303,6 +3308,30 @@ int main()
                 //    break;
             }
         }
+
+        ImGui::BeginOverride("Test");
+
+        if(ImGui::Button("Load"))
+        {
+            serialise ser;
+
+            ser.load("Test.txt");
+
+            orbital* next_o;
+
+            ser.handle_serialise(next_o, false);
+
+            fleet_manage.fleets.push_back(next_o->data);
+
+            next_o->parent = base->get_base();
+            base->make_in_place(next_o);
+
+            player_empire->take_ownership(next_o);
+            player_empire->take_ownership(next_o->data);
+            next_o->command_queue.cancel();
+        }
+
+        ImGui::End();
 
 
         system_manage.cull_empty_orbital_fleets(empire_manage, popup);
