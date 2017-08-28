@@ -569,14 +569,6 @@ struct serialise
         }
     }
 
-    /*template<typename T>
-    void handle_has_method(T& v, bool ser)
-    {
-        serialise_helper_has_method<T> helper;
-
-        helper.do_method(v, *this, ser);
-    }*/
-
     bool finished_deserialising()
     {
         return internal_counter >= (int)data.size();
