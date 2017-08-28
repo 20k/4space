@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "serialise.hpp"
 
 struct empire;
 
@@ -64,7 +65,7 @@ struct research_category
     float amount = 0;
 };
 
-struct research
+struct research : serialisable
 {
     std::vector<research_category> categories;
 
@@ -85,6 +86,8 @@ struct research
 
     ///MODIFIES UNDERLYING STORAGE
     research div(float amount);
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 #endif // RESEARCH_HPP_INCLUDED

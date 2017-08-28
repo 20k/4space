@@ -4228,12 +4228,12 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(colonise_target, ser);
         s.handle_serialise(colonising, ser);
 
-        ///PAST OWNERS RESEARCH
+        s.handle_serialise(past_owners_research_left, ser);
         s.handle_serialise(original_owning_race, ser);
         s.handle_serialise(crew_effectiveness, ser);
         s.handle_serialise(is_alien, ser);
 
-        ///RESEARCH
+        s.handle_serialise(research_left_from_crewing, ser);
         s.handle_serialise(cleanup, ser);
         s.handle_serialise(is_fully_disabled, ser);
         s.handle_serialise(currently_in_combat, ser);

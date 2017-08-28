@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "serialise.hpp"
 
 namespace resource
 {
@@ -85,7 +86,7 @@ namespace sf
     struct RenderWindow;
 }
 
-struct resource_manager
+struct resource_manager : serialisable
 {
     resource_manager();
 
@@ -105,6 +106,8 @@ struct resource_manager
     std::string get_formatted_str(bool can_skip = true);
 
     bool has_any_processed();
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 #endif // RESOURCE_MANAGER_HPP_INCLUDED

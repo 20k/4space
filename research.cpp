@@ -153,3 +153,8 @@ research research::div(float amount)
 
     return *this;
 }
+
+void research::do_serialise(serialise& s, bool ser)
+{
+    s.handle_serialise(categories, ser);
+}

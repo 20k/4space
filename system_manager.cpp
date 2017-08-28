@@ -1127,7 +1127,6 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(current_num_harvesting, ser);
         s.handle_serialise(last_num_harvesting, ser);
         s.handle_serialise(viewed_by, ser);
-        // ///VIEWED BY
         ///CURRENTLY VIEWED BY
         s.handle_serialise(last_viewed_position, ser);
         s.handle_serialise(last_screen_pos, ser);
@@ -1143,8 +1142,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(has_quest_alert, ser);
         s.handle_serialise(parent_system, ser);
         s.handle_serialise(parent_empire, ser);
-        // ///PARENT EMPIRE
-        ///PRODUCED_RESOURCES_PS
+        s.handle_serialise(produced_resources_ps, ser);
         s.handle_serialise(is_resource_object, ser);
         s.handle_serialise(col, ser);
         s.handle_serialise(vision_test_counter, ser);
@@ -1972,6 +1970,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         s.handle_serialise(asteroids, ser);
         s.handle_serialise(orbitals, ser);
         s.handle_serialise(universe_pos, ser);
+        s.handle_serialise(advertised_empires, ser);
 
         /*if(ser == false)
         {

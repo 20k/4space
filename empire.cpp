@@ -1451,7 +1451,6 @@ void empire::do_serialise(serialise& s, bool ser)
         s.handle_serialise(pirate_invasion_timer_s, ser);
         s.handle_serialise(parent, ser);
 
-
         ///BACKUP_DT_S
         ///BACKUP_INCOME_LIST
         ///LAST_INCOME
@@ -1462,6 +1461,9 @@ void empire::do_serialise(serialise& s, bool ser)
         s.handle_serialise(owned, ser);
         s.handle_serialise(ship_prefix, ser);
         s.handle_serialise(name, ser);
+
+        s.handle_serialise(resources, ser);
+        s.handle_serialise(research_tech_level, ser);
 
         s.handle_serialise(culture_similarity, ser);
         s.handle_serialise(given_colour, ser);

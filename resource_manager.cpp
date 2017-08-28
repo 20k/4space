@@ -355,3 +355,9 @@ bool resource_manager::has_any_processed()
 
     return false;
 }
+
+void resource_manager::do_serialise(serialise& s, bool ser)
+{
+    s.handle_serialise(resources, ser);
+}
+
