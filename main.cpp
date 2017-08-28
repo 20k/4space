@@ -3321,7 +3321,7 @@ int main()
             ser.save
         }*/
 
-        /*if(ImGui::Button("Save"))
+        if(ImGui::Button("Save"))
         {
             serialise ser;
 
@@ -3330,11 +3330,11 @@ int main()
             ser.handle_serialise(fleet_manage, true);
 
             ser.save("Game.save");
-        }*/
+        }
 
         if(ImGui::Button("Load"))
         {
-            serialise ser;
+            /*serialise ser;
 
             ser.load("Test.txt");
 
@@ -3349,9 +3349,9 @@ int main()
 
             player_empire->take_ownership(next_o);
             player_empire->take_ownership(next_o->data);
-            next_o->command_queue.cancel();
+            next_o->command_queue.cancel();*/
 
-            /*serialise ser;
+            serialise ser;
             ///textfile names are currently discarded!
             ser.load("Game.save");
 
@@ -3396,7 +3396,7 @@ int main()
 
                     break;
                 }
-            }*/
+            }
 
             system_manage.ensure_found_orbitals_handled();
         }
