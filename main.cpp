@@ -3329,6 +3329,16 @@ int main()
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);
 
+            /*for(ship_manager* sm : fleet_manage.fleets)
+            {
+                std::cout << "a " << sm << std::endl;
+
+                for(ship* s : sm->ships)
+                {
+                    std::cout << s << std::endl;
+                }
+            }*/
+
             ser.save("Game.save");
         }
 
@@ -3350,6 +3360,9 @@ int main()
             player_empire->take_ownership(next_o);
             player_empire->take_ownership(next_o->data);
             next_o->command_queue.cancel();*/
+
+            ///:(
+            popup.clear();
 
             serialise ser;
             ///textfile names are currently discarded!
@@ -3388,6 +3401,16 @@ int main()
             ser.handle_serialise(system_manage, false);
             ser.handle_serialise(fleet_manage, false);
 
+            /*for(ship_manager* sm : fleet_manage.fleets)
+            {
+                std::cout << "a " << sm << std::endl;
+
+                for(ship* s : sm->ships)
+                {
+                    std::cout << s << std::endl;
+                }
+            }*/
+
             for(empire* e : empire_manage.empires)
             {
                 if(e->is_player)
@@ -3397,6 +3420,7 @@ int main()
                     break;
                 }
             }
+
 
             system_manage.ensure_found_orbitals_handled();
         }

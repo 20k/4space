@@ -1720,6 +1720,7 @@ ship ship::duplicate()
 {
     ship s = *this;
     s.id = ship::get_new_id();
+    s.get_new_serialise_id();
 
     return s;
 }

@@ -34,6 +34,12 @@ struct serialisable
     static serialise_data_type gserialise_id;
     serialise_data_type serialise_id = gserialise_id++;
 
+    ///overload operator = ?
+    void get_new_serialise_id()
+    {
+        serialise_id = gserialise_id++;
+    }
+
     bool owned_by_host = true;
     serialise_owner_type owner_id = 0;
 
@@ -446,6 +452,8 @@ struct serialise_helper<std::string>
             std::cout << "Error, invalid bytefetch" << std::endl;
 
             v = std::string();
+
+            return;
         }
 
         for(int i=0; i<length; i++)
