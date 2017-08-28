@@ -274,7 +274,7 @@ struct orbital_system : serialisable
 
     orbital* make_new(orbital_info::type type, float rad, int num_verts = 5);
 
-    //orbital* make_in_place(orbital* o);
+    orbital* make_in_place(orbital* o);
 
     void ensure_found_orbitals_handled();
 

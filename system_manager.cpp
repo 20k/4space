@@ -1266,7 +1266,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     return n;
 }
 
-/*orbital* orbital_system::make_in_place(orbital* n)
+orbital* orbital_system::make_in_place(orbital* n)
 {
     n->parent_system = this;
 
@@ -1289,7 +1289,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     }
 
     return n;
-}*/
+}
 
 void orbital_system::ensure_found_orbitals_handled()
 {

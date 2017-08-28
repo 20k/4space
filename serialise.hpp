@@ -596,8 +596,6 @@ struct serialise
         int length = myfile.tellg();
         myfile.seekg (0, myfile.beg);
 
-        data.resize(length);
-
         if(length == 0)
             return;
 
