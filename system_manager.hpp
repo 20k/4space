@@ -80,7 +80,7 @@ namespace sf
     struct RenderWindow;
 }
 
-struct orbital_simple_renderable
+struct orbital_simple_renderable : serialisable
 {
     std::vector<float> vert_dist;
 
@@ -89,6 +89,8 @@ struct orbital_simple_renderable
     void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col = {1,1,1}, bool show_detail = false, orbital* o = nullptr);
 
     void main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col);
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct sprite_renderable

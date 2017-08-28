@@ -228,6 +228,14 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
     #endif
 }
 
+void orbital_simple_renderable::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(vert_dist, ser);
+    }
+}
+
 void premultiply(sf::Image& image);
 
 void sprite_renderable::load(const std::string& str)
@@ -1159,6 +1167,7 @@ void orbital::do_serialise(serialise& s, bool ser)
 
         s.handle_serialise(data, ser);
         s.handle_serialise(render_type, ser);
+        s.handle_serialise(simple_renderable, ser);
         s.handle_serialise(was_hovered, ser);
         s.handle_serialise(was_highlight, ser);
         s.handle_serialise(highlight, ser);
@@ -1297,11 +1306,7 @@ void orbital_system::ensure_found_orbitals_handled()
         {
             o->handled_by_client = true;
 
-            if(o->render_type == 0)
-            {
-                o->simple_renderable.init(o->num_verts, o->rad * 0.85f, o->rad * 1.2f);
-            }
-            else if(o->render_type == 1)
+            if(o->render_type == 1)
             {
                 o->sprite.load(orbital_info::load_strs[o->type]);
             }
@@ -1314,11 +1319,7 @@ void orbital_system::ensure_found_orbitals_handled()
         {
             o->handled_by_client = true;
 
-            if(o->render_type == 0)
-            {
-                o->simple_renderable.init(o->num_verts, o->rad * 0.85f, o->rad * 1.2f);
-            }
-            else if(o->render_type == 1)
+            if(o->render_type == 1)
             {
                 o->sprite.load(orbital_info::load_strs[o->type]);
             }
