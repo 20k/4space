@@ -35,6 +35,7 @@ struct serialisable
     serialise_data_type serialise_id = gserialise_id++;
 
     ///overload operator = ?
+    ///If we duplicate something we don't own, REALLY BAD STUFF will happen
     void get_new_serialise_id()
     {
         serialise_id = gserialise_id++;
