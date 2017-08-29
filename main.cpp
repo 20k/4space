@@ -3325,6 +3325,7 @@ int main()
         {
             serialise ser;
 
+            ser.handle_serialise(state, true);
             ser.handle_serialise(empire_manage, true);
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);
@@ -3409,6 +3410,7 @@ int main()
             fleet_manage = fleet_manager();
             all_battles = all_battles_manager();
 
+            ser.handle_serialise(state, false);
             ser.handle_serialise(empire_manage, false);
             ser.handle_serialise(system_manage, false);
             ser.handle_serialise(fleet_manage, false);
