@@ -4,6 +4,41 @@
 #include <SFML/Graphics.hpp>
 #include "ui_util.hpp"
 
+void object_command_queue_info::queue_element_data::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        //int enum_type = type;
+        s.handle_serialise(type, ser);
+        //type = enum_type;
+
+        s.handle_serialise(old_radius, ser);
+        s.handle_serialise(old_angle, ser);
+        s.handle_serialise(new_radius, ser);
+        s.handle_serialise(new_angle, ser);
+        s.handle_serialise(start_time_s, ser);
+        s.handle_serialise(combat_move, ser);
+        s.handle_serialise(target_drifts, ser);
+        s.handle_serialise(pos, ser);
+        s.handle_serialise(fin, ser);
+        s.handle_serialise(transfer_within, ser);
+        s.handle_serialise(target, ser);
+        s.handle_serialise(sm, ser);
+        s.handle_serialise(colony_target, ser);
+        s.handle_serialise(colony_ship_id, ser);
+        s.handle_serialise(should_pop, ser);
+        s.handle_serialise(anchor_target, ser);
+    }
+}
+
+void object_command_queue_info::queue_data::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(type, ser);
+        s.handle_serialise(data, ser);
+    }
+}
 
 float get_length_circle(vec2f p1, vec2f p2)
 {
@@ -708,4 +743,14 @@ orbital_system* object_command_queue::get_warp_destination()
     }
 
     return sys;
+}
+
+void object_command_queue::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(should_pop, ser);
+        s.handle_serialise(command_queue, ser);
+        s.handle_serialise(should_interrupt, ser);
+    }
 }

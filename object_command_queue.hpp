@@ -4,6 +4,7 @@
 #include <vec/vec.hpp>
 #include <vector>
 #include <deque>
+#include "serialise.hpp"
 
 struct orbital_system;
 struct orbital;
@@ -26,7 +27,7 @@ namespace object_command_queue_info
     ///given that target might become invalid, we need to check it still exists or clear it if invalid
     ///creates memory management difficulties in this method. Is there a better way? Targeting an orbital system is fine
     ///they're never going away. But orbital* ship targets might
-    struct queue_element_data
+    struct queue_element_data : serialisable
     {
         queue_element_type type;
 
@@ -53,12 +54,16 @@ namespace object_command_queue_info
         bool should_pop = false;
 
         orbital* anchor_target = nullptr;
+
+        void do_serialise(serialise& s, bool ser) override;
     };
 
-    struct queue_data
+    struct queue_data : serialisable
     {
         queue_element_type type;
         queue_element_data data;
+
+        void do_serialise(serialise& s, bool ser) override;
     };
 }
 
@@ -68,7 +73,7 @@ using queue_type = object_command_queue_info::queue_data;
 
 ///so, could deal with queueing vs interrupting by having state set
 ///don't want to push the full burden on the user
-struct object_command_queue
+struct object_command_queue : serialisable
 {
     bool should_interrupt = false;
 
@@ -112,6 +117,8 @@ struct object_command_queue
 
     std::vector<orbital_system*> get_warp_destinations();
     orbital_system* get_warp_destination();
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 #endif // OBJECT_COMMAND_QUEUE_HPP_INCLUDED

@@ -1178,7 +1178,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(name, ser);
         s.handle_serialise(num_verts, ser);
 
-        ///OBJECT COMMAND QUEUE
+        s.handle_serialise(command_queue, ser);
     }
 }
 
