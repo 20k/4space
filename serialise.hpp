@@ -12,6 +12,8 @@
 #include <set>
 #include <unordered_set>
 #include <unordered_map>
+#include <SFML/Graphics.hpp>
+#include <vec/vec.hpp>
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
@@ -466,6 +468,91 @@ struct serialise_helper<std::string>
 
             v.push_back(c);
         }
+    }
+};
+
+template<>
+struct serialise_helper<sf::Texture>
+{
+    void add(sf::Texture& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<vec2i> helper;
+        vec2i dim = {v.getSize().x, v.getSize().y};
+        helper.add(dim, s, data);
+
+        serialise_helper<char> smooth;
+        char is_smooth = (char)v.isSmooth();
+        smooth.add(is_smooth, s, data);
+
+        /*for(uint32_t i=0; i<v.size(); i++)
+        {
+            serialise_helper<decltype(v[i])> helper;
+            helper.add(v[i], s, data);
+        }*/
+
+        sf::Image img = v.copyToImage();
+
+        for(int y=0; y<dim.y(); y++)
+        {
+            for(int x=0; x<dim.x(); x++)
+            {
+                sf::Color col = img.getPixel(x, y);
+
+                serialise_helper<uint8_t> h1;
+                serialise_helper<uint8_t> h2;
+                serialise_helper<uint8_t> h3;
+                serialise_helper<uint8_t> h4;
+
+                h1.add(col.r, s, data);
+                h2.add(col.g, s, data);
+                h3.add(col.b, s, data);
+                h4.add(col.a, s, data);
+            }
+        }
+    }
+
+    void get(sf::Texture& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        /*serialise_helper<int32_t> helper;
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
+
+        if(internal_counter + length * sizeof(char) > (int)data.size())
+        {
+            std::cout << "Error, invalid bytefetch" << std::endl;
+
+            v = std::string();
+
+            return;
+        }
+
+        for(int i=0; i<length; i++)
+        {
+            serialise_helper<char> type;
+
+            char c;
+            type.get(c, s, internal_counter, data);
+
+            v.push_back(c);
+        }*/
+
+        serialise_helper<vec2i> helper;
+
+        vec2i dim;
+        helper.get(dim,s, internal_counter, data);
+
+        serialise_helper<char> smooth_helper;
+        char smooth;
+        smooth_helper.get(smooth, s, internal_counter, data);
+
+        sf::Image img;
+        img.create(dim.x(), dim.y(), (sf::Uint8*)&data[internal_counter]);
+
+        internal_counter += dim.x() * dim.y() * sizeof(sf::Uint8) * 4;
+
+        v.loadFromImage(img);
+
+        v.setSmooth((bool)smooth);
     }
 };
 

@@ -4,6 +4,8 @@
 #include "ship.hpp"
 #include <SFML/Graphics.hpp>
 
+#include "serialise.hpp"
+
 struct empire;
 struct ship;
 
@@ -22,7 +24,8 @@ struct projectile_options
 void tonemap(sf::Image& image, tonemap_options options = {{4, 4, 0.5}});
 void premultiply(sf::Image& image);
 
-struct projectile : positional
+///need to ensure loaded after serialisation
+struct projectile : positional, serialisable
 {
     projectile_options options;
 
@@ -41,6 +44,8 @@ struct projectile : positional
 
     empire* fired_by = nullptr;
     ship* ship_fired_by = nullptr;
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct battle_manager;
@@ -51,7 +56,7 @@ namespace sf
     struct RenderWindow;
 }
 
-struct projectile_manager
+struct projectile_manager : serialisable
 {
     std::vector<projectile*> projectiles;
 
@@ -63,13 +68,15 @@ struct projectile_manager
     void destroy_all();
 
     void draw(sf::RenderWindow& win);
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct all_battles_manager;
 struct orbital_system;
 struct system_manage;
 
-struct battle_manager
+struct battle_manager : serialisable
 {
     projectile_manager projectile_manage;
 
@@ -79,7 +86,7 @@ struct battle_manager
     std::map<int, std::vector<ship*>> ships;
 
     std::vector<std::pair<empire*, int>> slots_filled;
-    int num_slots = 0;
+    //int num_slots = 0;
 
     void tick(float step_s, system_manager& system_manage);
 
@@ -116,11 +123,13 @@ struct battle_manager
     uint32_t frame_counter = 0;
 
     bool is_ui_opened = false;
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 struct orbital;
 
-struct all_battles_manager
+struct all_battles_manager : serialisable
 {
     std::vector<battle_manager*> battles;
     battle_manager* currently_viewing = nullptr;
@@ -146,6 +155,8 @@ struct all_battles_manager
     bool request_stay_in_battle_system = false;
     bool request_enter_battle_view = false;
     bool request_leave_battle_view = false;
+
+    void do_serialise(serialise& s, bool ser) override;
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

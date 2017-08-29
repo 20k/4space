@@ -4246,6 +4246,8 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(display_popout, ser);
         s.handle_serialise(display_ui, ser);
         s.handle_serialise(owned_by, ser);
+        s.handle_serialise(tex, ser);
+        s.handle_serialise(is_loaded, ser);
         s.handle_serialise(highlight, ser);
         s.handle_serialise(has_element, ser);
 

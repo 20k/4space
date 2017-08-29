@@ -2689,7 +2689,7 @@ int main()
 
     fleet_manager fleet_manage;
 
-    #if 0
+    #ifndef ONLY_PLAYER
 
     empire* hostile_empire = empire_manage.make_new();
     hostile_empire->name = "Irate Uzbekiztaniaite Spacewombles";
@@ -2810,7 +2810,7 @@ int main()
     planet->orbital_length = 150.f;
     planet->rotation_velocity_ps = 2*M_PI / 200.f;
 
-    #if 0
+    #ifndef ONLY_PLAYER
     orbital* ofleet = base->make_new(orbital_info::FLEET, 5.f);
 
     ofleet->orbital_angle = M_PI/13.f;
@@ -2842,7 +2842,7 @@ int main()
 
 
     player_empire->take_ownership_of_all(base);
-    #if 0
+    #ifndef ONLY_PLAYER
     player_empire->take_ownership(fleet1);
     player_empire->take_ownership(fleet3);
 
@@ -2851,7 +2851,7 @@ int main()
     #endif
     //player_empire->take_ownership(fleet5);
 
-    #if 0
+    #ifndef ONLY_PLAYER
     orbital* ohostile_fleet = base->make_new(orbital_info::FLEET, 5.f);
     ohostile_fleet->orbital_angle = 0.f;
     ohostile_fleet->orbital_length = 250;
@@ -2878,7 +2878,7 @@ int main()
     //orbital_system* sys_2 = system_manage.make_new();
     //sys_2->generate_random_system(3, 100, 3, 5);
 
-    #if 0
+    #ifndef ONLY_PLAYER
 
     empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
     e2->take_ownership_of_all(sys_3);
@@ -2930,7 +2930,7 @@ int main()
 
     all_events_manager all_events;
 
-    #if 0
+    #ifndef ONLY_PLAYER
     game_event_manager* test_event = all_events.make_new(game_event_info::ANCIENT_PRECURSOR, tplanet, fleet_manage, system_manage);
 
     test_event->set_faction(derelict_empire);
@@ -3328,6 +3328,7 @@ int main()
             ser.handle_serialise(empire_manage, true);
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);
+            ser.handle_serialise(all_battles, true);
 
             /*for(ship_manager* sm : fleet_manage.fleets)
             {
@@ -3393,13 +3394,25 @@ int main()
                 delete sm;
             }
 
+            for(battle_manager* battle : all_battles.battles)
+            {
+                for(projectile* proj : battle->projectile_manage.projectiles)
+                {
+                    delete proj;
+                }
+
+                delete battle;
+            }
+
             empire_manage = empire_manager();
             system_manage = system_manager();
             fleet_manage = fleet_manager();
+            all_battles = all_battles_manager();
 
             ser.handle_serialise(empire_manage, false);
             ser.handle_serialise(system_manage, false);
             ser.handle_serialise(fleet_manage, false);
+            ser.handle_serialise(all_battles, false);
 
             /*for(ship_manager* sm : fleet_manage.fleets)
             {

@@ -127,6 +127,27 @@ void projectile::load(int type)
     tex.setSmooth(true);
 }
 
+void projectile::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(ship_fired_by, ser);
+        s.handle_serialise(fired_by, ser);
+        s.handle_serialise(base, ser);
+        s.handle_serialise(pteam, ser);
+        s.handle_serialise(velocity, ser);
+        s.handle_serialise(type, ser);
+        s.handle_serialise(options, ser);
+
+        if(handled_by_client == false)
+        {
+            handled_by_client = true;
+
+            load(type);
+        }
+    }
+}
+
 projectile* projectile_manager::make_new()
 {
     projectile* p = new projectile;
@@ -292,6 +313,14 @@ void projectile_manager::draw(sf::RenderWindow& win)
             win.draw(spr, mode);
         else
             win.draw(spr, states);
+    }
+}
+
+void projectile_manager::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(projectiles, ser);
     }
 }
 
@@ -854,6 +883,17 @@ orbital_system* battle_manager::get_system_in(system_manager& system_manage)
     return sys;
 }
 
+void battle_manager::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(is_ui_opened, ser);
+        s.handle_serialise(slots_filled, ser);
+        s.handle_serialise(ships, ser);
+        s.handle_serialise(projectile_manage, ser);
+    }
+}
+
 battle_manager* all_battles_manager::make_new()
 {
     battle_manager* bm = new battle_manager;
@@ -1000,4 +1040,17 @@ battle_manager* all_battles_manager::get_battle_involving(ship_manager* ship_man
     }
 
     return nullptr;
+}
+
+void all_battles_manager::do_serialise(serialise& s, bool ser)
+{
+    if(serialise_data_helper::disk_mode)
+    {
+        s.handle_serialise(request_leave_battle_view, ser);
+        s.handle_serialise(request_enter_battle_view, ser);
+        s.handle_serialise(request_stay_in_battle_system, ser);
+        s.handle_serialise(request_stay_id, ser);
+        s.handle_serialise(currently_viewing, ser);
+        s.handle_serialise(battles, ser);
+    }
 }
