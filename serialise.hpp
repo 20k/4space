@@ -219,12 +219,12 @@ struct serialise_helper<T*>
 
         if(was_nullptr)
         {
-            ///we're reading this element for the first time
-            ptr->do_serialise(s, false);
-
             ptr->handled_by_client = false;
             ptr->owned_by_host = false;
             ptr->owner_id = owner_id;
+
+            ///we're reading this element for the first time
+            ptr->do_serialise(s, false);
         }
 
         v = ptr;

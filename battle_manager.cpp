@@ -77,9 +77,11 @@ void premultiply(sf::Image& image)
     }
 }
 
-void projectile::load(int type)
+void projectile::load(int _type)
 {
     using namespace ship_component_elements;
+
+    type = _type;
 
     std::string str = "./pics/";
 
@@ -138,6 +140,12 @@ void projectile::do_serialise(serialise& s, bool ser)
         s.handle_serialise(velocity, ser);
         s.handle_serialise(type, ser);
         s.handle_serialise(options, ser);
+
+        s.handle_serialise(dim, ser);
+        s.handle_serialise(local_rot, ser);
+        s.handle_serialise(local_pos, ser);
+        s.handle_serialise(world_rot, ser);
+        s.handle_serialise(world_pos, ser);
 
         if(handled_by_client == false)
         {

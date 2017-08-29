@@ -4257,6 +4257,12 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(team, ser);
         s.handle_serialise(name, ser);
         s.handle_serialise(ai_fleet_type, ser);
+
+        s.handle_serialise(dim, ser);
+        s.handle_serialise(local_rot, ser);
+        s.handle_serialise(local_pos, ser);
+        s.handle_serialise(world_rot, ser);
+        s.handle_serialise(world_pos, ser);
     }
     #endif
 }
