@@ -480,15 +480,12 @@ struct serialise_helper<sf::Texture>
         vec2i dim = {v.getSize().x, v.getSize().y};
         helper.add(dim, s, data);
 
+        if(dim.x() == 0 || dim.y() == 0)
+            return;
+
         serialise_helper<char> smooth;
         char is_smooth = (char)v.isSmooth();
         smooth.add(is_smooth, s, data);
-
-        /*for(uint32_t i=0; i<v.size(); i++)
-        {
-            serialise_helper<decltype(v[i])> helper;
-            helper.add(v[i], s, data);
-        }*/
 
         sf::Image img = v.copyToImage();
 
@@ -513,33 +510,13 @@ struct serialise_helper<sf::Texture>
 
     void get(sf::Texture& v, serialise& s, int& internal_counter, std::vector<char>& data)
     {
-        /*serialise_helper<int32_t> helper;
-        int32_t length;
-        helper.get(length, s, internal_counter, data);
-
-        if(internal_counter + length * sizeof(char) > (int)data.size())
-        {
-            std::cout << "Error, invalid bytefetch" << std::endl;
-
-            v = std::string();
-
-            return;
-        }
-
-        for(int i=0; i<length; i++)
-        {
-            serialise_helper<char> type;
-
-            char c;
-            type.get(c, s, internal_counter, data);
-
-            v.push_back(c);
-        }*/
-
         serialise_helper<vec2i> helper;
 
         vec2i dim;
         helper.get(dim,s, internal_counter, data);
+
+        if(dim.x() == 0 || dim.y() == 0)
+            return;
 
         serialise_helper<char> smooth_helper;
         char smooth;
