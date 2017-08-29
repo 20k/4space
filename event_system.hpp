@@ -92,8 +92,8 @@ namespace lone_derelict_dialogue
 ///a game event is ONE single event
 struct game_event
 {
-    int arc_type;
-    int event_num;
+    int arc_type = 0;
+    int event_num = 0;
 
     float scanning_difficulty = randf_s(0.f, 1.f);
 
@@ -129,10 +129,10 @@ struct game_event_manager
     ///could be one of many
     empire* ancient_faction = nullptr;
     empire* interacting_faction = nullptr;
-    fleet_manager* fleet_manage;
-    system_manager* system_manage;
+    fleet_manager* fleet_manage = nullptr;
+    system_manager* system_manage = nullptr;
 
-    int arc_type;
+    int arc_type = 0;
     ///basically determines the difficulty of this arc
     ///we may need to distribute this more intelligently than just prng
     float overall_tech_level = randf_s(0.f, 9.f);
