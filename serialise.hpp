@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <vec/vec.hpp>
+#include <deque>
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
@@ -249,6 +250,41 @@ struct serialise_helper<std::vector<T>>
     }
 
     void get(std::vector<T>& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+        int32_t length;
+        helper.get(length, s, internal_counter, data);
+
+        for(int i=0; i<length; i++)
+        {
+            serialise_helper<T> type;
+
+            T t;
+            type.get(t, s, internal_counter, data);
+
+            v.push_back(t);
+        }
+    }
+};
+
+template<typename T>
+struct serialise_helper<std::deque<T>>
+{
+    void add(std::deque<T>& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<int32_t> helper;
+
+        int32_t len = v.size();
+        helper.add(len, s, data);
+
+        for(uint32_t i=0; i<v.size(); i++)
+        {
+            serialise_helper<T> helper;
+            helper.add(v[i], s, data);
+        }
+    }
+
+    void get(std::deque<T>& v, serialise& s, int& internal_counter, std::vector<char>& data)
     {
         serialise_helper<int32_t> helper;
         int32_t length;

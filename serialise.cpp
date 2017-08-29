@@ -158,6 +158,29 @@ void test_serialisation()
     }
 
     {
+        std::deque<test_object> objects;
+
+        objects.resize(5);
+
+        objects[1].v1 = 3434;
+
+        serialise ser;
+        ser.handle_serialise(objects, true);
+
+        std::deque<test_object> found;
+
+        ser.handle_serialise(found, false);
+
+        assert(found.size() == objects.size());
+
+        for(int i=0; i<found.size(); i++)
+        {
+            assert(objects[i].v1 == found[i].v1);
+            assert(objects[i].v2 == found[i].v2);
+        }
+    }
+
+    {
         std::vector<test_object*> objects;
         objects.resize(5);
 
