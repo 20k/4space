@@ -3455,6 +3455,8 @@ int main()
 
         if(ImGui::Button("TRY MASSIVE PACKET") && net_state.my_id != -1)
         {
+            serialise_data_helper::owner_to_id_to_pointer.clear();
+
             serialise ser;
 
             ser.handle_serialise(empire_manage, true);

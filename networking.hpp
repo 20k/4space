@@ -46,7 +46,7 @@ struct network_data
 
 int get_max_packet_size_clientside()
 {
-    return 256;
+    return 450;
 }
 
 int get_packet_fragments(int data_size)
@@ -134,6 +134,13 @@ struct network_state
         if(!sock.valid())
             return;
 
+        byte_vector v1;
+        v1.push_back(canary_start);
+        v1.push_back(message::KEEP_ALIVE);
+        v1.push_back(canary_end);
+
+        udp_send_to(sock, v1.ptr, (const sockaddr*)&store);
+
         bool any_recv = true;
 
         while(any_recv && sock_readable(sock))
@@ -175,8 +182,8 @@ struct network_state
                     s.data = fetch.ptr;
                     s.internal_counter = fetch.internal_counter;
 
-                    int real_current_data_length = header.current_size - header.calculate_size();
-                    int real_overall_data_length = header.overall_size - header.calculate_size();
+                    int real_current_data_length = header.current_size - header.calculate_size() - sizeof(no);
+                    int real_overall_data_length = header.overall_size - header.calculate_size() - sizeof(no);
 
                     int packet_fragments = get_packet_fragments(real_overall_data_length);
 
@@ -196,7 +203,7 @@ struct network_state
 
                         serialise ser;
 
-                        for(int i=0; i < real_current_data_length && i < get_max_packet_size_clientside(); i++)
+                        for(int i=0; i < real_current_data_length; i++)
                         {
                             ser.data.push_back(fetch.get<uint8_t>());
                         }
@@ -206,6 +213,8 @@ struct network_state
                         packets.push_back(next);
 
                         int current_received_fragments = packets.size();
+
+                        std::cout << "FHAS " << current_received_fragments << " ";
 
                         if(current_received_fragments == packet_fragments)
                         {
@@ -221,6 +230,8 @@ struct network_state
                             incomplete_packets[no.owner_id][no.serialise_id].erase(packet_id);
 
                             available_data.push_back({no, s, false});
+
+                            std::cout << "got full dataset " << s.data.size() << std::endl;
                         }
                     }
                     else
@@ -295,6 +306,7 @@ struct network_state
         packet_header header;
         header.current_size = s.data.size() + header.calculate_size() + sizeof(no);
         header.overall_size = header.current_size;
+        header.packet_id = packet_id;
 
         if(fragments == 1)
         {
@@ -320,6 +332,8 @@ struct network_state
         }
         else
         {
+            std::cout << "Fnum " << fragments << std::endl;
+
             int real_data_per_packet = ceil((float)s.data.size() / fragments);
 
             int sent = 0;
@@ -356,6 +370,9 @@ struct network_state
                     break;
 
                 vec.push_back(canary_end);
+
+
+                while(!sock_writable(sock)) {}
 
                 udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
 
