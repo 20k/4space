@@ -89,6 +89,7 @@ struct network_state
     std::vector<network_data> available_data;
     std::map<serialise_owner_type, std::map<serialise_data_type, std::map<packet_id_type, std::vector<packet_info>>>> incomplete_packets;
     std::map<packet_id_type, int> packet_sequence_to_expected_size;
+    std::map<packet_id_type, serialise_data_type> packet_id_to_serialise;
 
     void tick_join_game(float dt_s)
     {
@@ -165,6 +166,7 @@ struct network_state
         serialise_owner_type owner_id = 0;
         sequence_data_type sequence_id = 0;
         packet_id_type packet_id = 0;
+        serialise_data_type serialise_id;
     };
 
     void request_incomplete_packets(int max_fragments_to_request)
@@ -218,6 +220,8 @@ struct network_state
 
         for(packet_request& i : requests)
         {
+            i.serialise_id = packet_id_to_serialise[i.packet_id];
+
             byte_vector vec;
             vec.push_back(canary_start);
             vec.push_back(message::REQUEST);
@@ -225,7 +229,7 @@ struct network_state
             vec.push_back(i);
             vec.push_back(canary_end);
 
-            //std::cout << "R " << i.sequence_id << std::endl;
+            while(!sock_writable(sock)) {}
 
             udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
         }
@@ -236,7 +240,7 @@ struct network_state
         if(!sock.valid())
             return;
 
-        request_incomplete_packets(5);
+        request_incomplete_packets(20);
 
         byte_vector v1;
         v1.push_back(canary_start);
@@ -276,6 +280,16 @@ struct network_state
                     packet_request request = fetch.get<packet_request>();
 
                     fetch.get<int32_t>();
+
+                    network_object no;
+                    no.owner_id = request.owner_id;
+                    no.serialise_id = request.serialise_id;
+
+                    //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
+
+                    const auto& vec = packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
+
+                    udp_send_to(sock, vec.vec.ptr, (const sockaddr*)&store);
                 }
 
                 if(type == message::FORWARDING)
@@ -305,6 +319,7 @@ struct network_state
                     if(packet_fragments > 1)
                     {
                         packet_sequence_to_expected_size[header.packet_id] = packet_fragments;
+                        packet_id_to_serialise[header.packet_id] = no.serialise_id;
 
                         std::vector<packet_info>& packets = incomplete_packets[no.owner_id][no.serialise_id][header.packet_id];
 
@@ -312,7 +327,8 @@ struct network_state
                         packet_info next;
                         next.sequence_number = header.sequence_number;
 
-                        std::cout << header.sequence_number << std::endl;
+                        if((header.sequence_number % 100) == 0)
+                            std::cout << header.sequence_number << std::endl;
 
                         next.data.data = packet.fetch.ptr;
 
@@ -345,11 +361,12 @@ struct network_state
                             for(packet_info& packet : packets)
                             {
                                 s.data.insert(std::end(s.data), std::begin(packet.data.data), std::end(packet.data.data));
+
+                                packet.data.data.clear();
                             }
 
-                            incomplete_packets[no.owner_id][no.serialise_id].erase(header.packet_id);
-
-                            available_data.push_back({no, s, false});
+                            if(s.data.size() > 0)
+                                available_data.push_back({no, s, false});
 
                             std::cout << "got full dataset " << s.data.size() << std::endl;
                         }
@@ -409,14 +426,14 @@ struct network_state
         }
     }
 
-    byte_vector get_fragment(int id, const network_object& no, serialise& s)
+    byte_vector get_fragment(int id, const network_object& no, const std::vector<char>& data)
     {
-        int fragments = get_packet_fragments(s.data.size());
+        int fragments = get_packet_fragments(data.size());
 
         sequence_data_type sequence_number = 0;
 
         packet_header header;
-        header.current_size = s.data.size() + header.calculate_size() + sizeof(no);
+        header.current_size = data.size() + header.calculate_size() + sizeof(no);
         header.overall_size = header.current_size;
         header.packet_id = packet_id;
 
@@ -429,7 +446,7 @@ struct network_state
             vec.push_back(header);
             vec.push_back<network_object>(no);
 
-            for(auto& i : s.data)
+            for(auto& i : data)
             {
                 vec.push_back(i);
             }
@@ -439,10 +456,10 @@ struct network_state
             return vec;
         }
 
-        int real_data_per_packet = ceil((float)s.data.size() / fragments);
+        int real_data_per_packet = ceil((float)data.size() / fragments);
 
         int sent = id * real_data_per_packet;
-        int to_send = s.data.size();
+        int to_send = data.size();
 
         if(sent >= to_send)
             return byte_vector();
@@ -462,7 +479,7 @@ struct network_state
 
         for(int kk = 0; kk < real_data_per_packet && sent < to_send; kk++)
         {
-            vec.push_back(s.data[sent]);
+            vec.push_back(data[sent]);
 
             sent++;
         }
@@ -485,7 +502,7 @@ struct network_state
 
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
-            byte_vector frag = get_fragment(i, no, s);
+            byte_vector frag = get_fragment(i, no, s.data);
 
             while(!sock_writable(sock)) {}
 
