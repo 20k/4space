@@ -2251,3 +2251,13 @@ void empire_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(empires, ser);
     }
 }
+
+void empire_manager::erase_all()
+{
+    for(empire* e : empires)
+    {
+        delete e;
+    }
+
+    empires.clear();
+}

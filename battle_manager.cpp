@@ -1062,3 +1062,18 @@ void all_battles_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(battles, ser);
     }
 }
+
+void all_battles_manager::erase_all()
+{
+    for(battle_manager* battle : battles)
+    {
+        for(projectile* proj : battle->projectile_manage.projectiles)
+        {
+            delete proj;
+        }
+
+        delete battle;
+    }
+
+    battles.clear();
+}

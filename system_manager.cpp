@@ -3741,3 +3741,18 @@ void system_manager::ensure_found_orbitals_handled()
         sys->ensure_found_orbitals_handled();
     }
 }
+
+void system_manager::erase_all()
+{
+    for(orbital_system* sys : systems)
+    {
+        for(orbital* o : sys->orbitals)
+        {
+            delete o;
+        }
+
+        delete sys;
+    }
+
+    systems.clear();
+}

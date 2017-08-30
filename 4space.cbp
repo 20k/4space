@@ -91,6 +91,7 @@
 		<Unit filename="imgui_customisation.cpp" />
 		<Unit filename="imgui_customisation.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="networking.hpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />
 		<Unit filename="object_command_queue.cpp" />

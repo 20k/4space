@@ -253,6 +253,15 @@ struct network_state
         }
     }
 
+    ///hmm
+    /*bool is_data_complete(int data_id)
+    {
+        if(data_id < 0 || data_id >= data_complete.size())
+            return false;
+
+        return true;
+    }*/
+
     void tick()
     {
         if(!sock.valid())
@@ -325,9 +334,9 @@ struct network_state
 
                     network_object no = packet.no;
 
-                    serialise s;
-                    s.data = fetch.ptr;
-                    s.internal_counter = fetch.internal_counter;
+                    //serialise s;
+                    //s.data = fetch.ptr;
+                    //s.internal_counter = fetch.internal_counter;
 
                     //int real_current_data_length = header.current_size - header.calculate_size() - sizeof(no);
                     int real_overall_data_length = header.overall_size - header.calculate_size() - sizeof(no);
@@ -384,14 +393,18 @@ struct network_state
                             }
 
                             if(s.data.size() > 0)
+                            {
+                                std::cout << "got full dataset " << s.data.size() << std::endl;
                                 available_data.push_back({no, s, false});
-
-                            std::cout << "got full dataset " << s.data.size() << std::endl;
+                            }
                         }
                     }
                     else
                     {
-                         available_data.push_back({no, s, false});
+                        serialise s;
+                        s.data = packet.fetch.ptr;
+
+                        available_data.push_back({no, s, false});
                     }
 
                     auto found_end = packet.canary_second;

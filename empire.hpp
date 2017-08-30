@@ -300,6 +300,8 @@ struct empire_manager : serialisable
     int frame_counter = 0;
 
     void do_serialise(serialise& s, bool ser) override;
+
+    void erase_all();
 };
 
 #endif // EMPIRE_HPP_INCLUDED

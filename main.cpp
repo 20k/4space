@@ -3004,6 +3004,8 @@ int main()
     networking_init();
     network_state net_state;
 
+    bool test_networked_load = true;
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
@@ -3374,40 +3376,13 @@ int main()
             ///textfile names are currently discarded!
             ser.load("Game.save");
 
-            for(empire* e : empire_manage.empires)
-            {
-                delete e;
-            }
+            empire_manage.erase_all();
+            system_manage.erase_all();
 
-            for(orbital_system* sys : system_manage.systems)
-            {
-                for(orbital* o : sys->orbitals)
-                {
-                    delete o;
-                }
+            fleet_manage.erase_all();
 
-                delete sys;
-            }
+            all_battles.erase_all();
 
-            for(ship_manager* sm : fleet_manage.fleets)
-            {
-                for(ship* s : sm->ships)
-                {
-                    delete s;
-                }
-
-                delete sm;
-            }
-
-            for(battle_manager* battle : all_battles.battles)
-            {
-                for(projectile* proj : battle->projectile_manage.projectiles)
-                {
-                    delete proj;
-                }
-
-                delete battle;
-            }
 
             empire_manage = empire_manager();
             system_manage = system_manager();
@@ -3440,11 +3415,62 @@ int main()
                 }
             }
 
-
             system_manage.ensure_found_orbitals_handled();
         }
 
+
         ImGui::End();
+
+        if(test_networked_load && net_state.connected())
+        {
+            for(network_data& i : net_state.available_data)
+            {
+                int32_t internal_counter = i.data.internal_counter;
+
+                int32_t is_data_dump = 0;
+
+                i.data.handle_serialise(is_data_dump, false);
+
+                if(!is_data_dump)
+                {
+                    i.data.internal_counter = internal_counter;
+
+                    continue;
+                }
+
+                std::cout << "hello" << std::endl;
+
+                popup.clear();
+
+                empire_manage.erase_all();
+                system_manage.erase_all();
+
+                fleet_manage.erase_all();
+
+                all_battles.erase_all();
+
+                serialise ser = i.data;
+
+                ser.handle_serialise(empire_manage, false);
+                ser.handle_serialise(system_manage, false);
+                ser.handle_serialise(fleet_manage, false);
+                ser.handle_serialise(all_battles, false);
+
+                for(empire* e : empire_manage.empires)
+                {
+                    if(e->is_player)
+                    {
+                        player_empire = e;
+
+                        break;
+                    }
+                }
+
+                system_manage.ensure_found_orbitals_handled();
+
+                test_networked_load = false;
+            }
+        }
 
         ImGui::BeginOverride("Networking");
 
@@ -3459,6 +3485,8 @@ int main()
 
             serialise ser;
 
+            int32_t is_data_dump = true;
+            ser.handle_serialise(is_data_dump, true);
             ser.handle_serialise(empire_manage, true);
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);
@@ -3473,6 +3501,11 @@ int main()
         }
 
         ImGui::End();
+
+        if(net_state.connected())
+        {
+
+        }
 
         net_state.tick_join_game(diff_s);
         net_state.tick();

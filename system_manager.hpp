@@ -418,6 +418,8 @@ struct system_manager : serialisable
     void do_serialise(serialise& s, bool ser) override;
 
     void ensure_found_orbitals_handled();
+
+    void erase_all();
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

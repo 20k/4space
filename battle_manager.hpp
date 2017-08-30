@@ -157,6 +157,8 @@ struct all_battles_manager : serialisable
     bool request_leave_battle_view = false;
 
     void do_serialise(serialise& s, bool ser) override;
+
+    void erase_all();
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

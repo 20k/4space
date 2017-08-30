@@ -5425,3 +5425,18 @@ void fleet_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(fleets, ser);
     }
 }
+
+void fleet_manager::erase_all()
+{
+    for(ship_manager* sm : fleets)
+    {
+        for(ship* s : sm->ships)
+        {
+            delete s;
+        }
+
+        delete sm;
+    }
+
+    fleets.clear();
+}
