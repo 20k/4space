@@ -73,6 +73,7 @@ struct network_state
     udp_sock sock;
     sockaddr_storage store;
     bool have_sock = false;
+    bool try_join = false;
 
     packet_id_type packet_id = 0;
 
@@ -92,6 +93,9 @@ struct network_state
         if(my_id != -1)
             return;
 
+        if(!try_join)
+            return;
+
         timeout += dt_s;
 
         if(timeout > timeout_max)
@@ -107,6 +111,8 @@ struct network_state
         sock.close();
 
         my_id = -1;
+
+        try_join = false;
     }
 
     void tick()
@@ -212,6 +218,8 @@ struct network_state
                     {
                         printf("err in CLIENTJOINACK\n");
                     }
+
+                    std::cout << "id" << std::endl;
                 }
 
                 if(type == message::PING_DATA)

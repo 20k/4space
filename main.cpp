@@ -3001,6 +3001,9 @@ int main()
     tex.loadFromImage(img);
     tex.setSmooth(true);
 
+    networking_init();
+    network_state net_state;
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
@@ -3442,6 +3445,18 @@ int main()
         }
 
         ImGui::End();
+
+        ImGui::BeginOverride("Networking");
+
+        if(ImGui::Button("Join"))
+        {
+            net_state.try_join = true;
+        }
+
+        ImGui::End();
+
+        net_state.tick_join_game(diff_s);
+        net_state.tick();
 
 
         system_manage.cull_empty_orbital_fleets(empire_manage, popup);
