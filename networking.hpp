@@ -529,6 +529,8 @@ struct network_state
 
     void forward_data(const network_object& no, serialise& s)
     {
+        int max_to_send = 10;
+
         int fragments = get_packet_fragments(s.data.size());
 
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
@@ -539,7 +541,8 @@ struct network_state
 
             packet_id_to_sequence_number_to_data[packet_id][i] = {frag};
 
-            udp_send_to(sock, frag.ptr, (const sockaddr*)&store);
+            if(i < max_to_send)
+                udp_send_to(sock, frag.ptr, (const sockaddr*)&store);
         }
 
         packet_id = packet_id + 1;
