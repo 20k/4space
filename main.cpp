@@ -3453,6 +3453,23 @@ int main()
             net_state.try_join = true;
         }
 
+        if(ImGui::Button("TRY MASSIVE PACKET") && net_state.my_id != -1)
+        {
+            serialise ser;
+
+            ser.handle_serialise(empire_manage, true);
+            ser.handle_serialise(system_manage, true);
+            ser.handle_serialise(fleet_manage, true);
+            ser.handle_serialise(all_battles, true);
+
+            network_object no_test;
+
+            no_test.owner_id = net_state.my_id;
+            no_test.serialise_id = -2;
+
+            net_state.forward_data(no_test, ser);
+        }
+
         ImGui::End();
 
         net_state.tick_join_game(diff_s);

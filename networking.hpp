@@ -115,6 +115,20 @@ struct network_state
         try_join = false;
     }
 
+    #pragma pack(1)
+    struct packet_header
+    {
+        uint32_t current_size;
+        int32_t overall_size = 0;
+        packet_id_type packet_id = 0;
+        uint8_t sequence_number = 0;
+
+        uint32_t calculate_size()
+        {
+            return sizeof(overall_size) + sizeof(packet_id) + sizeof(sequence_number);
+        }
+    };
+
     void tick()
     {
         if(!sock.valid())
@@ -146,11 +160,14 @@ struct network_state
 
                 if(type == message::FORWARDING)
                 {
+                    /*uint32_t data_size = fetch.get<uint32_t>();
+                    uint32_t cdata_size = fetch.get<uint32_t>();
+
                     packet_id_type packet_id = fetch.get<packet_id_type>();
 
-                    uint8_t sequence_number = fetch.get<uint8_t>();
+                    uint8_t sequence_number = fetch.get<uint8_t>();*/
 
-                    uint32_t data_size = fetch.get<uint32_t>();
+                    packet_header header = fetch.get<packet_header>();
 
                     network_object no = fetch.get<network_object>();
 
@@ -158,7 +175,10 @@ struct network_state
                     s.data = fetch.ptr;
                     s.internal_counter = fetch.internal_counter;
 
-                    int packet_fragments = get_packet_fragments(data_size - sizeof(network_object));
+                    int real_current_data_length = header.current_size - header.calculate_size();
+                    int real_overall_data_length = header.overall_size - header.calculate_size();
+
+                    int packet_fragments = get_packet_fragments(real_overall_data_length);
 
                     if(packet_fragments > 1)
                     {
@@ -169,6 +189,21 @@ struct network_state
                         }*/
 
                         std::vector<packet_info>& packets = incomplete_packets[no.owner_id][no.serialise_id][packet_id];
+
+                        ///INSERT PACKET INTO PACKETS
+                        packet_info next;
+                        next.sequence_number = header.sequence_number;
+
+                        serialise ser;
+
+                        for(int i=0; i < real_current_data_length && i < get_max_packet_size_clientside(); i++)
+                        {
+                            ser.data.push_back(fetch.get<uint8_t>());
+                        }
+
+                        next.data = ser;
+
+                        packets.push_back(next);
 
                         int current_received_fragments = packets.size();
 
@@ -190,13 +225,14 @@ struct network_state
                     }
                     else
                     {
+                        for(int i=0; i < real_current_data_length && i < get_max_packet_size_clientside(); i++)
+                        {
+                            fetch.get<uint8_t>();
+                        }
+
                         available_data.push_back({no, s, false});
                     }
 
-                    for(int i=0; i < (data_size - sizeof(network_object)) && i < get_max_packet_size_clientside(); i++)
-                    {
-                        fetch.get<uint8_t>();
-                    }
 
                     auto found_end = fetch.get<decltype(canary_end)>();
 
@@ -219,7 +255,7 @@ struct network_state
                         printf("err in CLIENTJOINACK\n");
                     }
 
-                    std::cout << "id" << std::endl;
+                    std::cout << recv_id << std::endl;
                 }
 
                 if(type == message::PING_DATA)
@@ -250,11 +286,15 @@ struct network_state
 
     void forward_data(const network_object& no, serialise& s)
     {
-        uint32_t data_size = sizeof(no) + s.data.size();
+        //uint32_t data_size = sizeof(no) + s.data.size() + sizeof(uint8_t) + sizeof(packet_id);
 
-        int fragments = get_packet_fragments(data_size - sizeof(network_object));
+        int fragments = get_packet_fragments(s.data.size());
 
         uint8_t sequence_number = 0;
+
+        packet_header header;
+        header.current_size = s.data.size() + header.calculate_size() + sizeof(no);
+        header.overall_size = header.current_size;
 
         if(fragments == 1)
         {
@@ -262,9 +302,11 @@ struct network_state
 
             vec.push_back(canary_start);
             vec.push_back(message::FORWARDING);
-            vec.push_back(sequence_number);
-            vec.push_back(packet_id);
+            /*vec.push_back(data_size);
             vec.push_back(data_size);
+            vec.push_back(sequence_number);
+            vec.push_back(packet_id);*/
+            vec.push_back(header);
             vec.push_back<network_object>(no);
 
             for(auto& i : s.data)
@@ -287,11 +329,20 @@ struct network_state
             {
                 byte_vector vec;
 
+                int to_send_size = std::min(real_data_per_packet, to_send - sent);
+
+                header.current_size = to_send_size + header.calculate_size() + sizeof(no);
+                header.sequence_number = sequence_number;
+                header.packet_id = packet_id;
+
                 vec.push_back(canary_start);
                 vec.push_back(message::FORWARDING);
-                vec.push_back(sequence_number);
-                vec.push_back(packet_id);
+                /*vec.push_back(to_send_size);
                 vec.push_back(data_size);
+                vec.push_back(sequence_number);
+                vec.push_back(packet_id);*/
+
+                vec.push_back(header);
                 vec.push_back<network_object>(no);
 
                 for(int kk = 0; kk < real_data_per_packet && sent < to_send; kk++)
