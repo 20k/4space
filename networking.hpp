@@ -44,6 +44,28 @@ struct network_data
     bool should_cleanup = false;
 };
 
+int get_max_packet_size_clientside()
+{
+    return 256;
+}
+
+int get_packet_fragments(int data_size)
+{
+    int max_data_size = get_max_packet_size_clientside();
+
+    int fragments = ceil((float)data_size / max_data_size);
+
+    return fragments;
+}
+
+using packet_id_type = uint8_t;
+
+struct packet_info
+{
+    uint8_t sequence_number = 0;
+    serialise data;
+};
+
 struct network_state
 {
     int my_id = -1;
@@ -51,6 +73,8 @@ struct network_state
     udp_sock sock;
     sockaddr_storage store;
     bool have_sock = false;
+
+    packet_id_type packet_id = 0;
 
     bool connected()
     {
@@ -61,6 +85,7 @@ struct network_state
     float timeout = timeout_max;
 
     std::vector<network_data> available_data;
+    std::map<serialise_owner_type, std::map<serialise_data_type, std::map<packet_id_type, std::vector<packet_info>>>> incomplete_packets;
 
     void tick_join_game(float dt_s)
     {
@@ -115,6 +140,10 @@ struct network_state
 
                 if(type == message::FORWARDING)
                 {
+                    packet_id_type packet_id = fetch.get<packet_id_type>();
+
+                    uint8_t sequence_number = fetch.get<uint8_t>();
+
                     uint32_t data_size = fetch.get<uint32_t>();
 
                     network_object no = fetch.get<network_object>();
@@ -123,9 +152,42 @@ struct network_state
                     s.data = fetch.ptr;
                     s.internal_counter = fetch.internal_counter;
 
-                    available_data.push_back({no, s, false});
+                    int packet_fragments = get_packet_fragments(data_size - sizeof(network_object));
 
-                    for(int i=0; i < (data_size - sizeof(network_object)) && i < 512; i++)
+                    if(packet_fragments > 1)
+                    {
+                        /*if(incomplete_packets.find(no.owner_id) != incomplete_packets.end() &&
+                           incomplete_packets[no.owner_id].find(no.serialise_id] != incomplete_packets[no.owner_id].end())
+                        {
+                            current_received_fragments = incomplete_packets[no.owner_id][no.serialise_id][packet_id].size()
+                        }*/
+
+                        std::vector<packet_info>& packets = incomplete_packets[no.owner_id][no.serialise_id][packet_id];
+
+                        int current_received_fragments = packets.size();
+
+                        if(current_received_fragments == packet_fragments)
+                        {
+                            std::sort(packets.begin(), packets.end(), [](packet_info& p1, packet_info& p2){return p1.sequence_number < p2.sequence_number;});
+
+                            serialise s;
+
+                            for(packet_info& packet : packets)
+                            {
+                                s.data.insert(std::end(s.data), std::begin(packet.data.data), std::end(packet.data.data));
+                            }
+
+                            incomplete_packets[no.owner_id][no.serialise_id].erase(packet_id);
+
+                            available_data.push_back({no, s, false});
+                        }
+                    }
+                    else
+                    {
+                        available_data.push_back({no, s, false});
+                    }
+
+                    for(int i=0; i < (data_size - sizeof(network_object)) && i < get_max_packet_size_clientside(); i++)
                     {
                         fetch.get<uint8_t>();
                     }
@@ -182,21 +244,67 @@ struct network_state
     {
         uint32_t data_size = sizeof(no) + s.data.size();
 
-        byte_vector vec;
+        int fragments = get_packet_fragments(data_size - sizeof(network_object));
 
-        vec.push_back(canary_start);
-        vec.push_back(message::FORWARDING);
-        vec.push_back(data_size);
-        vec.push_back<network_object>(no);
+        uint8_t sequence_number = 0;
 
-        for(auto& i : s.data)
+        if(fragments == 1)
         {
-            vec.push_back(i);
+            byte_vector vec;
+
+            vec.push_back(canary_start);
+            vec.push_back(message::FORWARDING);
+            vec.push_back(sequence_number);
+            vec.push_back(packet_id);
+            vec.push_back(data_size);
+            vec.push_back<network_object>(no);
+
+            for(auto& i : s.data)
+            {
+                vec.push_back(i);
+            }
+
+            vec.push_back(canary_end);
+
+            udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+        }
+        else
+        {
+            int real_data_per_packet = ceil((float)s.data.size() / fragments);
+
+            int sent = 0;
+            int to_send = s.data.size();
+
+            for(int i=0; i<fragments; i++)
+            {
+                byte_vector vec;
+
+                vec.push_back(canary_start);
+                vec.push_back(message::FORWARDING);
+                vec.push_back(sequence_number);
+                vec.push_back(packet_id);
+                vec.push_back(data_size);
+                vec.push_back<network_object>(no);
+
+                for(int kk = 0; kk < real_data_per_packet && sent < to_send; kk++)
+                {
+                    vec.push_back(s.data[sent]);
+
+                    sent++;
+                }
+
+                if(sent == 0)
+                    break;
+
+                vec.push_back(canary_end);
+
+                udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+
+                sequence_number++;
+            }
         }
 
-        vec.push_back(canary_end);
-
-        udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+        packet_id = packet_id + 1;
     }
 
     /*void forward_data(int player_id, int object_id, int system_network_id, const byte_vector& vec)
