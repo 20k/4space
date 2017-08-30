@@ -178,6 +178,27 @@ struct network_state
         }
     }
 
+    void forward_data(const network_object& no, serialise& s)
+    {
+        uint32_t data_size = sizeof(no) + s.data.size();
+
+        byte_vector vec;
+
+        vec.push_back(canary_start);
+        vec.push_back(message::FORWARDING);
+        vec.push_back(data_size);
+        vec.push_back<network_object>(no);
+
+        for(auto& i : s.data)
+        {
+            vec.push_back(i);
+        }
+
+        vec.push_back(canary_end);
+
+        udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+    }
+
     /*void forward_data(int player_id, int object_id, int system_network_id, const byte_vector& vec)
     {
         network_variable nv(player_id, object_id, system_network_id);
