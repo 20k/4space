@@ -33,6 +33,7 @@
 #include "imgui_customisation.hpp"
 #include "stacktrace_helper.hpp"
 #include "serialise.hpp"
+#include "networking.hpp"
 
 
 /*std::string obfuscate(const std::string& str, bool should_obfuscate)
