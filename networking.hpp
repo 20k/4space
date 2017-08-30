@@ -295,10 +295,8 @@ struct network_state
         }
     }
 
-    void forward_data(const network_object& no, serialise& s)
+    byte_vector get_fragment(int id, const network_object& no, serialise& s)
     {
-        //uint32_t data_size = sizeof(no) + s.data.size() + sizeof(uint8_t) + sizeof(packet_id);
-
         int fragments = get_packet_fragments(s.data.size());
 
         uint8_t sequence_number = 0;
@@ -314,10 +312,72 @@ struct network_state
 
             vec.push_back(canary_start);
             vec.push_back(message::FORWARDING);
-            /*vec.push_back(data_size);
-            vec.push_back(data_size);
-            vec.push_back(sequence_number);
-            vec.push_back(packet_id);*/
+            vec.push_back(header);
+            vec.push_back<network_object>(no);
+
+            for(auto& i : s.data)
+            {
+                vec.push_back(i);
+            }
+
+            vec.push_back(canary_end);
+
+            return vec;
+        }
+
+        int real_data_per_packet = ceil((float)s.data.size() / fragments);
+
+        int sent = id * real_data_per_packet;
+        int to_send = s.data.size();
+
+        if(sent >= to_send)
+            return byte_vector();
+
+        byte_vector vec;
+
+        int to_send_size = std::min(real_data_per_packet, to_send - sent);
+
+        header.current_size = to_send_size + header.calculate_size() + sizeof(no);
+        header.sequence_number = id;
+        header.packet_id = packet_id;
+
+        vec.push_back(canary_start);
+        vec.push_back(message::FORWARDING);
+
+        vec.push_back(header);
+        vec.push_back<network_object>(no);
+
+        for(int kk = 0; kk < real_data_per_packet && sent < to_send; kk++)
+        {
+            vec.push_back(s.data[sent]);
+
+            sent++;
+        }
+
+        vec.push_back(canary_end);
+
+        return vec;
+    }
+
+    void forward_data(const network_object& no, serialise& s)
+    {
+        //uint32_t data_size = sizeof(no) + s.data.size() + sizeof(uint8_t) + sizeof(packet_id);
+
+        int fragments = get_packet_fragments(s.data.size());
+
+        /*uint8_t sequence_number = 0;
+
+        packet_header header;
+        header.current_size = s.data.size() + header.calculate_size() + sizeof(no);
+        header.overall_size = header.current_size;
+        header.packet_id = packet_id;
+
+        if(fragments == 1)
+        {
+            byte_vector vec;
+
+            vec.push_back(canary_start);
+            vec.push_back(message::FORWARDING);
             vec.push_back(header);
             vec.push_back<network_object>(no);
 
@@ -351,10 +411,6 @@ struct network_state
 
                 vec.push_back(canary_start);
                 vec.push_back(message::FORWARDING);
-                /*vec.push_back(to_send_size);
-                vec.push_back(data_size);
-                vec.push_back(sequence_number);
-                vec.push_back(packet_id);*/
 
                 vec.push_back(header);
                 vec.push_back<network_object>(no);
@@ -378,6 +434,15 @@ struct network_state
 
                 sequence_number++;
             }
+        }*/
+
+        for(int i=0; i<get_packet_fragments(s.data.size()); i++)
+        {
+            byte_vector frag = get_fragment(i, no, s);
+
+            while(!sock_writable(sock)) {}
+
+            udp_send_to(sock, frag.ptr, (const sockaddr*)&store);
         }
 
         packet_id = packet_id + 1;
