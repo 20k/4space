@@ -169,6 +169,8 @@ struct network_state
         serialise_data_type serialise_id;
     };
 
+    std::map<packet_id_type, std::map<sequence_data_type, sf::Clock>> request_timeouts;
+
     void request_incomplete_packets(int max_fragments_to_request)
     {
         int fragments_requested = 0;
@@ -215,8 +217,22 @@ struct network_state
             }
         }
 
+        float request_timeout_s = 0.2f;
+
+        for(int i=0; i<requests.size(); i++)
+        {
+            if(request_timeouts[requests[i].packet_id][requests[i].sequence_id].getElapsedTime().asMilliseconds() / 1000.f < request_timeout_s)
+            {
+                requests.erase(requests.begin() + i);
+                i--;
+                continue;
+            }
+        }
+
         if(requests.size() > max_fragments_to_request)
+        {
             requests.resize(max_fragments_to_request);
+        }
 
         for(packet_request& i : requests)
         {
@@ -232,6 +248,8 @@ struct network_state
             while(!sock_writable(sock)) {}
 
             udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+
+            request_timeouts[i.packet_id][i.sequence_id].restart();
         }
     }
 
@@ -240,7 +258,7 @@ struct network_state
         if(!sock.valid())
             return;
 
-        request_incomplete_packets(20);
+        request_incomplete_packets(50);
 
         byte_vector v1;
         v1.push_back(canary_start);
