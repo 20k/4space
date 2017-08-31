@@ -37,11 +37,13 @@ struct network_object
     serialise_data_type serialise_id = -1;
 };
 
+///update so that when processed, we keep around for 10 seconds or so then delete
 struct network_data
 {
     network_object object;
     serialise data;
     bool should_cleanup = false;
+    bool processed = false;
 };
 
 int get_max_packet_size_clientside()
@@ -397,10 +399,11 @@ struct network_state
                                 packet.data.data.clear();
                             }
 
+                            ///pipe back a response?
                             if(s.data.size() > 0)
                             {
                                 std::cout << "got full dataset " << s.data.size() << std::endl;
-                                available_data.push_back({no, s, false});
+                                available_data.push_back({no, s});
                             }
                         }
                     }
@@ -409,7 +412,7 @@ struct network_state
                         serialise s;
                         s.data = packet.fetch.ptr;
 
-                        available_data.push_back({no, s, false});
+                        available_data.push_back({no, s});
                     }
 
                     auto found_end = packet.canary_second;

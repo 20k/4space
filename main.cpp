@@ -3004,8 +3004,6 @@ int main()
     networking_init();
     network_state net_state;
 
-    bool test_networked_load = true;
-
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
@@ -3421,10 +3419,13 @@ int main()
 
         ImGui::End();
 
-        if(test_networked_load && net_state.connected())
+        if(net_state.connected())
         {
             for(network_data& i : net_state.available_data)
             {
+                if(i.processed)
+                    continue;
+
                 int32_t internal_counter = i.data.internal_counter;
 
                 int32_t disk_mode = 0;
@@ -3437,6 +3438,8 @@ int main()
 
                     continue;
                 }
+
+
 
                 serialise_data_helper::disk_mode = 1;
 
@@ -3470,7 +3473,7 @@ int main()
 
                 system_manage.ensure_found_orbitals_handled();
 
-                test_networked_load = false;
+                i.processed = true;
             }
         }
 
