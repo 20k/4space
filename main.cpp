@@ -3495,6 +3495,8 @@ int main()
                     continue;
                 }
 
+                std::cout << "got mini packet" << std::endl;
+
                 serialise_data_helper::disk_mode = 0;
 
                 /*for(orbital_system* sys : system_manage.systems)
@@ -3505,6 +3507,8 @@ int main()
                     }
                 }*/
 
+                std::cout << i.object.owner_id << " " << i.object.serialise_id << std::endl;
+
                 serialisable* found_s = net_state.get_serialisable(i.object);
 
                 if(found_s == nullptr)
@@ -3513,7 +3517,11 @@ int main()
                     continue;
                 }
 
+                std::cout << "doing mini packet" << std::endl;
+
                 found_s->do_serialise(i.data, false);
+
+                i.processed = true;
             }
         }
 

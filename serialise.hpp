@@ -150,7 +150,7 @@ struct serialise_helper
 template<typename T>
 struct serialise_helper<T*>
 {
-    void add(T* v, serialise& s, std::vector<char>& data)
+    void add(T* v, serialise& s, std::vector<char>& data, bool force = false)
     {
         serialise_helper<serialise_owner_type> helper_owner_id;
         serialise_helper<serialise_data_type> helper1;
@@ -178,14 +178,14 @@ struct serialise_helper<T*>
         bool in_disk_mode = serialise_data_helper::disk_mode == 1;
 
         ///we're writing out this element for the first time
-        if(last_ptr == nullptr && in_disk_mode)
+        if(last_ptr == nullptr && (in_disk_mode || force))
             v->do_serialise(s, true);
     }
 
     ///ok. So. we're specialsied on a pointer which means we're requesting a pointer
     ///but in reality when we serialise, we're going to get our 64bit id followed by the data of the pointer
 
-    void get(T*& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    void get(T*& v, serialise& s, int& internal_counter, std::vector<char>& data, bool force = false)
     {
         serialise_helper<serialise_owner_type> helper_owner_id;
 
@@ -229,7 +229,7 @@ struct serialise_helper<T*>
             ptr->owner_id = owner_id;
 
             ///we're reading this element for the first time
-            if(in_disk_mode)
+            if(in_disk_mode || force)
                 ptr->do_serialise(s, false);
         }
 
@@ -574,6 +574,39 @@ struct serialise_helper<sf::Texture>
     }
 };
 
+template<typename T>
+struct serialise_helper_force
+{
+    void add(T& v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<T> helper;
+        helper.add(v, s, data);
+    }
+
+    void get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<T> helper;
+        helper.get(v, s, internal_counter, data);
+    }
+};
+
+template<typename T>
+struct serialise_helper_force<T*>
+{
+    void add(T* v, serialise& s, std::vector<char>& data)
+    {
+        serialise_helper<T*> helper;
+        helper.add(v, s, data, true);
+    }
+
+    void get(T*& v, serialise& s, int& internal_counter, std::vector<char>& data)
+    {
+        serialise_helper<T*> helper;
+        helper.get(v, s, internal_counter, data, true);
+    }
+};
+
+
 #if 0
 template<typename T>
 struct serialise_helper<T>
@@ -644,7 +677,7 @@ struct serialise
     template<typename T>
     void push_back(T& v)
     {
-        serialise_helper<T> helper;
+        serialise_helper_force<T> helper;
 
         helper.add(v, *this, data);
     }
@@ -653,7 +686,7 @@ struct serialise
     template<typename T>
     T get()
     {
-        serialise_helper<T> helper;
+        serialise_helper_force<T> helper;
 
         T val;
 

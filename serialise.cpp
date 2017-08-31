@@ -24,6 +24,8 @@ struct test_object : serialisable
 
 void test_serialisation()
 {
+    serialise_data_helper::disk_mode = 1;
+
     ///test serialisation sanity for basic data types
     {
         uint64_t val = 5343424;
