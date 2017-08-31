@@ -3439,6 +3439,8 @@ int main()
                     continue;
                 }
 
+                serialise_data_helper::owner_to_id_to_pointer.clear();
+
                 serialise_data_helper::disk_mode = 1;
 
                 std::cout << "hello" << std::endl;
