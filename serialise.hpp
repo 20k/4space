@@ -175,8 +175,10 @@ struct serialise_helper<T*>
         helper_owner_id.add(v->owner_id, s, data);
         helper1.add(v->serialise_id, s, data);
 
+        bool in_disk_mode = serialise_data_helper::disk_mode == 1;
+
         ///we're writing out this element for the first time
-        if(last_ptr == nullptr)
+        if(last_ptr == nullptr && in_disk_mode)
             v->do_serialise(s, true);
     }
 
@@ -218,6 +220,8 @@ struct serialise_helper<T*>
         //*ptr = data_fetcher.get(internal_counter, data);
 
 
+        bool in_disk_mode = serialise_data_helper::disk_mode == 1;
+
         if(was_nullptr)
         {
             ptr->handled_by_client = false;
@@ -225,7 +229,8 @@ struct serialise_helper<T*>
             ptr->owner_id = owner_id;
 
             ///we're reading this element for the first time
-            ptr->do_serialise(s, false);
+            if(in_disk_mode)
+                ptr->do_serialise(s, false);
         }
 
         v = ptr;

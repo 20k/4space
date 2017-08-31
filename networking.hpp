@@ -38,6 +38,7 @@ struct network_object
 };
 
 ///update so that when processed, we keep around for 10 seconds or so then delete
+///when we cleanup processed data, should we tie this to cleaning up incomplete packets?
 struct network_data
 {
     network_object object;
@@ -93,6 +94,10 @@ struct network_state
     std::map<packet_id_type, int> packet_sequence_to_expected_size;
     std::map<packet_id_type, serialise_data_type> packet_id_to_serialise;
 
+    ///ok. If this is nullptr, either the data is intentionally nullptr (impossible because we wouldn't
+    ///be receiving updates about it)
+    ///or we haven't discovered this object yet... in which case maybe its a good time to make
+    ///a disk request about it, or whatever. That will be the most complex part of the networking
     serialisable* get_serialisable(network_object& obj)
     {
         return serialise_data_helper::owner_to_id_to_pointer[obj.owner_id][obj.serialise_id];

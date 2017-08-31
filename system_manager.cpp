@@ -1180,6 +1180,59 @@ void orbital::do_serialise(serialise& s, bool ser)
 
         s.handle_serialise(command_queue, ser);
     }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
+        //s.handle_serialise(expanded_window_clicked, ser);
+        //s.handle_serialise(force_draw_expanded_window, ser);
+        s.handle_serialise(current_num_harvesting, ser);
+        s.handle_serialise(last_num_harvesting, ser);
+        s.handle_serialise(viewed_by, ser);
+        ///CURRENTLY VIEWED BY
+        //s.handle_serialise(last_viewed_position, ser);
+        //s.handle_serialise(last_screen_pos, ser);
+        //s.handle_serialise(in_anchor_ui_state, ser);
+        s.handle_serialise(being_decolonised, ser);
+        s.handle_serialise(decolonise_timer_s, ser);
+        s.handle_serialise(mining_target, ser);
+        s.handle_serialise(is_mining, ser);
+        //s.handle_serialise(construction_ui_open, ser);
+        s.handle_serialise(can_construct_ships, ser);
+        //s.handle_serialise(dialogue_open, ser);
+        //s.handle_serialise(clicked, ser);
+        s.handle_serialise(has_quest_alert, ser);
+        s.handle_serialise(parent_system, ser);
+        s.handle_serialise(parent_empire, ser);
+        s.handle_serialise(produced_resources_ps, ser);
+        //s.handle_serialise(is_resource_object, ser);
+        //s.handle_serialise(col, ser);
+        //s.handle_serialise(vision_test_counter, ser);
+        //s.handle_serialise(type, ser);
+        s.handle_serialise(parent, ser);
+        s.handle_serialise(rad, ser);
+        s.handle_serialise(orbital_length, ser);
+        s.handle_serialise(orbital_angle, ser);
+        s.handle_serialise(rotation, ser);
+        s.handle_serialise(rotation_velocity_ps, ser);
+        s.handle_serialise(universe_view_pos, ser);
+        s.handle_serialise(absolute_pos, ser);
+        //s.handle_serialise(num_moons, ser);
+
+        s.handle_serialise(data, ser);
+        //s.handle_serialise(render_type, ser);
+        //s.handle_serialise(simple_renderable, ser);
+        //s.handle_serialise(was_hovered, ser);
+        //s.handle_serialise(was_highlight, ser);
+        //s.handle_serialise(highlight, ser);
+        //s.handle_serialise(internal_time_s, ser);
+        //s.handle_serialise(resource_type_for_flavour_text, ser);
+        //s.handle_serialise(star_temperature_fraction, ser);
+        //s.handle_serialise(description, ser);
+        //s.handle_serialise(name, ser);
+        //s.handle_serialise(num_verts, ser);
+
+        //s.handle_serialise(command_queue, ser);
+    }
 }
 
 /*void orbital::process_context_ui()

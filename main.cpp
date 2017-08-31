@@ -3475,6 +3475,27 @@ int main()
 
                 i.processed = true;
             }
+
+            for(network_data& i : net_state.available_data)
+            {
+                if(i.processed)
+                    continue;
+
+                int32_t internal_counter = i.data.internal_counter;
+
+                int32_t disk_mode = 0;
+
+                i.data.handle_serialise(disk_mode, false);
+
+                if(disk_mode != 0)
+                {
+                    i.data.internal_counter = internal_counter;
+
+                    continue;
+                }
+
+
+            }
         }
 
         ImGui::BeginOverride("Networking");
