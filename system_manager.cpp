@@ -1185,8 +1185,8 @@ void orbital::do_serialise(serialise& s, bool ser)
     {
         //s.handle_serialise(expanded_window_clicked, ser);
         //s.handle_serialise(force_draw_expanded_window, ser);
-        s.handle_serialise(current_num_harvesting, ser);
-        s.handle_serialise(last_num_harvesting, ser);
+        //s.handle_serialise(current_num_harvesting, ser);
+        //s.handle_serialise(last_num_harvesting, ser);
         s.handle_serialise(viewed_by, ser);
         ///CURRENTLY VIEWED BY
         //s.handle_serialise(last_viewed_position, ser);
