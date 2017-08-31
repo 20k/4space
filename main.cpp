@@ -2690,6 +2690,7 @@ int main()
 
     fleet_manager fleet_manage;
 
+    #define ONLY_PLAYER
     #ifndef ONLY_PLAYER
 
     empire* hostile_empire = empire_manage.make_new();
@@ -3494,7 +3495,25 @@ int main()
                     continue;
                 }
 
+                serialise_data_helper::disk_mode = 0;
 
+                /*for(orbital_system* sys : system_manage.systems)
+                {
+                    for(orbital* o : sys->orbitals)
+                    {
+                        i.data.handle_serialise(serialise_data_helper::disk_mode, false);
+                    }
+                }*/
+
+                serialisable* found_s = net_state.get_serialisable(i.object);
+
+                if(found_s == nullptr)
+                {
+                    i.processed = true;
+                    continue;
+                }
+
+                found_s->do_serialise(i.data, false);
             }
         }
 
@@ -3525,6 +3544,31 @@ int main()
             no_test.serialise_id = -2;
 
             net_state.forward_data(no_test, ser);
+        }
+
+        if(ImGui::Button("Try mini packet") && net_state.my_id != -1)
+        {
+            serialise_data_helper::disk_mode = 0;
+
+
+            for(orbital_system* sys : system_manage.systems)
+            {
+                for(orbital* o : sys->orbitals)
+                {
+                    serialise ser;
+
+                    ser.handle_serialise(serialise_data_helper::disk_mode, true);
+
+                    network_object no;
+                    ///uuh. Ok it should be this but it wont work yet as we don't by default own stuff
+                    ///need to patch ids or something if owner_id is set to default
+                    //no.owner_id = o->owner_id;
+                    no.owner_id = net_state.my_id;
+                    no.serialise_id = o->serialise_id;
+
+                    net_state.forward_data(no, ser);
+                }
+            }
         }
 
         ImGui::End();
