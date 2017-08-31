@@ -3439,8 +3439,6 @@ int main()
                     continue;
                 }
 
-
-
                 serialise_data_helper::disk_mode = 1;
 
                 std::cout << "hello" << std::endl;
