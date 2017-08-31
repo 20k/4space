@@ -91,6 +91,11 @@ struct network_state
     std::map<packet_id_type, int> packet_sequence_to_expected_size;
     std::map<packet_id_type, serialise_data_type> packet_id_to_serialise;
 
+    serialisable* get_serialisable(network_object& obj)
+    {
+        return serialise_data_helper::owner_to_id_to_pointer[obj.owner_id][obj.serialise_id];
+    }
+
     void tick_join_game(float dt_s)
     {
         if(my_id != -1)

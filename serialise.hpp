@@ -19,13 +19,6 @@
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
 
-struct serialise_data_helper
-{
-    static int32_t disk_mode;
-    //static int pass;
-
-    static std::map<serialise_owner_type, std::map<serialise_data_type, void*>> owner_to_id_to_pointer;
-};
 
 //#define serialise_owner_type int32_t
 //#define serialise_data_type uint64_t
@@ -55,6 +48,13 @@ struct serialisable
     }
 
     virtual ~serialisable(){}
+};
+
+struct serialise_data_helper
+{
+    static int32_t disk_mode;
+
+    static std::map<serialise_owner_type, std::map<serialise_data_type, serialisable*>> owner_to_id_to_pointer;
 };
 
 struct serialise;
