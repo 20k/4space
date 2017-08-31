@@ -3427,16 +3427,18 @@ int main()
             {
                 int32_t internal_counter = i.data.internal_counter;
 
-                int32_t is_data_dump = 0;
+                int32_t disk_mode = 0;
 
-                i.data.handle_serialise(is_data_dump, false);
+                i.data.handle_serialise(disk_mode, false);
 
-                if(!is_data_dump)
+                if(disk_mode != 1)
                 {
                     i.data.internal_counter = internal_counter;
 
                     continue;
                 }
+
+                serialise_data_helper::disk_mode = 1;
 
                 std::cout << "hello" << std::endl;
 
@@ -3483,10 +3485,11 @@ int main()
         {
             serialise_data_helper::owner_to_id_to_pointer.clear();
 
+            serialise_data_helper::disk_mode = 1;
+
             serialise ser;
 
-            int32_t is_data_dump = true;
-            ser.handle_serialise(is_data_dump, true);
+            ser.handle_serialise(serialise_data_helper::disk_mode, true);
             ser.handle_serialise(empire_manage, true);
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);

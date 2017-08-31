@@ -21,7 +21,7 @@ using serialise_data_type = uint64_t;
 
 struct serialise_data_helper
 {
-    static bool disk_mode;
+    static int32_t disk_mode;
     //static int pass;
 
     static std::map<serialise_owner_type, std::map<serialise_data_type, void*>> owner_to_id_to_pointer;
@@ -262,7 +262,7 @@ struct serialise_helper<std::vector<T>>
             T t;
             type.get(t, s, internal_counter, data);
 
-            v.push_back(t);
+            v.push_back(std::move(t));
         }
     }
 };
@@ -297,7 +297,7 @@ struct serialise_helper<std::deque<T>>
             T t;
             type.get(t, s, internal_counter, data);
 
-            v.push_back(t);
+            v.push_back(std::move(t));
         }
     }
 };
@@ -341,7 +341,7 @@ struct serialise_helper<std::map<T, U>>
             h1.get(first, s, internal_counter, data);
             h2.get(second, s, internal_counter, data);
 
-            v[first] = second;
+            v[first] = std::move(second);
         }
     }
 };
@@ -385,7 +385,7 @@ struct serialise_helper<std::unordered_map<T, U>>
             h1.get(first, s, internal_counter, data);
             h2.get(second, s, internal_counter, data);
 
-            v[first] = second;
+            v[first] = std::move(second);
         }
     }
 };
@@ -422,7 +422,7 @@ struct serialise_helper<std::set<T>>
             T t;
             type.get(t, s, internal_counter, data);
 
-            v.insert(t);
+            v.insert(std::move(t));
         }
     }
 };
@@ -459,7 +459,7 @@ struct serialise_helper<std::unordered_set<T>>
             T t;
             type.get(t, s, internal_counter, data);
 
-            v.insert(t);
+            v.insert(std::move(t));
         }
     }
 };
@@ -681,10 +681,12 @@ struct serialise
     {
         serialise_data_helper::owner_to_id_to_pointer.clear();
 
+        serialise_data_helper::disk_mode = 1;
+
         if(data.size() == 0)
             return;
 
-        auto myfile = std::fstream("save.game", std::ios::out | std::ios::binary);
+        auto myfile = std::fstream(file, std::ios::out | std::ios::binary);
         myfile.write((char*)&data[0], (int)data.size());
         myfile.close();
     }
@@ -693,9 +695,11 @@ struct serialise
     {
         serialise_data_helper::owner_to_id_to_pointer.clear();
 
+        serialise_data_helper::disk_mode = 1;
+
         internal_counter = 0;
 
-        auto myfile = std::fstream("save.game", std::ios::in | std::ios::out | std::ios::binary);
+        auto myfile = std::fstream(file, std::ios::in | std::ios::out | std::ios::binary);
 
         myfile.seekg (0, myfile.end);
         int length = myfile.tellg();

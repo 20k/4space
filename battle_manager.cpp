@@ -131,6 +131,9 @@ void projectile::load(int _type)
 
 void projectile::do_serialise(serialise& s, bool ser)
 {
+    ///ok so. Assume that disk mode is called
+    ///whenever an item needs full sync
+    ///and non disk mode is called per 'tick'
     if(serialise_data_helper::disk_mode)
     {
         s.handle_serialise(ship_fired_by, ser);
