@@ -3479,6 +3479,17 @@ int main()
 
                 system_manage.ensure_found_orbitals_handled();
 
+                for(orbital_system* sys : system_manage.systems)
+                {
+                    for(orbital* o : sys->orbitals)
+                    {
+                        if(!o->owned_by_host)
+                        {
+                            o->command_queue.cancel();
+                        }
+                    }
+                }
+
                 i.set_complete();
 
                 /*std::cout << "testing " << std::endl;
@@ -3582,9 +3593,20 @@ int main()
             net_state.forward_data(no_test, ser);
         }
 
-        if(ImGui::Button("Try mini packet") && net_state.my_id != -1)
+        //if(ImGui::Button("Try mini packet") && net_state.my_id != -1)
+
+        ///ok. This is fine. What we need to do now is mark serialisation strategies with priorities
+        ///and then execute based on priority
+        ///priority could be seconds between execution
+        ///update objects in motion more frequently (ie currently transferring)
+        if(net_state.my_id != -1)
         {
             serialise_data_helper::disk_mode = 0;
+
+            int c_id = 0;
+            static int m_id = 0;
+
+            //std::cout << "hello " << std::endl;
 
             for(orbital_system* sys : system_manage.systems)
             {
@@ -3593,6 +3615,25 @@ int main()
                     //o->owner_id = net_state.my_id;
 
                     //std::cout << o->owner_id << " " << o->serialise_id << std::endl;
+
+                    if(o->owner_id != 1 && o->owner_id != net_state.my_id)
+                    {
+                        continue;
+                    }
+
+                    if(o->type != orbital_info::FLEET)
+                    {
+                        continue;
+                    }
+
+                    if(c_id != m_id)
+                    {
+                        c_id++;
+                        continue;
+                    }
+
+                    c_id++;
+
 
                     serialise ser;
                     ///because o is a pointer, we allow the stream to force decode the pointer
@@ -3622,8 +3663,16 @@ int main()
                     //std::cout << "packet_fragments " << get_packet_fragments(ser.data.size()) << std::endl;
 
                     net_state.forward_data(no, ser);
+
                 }
             }
+
+            //std::cout << c_id << std::endl;
+
+            m_id++;
+
+            if(c_id > 0)
+                m_id %= c_id;
         }
 
         ImGui::End();
