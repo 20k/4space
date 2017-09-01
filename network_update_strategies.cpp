@@ -116,8 +116,15 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     std::vector<orbital*> orbitals;
     std::vector<orbital*> bodies;
 
+    std::vector<orbital_system*> systems;
+
     for(orbital_system* sys : system_manage.systems)
     {
+        if(net_state.owns(sys))
+        {
+            systems.push_back(sys);
+        }
+
         for(orbital* o : sys->orbitals)
         {
             if(o->owner_id != 1 && o->owner_id != net_state.my_id)
@@ -143,6 +150,9 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     static update_strategy body_strategy;
     body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state);
+
+    static update_strategy system_strategy;
+    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state);
 
     elapsed_time_s += dt_s;
 }

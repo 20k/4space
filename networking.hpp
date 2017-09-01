@@ -200,6 +200,14 @@ struct network_state
         sf::Clock clk;
     };
 
+    bool owns(serialisable* s)
+    {
+        if(s->owner_id == -1 || s->owner_id == my_id)
+            return true;
+
+        return false;
+    }
+
     std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>> request_timeouts;
 
     void request_incomplete_packets(int max_fragments_to_request)

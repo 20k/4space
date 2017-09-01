@@ -2016,7 +2016,7 @@ resource_manager orbital_system::get_potential_resources()
 
 void orbital_system::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(toggle_fleet_ui, ser);
         s.handle_serialise(accumulated_nonviewed_time, ser);
@@ -2032,6 +2032,21 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         }*/
 
         ///ADVERTISED EMPIRES?
+    }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
+        printf("pre\n");
+
+        //s.handle_serialise(toggle_fleet_ui, ser);
+        //s.handle_serialise(accumulated_nonviewed_time, ser);
+        //s.handle_serialise(highlight, ser);
+        //s.handle_serialise(asteroids, ser);
+        s.handle_serialise(orbitals, ser);
+        //s.handle_serialise(universe_pos, ser);
+        //s.handle_serialise(advertised_empires, ser);
+
+        printf("%i %i\n", s.data.size(), orbitals.size());
     }
 }
 

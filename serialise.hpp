@@ -204,6 +204,7 @@ struct serialise_helper<T*>
         if(v != nullptr && serialise_data_helper::disk_mode == 0 && force)
         {
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
+            printf("hi there\n");
         }
     }
 
@@ -715,6 +716,7 @@ struct serialise_helper<T>
 struct serialise : serialise_data
 {
     bool allow_force = false;
+    bool forced = false;
 
     template<typename T>
     void push_back(T& v)
@@ -730,8 +732,10 @@ struct serialise : serialise_data
     {
         val = T();
 
-        if(allow_force)
+        if(allow_force && !forced)
         {
+            forced = true;
+
             serialise_helper_force<T> helper;
 
             helper.get(val, *this);
