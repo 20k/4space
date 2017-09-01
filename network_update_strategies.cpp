@@ -122,6 +122,16 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     {
         for(orbital* o : sys->orbitals)
         {
+            if(o->owner_id != 1 && o->owner_id != net_state.my_id)
+            {
+                continue;
+            }
+
+            if(o->type != orbital_info::FLEET)
+            {
+                continue;
+            }
+
             orbitals.push_back(o);
         }
     }

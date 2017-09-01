@@ -3602,6 +3602,7 @@ int main()
         ///and then execute based on priority
         ///priority could be seconds between execution
         ///update objects in motion more frequently (ie currently transferring)
+        #if 0
         if(net_state.my_id != -1)
         {
             serialise_data_helper::disk_mode = 0;
@@ -3677,6 +3678,7 @@ int main()
             if(c_id > 0)
                 m_id %= c_id;
         }
+        #endif
 
         ImGui::End();
 
