@@ -128,6 +128,8 @@ struct network_state
         {
             sock = join_game("127.0.0.1", GAMESERVER_PORT);
 
+            sock_set_non_blocking(sock, 1);
+
             timeout = 0;
         }
     }
