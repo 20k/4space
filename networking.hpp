@@ -37,14 +37,26 @@ struct network_object
     serialise_data_type serialise_id = -1;
 };
 
+using packet_id_type = uint32_t;
+using sequence_data_type = uint32_t;
+
 ///update so that when processed, we keep around for 10 seconds or so then delete
 ///when we cleanup processed data, should we tie this to cleaning up incomplete packets?
 struct network_data
 {
     network_object object;
     serialise data;
+    packet_id_type packet_id;
     bool should_cleanup = false;
     bool processed = false;
+
+    sf::Clock clk;
+
+    void set_complete()
+    {
+        processed = true;
+        clk.restart();
+    }
 };
 
 int get_max_packet_size_clientside()
@@ -60,9 +72,6 @@ int get_packet_fragments(int data_size)
 
     return fragments;
 }
-
-using packet_id_type = uint32_t;
-using sequence_data_type = uint32_t;
 
 struct packet_info
 {
@@ -209,6 +218,9 @@ struct network_state
 
                     std::vector<packet_info>& packets = packet_ids.second;
 
+                    if(packets.size() == packet_sequence_to_expected_size[packet_id])
+                        continue;
+
                     std::sort(packets.begin(), packets.end(), [](auto& p1, auto& p2){return p1.sequence_number < p2.sequence_number;});
 
                     if(packets[0].sequence_number != 0)
@@ -295,12 +307,38 @@ struct network_state
         return true;
     }*/
 
+    void cleanup_available_data_and_incomplete_packets()
+    {
+        float cleanup_time_s = 1.f;
+
+        for(int i=0; i<available_data.size(); i++)
+        {
+            network_data& data = available_data[i];
+
+            if(data.processed == true && data.clk.getElapsedTime().asMilliseconds() / 1000.f > cleanup_time_s)
+            {
+                network_object& net_obj = data.object;
+
+                packet_id_type packet_id = data.packet_id;
+
+                incomplete_packets[net_obj.owner_id][net_obj.serialise_id].erase(packet_id);
+
+                available_data[i].should_cleanup = true;
+            }
+        }
+    }
+
+    ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
     void tick()
     {
         if(!sock.valid())
             return;
 
         request_incomplete_packets(200);
+
+        cleanup_available_data_and_incomplete_packets();
+
+        tick_cleanup();
 
         byte_vector v1;
         v1.push_back(canary_start);
@@ -348,6 +386,8 @@ struct network_state
                     //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
 
                     const auto& vec = packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
+
+                    while(!sock_writable(sock)){}
 
                     udp_send_to(sock, vec.vec.ptr, (const sockaddr*)&store);
                 }
@@ -430,7 +470,7 @@ struct network_state
                             if(s.data.size() > 0)
                             {
                                 //std::cout << "got full dataset " << s.data.size() << std::endl;
-                                available_data.push_back({no, s});
+                                available_data.push_back({no, s, header.packet_id});
                             }
                         }
                     }
@@ -439,7 +479,7 @@ struct network_state
                         serialise s;
                         s.data = packet.fetch.ptr;
 
-                        available_data.push_back({no, s});
+                        available_data.push_back({no, s, header.packet_id});
                     }
 
                     auto found_end = packet.canary_second;

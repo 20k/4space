@@ -3479,7 +3479,7 @@ int main()
 
                 system_manage.ensure_found_orbitals_handled();
 
-                i.processed = true;
+                i.set_complete();
 
                 /*std::cout << "testing " << std::endl;
 
@@ -3534,7 +3534,7 @@ int main()
 
                 if(found_s == nullptr)
                 {
-                    i.processed = true;
+                    i.set_complete();
                     continue;
                 }
 
@@ -3547,7 +3547,7 @@ int main()
                 i.data.allow_force = true;
                 i.data.handle_serialise(found_s, false);
 
-                i.processed = true;
+                i.set_complete();
             }
         }
 
