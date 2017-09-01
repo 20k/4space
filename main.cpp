@@ -3591,6 +3591,7 @@ int main()
                     ser.default_owner = net_state.my_id;
 
                     ser.handle_serialise(serialise_data_helper::disk_mode, true);
+                    ser.handle_serialise(o, true);
 
                     network_object no;
                     ///uuh. Ok it should be this but it wont work yet as we don't by default own stuff
