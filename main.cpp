@@ -3538,9 +3538,14 @@ int main()
                     continue;
                 }
 
-                std::cout << "doing mini packet" << std::endl;
+                std::cout << "doing mini packet of " << i.data.data.size() << std::endl;
 
-                found_s->do_serialise(i.data, false);
+                //found_s->do_serialise(i.data, false);
+
+                ///because the next element is a pointer, we force the stream
+                ///to decode the pointer data
+                i.data.allow_force = true;
+                i.data.handle_serialise(found_s, false);
 
                 i.processed = true;
             }
@@ -3588,10 +3593,15 @@ int main()
                     o->owner_id = net_state.my_id;
 
                     serialise ser;
+                    ///because o is a pointer, we allow the stream to force decode the pointer
+                    ///if o were a non ptr with a do_serialise method, this would have to be false
+                    ser.allow_force = true;
                     ser.default_owner = net_state.my_id;
 
                     ser.handle_serialise(serialise_data_helper::disk_mode, true);
                     ser.handle_serialise(o, true);
+
+                    std::cout << ser.data.size() << std::endl;
 
                     network_object no;
                     ///uuh. Ok it should be this but it wont work yet as we don't by default own stuff

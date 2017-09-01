@@ -102,9 +102,11 @@ void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& da
 
     if(internal_counter > (int)data.size())
     {
-        std::cout << "Error, invalid bytefetch" << std::endl;
+        std::cout << "Error, invalid bytefetch low" << std::endl;
 
         v = T();
+
+        return;
     }
 
     v = *std::launder((T*)&data[prev]);
@@ -518,7 +520,7 @@ struct serialise_helper<std::string>
 
         if(s.internal_counter + length * sizeof(char) > (int)s.data.size())
         {
-            std::cout << "Error, invalid bytefetch" << std::endl;
+            std::cout << "Error, invalid bytefetch st" << std::endl;
 
             v = std::string();
 
@@ -695,6 +697,8 @@ struct serialise_helper<T>
 ///we actually need to
 struct serialise : serialise_data
 {
+    bool allow_force = false;
+
     template<typename T>
     void push_back(T& v)
     {
@@ -707,13 +711,26 @@ struct serialise : serialise_data
     template<typename T>
     T get()
     {
-        serialise_helper_force<T> helper;
+        if(allow_force)
+        {
+            serialise_helper_force<T> helper;
 
-        T val;
+            T val;
 
-        helper.get(val, *this);
+            helper.get(val, *this);
 
-        return val;
+            return val;
+        }
+        else
+        {
+            serialise_helper<T> helper;
+
+            T val;
+
+            helper.get(val, *this);
+
+            return val;
+        }
     }
 
     template<typename T>

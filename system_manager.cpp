@@ -1128,7 +1128,7 @@ bool orbital::in_friendly_territory()
 
 void orbital::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(expanded_window_clicked, ser);
         s.handle_serialise(force_draw_expanded_window, ser);
@@ -1183,6 +1183,11 @@ void orbital::do_serialise(serialise& s, bool ser)
 
     if(serialise_data_helper::disk_mode == 0)
     {
+        if(ser == false)
+        {
+            std::cout << "decode " << std::endl;
+        }
+
         //s.handle_serialise(expanded_window_clicked, ser);
         //s.handle_serialise(force_draw_expanded_window, ser);
         //s.handle_serialise(current_num_harvesting, ser);
