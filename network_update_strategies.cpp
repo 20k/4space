@@ -152,8 +152,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state);
 
     static update_strategy body_strategy;
-    //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state);
+    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state);
 
+    ///so. I think the problem is that we're giving the system references to orbitals that may get created
+    ///but aren't fully initialised, hence the crash
     static update_strategy system_strategy;
     //system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state);
 
