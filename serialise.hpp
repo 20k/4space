@@ -194,8 +194,13 @@ struct serialise_helper<T*>
         bool in_disk_mode = serialise_data_helper::disk_mode == 1;
 
         ///we're writing out this element for the first time
-        if(last_ptr == nullptr && (in_disk_mode || force))
+        if(last_ptr == nullptr && in_disk_mode)
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
+
+        if(v != nullptr && serialise_data_helper::disk_mode == 0 && force)
+        {
+            v->do_serialise(reinterpret_cast<serialise&>(s), true);
+        }
     }
 
     ///ok. So. we're specialsied on a pointer which means we're requesting a pointer
@@ -256,8 +261,13 @@ struct serialise_helper<T*>
             }*/
 
             ///we're reading this element for the first time
-            if(in_disk_mode || force)
+            if(in_disk_mode)
                 ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
+        }
+
+        if(ptr != nullptr && serialise_data_helper::disk_mode == 0 && force)
+        {
+            ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
         }
 
         v = ptr;
