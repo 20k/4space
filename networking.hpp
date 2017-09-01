@@ -61,7 +61,7 @@ int get_packet_fragments(int data_size)
     return fragments;
 }
 
-using packet_id_type = uint8_t;
+using packet_id_type = uint32_t;
 using sequence_data_type = uint32_t;
 
 struct packet_info
