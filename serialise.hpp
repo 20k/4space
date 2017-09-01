@@ -86,7 +86,7 @@ void lowest_add(T& v, serialise& s, std::vector<char>& data)
 {
     char* pv = std::launder((char*)&v);
 
-    for(uint32_t i=0; i<sizeof(T); i++)
+    for(int i=0; i<sizeof(T); i++)
     {
         data.push_back(pv[i]);
     }
@@ -340,10 +340,7 @@ struct serialise_helper<std::deque<T>>
         {
             serialise_helper<T> type;
 
-            T t;
-            type.get(t, s);
-
-            v[i] = std::move(t);
+            type.get(v[i], s);
         }
     }
 };
