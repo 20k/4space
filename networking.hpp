@@ -49,7 +49,7 @@ struct network_data
 
 int get_max_packet_size_clientside()
 {
-    return 450;
+    return 300;
 }
 
 int get_packet_fragments(int data_size)

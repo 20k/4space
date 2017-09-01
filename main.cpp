@@ -3590,7 +3590,9 @@ int main()
             {
                 for(orbital* o : sys->orbitals)
                 {
-                    o->owner_id = net_state.my_id;
+                    //o->owner_id = net_state.my_id;
+
+                    std::cout << o->owner_id << " " << o->serialise_id << std::endl;
 
                     serialise ser;
                     ///because o is a pointer, we allow the stream to force decode the pointer
