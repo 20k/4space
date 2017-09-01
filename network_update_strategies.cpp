@@ -67,12 +67,9 @@ struct update_strategy
     }
 
     template<typename T>
-    void do_update_strategy(float dt_s, float time_between_full_updates, int max_ids, const std::vector<T*>& to_manage, network_state& net_state)
+    void do_update_strategy(float dt_s, float time_between_full_updates, const std::vector<T*>& to_manage, network_state& net_state)
     {
         if(to_manage.size() == 0)
-            return;
-
-        if(max_ids == 0)
             return;
 
         if(time_elapsed_s > time_between_full_updates)
@@ -117,6 +114,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     int num_orbitals = 0;
 
     std::vector<orbital*> orbitals;
+    std::vector<orbital*> bodies;
 
     for(orbital_system* sys : system_manage.systems)
     {
@@ -127,18 +125,24 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
                 continue;
             }
 
-            if(o->type != orbital_info::FLEET)
+            if(o->type == orbital_info::FLEET)
             {
+                orbitals.push_back(o);
                 continue;
             }
-
-            orbitals.push_back(o);
+            else
+            {
+                bodies.push_back(o);
+                continue;
+            }
         }
     }
 
     static update_strategy orbital_strategy;
+    orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state);
 
-    orbital_strategy.do_update_strategy(dt_s, 1.f, orbitals.size(), orbitals, net_state);
+    static update_strategy body_strategy;
+    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state);
 
     elapsed_time_s += dt_s;
 }
