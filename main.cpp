@@ -3329,12 +3329,15 @@ int main()
         if(ImGui::Button("Save"))
         {
             serialise ser;
+            ser.default_owner = net_state.my_id;
 
             ser.handle_serialise(state, true);
             ser.handle_serialise(empire_manage, true);
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);
             ser.handle_serialise(all_battles, true);
+
+            serialise_data_helper::owner_to_id_to_pointer.clear();
 
             /*for(ship_manager* sm : fleet_manage.fleets)
             {
@@ -3415,6 +3418,8 @@ int main()
             }
 
             system_manage.ensure_found_orbitals_handled();
+
+            serialise_data_helper::owner_to_id_to_pointer.clear();
         }
 
 
@@ -3475,6 +3480,16 @@ int main()
                 system_manage.ensure_found_orbitals_handled();
 
                 i.processed = true;
+
+                /*std::cout << "testing " << std::endl;
+
+                std::cout << i.object.owner_id << std::endl;
+
+                for(auto& i : serialise_data_helper::owner_to_id_to_pointer[i.object.owner_id])
+                {
+                    std::cout << i.first << std::endl;
+                    std::cout << i.second << std::endl;
+                }*/
             }
 
             for(network_data& i : net_state.available_data)
@@ -3495,7 +3510,7 @@ int main()
                     continue;
                 }
 
-                std::cout << "got mini packet" << std::endl;
+                //std::cout << "got mini packet" << std::endl;
 
                 serialise_data_helper::disk_mode = 0;
 
@@ -3507,9 +3522,15 @@ int main()
                     }
                 }*/
 
-                std::cout << i.object.owner_id << " " << i.object.serialise_id << std::endl;
+                //std::cout << i.object.owner_id << " " << i.object.serialise_id << std::endl;
 
                 serialisable* found_s = net_state.get_serialisable(i.object);
+
+                /*for(auto& i : serialise_data_helper::owner_to_id_to_pointer[i.object.owner_id])
+                {
+                    std::cout << i.first << std::endl;
+                    std::cout << i.second << std::endl;
+                }*/
 
                 if(found_s == nullptr)
                 {
@@ -3539,6 +3560,8 @@ int main()
             serialise_data_helper::disk_mode = 1;
 
             serialise ser;
+            ser.default_owner = net_state.my_id;
+
 
             ser.handle_serialise(serialise_data_helper::disk_mode, true);
             ser.handle_serialise(empire_manage, true);
@@ -3558,12 +3581,14 @@ int main()
         {
             serialise_data_helper::disk_mode = 0;
 
-
             for(orbital_system* sys : system_manage.systems)
             {
                 for(orbital* o : sys->orbitals)
                 {
+                    o->owner_id = net_state.my_id;
+
                     serialise ser;
+                    ser.default_owner = net_state.my_id;
 
                     ser.handle_serialise(serialise_data_helper::disk_mode, true);
 
@@ -3573,6 +3598,8 @@ int main()
                     //no.owner_id = o->owner_id;
                     no.owner_id = net_state.my_id;
                     no.serialise_id = o->serialise_id;
+
+                    //std::cout << no.owner_id << " " << no.serialise_id << std::endl;
 
                     net_state.forward_data(no, ser);
                 }

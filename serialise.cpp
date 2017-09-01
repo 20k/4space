@@ -84,7 +84,7 @@ void test_serialisation()
     }
 
     ///test receiving data from/about ourselves to check ownership semantics work
-    {
+    /*{
         test_object* test = new test_object;
 
         serialise s2;
@@ -106,12 +106,12 @@ void test_serialisation()
         assert(test == received);
 
         delete test;
-    }
+    }*/
 
 
     ///ok. Final test:
     ///Can we ping data from a to b, modify b, then ping it back to a
-    {
+    /*{
         test_object* test = new test_object;
 
         serialise ser;
@@ -134,7 +134,7 @@ void test_serialisation()
 
         assert(test->v1 == received->v1);
         assert(test->v2 == received->v2);
-    }
+    }*/
 
     {
         std::vector<test_object> objects;
