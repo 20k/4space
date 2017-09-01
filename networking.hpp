@@ -333,6 +333,9 @@ struct network_state
     }
 
     ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
+    ///I think the reason the data transfer is slow is because the framerate is bad
+    ///if we threaded it i think the data transfer would go v high
+    ///may be worth just threading the actual socket itself
     void tick()
     {
         if(!sock.valid())
