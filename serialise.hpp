@@ -84,11 +84,15 @@ template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable
 inline
 void lowest_add(T& v, serialise& s, std::vector<char>& data)
 {
-    char* pv = std::launder((char*)&v);
+    char* pv = (char*)&v;
+
+    int ds = data.size();
+
+    data.resize(ds + sizeof(T));
 
     for(int i=0; i<sizeof(T); i++)
     {
-        data.push_back(pv[i]);
+        data[ds + i] = pv[i];
     }
 }
 
