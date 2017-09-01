@@ -722,27 +722,21 @@ struct serialise : serialise_data
 
     ///if pointer, look up in pointer map
     template<typename T>
-    T get()
+    void get(T& val)
     {
+        val = T();
+
         if(allow_force)
         {
             serialise_helper_force<T> helper;
 
-            T val;
-
             helper.get(val, *this);
-
-            return val;
         }
         else
         {
             serialise_helper<T> helper;
 
-            T val;
-
             helper.get(val, *this);
-
-            return val;
         }
     }
 
@@ -755,7 +749,7 @@ struct serialise : serialise_data
         }
         else
         {
-            v = get<T>();
+            get<T>(v);
         }
     }
 
