@@ -127,10 +127,13 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
         for(orbital* o : sys->orbitals)
         {
-            if(o->owner_id != 1 && o->owner_id != net_state.my_id)
+            /*if(o->owner_id != 1 && o->owner_id != net_state.my_id)
             {
                 continue;
-            }
+            }*/
+
+            if(!net_state.owns(o))
+                continue;
 
             if(o->type == orbital_info::FLEET)
             {
@@ -149,10 +152,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state);
 
     static update_strategy body_strategy;
-    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state);
+    //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state);
 
     static update_strategy system_strategy;
-    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state);
+    //system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state);
 
     elapsed_time_s += dt_s;
 }

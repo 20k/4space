@@ -1232,7 +1232,11 @@ void orbital::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(num_verts, ser);
 
         //s.handle_serialise(command_queue, ser);
+
+        //printf("well then\n");
     }
+
+    //printf("what?\n");
 }
 
 /*void orbital::process_context_ui()
@@ -2036,7 +2040,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
     if(serialise_data_helper::disk_mode == 0)
     {
-        printf("pre\n");
+        //printf("pre\n");
 
         //s.handle_serialise(toggle_fleet_ui, ser);
         //s.handle_serialise(accumulated_nonviewed_time, ser);
@@ -2046,7 +2050,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(universe_pos, ser);
         //s.handle_serialise(advertised_empires, ser);
 
-        printf("%i %i\n", s.data.size(), orbitals.size());
+        //printf("%i %i\n", s.data.size(), orbitals.size());
     }
 }
 

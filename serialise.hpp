@@ -204,7 +204,6 @@ struct serialise_helper<T*>
         if(v != nullptr && serialise_data_helper::disk_mode == 0 && force)
         {
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
-            printf("hi there\n");
         }
     }
 
@@ -301,6 +300,9 @@ struct serialise_helper<std::vector<T>>
         serialise_helper<int32_t> helper;
         int32_t length;
         helper.get(length, s);
+
+        if(length == 0)
+            return;
 
         v.reserve(length);
 
@@ -543,6 +545,9 @@ struct serialise_helper<std::string>
             return;
         }
 
+        if(length == 0)
+            return;
+
         v.reserve(length);
 
         for(int i=0; i<length; i++)
@@ -734,7 +739,7 @@ struct serialise : serialise_data
 
         if(allow_force && !forced)
         {
-            forced = true;
+            //forced = true;
 
             serialise_helper_force<T> helper;
 
