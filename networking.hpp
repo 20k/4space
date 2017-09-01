@@ -49,7 +49,7 @@ struct network_data
 
 int get_max_packet_size_clientside()
 {
-    return 300;
+    return 450;
 }
 
 int get_packet_fragments(int data_size)
@@ -181,7 +181,13 @@ struct network_state
         serialise_data_type serialise_id;
     };
 
-    std::map<packet_id_type, std::map<sequence_data_type, sf::Clock>> request_timeouts;
+    struct request_timeout_info
+    {
+        bool ever = false;
+        sf::Clock clk;
+    };
+
+    std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>> request_timeouts;
 
     void request_incomplete_packets(int max_fragments_to_request)
     {
@@ -229,21 +235,35 @@ struct network_state
             }
         }
 
-        float request_timeout_s = 0.2f;
+        float request_timeout_s = 0.4f;
+
+        int num_requested = 0;
 
         for(int i=0; i<requests.size(); i++)
         {
-            if(request_timeouts[requests[i].packet_id][requests[i].sequence_id].getElapsedTime().asMilliseconds() / 1000.f < request_timeout_s)
+            request_timeout_info& inf = request_timeouts[requests[i].packet_id][requests[i].sequence_id];
+
+            if(!inf.ever)
+                continue;
+
+            if(inf.clk.getElapsedTime().asMilliseconds() / 1000.f < request_timeout_s)
             {
+                num_requested++;
+
                 requests.erase(requests.begin() + i);
                 i--;
                 continue;
             }
         }
 
-        if(requests.size() > max_fragments_to_request)
+        int num = max_fragments_to_request - num_requested;
+
+        if(num < 0)
+            num = 0;
+
+        if(requests.size() > num)
         {
-            requests.resize(max_fragments_to_request);
+            requests.resize(num);
         }
 
         for(packet_request& i : requests)
@@ -261,7 +281,8 @@ struct network_state
 
             udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
 
-            request_timeouts[i.packet_id][i.sequence_id].restart();
+            request_timeouts[i.packet_id][i.sequence_id].clk.restart();
+            request_timeouts[i.packet_id][i.sequence_id].ever = true;
         }
     }
 
@@ -279,7 +300,7 @@ struct network_state
         if(!sock.valid())
             return;
 
-        request_incomplete_packets(50);
+        request_incomplete_packets(200);
 
         byte_vector v1;
         v1.push_back(canary_start);
@@ -366,8 +387,9 @@ struct network_state
                         packet_info next;
                         next.sequence_number = header.sequence_number;
 
-                        if((header.sequence_number % 100) == 0)
-                            std::cout << header.sequence_number << std::endl;
+                        //if((header.sequence_number % 100) == 0)
+                        if(header.sequence_number > 50 && (header.sequence_number % 100) == 0)
+                            std::cout << header.sequence_number << " ";
 
                         next.data.data = packet.fetch.ptr;
 
@@ -407,7 +429,7 @@ struct network_state
                             ///pipe back a response?
                             if(s.data.size() > 0)
                             {
-                                std::cout << "got full dataset " << s.data.size() << std::endl;
+                                //std::cout << "got full dataset " << s.data.size() << std::endl;
                                 available_data.push_back({no, s});
                             }
                         }

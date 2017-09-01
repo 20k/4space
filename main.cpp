@@ -2690,7 +2690,7 @@ int main()
 
     fleet_manager fleet_manage;
 
-    #define ONLY_PLAYER
+    //#define ONLY_PLAYER
     #ifndef ONLY_PLAYER
 
     empire* hostile_empire = empire_manage.make_new();
@@ -3449,7 +3449,7 @@ int main()
 
                 serialise_data_helper::disk_mode = 1;
 
-                std::cout << "hello" << std::endl;
+                std::cout << "got full gamestate" << std::endl;
 
                 popup.clear();
 
@@ -3538,7 +3538,7 @@ int main()
                     continue;
                 }
 
-                std::cout << "doing mini packet of " << i.data.data.size() << std::endl;
+                //std::cout << "doing mini packet of " << i.data.data.size() << std::endl;
 
                 //found_s->do_serialise(i.data, false);
 
@@ -3592,7 +3592,7 @@ int main()
                 {
                     //o->owner_id = net_state.my_id;
 
-                    std::cout << o->owner_id << " " << o->serialise_id << std::endl;
+                    //std::cout << o->owner_id << " " << o->serialise_id << std::endl;
 
                     serialise ser;
                     ///because o is a pointer, we allow the stream to force decode the pointer
@@ -3603,16 +3603,23 @@ int main()
                     ser.handle_serialise(serialise_data_helper::disk_mode, true);
                     ser.handle_serialise(o, true);
 
-                    std::cout << ser.data.size() << std::endl;
+                    //std::cout << ser.data.size() << std::endl;
 
                     network_object no;
                     ///uuh. Ok it should be this but it wont work yet as we don't by default own stuff
                     ///need to patch ids or something if owner_id is set to default
                     //no.owner_id = o->owner_id;
-                    no.owner_id = net_state.my_id;
+
+                    if(o->owner_id == -1)
+                        no.owner_id = net_state.my_id;
+                    else
+                        no.owner_id = o->owner_id;
+
                     no.serialise_id = o->serialise_id;
 
                     //std::cout << no.owner_id << " " << no.serialise_id << std::endl;
+
+                    //std::cout << "packet_fragments " << get_packet_fragments(ser.data.size()) << std::endl;
 
                     net_state.forward_data(no, ser);
                 }
