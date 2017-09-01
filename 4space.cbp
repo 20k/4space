@@ -91,6 +91,8 @@
 		<Unit filename="imgui_customisation.cpp" />
 		<Unit filename="imgui_customisation.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="network_update_strategies.cpp" />
+		<Unit filename="network_update_strategies.hpp" />
 		<Unit filename="networking.hpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />

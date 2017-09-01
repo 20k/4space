@@ -34,6 +34,7 @@
 #include "stacktrace_helper.hpp"
 #include "serialise.hpp"
 #include "networking.hpp"
+#include "network_update_strategies.hpp"
 
 
 /*std::string obfuscate(const std::string& str, bool should_obfuscate)
@@ -3005,6 +3006,8 @@ int main()
     networking_init();
     network_state net_state;
 
+    network_updater net_update;
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);
@@ -3677,11 +3680,7 @@ int main()
 
         ImGui::End();
 
-        if(net_state.connected())
-        {
-
-        }
-
+        net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, all_battles);
         net_state.tick_join_game(diff_s);
         net_state.tick();
 

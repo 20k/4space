@@ -59,11 +59,13 @@ struct network_data
     }
 };
 
+inline
 int get_max_packet_size_clientside()
 {
     return 450;
 }
 
+inline
 int get_packet_fragments(int data_size)
 {
     int max_data_size = get_max_packet_size_clientside();
