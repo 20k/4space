@@ -1523,11 +1523,13 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick_calculate_owned_systems();
         emp->tick(step_s);
         emp->tick_system_claim();
-        emp->tick_ai(all_battles, system_manage);
+
+        if(emp->owned_by_host)
+            emp->tick_ai(all_battles, system_manage);
 
         emp->accumulated_dt_s += step_s;
 
-        if(e_id == frame_counter)
+        if(e_id == frame_counter && emp->owned_by_host)
         {
             emp->tick_high_level_ai(step_s, fleet_manage, system_manage);
         }
@@ -1536,7 +1538,7 @@ void empire_manager::tick_all(float step_s, all_battles_manager& all_battles, sy
         emp->tick_relation_alliance_changes(player_empire);
         emp->tick_relation_border_friction(step_s, system_manage);
 
-        if(emp->has_ai && !emp->is_pirate)
+        if(emp->has_ai && !emp->is_pirate && emp->owned_by_host)
         {
             e_id++;
         }
