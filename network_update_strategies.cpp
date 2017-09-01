@@ -48,11 +48,11 @@ struct update_strategy
         serialise ser;
         ///because o is a pointer, we allow the stream to force decode the pointer
         ///if o were a non ptr with a do_serialise method, this would have to be false
-        ser.allow_force = true;
+        //ser.allow_force = true;
         ser.default_owner = net_state.my_id;
 
         ser.handle_serialise(serialise_data_helper::disk_mode, true);
-        ser.handle_serialise(t, true);
+        ser.force_serialise(t, true);
 
         network_object no;
 

@@ -3558,8 +3558,8 @@ int main()
 
                 ///because the next element is a pointer, we force the stream
                 ///to decode the pointer data
-                i.data.allow_force = true;
-                i.data.handle_serialise(found_s, false);
+                //i.data.allow_force = true;
+                i.data.force_serialise(found_s, false);
 
                 i.set_complete();
             }

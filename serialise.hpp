@@ -720,27 +720,34 @@ struct serialise_helper<T>
 ///we actually need to
 struct serialise : serialise_data
 {
-    bool allow_force = false;
-    bool forced = false;
+    //bool allow_force = false;
+    //bool forced = false;
 
     template<typename T>
-    void push_back(T& v)
+    void push_back(T& v, bool force = false)
     {
-        serialise_helper_force<T> helper;
+        if(force)
+        {
+            serialise_helper_force<T> helper;
 
-        helper.add(v, *this);
+            helper.add(v, *this);
+        }
+        else
+        {
+            serialise_helper<T> helper;
+
+            helper.add(v, *this);
+        }
     }
 
     ///if pointer, look up in pointer map
     template<typename T>
-    void get(T& val)
+    void get(T& val, bool force = false)
     {
         val = T();
 
-        if(allow_force && !forced)
+        if(force)
         {
-            //forced = true;
-
             serialise_helper_force<T> helper;
 
             helper.get(val, *this);
@@ -750,6 +757,19 @@ struct serialise : serialise_data
             serialise_helper<T> helper;
 
             helper.get(val, *this);
+        }
+    }
+
+    template<typename T>
+    void force_serialise(T& v, bool ser)
+    {
+        if(ser)
+        {
+            push_back(v, true);
+        }
+        else
+        {
+            get<T>(v, true);
         }
     }
 
