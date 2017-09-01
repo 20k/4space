@@ -297,6 +297,8 @@ struct serialise_helper<std::vector<T>>
         int32_t length;
         helper.get(length, s);
 
+        v.reserve(length);
+
         for(int i=0; i<length; i++)
         {
             serialise_helper<T> type;
@@ -332,6 +334,8 @@ struct serialise_helper<std::deque<T>>
         int32_t length;
         helper.get(length, s);
 
+        v.resize(length);
+
         for(int i=0; i<length; i++)
         {
             serialise_helper<T> type;
@@ -339,7 +343,7 @@ struct serialise_helper<std::deque<T>>
             T t;
             type.get(t, s);
 
-            v.push_back(std::move(t));
+            v[i] = std::move(t);
         }
     }
 };
@@ -383,7 +387,7 @@ struct serialise_helper<std::map<T, U>>
             h1.get(first, s);
             h2.get(second, s);
 
-            v[first] = std::move(second);
+            v.insert(v.end(), {first, std::move(second)});
         }
     }
 };
@@ -427,7 +431,7 @@ struct serialise_helper<std::unordered_map<T, U>>
             h1.get(first, s);
             h2.get(second, s);
 
-            v[first] = std::move(second);
+            v.insert(v.end(), {first, std::move(second)});
         }
     }
 };
@@ -464,7 +468,7 @@ struct serialise_helper<std::set<T>>
             T t;
             type.get(t, s);
 
-            v.insert(std::move(t));
+            v.insert(v.end(), std::move(t));
         }
     }
 };
@@ -536,6 +540,8 @@ struct serialise_helper<std::string>
 
             return;
         }
+
+        v.reserve(length);
 
         for(int i=0; i<length; i++)
         {
