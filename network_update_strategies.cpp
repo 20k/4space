@@ -163,8 +163,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
             if(!net_state.owns(o))
                 continue;
 
-            //if(o->dirty)
-            //    continue;
+            if(o->dirty)
+                continue;
 
             if(o->type == orbital_info::FLEET)
             {
@@ -179,8 +179,11 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
         }
     }
 
+    //if(orbitals.size() > 0)
+    //    std::cout << orbitals.size() << std::endl;
+
     static update_strategy orbital_strategy;
-    //orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state, false);
+    orbital_strategy.do_update_strategy(dt_s, 0.1f, orbitals, net_state, false);
 
     static update_strategy body_strategy;
     //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
