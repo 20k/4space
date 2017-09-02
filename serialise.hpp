@@ -230,15 +230,17 @@ struct serialise_helper<T*>
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(v != nullptr && serialise_data_helper::disk_mode == 0 && force)
+        if(serialise_data_helper::disk_mode == 0 && force)
         {
             did_serialise = true;
 
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(v && !did_serialise && was_dirty)
+        if(!did_serialise && was_dirty)
         {
+            std::cout << "dirty send " << typeid(v).name() << std::endl;
+
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
     }
@@ -318,15 +320,17 @@ struct serialise_helper<T*>
             }
         }
 
-        if(ptr != nullptr && serialise_data_helper::disk_mode == 0 && force)
+        if(serialise_data_helper::disk_mode == 0 && force)
         {
             did_serialise = true;
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
         }
 
-        if(ptr && dirty && !did_serialise)
+        if(dirty && !did_serialise)
         {
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
+
+            std::cout << "dirty" << std::endl;
         }
 
         if(!ptr->handled_by_client && was_nullptr)
