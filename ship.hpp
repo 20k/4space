@@ -795,6 +795,8 @@ struct ship_manager : serialisable
 
     ///need to differentiate disk and network serialisation
     void do_serialise(serialise& s, bool ser) override;
+
+    fleet_manager* fleet_manage = nullptr;
 };
 
 struct empire_manager;

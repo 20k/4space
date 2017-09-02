@@ -2239,7 +2239,7 @@ float empire_manager::get_spawn_empire_distance(empire* e1, empire* e2)
 
 void empire_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(frame_counter, ser);
         s.handle_serialise(giving_are_you_sure, ser);
@@ -2252,6 +2252,22 @@ void empire_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(unknown_empire, ser); ///???
         s.handle_serialise(initial_spawn_reference, ser);
         s.handle_serialise(pirate_empires, ser);
+        s.handle_serialise(empires, ser);
+    }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
+        //s.handle_serialise(frame_counter, ser);
+        //s.handle_serialise(giving_are_you_sure, ser);
+        ///OFFERING
+        //s.handle_serialise(giving_resources_ui_clicked, ser);
+        //s.handle_serialise(offer_resources_ui, ser);
+        //s.handle_serialise(offering_resources, ser);
+        //s.handle_serialise(confirm_declare_war, ser);
+        //s.handle_serialise(confirm_break_alliance, ser);
+        //s.handle_serialise(unknown_empire, ser); ///???
+        //s.handle_serialise(initial_spawn_reference, ser);
+        //s.handle_serialise(pirate_empires, ser);
         s.handle_serialise(empires, ser);
     }
 }

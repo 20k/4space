@@ -210,6 +210,9 @@ struct serialise_helper<T*>
 
         bool did_serialise = false;
 
+        ///if dirty, we want to serialise in mode 1, but still not follow references i think (unless dirty)
+        ///mode 2?
+
         ///we're writing out this element for the first time
         if(last_ptr == nullptr && in_disk_mode)
         {

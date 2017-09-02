@@ -4222,7 +4222,7 @@ void ship::set_size(float new_size)
 void ship::do_serialise(serialise& s, bool ser)
 {
     #if 1
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(editor_size_storage, ser);
         s.handle_serialise(colonise_target, ser);
@@ -4264,6 +4264,60 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(world_rot, ser);
         s.handle_serialise(world_pos, ser);
     }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
+        //s.handle_serialise(editor_size_storage, ser);
+        s.handle_serialise(colonise_target, ser);
+        s.handle_serialise(colonising, ser);
+
+        s.handle_serialise(past_owners_research_left, ser);
+        s.handle_serialise(original_owning_race, ser);
+        s.handle_serialise(crew_effectiveness, ser);
+        s.handle_serialise(is_alien, ser);
+
+        s.handle_serialise(research_left_from_crewing, ser);
+        s.handle_serialise(cleanup, ser);
+        s.handle_serialise(is_fully_disabled, ser);
+        s.handle_serialise(currently_in_combat, ser);
+
+        s.handle_serialise(currently_in_combat, ser);
+        s.handle_serialise(time_in_combat_s, ser);
+        s.handle_serialise(is_disengaging, ser);
+        s.handle_serialise(disengage_clock_s, ser);
+        //s.handle_serialise(display_weapon, ser);
+        //s.handle_serialise(display_popout, ser);
+        //s.handle_serialise(display_ui, ser);
+        s.handle_serialise(owned_by, ser);
+        //s.handle_serialise(tex, ser);
+        //s.handle_serialise(is_loaded, ser);
+        //s.handle_serialise(highlight, ser);
+        //s.handle_serialise(has_element, ser);
+
+        //s.handle_serialise(entity_list, ser);
+
+        //s.handle_serialise(type_to_component_offsets, ser);
+        //s.handle_serialise(team, ser);
+        //s.handle_serialise(name, ser);
+        //s.handle_serialise(ai_fleet_type, ser);
+
+        //s.handle_serialise(dim, ser);
+        s.handle_serialise(local_rot, ser);
+        s.handle_serialise(local_pos, ser);
+        s.handle_serialise(world_rot, ser);
+        s.handle_serialise(world_pos, ser);
+
+        ///ok, but this will break when/if we swap dirty to using disk serialisation
+        if(!handled_by_client)
+        {
+            handled_by_client = true;
+
+            owned_by->ships.push_back(this);
+        }
+    }
+
+    handled_by_client = true;
+
     #endif
 }
 
@@ -5228,7 +5282,7 @@ float ship_manager::get_min_fuel_frac()
 
 void ship_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(in_friendly_territory, ser);
         s.handle_serialise(can_merge, ser);
@@ -5242,6 +5296,30 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
     }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
+        //s.handle_serialise(in_friendly_territory, ser);
+        //s.handle_serialise(can_merge, ser);
+        //s.handle_serialise(to_close_ui, ser);
+        //s.handle_serialise(toggle_fleet_ui, ser);
+        s.handle_serialise(decolonising, ser);
+        s.handle_serialise(accumulated_dt, ser);
+        s.handle_serialise(parent_empire, ser);
+        s.handle_serialise(auto_colonise, ser);
+        s.handle_serialise(auto_harvest_ore, ser);
+        s.handle_serialise(auto_resupply, ser);
+        s.handle_serialise(ships, ser);
+
+        if(!handled_by_client)
+        {
+            handled_by_client = true;
+
+            fleet_manage->fleets.push_back(this);
+        }
+    }
+
+    handled_by_client = true;
 }
 
 ship_manager* fleet_manager::make_new()
@@ -5250,6 +5328,7 @@ ship_manager* fleet_manager::make_new()
 
     fleets.push_back(ns);
     ns->make_dirty();
+    ns->fleet_manage = this;
 
     return ns;
 }
@@ -5423,9 +5502,14 @@ ship* fleet_manager::nearest_free_colony_ship_of_empire(orbital* o, empire* e)
 
 void fleet_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(internal_counter, ser);
+        s.handle_serialise(fleets, ser);
+    }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
         s.handle_serialise(fleets, ser);
     }
 }

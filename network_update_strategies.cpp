@@ -34,6 +34,34 @@ void empire_update_strategy(empire_manager& empire_manage)
 
 }*/
 
+void send_data(network_object& no, serialise& ser, network_state& net_state)
+{
+    serialise_data_helper::disk_mode = 0;
+
+    net_state.forward_data(no, ser);
+}
+
+void send_data(serialisable* t, serialise& ser, network_state& net_state)
+{
+    serialise_data_helper::disk_mode = 0;
+
+    //if(t->dirty)
+    //   return;
+
+    ser.default_owner = net_state.my_id;
+
+    network_object no;
+
+    if(t->owner_id == -1)
+        no.owner_id = net_state.my_id;
+    else
+        no.owner_id = t->owner_id;
+
+    no.serialise_id = t->serialise_id;
+
+    net_state.forward_data(no, ser);
+}
+
 struct update_strategy
 {
     int num_updated = 0;
@@ -41,33 +69,21 @@ struct update_strategy
     double time_elapsed_s = 0;
 
     template<typename T>
-    void update(T* t, network_state& net_state)
+    void update(T* t, network_state& net_state, bool transmit_dirty)
     {
-        serialise_data_helper::disk_mode = 0;
-
         serialise ser;
         ///because o is a pointer, we allow the stream to force decode the pointer
         ///if o were a non ptr with a do_serialise method, this would have to be false
         //ser.allow_force = true;
-        ser.default_owner = net_state.my_id;
 
         ser.handle_serialise(serialise_data_helper::disk_mode, true);
         ser.force_serialise(t, true);
 
-        network_object no;
-
-        if(t->owner_id == -1)
-            no.owner_id = net_state.my_id;
-        else
-            no.owner_id = t->owner_id;
-
-        no.serialise_id = t->serialise_id;
-
-        net_state.forward_data(no, ser);
+        send_data(t, ser, net_state);
     }
 
     template<typename T>
-    void do_update_strategy(float dt_s, float time_between_full_updates, const std::vector<T*>& to_manage, network_state& net_state)
+    void do_update_strategy(float dt_s, float time_between_full_updates, const std::vector<T*>& to_manage, network_state& net_state, bool transmit_dirty)
     {
         if(to_manage.size() == 0)
             return;
@@ -78,7 +94,7 @@ struct update_strategy
             {
                 T* t = to_manage[i];
 
-                update(t, net_state);
+                update(t, net_state, transmit_dirty);
             }
 
             time_elapsed_s = 0.;
@@ -97,7 +113,7 @@ struct update_strategy
         {
             T* t = to_manage[num_updated];
 
-            update(t, net_state);
+            update(t, net_state, transmit_dirty);
         }
 
         time_elapsed_s += dt_s;
@@ -149,15 +165,33 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     }
 
     static update_strategy orbital_strategy;
-    orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state);
+    orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state, false);
 
     static update_strategy body_strategy;
-    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state);
+    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
 
     ///so. I think the problem is that we're giving the system references to orbitals that may get created
     ///but aren't fully initialised, hence the crash
     static update_strategy system_strategy;
-    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state);
+    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, false);
+
+    ///Hmm. This isn't the best plan
+    ///the problem is, nobody owns these
+    ///sort this out through dirty and make_new
+    /*network_object no;
+    ///CONFLICT BETWEEN PLAYERS
+    no.owner_id = net_state.my_id;
+    no.serialise_id = -1;
+
+    serialise ser;
+
+    ser.handle_serialise<decltype(serialise_data_helper::disk_mode)>(2, true);
+    ser.force_serialise(empire_manage, true);
+    ser.force_serialise(system_manage, true);
+    ser.force_serialise(fleet_manage, true);
+    ser.force_serialise(all_battles, true);
+
+    send_data(t, ser, net_state);*/
 
     elapsed_time_s += dt_s;
 }

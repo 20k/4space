@@ -3420,7 +3420,7 @@ int main()
                 }
             }
 
-            system_manage.ensure_found_orbitals_handled();
+            //system_manage.ensure_found_orbitals_handled();
 
             serialise_data_helper::owner_to_id_to_pointer.clear();
         }
@@ -3480,7 +3480,7 @@ int main()
                     }
                 }
 
-                system_manage.ensure_found_orbitals_handled();
+                //system_manage.ensure_found_orbitals_handled();
 
                 for(orbital_system* sys : system_manage.systems)
                 {
@@ -3494,16 +3494,36 @@ int main()
                 }
 
                 i.set_complete();
+            }
 
-                /*std::cout << "testing " << std::endl;
+            for(network_data& i : net_state.available_data)
+            {
+                if(i.processed)
+                    continue;
 
-                std::cout << i.object.owner_id << std::endl;
+                int32_t internal_counter = i.data.internal_counter;
 
-                for(auto& i : serialise_data_helper::owner_to_id_to_pointer[i.object.owner_id])
+                int32_t disk_mode = 0;
+
+                i.data.handle_serialise(disk_mode, false);
+
+                if(disk_mode != 2)
                 {
-                    std::cout << i.first << std::endl;
-                    std::cout << i.second << std::endl;
-                }*/
+                    i.data.internal_counter = internal_counter;
+
+                    continue;
+                }
+
+                serialise_data_helper::disk_mode = 0;
+
+                serialise ser = i.data;
+
+                ser.handle_serialise(empire_manage, false);
+                ser.handle_serialise(system_manage, false);
+                ser.handle_serialise(fleet_manage, false);
+                ser.handle_serialise(all_battles, false);
+
+                i.set_complete();
             }
 
             for(network_data& i : net_state.available_data)

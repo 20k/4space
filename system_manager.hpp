@@ -95,6 +95,7 @@ struct orbital_simple_renderable : serialisable
 
 struct sprite_renderable
 {
+    bool loaded = false;
     sf::Image img;
     sf::Texture tex;
 

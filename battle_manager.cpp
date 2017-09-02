@@ -134,7 +134,7 @@ void projectile::do_serialise(serialise& s, bool ser)
     ///ok so. Assume that disk mode is called
     ///whenever an item needs full sync
     ///and non disk mode is called per 'tick'
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(ship_fired_by, ser);
         s.handle_serialise(fired_by, ser);
@@ -152,11 +152,33 @@ void projectile::do_serialise(serialise& s, bool ser)
 
         if(handled_by_client == false)
         {
-            handled_by_client = true;
-
             load(type);
         }
     }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
+        s.handle_serialise(ship_fired_by, ser);
+        s.handle_serialise(fired_by, ser);
+        s.handle_serialise(base, ser);
+        s.handle_serialise(pteam, ser);
+        s.handle_serialise(velocity, ser);
+        s.handle_serialise(type, ser);
+        s.handle_serialise(options, ser);
+
+        s.handle_serialise(dim, ser);
+        s.handle_serialise(local_rot, ser);
+        s.handle_serialise(local_pos, ser);
+        s.handle_serialise(world_rot, ser);
+        s.handle_serialise(world_pos, ser);
+
+        if(handled_by_client == false)
+        {
+            load(type);
+        }
+    }
+
+    handled_by_client = true;
 }
 
 projectile* projectile_manager::make_new()
@@ -898,9 +920,16 @@ orbital_system* battle_manager::get_system_in(system_manager& system_manage)
 
 void battle_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(is_ui_opened, ser);
+        s.handle_serialise(slots_filled, ser);
+        s.handle_serialise(ships, ser);
+        s.handle_serialise(projectile_manage, ser);
+    }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
         s.handle_serialise(slots_filled, ser);
         s.handle_serialise(ships, ser);
         s.handle_serialise(projectile_manage, ser);
@@ -1059,13 +1088,18 @@ battle_manager* all_battles_manager::get_battle_involving(ship_manager* ship_man
 
 void all_battles_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(request_leave_battle_view, ser);
         s.handle_serialise(request_enter_battle_view, ser);
         s.handle_serialise(request_stay_in_battle_system, ser);
         s.handle_serialise(request_stay_id, ser);
         s.handle_serialise(currently_viewing, ser);
+        s.handle_serialise(battles, ser);
+    }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
         s.handle_serialise(battles, ser);
     }
 }

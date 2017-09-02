@@ -240,12 +240,17 @@ void premultiply(sf::Image& image);
 
 void sprite_renderable::load(const std::string& str)
 {
+    if(loaded)
+        return;
+
     img.loadFromFile(str);
     premultiply(img);
     tex.loadFromImage(img);
     tex.setSmooth(true);
     ///smooth rendering causes issues, we'll have to go high res or constructive
     ///also looks hideous
+
+    loaded = true;
 }
 
 void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
@@ -493,7 +498,10 @@ void check_for_resources(orbital* me)
 
 void orbital::tick(float step_s)
 {
-    ensure_handled_by_client();
+    if(render_type == 1 && !sprite.loaded)
+    {
+        sprite.load(orbital_info::load_strs[type]);
+    }
 
     internal_time_s += step_s;
 
@@ -1235,13 +1243,28 @@ void orbital::do_serialise(serialise& s, bool ser)
 
         //s.handle_serialise(command_queue, ser);
 
+        if(!handled_by_client)
+        {
+            if(parent_system != nullptr)
+            {
+                if(type != orbital_info::ASTEROID)
+                    parent_system->orbitals.push_back(this);
+                else
+                    parent_system->asteroids.push_back(this);
+            }
+
+            handled_by_client = true;
+        }
+
         //printf("well then\n");
     }
+
+    handled_by_client = true;
 
     //printf("what?\n");
 }
 
-void orbital::ensure_handled_by_client()
+/*void orbital::ensure_handled_by_client()
 {
     if(handled_by_client == false)
     {
@@ -1252,7 +1275,7 @@ void orbital::ensure_handled_by_client()
             sprite.load(orbital_info::load_strs[type]);
         }
     }
-}
+}*/
 
 /*void orbital::process_context_ui()
 {
@@ -1372,7 +1395,7 @@ orbital* orbital_system::make_in_place(orbital* n)
     return n;
 }
 
-void orbital_system::ensure_found_orbitals_handled()
+/*void orbital_system::ensure_found_orbitals_handled()
 {
     for(orbital* o : orbitals)
     {
@@ -1399,7 +1422,7 @@ void orbital_system::ensure_found_orbitals_handled()
             }
         }
     }
-}
+}*/
 
 orbital* orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, float angle, empire* e)
 {
@@ -3812,7 +3835,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
 void system_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::disk_mode == 1)
     {
         s.handle_serialise(camera, ser);
         s.handle_serialise(zoom_level, ser);
@@ -3823,15 +3846,25 @@ void system_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(currently_viewed, ser);
         s.handle_serialise(hovered_system, ser);
     }
+
+    if(serialise_data_helper::disk_mode == 0)
+    {
+        //s.handle_serialise(camera, ser);
+        //s.handle_serialise(zoom_level, ser);
+        s.handle_serialise(systems, ser);
+        //s.handle_serialise(backup_system, ser);
+        //s.handle_serialise(currently_viewed, ser);
+        //s.handle_serialise(hovered_system, ser);
+    }
 }
 
-void system_manager::ensure_found_orbitals_handled()
+/*void system_manager::ensure_found_orbitals_handled()
 {
     for(orbital_system* sys : systems)
     {
         sys->ensure_found_orbitals_handled();
     }
-}
+}*/
 
 void system_manager::erase_all()
 {
