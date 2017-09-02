@@ -71,6 +71,8 @@ struct update_strategy
     template<typename T>
     void update(T* t, network_state& net_state, bool transmit_dirty)
     {
+        serialise_data_helper::disk_mode = 0;
+
         serialise ser;
         ///because o is a pointer, we allow the stream to force decode the pointer
         ///if o were a non ptr with a do_serialise method, this would have to be false
