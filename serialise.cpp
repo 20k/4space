@@ -7,6 +7,7 @@ uint64_t serialisable::gserialise_id;
 int32_t serialise_data_helper::disk_mode = 1;
 std::map<serialise_owner_type, std::map<serialise_data_type, serialisable*>> serialise_data_helper::owner_to_id_to_pointer;
 //int serialise_data_helper::pass = 0;
+std::map<size_t, unhandled_types> serialise_data_helper::type_to_datas;
 
 struct test_object : serialisable
 {

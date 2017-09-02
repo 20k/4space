@@ -15,6 +15,7 @@
 #include <SFML/Graphics.hpp>
 #include <vec/vec.hpp>
 #include <deque>
+#include <typeinfo>
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
@@ -66,11 +67,19 @@ struct serialisable
     virtual ~serialisable(){}
 };
 
+struct unhandled_types
+{
+    std::string type_name;
+    std::vector<serialisable*> data;
+};
+
 struct serialise_data_helper
 {
     static int32_t disk_mode;
 
     static std::map<serialise_owner_type, std::map<serialise_data_type, serialisable*>> owner_to_id_to_pointer;
+
+    static std::map<size_t, unhandled_types> type_to_datas;
 };
 
 struct serialise;
@@ -318,6 +327,12 @@ struct serialise_helper<T*>
         if(ptr && dirty && !did_serialise)
         {
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
+        }
+
+        if(!ptr->handled_by_client && was_nullptr)
+        {
+            serialise_data_helper::type_to_datas[typeid(ptr).hash_code()].data.push_back(ptr);
+            serialise_data_helper::type_to_datas[typeid(ptr).hash_code()].type_name = typeid(ptr).name();
         }
 
         v = ptr;

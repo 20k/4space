@@ -5311,15 +5311,16 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
 
-        if(!handled_by_client)
+        ///when we call this fleet manage doesn't exist
+        /*if(!handled_by_client)
         {
             handled_by_client = true;
 
             fleet_manage->fleets.push_back(this);
-        }
+        }*/
     }
 
-    handled_by_client = true;
+    //handled_by_client = true;
 }
 
 ship_manager* fleet_manager::make_new()
@@ -5328,9 +5329,20 @@ ship_manager* fleet_manager::make_new()
 
     fleets.push_back(ns);
     ns->make_dirty();
-    ns->fleet_manage = this;
+    //ns->fleet_manage = this;
 
     return ns;
+}
+
+bool fleet_manager::owns(ship_manager* sm)
+{
+    for(auto& i : fleets)
+    {
+        if(i == sm)
+            return true;
+    }
+
+    return false;
 }
 
 ///how do we handle dirtyness when destroying?

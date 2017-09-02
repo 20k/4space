@@ -2270,6 +2270,8 @@ void empire_manager::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(pirate_empires, ser);
         s.handle_serialise(empires, ser);
     }
+
+    handled_by_client = true;
 }
 
 void empire_manager::erase_all()

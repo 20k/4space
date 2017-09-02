@@ -796,7 +796,7 @@ struct ship_manager : serialisable
     ///need to differentiate disk and network serialisation
     void do_serialise(serialise& s, bool ser) override;
 
-    fleet_manager* fleet_manage = nullptr;
+    //fleet_manager* fleet_manage = nullptr;
 };
 
 struct empire_manager;
@@ -807,12 +807,14 @@ struct fleet_manager : serialisable
     std::vector<ship_manager*> fleets;
 
     ship_manager* make_new();
+    bool owns(ship_manager* sm);
 
     void destroy(ship_manager*);
 
     void cull_dead(empire_manager& empire_manage);
 
     void tick_all(float step_s);
+
 
     ship* nearest_free_colony_ship_of_empire(orbital* o, empire* e);
 

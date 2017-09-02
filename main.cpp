@@ -3703,6 +3703,50 @@ int main()
         ImGui::End();
 
         net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, all_battles);
+
+        for(auto& unprocessed : serialise_data_helper::type_to_datas)
+        {
+            const size_t type = unprocessed.first;
+            unhandled_types& objects = unprocessed.second;
+
+            if(typeid(ship_manager*).hash_code() == type)
+            {
+                std::cout << "found orphaned ship" << std::endl;
+
+                for(serialisable* obj : objects.data)
+                {
+                    ship_manager* sm = (ship_manager*)obj;
+
+                    if(!fleet_manage.owns(sm))
+                    {
+                        fleet_manage.fleets.push_back(sm);
+                    }
+
+                    sm->handled_by_client = true;
+                }
+            }
+            else if(typeid(empire*).hash_code() == type)
+            {
+                std::cout << "potential orphaned empire" << std::endl;
+
+                ///hmm
+                for(serialisable* obj : objects.data)
+                {
+                    empire* e = (empire*)obj;
+
+                    e->handled_by_client = true;
+
+                    std::cout << e->name << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "Warning unhandled type " << objects.type_name << std::endl;
+            }
+        }
+
+        serialise_data_helper::type_to_datas.clear();
+
         net_state.tick_join_game(diff_s);
         net_state.tick();
 

@@ -234,6 +234,8 @@ void orbital_simple_renderable::do_serialise(serialise& s, bool ser)
     {
         s.handle_serialise(vert_dist, ser);
     }
+
+    handled_by_client = true;
 }
 
 void premultiply(sf::Image& image);
@@ -1243,7 +1245,7 @@ void orbital::do_serialise(serialise& s, bool ser)
 
         //s.handle_serialise(command_queue, ser);
 
-        if(!handled_by_client)
+        /*if(!handled_by_client)
         {
             if(parent_system != nullptr)
             {
@@ -1253,8 +1255,10 @@ void orbital::do_serialise(serialise& s, bool ser)
                     parent_system->asteroids.push_back(this);
             }
 
+            //printf("hi there\n");
+
             handled_by_client = true;
-        }
+        }*/
 
         //printf("well then\n");
     }
@@ -2092,6 +2096,8 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
         //printf("%i %i\n", s.data.size(), orbitals.size());
     }
+
+    handled_by_client = true;
 }
 
 system_manager::system_manager()
@@ -3856,6 +3862,8 @@ void system_manager::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(currently_viewed, ser);
         //s.handle_serialise(hovered_system, ser);
     }
+
+    handled_by_client = true;
 }
 
 /*void system_manager::ensure_found_orbitals_handled()
