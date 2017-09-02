@@ -503,9 +503,10 @@ struct network_state
 
                     //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
 
-                    if(request.owner_id == my_id)
+                    if(owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].find(request.sequence_id) !=
+                       owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].end())
                     {
-                        auto& vec = owner_to_packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
+                        auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
 
                         //std::cout << vec.vec.ptr.size() << std::endl;
 
@@ -515,7 +516,7 @@ struct network_state
                     }
                     else
                     {
-                        std::cout << "my_id " << my_id << " t " << request.owner_id << std::endl;
+                        std::cout << "dont have data" << std::endl;
                     }
                 }
 
@@ -739,7 +740,7 @@ struct network_state
         byte_vector vec;
     };
 
-    std::map<packet_id_type, std::map<sequence_data_type, resend_info>> owner_to_packet_id_to_sequence_number_to_data;
+    std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, resend_info>>> owner_to_packet_id_to_sequence_number_to_data;
 
     void forward_data(const network_object& no, serialise& s)
     {
@@ -753,7 +754,7 @@ struct network_state
 
            // while(!sock_writable(sock)) {}
 
-            owner_to_packet_id_to_sequence_number_to_data[packet_id][i] = {frag};
+            owner_to_packet_id_to_sequence_number_to_data[no.owner_id][packet_id][i] = {frag};
 
             if(i < max_to_send)
             {
