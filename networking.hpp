@@ -503,13 +503,20 @@ struct network_state
 
                     //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
 
-                    auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
+                    if(request.owner_id == my_id)
+                    {
+                        auto& vec = owner_to_packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
 
-                    //std::cout << vec.vec.ptr.size() << std::endl;
+                        //std::cout << vec.vec.ptr.size() << std::endl;
 
-                    while(!sock_writable(sock)){}
+                        while(!sock_writable(sock)){}
 
-                    udp_send_to(sock, vec.vec.ptr, (const sockaddr*)&store);
+                        udp_send_to(sock, vec.vec.ptr, (const sockaddr*)&store);
+                    }
+                    else
+                    {
+                        std::cout << "my_id " << my_id << " t " << request.owner_id << std::endl;
+                    }
                 }
 
                 if(type == message::FORWARDING)
@@ -732,7 +739,7 @@ struct network_state
         byte_vector vec;
     };
 
-    std::map<serialise_owner_type,std::map<packet_id_type, std::map<sequence_data_type, resend_info>>> owner_to_packet_id_to_sequence_number_to_data;
+    std::map<packet_id_type, std::map<sequence_data_type, resend_info>> owner_to_packet_id_to_sequence_number_to_data;
 
     void forward_data(const network_object& no, serialise& s)
     {
@@ -746,7 +753,7 @@ struct network_state
 
            // while(!sock_writable(sock)) {}
 
-            owner_to_packet_id_to_sequence_number_to_data[my_id][packet_id][i] = {frag};
+            owner_to_packet_id_to_sequence_number_to_data[packet_id][i] = {frag};
 
             if(i < max_to_send)
             {
