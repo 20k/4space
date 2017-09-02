@@ -1699,7 +1699,7 @@ float component::safe_hp_frac_modify(float in)
 
 void component::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(cost_mult, ser);
         s.handle_serialise(repair_this_when_recrewing, ser);
@@ -1713,6 +1713,11 @@ void component::do_serialise(serialise& s, bool ser)
         s.handle_serialise(current_size, ser);
         s.handle_serialise(tech_type, ser);
         s.handle_serialise(primary_attribute, ser);
+    }
+
+    if(serialise_data_helper::send_mode == 0)
+    {
+        s.handle_serialise(components, ser);
     }
 }
 
@@ -4222,7 +4227,7 @@ void ship::set_size(float new_size)
 void ship::do_serialise(serialise& s, bool ser)
 {
     #if 1
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(editor_size_storage, ser);
         s.handle_serialise(colonise_target, ser);
@@ -4265,7 +4270,7 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(world_pos, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         //s.handle_serialise(editor_size_storage, ser);
         s.handle_serialise(colonise_target, ser);
@@ -5282,7 +5287,7 @@ float ship_manager::get_min_fuel_frac()
 
 void ship_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(in_friendly_territory, ser);
         s.handle_serialise(can_merge, ser);
@@ -5297,14 +5302,14 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(ships, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         //s.handle_serialise(in_friendly_territory, ser);
         //s.handle_serialise(can_merge, ser);
         //s.handle_serialise(to_close_ui, ser);
         //s.handle_serialise(toggle_fleet_ui, ser);
         s.handle_serialise(decolonising, ser);
-        s.handle_serialise(accumulated_dt, ser);
+        //s.handle_serialise(accumulated_dt, ser);
         s.handle_serialise(parent_empire, ser);
         s.handle_serialise(auto_colonise, ser);
         s.handle_serialise(auto_harvest_ore, ser);
@@ -5514,13 +5519,13 @@ ship* fleet_manager::nearest_free_colony_ship_of_empire(orbital* o, empire* e)
 
 void fleet_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(internal_counter, ser);
         s.handle_serialise(fleets, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(fleets, ser);
     }

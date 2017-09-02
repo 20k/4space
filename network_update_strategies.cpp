@@ -36,14 +36,16 @@ void empire_update_strategy(empire_manager& empire_manage)
 
 void send_data(network_object& no, serialise& ser, network_state& net_state)
 {
-    serialise_data_helper::disk_mode = 0;
+    serialise_data_helper::send_mode = 0;
+    serialise_data_helper::ref_mode = 0;
 
     net_state.forward_data(no, ser);
 }
 
 void send_data(serialisable* t, serialise& ser, network_state& net_state)
 {
-    serialise_data_helper::disk_mode = 0;
+    serialise_data_helper::send_mode = 0;
+    serialise_data_helper::ref_mode = 0;
 
     //if(t->dirty)
     //   return;
@@ -72,7 +74,8 @@ struct update_strategy
     template<typename T>
     void update(T* t, network_state& net_state, bool transmit_dirty)
     {
-        serialise_data_helper::disk_mode = 0;
+        serialise_data_helper::send_mode = 0;
+        serialise_data_helper::ref_mode = 0;
 
         serialise ser;
         ///because o is a pointer, we allow the stream to force decode the pointer
@@ -81,7 +84,7 @@ struct update_strategy
 
         ser.default_owner = net_state.my_id;
 
-        ser.handle_serialise(serialise_data_helper::disk_mode, true);
+        ser.handle_serialise(serialise_data_helper::send_mode, true);
         ser.force_serialise(t, true);
 
         send_data(t, ser, net_state);
@@ -178,7 +181,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state, false);
 
     static update_strategy body_strategy;
-    //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
+    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate

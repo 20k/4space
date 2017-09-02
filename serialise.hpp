@@ -75,7 +75,11 @@ struct unhandled_types
 
 struct serialise_data_helper
 {
-    static int32_t disk_mode;
+    ///0 = don't follow references unless dirty, 1 = follow (and serialise) references
+    static int32_t ref_mode;
+
+    ///0 = partial update, 1 = full
+    static int32_t send_mode;
 
     static std::map<serialise_owner_type, std::map<serialise_data_type, serialisable*>> owner_to_id_to_pointer;
 
@@ -215,7 +219,7 @@ struct serialise_helper<T*>
 
         v->dirty = false;
 
-        bool in_disk_mode = serialise_data_helper::disk_mode == 1;
+        bool follow_references = serialise_data_helper::ref_mode == 1;
 
         bool did_serialise = false;
 
@@ -223,14 +227,14 @@ struct serialise_helper<T*>
         ///mode 2?
 
         ///we're writing out this element for the first time
-        if(last_ptr == nullptr && in_disk_mode)
+        if(last_ptr == nullptr && follow_references)
         {
             did_serialise = true;
 
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(serialise_data_helper::disk_mode == 0 && force)
+        if(serialise_data_helper::ref_mode == 0 && force)
         {
             did_serialise = true;
 
@@ -301,7 +305,7 @@ struct serialise_helper<T*>
         bool did_serialise = false;
 
 
-        bool in_disk_mode = serialise_data_helper::disk_mode == 1;
+        bool follow_references = serialise_data_helper::ref_mode == 1;
 
         if(was_nullptr)
         {
@@ -316,14 +320,14 @@ struct serialise_helper<T*>
             }*/
 
             ///we're reading this element for the first time
-            if(in_disk_mode)
+            if(follow_references)
             {
                 did_serialise = true;
                 ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
             }
         }
 
-        if(serialise_data_helper::disk_mode == 0 && force)
+        if(serialise_data_helper::ref_mode == 0 && force)
         {
             did_serialise = true;
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
@@ -869,7 +873,8 @@ struct serialise : serialise_data
     {
         serialise_data_helper::owner_to_id_to_pointer.clear();
 
-        serialise_data_helper::disk_mode = 1;
+        serialise_data_helper::ref_mode = 1;
+        serialise_data_helper::send_mode = 1;
 
         if(data.size() == 0)
             return;
@@ -883,7 +888,8 @@ struct serialise : serialise_data
     {
         serialise_data_helper::owner_to_id_to_pointer.clear();
 
-        serialise_data_helper::disk_mode = 1;
+        serialise_data_helper::ref_mode = 1;
+        serialise_data_helper::send_mode = 1;
 
         internal_counter = 0;
 

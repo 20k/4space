@@ -6,7 +6,7 @@
 
 void object_command_queue_info::queue_element_data::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::send_mode == 1)
     {
         //int enum_type = type;
         s.handle_serialise(type, ser);
@@ -29,14 +29,25 @@ void object_command_queue_info::queue_element_data::do_serialise(serialise& s, b
         s.handle_serialise(should_pop, ser);
         s.handle_serialise(anchor_target, ser);
     }
+
+    ///don't pipe command queues across the network, no need?
+    if(serialise_data_helper::send_mode == 0)
+    {
+
+    }
 }
 
 void object_command_queue_info::queue_data::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(type, ser);
         s.handle_serialise(data, ser);
+    }
+
+    if(serialise_data_helper::send_mode == 0)
+    {
+
     }
 }
 
@@ -747,10 +758,15 @@ orbital_system* object_command_queue::get_warp_destination()
 
 void object_command_queue::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(should_pop, ser);
         s.handle_serialise(command_queue, ser);
         s.handle_serialise(should_interrupt, ser);
+    }
+
+    if(serialise_data_helper::send_mode == 0)
+    {
+
     }
 }

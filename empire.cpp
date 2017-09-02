@@ -1438,7 +1438,7 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
 
 void empire::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(frame_counter, ser);
         s.handle_serialise(accumulated_dt_s, ser);
@@ -1473,6 +1473,41 @@ void empire::do_serialise(serialise& s, bool ser)
         s.handle_serialise(is_player, ser);
 
         ///AI EMPIRE CONTROLLER
+    }
+
+    if(serialise_data_helper::send_mode == 0)
+    {
+        //s.handle_serialise(frame_counter, ser);
+        //s.handle_serialise(accumulated_dt_s, ser);
+        s.handle_serialise(desired_empire_size, ser);
+        s.handle_serialise(fleet_name_counter, ser);
+        //s.handle_serialise(toggle_systems_ui, ser);
+        //s.handle_serialise(is_derelict, ser);
+        //s.handle_serialise(toggle_ui, ser);
+        //s.handle_serialise(is_pirate, ser);
+        s.handle_serialise(pirate_invasion_timer_s, ser);
+        s.handle_serialise(parent, ser);
+
+        ///BACKUP_DT_S
+        ///BACKUP_INCOME_LIST
+        ///LAST_INCOME
+        ///BACKUP_INCOME
+
+        s.handle_serialise(relations_map, ser);
+        s.handle_serialise(owned_fleets, ser);
+        s.handle_serialise(owned, ser);
+        //s.handle_serialise(ship_prefix, ser);
+        //s.handle_serialise(name, ser);
+
+        s.handle_serialise(resources, ser);
+        s.handle_serialise(research_tech_level, ser);
+
+        s.handle_serialise(culture_similarity, ser);
+        //s.handle_serialise(given_colour, ser);
+        //s.handle_serialise(colour, ser);
+        s.handle_serialise(has_ai, ser);
+
+        s.handle_serialise(is_player, ser);
     }
 }
 
@@ -2239,7 +2274,7 @@ float empire_manager::get_spawn_empire_distance(empire* e1, empire* e2)
 
 void empire_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(frame_counter, ser);
         s.handle_serialise(giving_are_you_sure, ser);
@@ -2255,7 +2290,7 @@ void empire_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(empires, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         //s.handle_serialise(frame_counter, ser);
         //s.handle_serialise(giving_are_you_sure, ser);

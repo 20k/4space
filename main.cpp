@@ -3437,11 +3437,11 @@ int main()
 
                 int32_t internal_counter = i.data.internal_counter;
 
-                int32_t disk_mode = 0;
+                int32_t send_mode = 0;
 
-                i.data.handle_serialise(disk_mode, false);
+                i.data.handle_serialise(send_mode, false);
 
-                if(disk_mode != 1)
+                if(send_mode != 1)
                 {
                     i.data.internal_counter = internal_counter;
 
@@ -3450,7 +3450,8 @@ int main()
 
                 serialise_data_helper::owner_to_id_to_pointer.clear();
 
-                serialise_data_helper::disk_mode = 1;
+                serialise_data_helper::send_mode = 1;
+                serialise_data_helper::ref_mode = 1;
 
                 std::cout << "got full gamestate" << std::endl;
 
@@ -3496,7 +3497,7 @@ int main()
                 i.set_complete();
             }
 
-            for(network_data& i : net_state.available_data)
+            /*for(network_data& i : net_state.available_data)
             {
                 if(i.processed)
                     continue;
@@ -3515,6 +3516,7 @@ int main()
                 }
 
                 serialise_data_helper::disk_mode = 0;
+                serialise_data_helper::send_mode = 0;
 
                 serialise ser = i.data;
 
@@ -3524,7 +3526,7 @@ int main()
                 ser.handle_serialise(all_battles, false);
 
                 i.set_complete();
-            }
+            }*/
 
             for(network_data& i : net_state.available_data)
             {
@@ -3546,7 +3548,8 @@ int main()
 
                 //std::cout << "got mini packet" << std::endl;
 
-                serialise_data_helper::disk_mode = 0;
+                serialise_data_helper::send_mode = 0;
+                serialise_data_helper::ref_mode = 0;
 
                 /*for(orbital_system* sys : system_manage.systems)
                 {
@@ -3600,13 +3603,14 @@ int main()
         {
             serialise_data_helper::owner_to_id_to_pointer.clear();
 
-            serialise_data_helper::disk_mode = 1;
+            serialise_data_helper::send_mode = 1;
+            serialise_data_helper::ref_mode = 1;
 
             serialise ser;
             ser.default_owner = net_state.my_id;
 
 
-            ser.handle_serialise(serialise_data_helper::disk_mode, true);
+            ser.handle_serialise(serialise_data_helper::send_mode, true);
             ser.handle_serialise(empire_manage, true);
             ser.handle_serialise(system_manage, true);
             ser.handle_serialise(fleet_manage, true);

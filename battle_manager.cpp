@@ -134,7 +134,7 @@ void projectile::do_serialise(serialise& s, bool ser)
     ///ok so. Assume that disk mode is called
     ///whenever an item needs full sync
     ///and non disk mode is called per 'tick'
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(ship_fired_by, ser);
         s.handle_serialise(fired_by, ser);
@@ -156,7 +156,7 @@ void projectile::do_serialise(serialise& s, bool ser)
         }
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(ship_fired_by, ser);
         s.handle_serialise(fired_by, ser);
@@ -353,7 +353,12 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
 void projectile_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::send_mode == 1)
+    {
+        s.handle_serialise(projectiles, ser);
+    }
+
+    if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(projectiles, ser);
     }
@@ -920,7 +925,7 @@ orbital_system* battle_manager::get_system_in(system_manager& system_manage)
 
 void battle_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(is_ui_opened, ser);
         s.handle_serialise(slots_filled, ser);
@@ -928,7 +933,7 @@ void battle_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(projectile_manage, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(slots_filled, ser);
         s.handle_serialise(ships, ser);
@@ -1088,7 +1093,7 @@ battle_manager* all_battles_manager::get_battle_involving(ship_manager* ship_man
 
 void all_battles_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(request_leave_battle_view, ser);
         s.handle_serialise(request_enter_battle_view, ser);
@@ -1098,7 +1103,7 @@ void all_battles_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(battles, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(battles, ser);
     }

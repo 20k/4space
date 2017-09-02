@@ -230,9 +230,14 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
 
 void orbital_simple_renderable::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(vert_dist, ser);
+    }
+
+    if(serialise_data_helper::send_mode == 0)
+    {
+
     }
 
     handled_by_client = true;
@@ -1140,7 +1145,7 @@ bool orbital::in_friendly_territory()
 
 void orbital::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(expanded_window_clicked, ser);
         s.handle_serialise(force_draw_expanded_window, ser);
@@ -1193,7 +1198,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(command_queue, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         //s.handle_serialise(expanded_window_clicked, ser);
         //s.handle_serialise(force_draw_expanded_window, ser);
@@ -2064,7 +2069,7 @@ resource_manager orbital_system::get_potential_resources()
 
 void orbital_system::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(toggle_fleet_ui, ser);
         s.handle_serialise(accumulated_nonviewed_time, ser);
@@ -2082,7 +2087,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         ///ADVERTISED EMPIRES?
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         //printf("pre\n");
 
@@ -3841,7 +3846,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
 void system_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::disk_mode == 1)
+    if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(camera, ser);
         s.handle_serialise(zoom_level, ser);
@@ -3853,7 +3858,7 @@ void system_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(hovered_system, ser);
     }
 
-    if(serialise_data_helper::disk_mode == 0)
+    if(serialise_data_helper::send_mode == 0)
     {
         //s.handle_serialise(camera, ser);
         //s.handle_serialise(zoom_level, ser);
