@@ -6,7 +6,7 @@ uint64_t serialisable::gserialise_id;
 
 int32_t serialise_data_helper::ref_mode = 1;
 int32_t serialise_data_helper::send_mode = 1;
-std::map<serialise_owner_type, std::map<serialise_data_type, serialisable*>> serialise_data_helper::owner_to_id_to_pointer;
+std::map<serialise_host_type, std::map<serialise_data_type, serialisable*>> serialise_data_helper::host_to_id_to_pointer;
 //int serialise_data_helper::pass = 0;
 std::map<size_t, unhandled_types> serialise_data_helper::type_to_datas;
 
@@ -68,7 +68,7 @@ void test_serialisation()
 
 
         ///emulate network receive
-        serialise_data_helper::owner_to_id_to_pointer[test->owner_id][test->serialise_id] = nullptr;
+        serialise_data_helper::host_to_id_to_pointer[test->host_id][test->serialise_id] = nullptr;
 
         test_object* received;
 
@@ -199,7 +199,7 @@ void test_serialisation()
         serialise ser;
         ser.handle_serialise(objects, true);
 
-        serialise_data_helper::owner_to_id_to_pointer.clear();
+        serialise_data_helper::host_to_id_to_pointer.clear();
 
         std::vector<test_object*> found;
 
@@ -239,7 +239,7 @@ void test_serialisation()
         serialise ser;
         ser.handle_serialise(objects, true);
 
-        serialise_data_helper::owner_to_id_to_pointer.clear();
+        serialise_data_helper::host_to_id_to_pointer.clear();
 
         std::vector<test_object*> test;
 
@@ -340,5 +340,5 @@ void test_serialisation()
 
     ///ensure tests don't interfere with global state. It shouldn't affect it even without this call
     ///but it may make debugging easier
-    serialise_data_helper::owner_to_id_to_pointer.clear();
+    serialise_data_helper::host_to_id_to_pointer.clear();
 }

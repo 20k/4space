@@ -17,6 +17,7 @@
 #include <deque>
 #include <typeinfo>
 
+using serialise_host_type = int32_t;
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
 using serialise_dirty_type = uint8_t;
@@ -49,7 +50,7 @@ struct serialisable
     }
 
     bool owned_by_host = true;
-    serialise_owner_type owner_id = -1;
+    serialise_host_type host_id = -1;
     serialise_dirty_type dirty = 0;
 
     void make_dirty()
@@ -64,7 +65,7 @@ struct serialisable
 
     }
 
-    virtual ~serialisable(){}
+    virtual ~serialisable() {}
 };
 
 struct unhandled_types
@@ -81,7 +82,7 @@ struct serialise_data_helper
     ///0 = partial update, 1 = full
     static int32_t send_mode;
 
-    static std::map<serialise_owner_type, std::map<serialise_data_type, serialisable*>> owner_to_id_to_pointer;
+    static std::map<serialise_host_type, std::map<serialise_data_type, serialisable*>> host_to_id_to_pointer;
 
     static std::map<size_t, unhandled_types> type_to_datas;
 };
@@ -101,8 +102,8 @@ void lowest_add(T& v, serialise& s, std::vector<char>& data)
 }*/
 
 template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable, T> && std::is_standard_layout_v<std::remove_reference_t<T>>>>
-inline
-void lowest_add(T& v, serialise& s, std::vector<char>& data)
+         inline
+         void lowest_add(T& v, serialise& s, std::vector<char>& data)
 {
     char* pv = (char*)&v;
 
@@ -117,8 +118,8 @@ void lowest_add(T& v, serialise& s, std::vector<char>& data)
 }
 
 template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable, T> && std::is_standard_layout_v<std::remove_reference_t<T>>>>
-inline
-void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
+         inline
+         void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
 {
     int prev = internal_counter;
 
@@ -200,18 +201,18 @@ struct serialise_helper<T*>
         }
 
 
-        if(v->owner_id == -1)
+        if(v->host_id == -1)
         {
-            v->owner_id = s.default_owner;
+            v->host_id = s.default_owner;
         }
 
         ///we need to clear this every disk save atm
-        auto last_ptr = serialise_data_helper::owner_to_id_to_pointer[v->owner_id][v->serialise_id];
+        auto last_ptr = serialise_data_helper::host_to_id_to_pointer[v->host_id][v->serialise_id];
 
         ///this is fairly expensive
-        serialise_data_helper::owner_to_id_to_pointer[v->owner_id][v->serialise_id] = v;
+        serialise_data_helper::host_to_id_to_pointer[v->host_id][v->serialise_id] = v;
 
-        helper_owner_id.add(v->owner_id, s);
+        helper_owner_id.add(v->host_id, s);
         helper1.add(v->serialise_id, s);
         helper_dirty.add(v->dirty, s);
 
@@ -272,10 +273,10 @@ struct serialise_helper<T*>
     {
         serialise_helper<serialise_owner_type> helper_owner_id;
 
-        serialise_owner_type owner_id;
-        helper_owner_id.get(owner_id, s);
+        serialise_owner_type host_id;
+        helper_owner_id.get(host_id, s);
 
-        if(owner_id == -2)
+        if(host_id == -2)
         {
             v = nullptr;
             return;
@@ -296,7 +297,7 @@ struct serialise_helper<T*>
             owner_id = s.default_owner;
         }*/
 
-        T* ptr = (T*)serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id];
+        T* ptr = (T*)serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id];
 
         bool was_nullptr = ptr == nullptr;
 
@@ -306,7 +307,7 @@ struct serialise_helper<T*>
 
             //std::cout << typeid(T).name() << " " << ptr << std::endl;
 
-            serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id] = ptr;
+            serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id] = ptr;
         }
 
         ptr->dirty = false;
@@ -329,7 +330,7 @@ struct serialise_helper<T*>
         {
             ptr->handled_by_client = false;
             ptr->owned_by_host = false;
-            ptr->owner_id = owner_id;
+            ptr->host_id = host_id;
             ptr->serialise_id = serialise_id;
 
             /*if(serialise_id == 3557)
@@ -894,7 +895,7 @@ struct serialise : serialise_data
     ///and disk mode. Ie two separate tables
     void save(const std::string& file)
     {
-        serialise_data_helper::owner_to_id_to_pointer.clear();
+        serialise_data_helper::host_to_id_to_pointer.clear();
 
         serialise_data_helper::ref_mode = 1;
         serialise_data_helper::send_mode = 1;
@@ -909,7 +910,7 @@ struct serialise : serialise_data
 
     void load(const std::string& file)
     {
-        serialise_data_helper::owner_to_id_to_pointer.clear();
+        serialise_data_helper::host_to_id_to_pointer.clear();
 
         serialise_data_helper::ref_mode = 1;
         serialise_data_helper::send_mode = 1;

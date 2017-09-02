@@ -3340,7 +3340,7 @@ int main()
             ser.handle_serialise(fleet_manage, true);
             ser.handle_serialise(all_battles, true);
 
-            serialise_data_helper::owner_to_id_to_pointer.clear();
+            serialise_data_helper::host_to_id_to_pointer.clear();
 
             /*for(ship_manager* sm : fleet_manage.fleets)
             {
@@ -3422,7 +3422,7 @@ int main()
 
             //system_manage.ensure_found_orbitals_handled();
 
-            serialise_data_helper::owner_to_id_to_pointer.clear();
+            serialise_data_helper::host_to_id_to_pointer.clear();
         }
 
 
@@ -3448,7 +3448,7 @@ int main()
                     continue;
                 }
 
-                serialise_data_helper::owner_to_id_to_pointer.clear();
+                serialise_data_helper::host_to_id_to_pointer.clear();
 
                 serialise_data_helper::send_mode = 1;
                 serialise_data_helper::ref_mode = 1;
@@ -3546,15 +3546,19 @@ int main()
                     continue;
                 }
 
+                serialise_host_type host_id;
+
+                i.data.handle_serialise(host_id, false);
+
                 //std::cout << "got mini packet" << std::endl;
 
                 serialise_data_helper::send_mode = send_mode;
                 serialise_data_helper::ref_mode = 0;
 
-                if(send_mode == 2)
+                /*if(send_mode == 2)
                 {
                     printf("hi\n");
-                }
+                }*/
 
                 /*for(orbital_system* sys : system_manage.systems)
                 {
@@ -3566,7 +3570,7 @@ int main()
 
                 //std::cout << i.object.owner_id << " " << i.object.serialise_id << std::endl;
 
-                serialisable* found_s = net_state.get_serialisable(i.object);
+                serialisable* found_s = net_state.get_serialisable(host_id, i.object.serialise_id);
 
                 /*for(auto& i : serialise_data_helper::owner_to_id_to_pointer[i.object.owner_id])
                 {
@@ -3606,7 +3610,7 @@ int main()
 
         if(ImGui::Button("TRY MASSIVE PACKET") && net_state.my_id != -1)
         {
-            serialise_data_helper::owner_to_id_to_pointer.clear();
+            serialise_data_helper::host_to_id_to_pointer.clear();
 
             serialise_data_helper::send_mode = 1;
             serialise_data_helper::ref_mode = 1;

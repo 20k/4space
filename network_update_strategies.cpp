@@ -42,22 +42,10 @@ void empire_update_strategy(empire_manager& empire_manage)
     net_state.forward_data(no, ser);
 }*/
 
-void send_data(serialisable* t, serialise& ser, network_state& net_state, int send_mode)
+/*void send_data(serialisable* t, serialise& ser, network_state& net_state, int send_mode)
 {
-    serialise_data_helper::send_mode = send_mode;
-    serialise_data_helper::ref_mode = 0;
 
-    network_object no;
-
-    if(t->owner_id == -1)
-        no.owner_id = net_state.my_id;
-    else
-        no.owner_id = t->owner_id;
-
-    no.serialise_id = t->serialise_id;
-
-    net_state.forward_data(no, ser);
-}
+}*/
 
 struct update_strategy
 {
@@ -78,10 +66,23 @@ struct update_strategy
 
         ser.default_owner = net_state.my_id;
 
+        serialise_host_type host_id = net_state.my_id;
+
+        if(t->host_id != -1)
+        {
+            host_id = t->host_id;
+        }
+
         ser.handle_serialise(serialise_data_helper::send_mode, true);
+        ser.handle_serialise(host_id, true);
         ser.force_serialise(t, true);
 
-        send_data(t, ser, net_state, send_mode);
+        network_object no;
+
+        no.owner_id = net_state.my_id;
+        no.serialise_id = t->serialise_id;
+
+        net_state.forward_data(no, ser);
     }
 
     template<typename T>

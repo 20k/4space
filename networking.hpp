@@ -33,6 +33,7 @@ udp_sock join_game(const std::string& address, const std::string& port)
 
 struct network_object
 {
+    ///who's sending the data
     serialise_owner_type owner_id = -1;
     serialise_data_type serialise_id = -1;
 };
@@ -109,9 +110,14 @@ struct network_state
     ///be receiving updates about it)
     ///or we haven't discovered this object yet... in which case maybe its a good time to make
     ///a disk request about it, or whatever. That will be the most complex part of the networking
-    serialisable* get_serialisable(network_object& obj)
+    /*serialisable* get_serialisable(network_object& obj)
     {
         return serialise_data_helper::owner_to_id_to_pointer[obj.owner_id][obj.serialise_id];
+    }*/
+
+    serialisable* get_serialisable(serialise_host_type& host_id, serialise_data_type& serialise_id)
+    {
+        return serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id];
     }
 
     void tick_join_game(float dt_s)
@@ -202,7 +208,7 @@ struct network_state
 
     bool owns(serialisable* s)
     {
-        if(s->owner_id == -1 || s->owner_id == my_id)
+        if(s->host_id == -1 || s->host_id == my_id)
             return true;
 
         return false;
@@ -742,6 +748,11 @@ struct network_state
 
     std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, resend_info>>> owner_to_packet_id_to_sequence_number_to_data;
 
+    ///ok so the issue is that no.owner_id is wrong
+    ///we're treating it like the client id, but its actually who owns the object
+    ///which means that packet ids are getting trampled
+    ///what we really need to do is make it the client's id, and then change
+    ///change owns() to respect this. It should be a fairly transparent change
     void forward_data(const network_object& no, serialise& s)
     {
         int max_to_send = 10;
@@ -754,6 +765,9 @@ struct network_state
 
            // while(!sock_writable(sock)) {}
 
+            ///ah. we have a packet id conflict, if we pipe down on no.owner_id, our packet id will overlap
+            ///and the data will never get delivered
+            ///no.owner_id actually needs to be the id of the client, not who owns the data
             owner_to_packet_id_to_sequence_number_to_data[no.owner_id][packet_id][i] = {frag};
 
             if(i < max_to_send)

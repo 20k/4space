@@ -2118,7 +2118,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
                 }
             }
 
-            std::cout << extra << std::endl;
+            //std::cout << extra << std::endl;
 
             s.handle_serialise(extra, ser);
 
@@ -2136,7 +2136,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
             s.handle_serialise(extra, ser);
 
-            std::cout << "got " << extra << std::endl;
+            //std::cout << "got " << extra << std::endl;
 
             for(int i=0; i<extra; i++)
             {
