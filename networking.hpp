@@ -346,7 +346,9 @@ struct network_state
     }
 
     std::map<serialise_owner_type, std::deque<forward_packet>> forward_ordered_packets;
-    std::map<serialise_owner_type, packet_id_type> last_received_id;
+    //std::map<serialise_owner_type, packet_id_type> last_received_id;
+
+    //std::map<serialise_owner_type, packet_id_type> already_have;
 
     void make_available(const serialise_owner_type& owner, int id)
     {
@@ -380,7 +382,8 @@ struct network_state
         }
     };
 
-    std::map<packet_id_type, wait_info> packet_wait_map;
+    std::map<serialise_owner_type, std::map<packet_id_type, wait_info>> packet_wait_map;
+    std::map<serialise_owner_type, std::map<packet_id_type, bool>> received_packet;
 
     void make_packets_available()
     {
@@ -393,6 +396,28 @@ struct network_state
               std::sort(packet_list.begin(), packet_list.end(),
                   [](auto& p1, auto& p2){return p1.header.packet_id < p2.header.packet_id;});
 
+            for(int i=0; i<packet_list.size() - 1; i++)
+            {
+                if(packet_list[i].header.packet_id == packet_list[i+1].header.packet_id)
+                {
+                    packet_list.erase(packet_list.begin() + i);
+                    i--;
+                    continue;
+                }
+            }
+
+            while(packet_list.size() >= 2)
+            {
+                forward_packet& first = packet_list[0];
+                forward_packet& second = packet_list[1];
+
+                if(first.header.packet_id + 1 != second.header.packet_id)
+                    break;
+
+                packet_wait_map[first.no.owner_id].erase(first.header.packet_id);
+                make_available(first.no.owner_id, 0);
+            }
+
             for(int i=1; i<packet_list.size(); i++)
             {
                 forward_packet& last = packet_list[i-1];
@@ -400,13 +425,13 @@ struct network_state
 
                 if(last.header.packet_id + 1 != cur.header.packet_id)
                 {
-                    wait_info& info = packet_wait_map[last.header.packet_id];
+                    wait_info& info = packet_wait_map[cur.no.owner_id][last.header.packet_id];
 
                     //if(info.not_long_enough())
                     //    continue;
 
                     if(!info.too_long())
-                        continue;
+                        break;
 
                     info.request();
 
@@ -419,14 +444,8 @@ struct network_state
                     //std::cout << "request\n";
 
                     make_packet_request(request);
-                }
-                else
-                {
-                    //std::cout << "yay\n";
 
-                    make_available(packet_data.first, i-1);
-                    i--;
-                    continue;
+                    break;
                 }
             }
         }
@@ -494,9 +513,9 @@ struct network_state
 
                     //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
 
-                    const auto& vec = packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
+                    auto& vec = packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
 
-                    std::cout << vec.vec.ptr.size() << std::endl;
+                    //std::cout << vec.vec.ptr.size() << std::endl;
 
                     while(!sock_writable(sock)){}
 
@@ -571,13 +590,18 @@ struct network_state
                                 //std::cout << "got full dataset " << s.data.size() << std::endl;
                                 //available_data.push_back({no, s, header.packet_id});
 
-                                packet.fetch = byte_fetch();
+                                if(received_packet[packet.no.owner_id][packet.header.packet_id] == false)
+                                {
+                                    packet.fetch = byte_fetch();
 
-                                forward_packet full_forward = packet;
+                                    forward_packet full_forward = packet;
 
-                                full_forward.fetch.ptr = std::move(s.data);
+                                    full_forward.fetch.ptr = std::move(s.data);
 
-                                forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
+                                    forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
+
+                                    received_packet[packet.no.owner_id][packet.header.packet_id] = true;
+                                }
                             }
                         }
                     }
@@ -588,11 +612,16 @@ struct network_state
 
                         available_data.push_back({no, s, header.packet_id});*/
 
-                        forward_packet full_forward = packet;
+                        if(received_packet[packet.no.owner_id][packet.header.packet_id] == false)
+                        {
+                            forward_packet full_forward = packet;
 
-                        full_forward.fetch.ptr = std::move(packet.fetch.ptr);
+                            full_forward.fetch.ptr = std::move(packet.fetch.ptr);
 
-                        forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
+                            forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
+
+                            received_packet[packet.no.owner_id][packet.header.packet_id] = true;
+                        }
                     }
 
                     auto found_end = packet.canary_second;
