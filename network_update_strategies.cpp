@@ -140,7 +140,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     for(orbital_system* sys : system_manage.systems)
     {
-        if(net_state.owns(sys))
+        ///in mode 2 we cooperatively share memory!
+        //if(net_state.owns(sys))
         {
             systems.push_back(sys);
         }
