@@ -117,6 +117,8 @@ struct update_strategy
 
         int num_to_update_to = frac * (float)to_manage.size();
 
+        num_to_update_to = clamp(num_to_update_to, 0, (int)to_manage.size());
+
         for(; num_updated < num_to_update_to; num_updated++)
         {
             T* t = to_manage[num_updated];
@@ -161,8 +163,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
             if(!net_state.owns(o))
                 continue;
 
-            if(o->dirty)
-                continue;
+            //if(o->dirty)
+            //    continue;
 
             if(o->type == orbital_info::FLEET)
             {
@@ -178,10 +180,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     }
 
     static update_strategy orbital_strategy;
-    orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state, false);
+    //orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state, false);
 
     static update_strategy body_strategy;
-    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
+    //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate
@@ -191,6 +193,17 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///OK. So we aren't serialising it because it doesn't exist in the owner to id to pointer table
     ///where it doesn't exist because its never been encountered before. This means its just ditched
     ///but then why are we crashing on do update strategy for systems?
+
+    ///Ok. Same problem still happening just less likely across frames, problem is packet reordering I think
+
+    ///OH OK. What happens is that something else processes the dirty, which means that when we send system
+    ///we don't send with dirty
+    ///that means that when the system packet arrives, we get a bad orbital and boom it are crashing
+
+    ///No. Ok something is actually broken, still crashing on system strategy sending and only system strategy
+    ///still getting orphaned orbitals
+    ///still suspect packet reordering
+    ///implement packet ordering, need it anyway
 
 
     ///so. I think the problem is that we're giving the system references to orbitals that may get created
