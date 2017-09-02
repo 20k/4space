@@ -383,6 +383,8 @@ struct network_state
     };
 
     std::map<serialise_owner_type, std::map<packet_id_type, wait_info>> packet_wait_map;
+    ///there's a few structures here and there to do with packets that actually just pile up infinitely
+    ///needs to be a general "after 10 seconds or so clean these up as those packets aren't comin"
     std::map<serialise_owner_type, std::map<packet_id_type, bool>> received_packet;
 
     void make_packets_available()
@@ -427,9 +429,6 @@ struct network_state
                 {
                     wait_info& info = packet_wait_map[cur.no.owner_id][last.header.packet_id];
 
-                    //if(info.not_long_enough())
-                    //    continue;
-
                     if(!info.too_long())
                         break;
 
@@ -440,8 +439,6 @@ struct network_state
                     request.packet_id = last.header.packet_id + 1;
                     request.sequence_id = 0;
                     request.serialise_id = packet_id_to_serialise[request.packet_id];
-
-                    //std::cout << "request\n";
 
                     make_packet_request(request);
 
