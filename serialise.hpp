@@ -215,16 +215,23 @@ struct serialise_helper<T*>
         helper1.add(v->serialise_id, s);
         helper_dirty.add(v->dirty, s);
 
-        bool was_dirty = v->dirty;
+        bool dirty = v->dirty;
 
         v->dirty = false;
 
         bool follow_references = serialise_data_helper::ref_mode == 1;
 
-        bool did_serialise = false;
+        auto old_send_mode = serialise_data_helper::send_mode;
+
+        if(dirty)
+        {
+            serialise_data_helper::send_mode = 1;
+        }
 
         ///if dirty, we want to serialise in mode 1, but still not follow references i think (unless dirty)
         ///mode 2?
+
+        bool did_serialise = false;
 
         ///we're writing out this element for the first time
         if(last_ptr == nullptr && follow_references)
@@ -241,15 +248,20 @@ struct serialise_helper<T*>
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(!did_serialise && was_dirty)
+        if(!did_serialise && dirty)
         {
             did_serialise = true;
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(was_dirty && did_serialise)
+        if(dirty && did_serialise)
         {
             //std::cout << "dirty send " << typeid(v).name() << std::endl;
+        }
+
+        if(dirty)
+        {
+            serialise_data_helper::send_mode = old_send_mode;
         }
     }
 
@@ -304,6 +316,12 @@ struct serialise_helper<T*>
 
         bool did_serialise = false;
 
+        auto old_send_mode = serialise_data_helper::send_mode;
+
+        if(dirty)
+        {
+            serialise_data_helper::send_mode = 1;
+        }
 
         bool follow_references = serialise_data_helper::ref_mode == 1;
 
@@ -348,6 +366,11 @@ struct serialise_helper<T*>
         {
             serialise_data_helper::type_to_datas[typeid(ptr).hash_code()].data.push_back(ptr);
             serialise_data_helper::type_to_datas[typeid(ptr).hash_code()].type_name = typeid(ptr).name();
+        }
+
+        if(dirty)
+        {
+            serialise_data_helper::send_mode = old_send_mode;
         }
 
         v = ptr;
