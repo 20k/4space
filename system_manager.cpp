@@ -1268,7 +1268,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         //printf("well then\n");
     }
 
-    std::cout << serialise_data_helper::send_mode << std::endl;
+    //std::cout << serialise_data_helper::send_mode << std::endl;
 
     handled_by_client = true;
 
@@ -2117,6 +2117,8 @@ void orbital_system::do_serialise(serialise& s, bool ser)
                     extra++;
                 }
             }
+
+            std::cout << extra << std::endl;
 
             s.handle_serialise(extra, ser);
 

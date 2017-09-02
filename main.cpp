@@ -3551,6 +3551,11 @@ int main()
                 serialise_data_helper::send_mode = send_mode;
                 serialise_data_helper::ref_mode = 0;
 
+                if(send_mode == 2)
+                {
+                    printf("hi\n");
+                }
+
                 /*for(orbital_system* sys : system_manage.systems)
                 {
                     for(orbital* o : sys->orbitals)

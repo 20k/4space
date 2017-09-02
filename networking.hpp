@@ -128,7 +128,7 @@ struct network_state
         {
             sock = join_game("127.0.0.1", GAMESERVER_PORT);
 
-            sock_set_non_blocking(sock, 1);
+            //sock_set_non_blocking(sock, 1);
 
             timeout = 0;
         }
@@ -503,7 +503,7 @@ struct network_state
 
                     //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
 
-                    auto& vec = packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
+                    auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
 
                     //std::cout << vec.vec.ptr.size() << std::endl;
 
@@ -732,7 +732,7 @@ struct network_state
         byte_vector vec;
     };
 
-    std::map<packet_id_type, std::map<sequence_data_type, resend_info>> packet_id_to_sequence_number_to_data;
+    std::map<serialise_owner_type,std::map<packet_id_type, std::map<sequence_data_type, resend_info>>> owner_to_packet_id_to_sequence_number_to_data;
 
     void forward_data(const network_object& no, serialise& s)
     {
@@ -744,12 +744,16 @@ struct network_state
         {
             byte_vector frag = get_fragment(i, no, s.data);
 
-            while(!sock_writable(sock)) {}
+           // while(!sock_writable(sock)) {}
 
-            packet_id_to_sequence_number_to_data[packet_id][i] = {frag};
+            owner_to_packet_id_to_sequence_number_to_data[my_id][packet_id][i] = {frag};
 
             if(i < max_to_send)
+            {
+                while(!sock_writable(sock)) {}
+
                 udp_send_to(sock, frag.ptr, (const sockaddr*)&store);
+            }
         }
 
         packet_id = packet_id + 1;

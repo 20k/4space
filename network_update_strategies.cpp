@@ -178,10 +178,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     //    std::cout << orbitals.size() << std::endl;
 
     static update_strategy orbital_strategy;
-    orbital_strategy.do_update_strategy(dt_s, 0.1f, orbitals, net_state, 0);
+    //orbital_strategy.do_update_strategy(dt_s, 0.1f, orbitals, net_state, 0);
 
     static update_strategy body_strategy;
-    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, 0);
+    //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, 0);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate
