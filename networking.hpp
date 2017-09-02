@@ -102,8 +102,8 @@ struct network_state
 
     std::vector<network_data> available_data;
     std::map<serialise_owner_type, std::map<serialise_data_type, std::map<packet_id_type, std::vector<packet_info>>>> incomplete_packets;
-    std::map<packet_id_type, int> packet_sequence_to_expected_size;
-    std::map<packet_id_type, serialise_data_type> packet_id_to_serialise;
+    std::map<serialise_owner_type, std::map<packet_id_type, int>> owner_to_packet_sequence_to_expected_size;
+    std::map<serialise_owner_type, std::map<packet_id_type, serialise_data_type>> owner_to_packet_id_to_serialise;
 
     ///ok. If this is nullptr, either the data is intentionally nullptr (impossible because we wouldn't
     ///be receiving updates about it)
@@ -222,7 +222,7 @@ struct network_state
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
     }
 
-    std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>> request_timeouts;
+    std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>>> owner_to_request_timeouts;
 
     void request_incomplete_packets(int max_fragments_to_request)
     {
@@ -244,7 +244,7 @@ struct network_state
 
                     std::vector<packet_info>& packets = packet_ids.second;
 
-                    if(packets.size() == packet_sequence_to_expected_size[packet_id])
+                    if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
                         continue;
 
                     std::sort(packets.begin(), packets.end(), [](auto& p1, auto& p2){return p1.sequence_number < p2.sequence_number;});
@@ -265,7 +265,7 @@ struct network_state
                         }
                     }
 
-                    for(int i=packets.size(); i<packet_sequence_to_expected_size[packet_id]; i++)
+                    for(int i=packets.size(); i<owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; i++)
                     {
                         requests.push_back({owner_id, i, packet_id});
                     }
@@ -279,7 +279,7 @@ struct network_state
 
         for(int i=0; i<requests.size(); i++)
         {
-            request_timeout_info& inf = request_timeouts[requests[i].packet_id][requests[i].sequence_id];
+            request_timeout_info& inf = owner_to_request_timeouts[requests[i].owner_id][requests[i].packet_id][requests[i].sequence_id];
 
             if(!inf.ever)
                 continue;
@@ -306,12 +306,12 @@ struct network_state
 
         for(packet_request& i : requests)
         {
-            i.serialise_id = packet_id_to_serialise[i.packet_id];
+            i.serialise_id = owner_to_packet_id_to_serialise[i.owner_id][i.packet_id];
 
             make_packet_request(i);
 
-            request_timeouts[i.packet_id][i.sequence_id].clk.restart();
-            request_timeouts[i.packet_id][i.sequence_id].ever = true;
+            owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].clk.restart();
+            owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].ever = true;
         }
     }
 
@@ -431,7 +431,7 @@ struct network_state
                     request.owner_id = last.no.owner_id;
                     request.packet_id = last.header.packet_id + 1;
                     request.sequence_id = 0;
-                    request.serialise_id = packet_id_to_serialise[request.packet_id];
+                    request.serialise_id = owner_to_packet_id_to_serialise[request.owner_id][request.packet_id];
 
                     make_packet_request(request);
 
@@ -526,8 +526,8 @@ struct network_state
 
                     if(packet_fragments > 1)
                     {
-                        packet_sequence_to_expected_size[header.packet_id] = packet_fragments;
-                        packet_id_to_serialise[header.packet_id] = no.serialise_id;
+                        owner_to_packet_sequence_to_expected_size[no.owner_id][header.packet_id] = packet_fragments;
+                        owner_to_packet_id_to_serialise[no.owner_id][header.packet_id] = no.serialise_id;
 
                         std::vector<packet_info>& packets = incomplete_packets[no.owner_id][no.serialise_id][header.packet_id];
 
