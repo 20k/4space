@@ -366,11 +366,6 @@ struct network_state
     {
         sf::Clock clk;
 
-        /*bool not_long_enough()
-        {
-            return clk.getElapsedTime().asMilliseconds() < 100;
-        }*/
-
         bool too_long()
         {
             return clk.getElapsedTime().asMilliseconds() > 500;
@@ -391,8 +386,6 @@ struct network_state
     {
         for(auto& packet_data : forward_ordered_packets)
         {
-            //std::cout << "hello\n";
-
             std::deque<forward_packet>& packet_list = packet_data.second;
 
               std::sort(packet_list.begin(), packet_list.end(),
