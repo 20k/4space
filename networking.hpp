@@ -536,7 +536,7 @@ struct network_state
                         next.sequence_number = header.sequence_number;
 
                         //if((header.sequence_number % 100) == 0)
-                        if(header.sequence_number > 50 && (header.sequence_number % 100) == 0)
+                        if(header.sequence_number > 400 && (header.sequence_number % 100) == 0)
                             std::cout << header.sequence_number << " ";
 
                         next.data.data = packet.fetch.ptr;

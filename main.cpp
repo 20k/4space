@@ -3719,7 +3719,7 @@ int main()
 
             if(typeid(ship_manager*).hash_code() == type)
             {
-                std::cout << "found orphaned ship" << std::endl;
+                //std::cout << "found orphaned ship" << std::endl;
 
                 for(serialisable* obj : objects.data)
                 {
@@ -3735,7 +3735,7 @@ int main()
             }
             else if(typeid(empire*).hash_code() == type)
             {
-                std::cout << "potential orphaned empire" << std::endl;
+                //std::cout << "potential orphaned empire" << std::endl;
 
                 ///hmm
                 for(serialisable* obj : objects.data)
