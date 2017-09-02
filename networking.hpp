@@ -8,6 +8,17 @@
 ///intent: Make this file increasingly more general so eventually we can port it between projects
 
 inline
+void send_join_game(udp_sock& sock)
+{
+    byte_vector vec;
+    vec.push_back(canary_start);
+    vec.push_back(message::CLIENTJOINREQUEST);
+    vec.push_back(canary_end);
+
+    udp_send(sock, vec.ptr);
+}
+
+inline
 udp_sock join_game(const std::string& address, const std::string& port)
 {
     udp_sock sock = udp_connect(address, port);
@@ -128,13 +139,14 @@ struct network_state
         if(!try_join)
             return;
 
+        if(!sock.valid())
+            sock = udp_connect("127.0.0.1", GAMESERVER_PORT);
+
         timeout += dt_s;
 
         if(timeout > timeout_max)
         {
-            sock = join_game("127.0.0.1", GAMESERVER_PORT);
-
-            //sock_set_non_blocking(sock, 1);
+            send_join_game(sock);
 
             timeout = 0;
         }
