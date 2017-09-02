@@ -239,9 +239,13 @@ struct serialise_helper<T*>
 
         if(!did_serialise && was_dirty)
         {
-            std::cout << "dirty send " << typeid(v).name() << std::endl;
-
+            did_serialise = true;
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
+        }
+
+        if(was_dirty && did_serialise)
+        {
+            //std::cout << "dirty send " << typeid(v).name() << std::endl;
         }
     }
 
@@ -254,7 +258,6 @@ struct serialise_helper<T*>
 
         serialise_owner_type owner_id;
         helper_owner_id.get(owner_id, s);
-
 
         if(owner_id == -2)
         {
@@ -328,9 +331,13 @@ struct serialise_helper<T*>
 
         if(dirty && !did_serialise)
         {
+            did_serialise = true;
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
+        }
 
-            std::cout << "dirty" << std::endl;
+        if(dirty && did_serialise)
+        {
+            //std::cout << "dirty recv " << typeid(ptr).name() << std::endl;
         }
 
         if(!ptr->handled_by_client && was_nullptr)

@@ -3568,9 +3568,13 @@ int main()
 
                 if(found_s == nullptr)
                 {
+                    //std::cout << "nullptr" << std::endl;
+
                     i.set_complete();
                     continue;
                 }
+
+                //std::cout << "got" << std::endl;
 
                 //std::cout << "doing mini packet of " << i.data.data.size() << std::endl;
 

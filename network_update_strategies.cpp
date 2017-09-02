@@ -58,9 +58,9 @@ void send_data(serialisable* t, serialise& ser, network_state& net_state)
 
     no.serialise_id = t->serialise_id;
 
-    net_state.forward_data(no, ser);
+    //std::cout << t->owner_id << " " << t->serialise_id << std::endl;
 
-    //printf("hi there\n");
+    net_state.forward_data(no, ser);
 }
 
 struct update_strategy
@@ -158,6 +158,9 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
             if(!net_state.owns(o))
                 continue;
 
+            if(o->dirty)
+                continue;
+
             if(o->type == orbital_info::FLEET)
             {
                 orbitals.push_back(o);
@@ -175,10 +178,16 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     orbital_strategy.do_update_strategy(dt_s, 0.5f, orbitals, net_state, false);
 
     static update_strategy body_strategy;
-    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
+    //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate
+    ///the problem was that the orbital strategy would pipe across an orbital
+    ///but there is some conflict with the dirty send strategy
+
+    ///OK. So we aren't serialising it because it doesn't exist in the owner to id to pointer table
+    ///where it doesn't exist because its never been encountered before. This means its just ditched
+    ///but then why are we crashing on do update strategy for systems?
 
 
     ///so. I think the problem is that we're giving the system references to orbitals that may get created
