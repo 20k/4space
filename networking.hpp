@@ -208,6 +208,20 @@ struct network_state
         return false;
     }
 
+    void make_packet_request(packet_request& request)
+    {
+        byte_vector vec;
+        vec.push_back(canary_start);
+        vec.push_back(message::REQUEST);
+        vec.push_back<int32_t>(sizeof(request));
+        vec.push_back(request);
+        vec.push_back(canary_end);
+
+        while(!sock_writable(sock)) {}
+
+        udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+    }
+
     std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>> request_timeouts;
 
     void request_incomplete_packets(int max_fragments_to_request)
@@ -294,16 +308,7 @@ struct network_state
         {
             i.serialise_id = packet_id_to_serialise[i.packet_id];
 
-            byte_vector vec;
-            vec.push_back(canary_start);
-            vec.push_back(message::REQUEST);
-            vec.push_back<int32_t>(sizeof(i));
-            vec.push_back(i);
-            vec.push_back(canary_end);
-
-            while(!sock_writable(sock)) {}
-
-            udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+            make_packet_request(i);
 
             request_timeouts[i.packet_id][i.sequence_id].clk.restart();
             request_timeouts[i.packet_id][i.sequence_id].ever = true;
@@ -340,6 +345,93 @@ struct network_state
         }
     }
 
+    std::map<serialise_owner_type, std::deque<forward_packet>> forward_ordered_packets;
+    std::map<serialise_owner_type, packet_id_type> last_received_id;
+
+    void make_available(const serialise_owner_type& owner, int id)
+    {
+        forward_packet& packet = forward_ordered_packets[owner][id];
+
+        serialise s;
+        s.data = std::move(packet.fetch.ptr);
+
+        available_data.push_back({packet.no, std::move(s), packet.header.packet_id});
+
+        forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
+    }
+
+    struct wait_info
+    {
+        sf::Clock clk;
+
+        /*bool not_long_enough()
+        {
+            return clk.getElapsedTime().asMilliseconds() < 100;
+        }*/
+
+        bool too_long()
+        {
+            return clk.getElapsedTime().asMilliseconds() > 500;
+        }
+
+        void request()
+        {
+            clk.restart();
+        }
+    };
+
+    std::map<packet_id_type, wait_info> packet_wait_map;
+
+    void make_packets_available()
+    {
+        for(auto& packet_data : forward_ordered_packets)
+        {
+            //std::cout << "hello\n";
+
+            std::deque<forward_packet>& packet_list = packet_data.second;
+
+              std::sort(packet_list.begin(), packet_list.end(),
+                  [](auto& p1, auto& p2){return p1.header.packet_id < p2.header.packet_id;});
+
+            for(int i=1; i<packet_list.size(); i++)
+            {
+                forward_packet& last = packet_list[i-1];
+                forward_packet& cur = packet_list[i];
+
+                if(last.header.packet_id + 1 != cur.header.packet_id)
+                {
+                    wait_info& info = packet_wait_map[last.header.packet_id];
+
+                    //if(info.not_long_enough())
+                    //    continue;
+
+                    if(!info.too_long())
+                        continue;
+
+                    info.request();
+
+                    packet_request request;
+                    request.owner_id = last.no.owner_id;
+                    request.packet_id = last.header.packet_id + 1;
+                    request.sequence_id = 0;
+                    request.serialise_id = packet_id_to_serialise[request.packet_id];
+
+                    //std::cout << "request\n";
+
+                    make_packet_request(request);
+                }
+                else
+                {
+                    //std::cout << "yay\n";
+
+                    make_available(packet_data.first, i-1);
+                    i--;
+                    continue;
+                }
+            }
+        }
+    }
+
     ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
     ///I think the reason the data transfer is slow is because the framerate is bad
     ///if we threaded it i think the data transfer would go v high
@@ -352,6 +444,8 @@ struct network_state
         request_incomplete_packets(200);
 
         cleanup_available_data_and_incomplete_packets();
+
+        make_packets_available();
 
         tick_cleanup();
 
@@ -402,6 +496,8 @@ struct network_state
 
                     const auto& vec = packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id];
 
+                    std::cout << vec.vec.ptr.size() << std::endl;
+
                     while(!sock_writable(sock)){}
 
                     udp_send_to(sock, vec.vec.ptr, (const sockaddr*)&store);
@@ -409,24 +505,12 @@ struct network_state
 
                 if(type == message::FORWARDING)
                 {
-                    /*uint32_t data_size = fetch.get<uint32_t>();
-                    uint32_t cdata_size = fetch.get<uint32_t>();
-
-                    packet_id_type packet_id = fetch.get<packet_id_type>();
-
-                    uint8_t sequence_number = fetch.get<uint8_t>();*/
-
                     forward_packet packet = decode_forward(fetch);
 
                     packet_header header = packet.header;
 
                     network_object no = packet.no;
 
-                    //serialise s;
-                    //s.data = fetch.ptr;
-                    //s.internal_counter = fetch.internal_counter;
-
-                    //int real_current_data_length = header.current_size - header.calculate_size() - sizeof(no);
                     int real_overall_data_length = header.overall_size - header.calculate_size() - sizeof(no);
 
                     int packet_fragments = get_packet_fragments(real_overall_data_length);
@@ -485,16 +569,30 @@ struct network_state
                             if(s.data.size() > 0)
                             {
                                 //std::cout << "got full dataset " << s.data.size() << std::endl;
-                                available_data.push_back({no, s, header.packet_id});
+                                //available_data.push_back({no, s, header.packet_id});
+
+                                packet.fetch = byte_fetch();
+
+                                forward_packet full_forward = packet;
+
+                                full_forward.fetch.ptr = std::move(s.data);
+
+                                forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
                             }
                         }
                     }
                     else
                     {
-                        serialise s;
+                        /*serialise s;
                         s.data = packet.fetch.ptr;
 
-                        available_data.push_back({no, s, header.packet_id});
+                        available_data.push_back({no, s, header.packet_id});*/
+
+                        forward_packet full_forward = packet;
+
+                        full_forward.fetch.ptr = std::move(packet.fetch.ptr);
+
+                        forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
                     }
 
                     auto found_end = packet.canary_second;
