@@ -48,7 +48,6 @@ void send_data(serialisable* t, serialise& ser, network_state& net_state)
     //if(t->dirty)
     //   return;
 
-    ser.default_owner = net_state.my_id;
 
     network_object no;
 
@@ -60,6 +59,8 @@ void send_data(serialisable* t, serialise& ser, network_state& net_state)
     no.serialise_id = t->serialise_id;
 
     net_state.forward_data(no, ser);
+
+    //printf("hi there\n");
 }
 
 struct update_strategy
@@ -77,6 +78,8 @@ struct update_strategy
         ///because o is a pointer, we allow the stream to force decode the pointer
         ///if o were a non ptr with a do_serialise method, this would have to be false
         //ser.allow_force = true;
+
+        ser.default_owner = net_state.my_id;
 
         ser.handle_serialise(serialise_data_helper::disk_mode, true);
         ser.force_serialise(t, true);
@@ -150,6 +153,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
                 continue;
             }*/
 
+            //std::cout << o->owner_id << std::endl;
+
             if(!net_state.owns(o))
                 continue;
 
@@ -176,6 +181,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///but aren't fully initialised, hence the crash
     static update_strategy system_strategy;
     system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, false);
+
+    //std::cout << orbitals.size() << std::endl;
 
     ///Hmm. This isn't the best plan
     ///the problem is, nobody owns these
