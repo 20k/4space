@@ -258,6 +258,8 @@ struct orbital : serialisable
     virtual ~orbital(){}
 
     void do_serialise(serialise& s, bool ser) override;
+
+    void ensure_handled_by_client();
 };
 
 struct popup_info;

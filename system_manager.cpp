@@ -493,6 +493,8 @@ void check_for_resources(orbital* me)
 
 void orbital::tick(float step_s)
 {
+    ensure_handled_by_client();
+
     internal_time_s += step_s;
 
     rotation += rotation_velocity_ps * step_s;
@@ -1239,6 +1241,19 @@ void orbital::do_serialise(serialise& s, bool ser)
     //printf("what?\n");
 }
 
+void orbital::ensure_handled_by_client()
+{
+    if(handled_by_client == false)
+    {
+        handled_by_client = true;
+
+        if(render_type == 1)
+        {
+            sprite.load(orbital_info::load_strs[type]);
+        }
+    }
+}
+
 /*void orbital::process_context_ui()
 {
     if(type == orbital_info::FLEET)
@@ -1326,6 +1341,8 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     {
         orbitals.push_back(n);
     }
+
+    n->make_dirty();
 
     return n;
 }
@@ -2065,6 +2082,8 @@ orbital_system* system_manager::make_new()
     orbital_system* sys = new orbital_system;
 
     systems.push_back(sys);
+
+    sys->make_dirty();
 
     return sys;
 }

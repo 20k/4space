@@ -18,6 +18,7 @@
 
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
+using serialise_dirty_type = uint8_t;
 
 
 //#define serialise_owner_type int32_t
@@ -48,6 +49,12 @@ struct serialisable
 
     bool owned_by_host = true;
     serialise_owner_type owner_id = -1;
+    serialise_dirty_type dirty = 0;
+
+    void make_dirty()
+    {
+        dirty = 1;
+    }
 
     bool handled_by_client = true;
 
@@ -169,17 +176,16 @@ struct serialise_helper<T*>
     {
         serialise_helper<serialise_owner_type> helper_owner_id;
         serialise_helper<serialise_data_type> helper1;
+        serialise_helper<serialise_dirty_type> helper_dirty;
 
         if(v == nullptr)
         {
             serialise_owner_type bad_owner = -2;
-            serialise_data_type bad_data = -2; ///overflows
-
             helper_owner_id.add(bad_owner, s);
-            helper1.add(bad_data, s);
 
             return;
         }
+
 
         if(v->owner_id == -1)
         {
@@ -194,14 +200,32 @@ struct serialise_helper<T*>
 
         helper_owner_id.add(v->owner_id, s);
         helper1.add(v->serialise_id, s);
+        helper_dirty.add(v->dirty, s);
+
+        bool was_dirty = v->dirty;
+
+        v->dirty = false;
 
         bool in_disk_mode = serialise_data_helper::disk_mode == 1;
 
+        bool did_serialise = false;
+
         ///we're writing out this element for the first time
         if(last_ptr == nullptr && in_disk_mode)
+        {
+            did_serialise = true;
+
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
+        }
 
         if(v != nullptr && serialise_data_helper::disk_mode == 0 && force)
+        {
+            did_serialise = true;
+
+            v->do_serialise(reinterpret_cast<serialise&>(s), true);
+        }
+
+        if(v && !did_serialise && was_dirty)
         {
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
@@ -217,16 +241,22 @@ struct serialise_helper<T*>
         serialise_owner_type owner_id;
         helper_owner_id.get(owner_id, s);
 
-        serialise_helper<serialise_data_type> helper1;
-
-        serialise_data_type serialise_id;
-        helper1.get(serialise_id, s);
 
         if(owner_id == -2)
         {
             v = nullptr;
             return;
         }
+
+        serialise_data_type serialise_id;
+
+        serialise_helper<serialise_data_type> helper1;
+        helper1.get(serialise_id, s);
+
+        serialise_dirty_type dirty;
+
+        serialise_helper<serialise_dirty_type> helper_dirty;
+        helper_dirty.get(dirty, s);
 
         /*if(owner_id == -1)
         {
@@ -246,8 +276,12 @@ struct serialise_helper<T*>
             serialise_data_helper::owner_to_id_to_pointer[owner_id][serialise_id] = ptr;
         }
 
+        ptr->dirty = false;
+
         //serialise_helper<T> data_fetcher;
         //*ptr = data_fetcher.get(internal_counter);
+
+        bool did_serialise = false;
 
 
         bool in_disk_mode = serialise_data_helper::disk_mode == 1;
@@ -266,10 +300,19 @@ struct serialise_helper<T*>
 
             ///we're reading this element for the first time
             if(in_disk_mode)
+            {
+                did_serialise = true;
                 ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
+            }
         }
 
         if(ptr != nullptr && serialise_data_helper::disk_mode == 0 && force)
+        {
+            did_serialise = true;
+            ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
+        }
+
+        if(ptr && dirty && !did_serialise)
         {
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
         }

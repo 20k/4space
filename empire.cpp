@@ -1487,6 +1487,8 @@ empire* empire_manager::make_new()
 
     empires.push_back(e);
 
+    e->make_dirty();
+
     return e;
 }
 

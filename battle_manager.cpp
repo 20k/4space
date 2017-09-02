@@ -165,6 +165,8 @@ projectile* projectile_manager::make_new()
 
     projectiles.push_back(p);
 
+    p->make_dirty();
+
     return p;
 }
 
@@ -910,6 +912,8 @@ battle_manager* all_battles_manager::make_new()
     battle_manager* bm = new battle_manager;
 
     battles.push_back(bm);
+
+    bm->make_dirty();
 
     return bm;
 }

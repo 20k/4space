@@ -4296,6 +4296,8 @@ ship* ship_manager::make_new_from(empire* e, const ship& ns)
 
     s->owned_by = this;
 
+    s->make_dirty();
+
     return s;
 }
 
@@ -5247,10 +5249,12 @@ ship_manager* fleet_manager::make_new()
     ship_manager* ns = new ship_manager;
 
     fleets.push_back(ns);
+    ns->make_dirty();
 
     return ns;
 }
 
+///how do we handle dirtyness when destroying?
 void fleet_manager::destroy(ship_manager* ns)
 {
     for(int i=0; i < fleets.size(); i++)

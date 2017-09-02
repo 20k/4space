@@ -256,6 +256,7 @@ struct empire_manager : serialisable
         unknown_empire = new empire;
         unknown_empire->name = "Unknown";
         unknown_empire->parent = this;
+        unknown_empire->make_dirty();
     }
 
     empire* make_new();

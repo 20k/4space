@@ -2691,7 +2691,7 @@ int main()
 
     fleet_manager fleet_manage;
 
-    //#define ONLY_PLAYER
+    #define ONLY_PLAYER
     #ifndef ONLY_PLAYER
 
     empire* hostile_empire = empire_manage.make_new();
