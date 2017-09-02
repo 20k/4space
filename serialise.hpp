@@ -714,73 +714,8 @@ struct serialise_helper_force<T*>
     }
 };
 
-
-#if 0
-template<typename T>
-struct serialise_helper<T>
-{
-    /*void add(const T& v, serialise& s)
-    {
-        v.do_serialise(s, true);
-    }
-
-    void get(const T& v, serialise& s)
-    {
-        v.do_serialise(s, false);
-    }*/
-
-    /*void do_method(T& v, serialise& s, bool ser)
-    {
-        v.do_serialise(s, ser);
-    }*/
-
-    void add(const std::string& v, serialise& s, std::vector<char>& data)
-    {
-        serialise_helper<int32_t> helper;
-        helper.add((int32_t)v.size(), s);
-
-        for(uint32_t i=0; i<v.size(); i++)
-        {
-            serialise_helper<decltype(v[i])> helper;
-            helper.add(v[i], s);
-        }
-    }
-
-    T get(serialise& s, int& internal_counter, std::vector<char>& data)
-    {
-        serialise_helper<int32_t> helper;
-        int32_t length = helper.get(s, internal_counter);
-
-        if(internal_counter + length * sizeof(char) > (int)data.size())
-        {
-            std::cout << "Error, invalid bytefetch" << std::endl;
-
-            return std::string();
-        }
-
-        std::string ret;
-
-        for(int i=0; i<length; i++)
-        {
-            serialise_helper<char> type;
-
-            ret.push_back(type.get(s, internal_counter));
-        }
-
-        return ret;
-    }
-};
-#endif
-
-///at the moment serialisation will cause essentially a chain reaction and serialise anything related to an object
-///ie pretty much everything
-///this is great for disk mode, but in network mode I need to make sure that it never serialises references unless
-///we actually need to
 struct serialise : serialise_data
 {
-    //bool allow_force = false;
-    //bool forced = false;
-
     template<typename T>
     void push_back(T& v, bool force = false)
     {
@@ -849,7 +784,7 @@ struct serialise : serialise_data
         return internal_counter >= (int)data.size();
     }
 
-    ///need to use differetn serialise_data_helper::owner_to_id_to_pointer.clear() strategy for network
+    ///need to use different serialise_data_helper:host_to_id_to_pointer.clear() strategy for network
     ///and disk mode. Ie two separate tables
     void save(const std::string& file)
     {
