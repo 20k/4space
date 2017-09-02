@@ -1268,6 +1268,8 @@ void orbital::do_serialise(serialise& s, bool ser)
         //printf("well then\n");
     }
 
+    std::cout << serialise_data_helper::send_mode << std::endl;
+
     handled_by_client = true;
 
     //printf("what?\n");
@@ -2100,6 +2102,49 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(advertised_empires, ser);
 
         //printf("%i %i\n", s.data.size(), orbitals.size());
+    }
+
+    if(serialise_data_helper::send_mode == 2)
+    {
+        if(ser)
+        {
+            int32_t extra = 0;
+
+            for(orbital* o : orbitals)
+            {
+                if(o->dirty)
+                {
+                    extra++;
+                }
+            }
+
+            s.handle_serialise(extra, ser);
+
+            for(orbital* o : orbitals)
+            {
+                if(o->dirty)
+                {
+                    s.handle_serialise(o, ser);
+                }
+            }
+        }
+        else
+        {
+            int32_t extra = 0;
+
+            s.handle_serialise(extra, ser);
+
+            std::cout << "got " << extra << std::endl;
+
+            for(int i=0; i<extra; i++)
+            {
+                orbital* o = nullptr;
+
+                s.handle_serialise(o, ser);
+
+                orbitals.push_back(o);
+            }
+        }
     }
 
     handled_by_client = true;
