@@ -34,22 +34,18 @@ void empire_update_strategy(empire_manager& empire_manage)
 
 }*/
 
-void send_data(network_object& no, serialise& ser, network_state& net_state)
+/*void send_data(network_object& no, serialise& ser, network_state& net_state)
 {
     serialise_data_helper::send_mode = 0;
     serialise_data_helper::ref_mode = 0;
 
     net_state.forward_data(no, ser);
-}
+}*/
 
-void send_data(serialisable* t, serialise& ser, network_state& net_state)
+void send_data(serialisable* t, serialise& ser, network_state& net_state, int send_mode)
 {
-    serialise_data_helper::send_mode = 0;
+    serialise_data_helper::send_mode = send_mode;
     serialise_data_helper::ref_mode = 0;
-
-    //if(t->dirty)
-    //   return;
-
 
     network_object no;
 
@@ -59,8 +55,6 @@ void send_data(serialisable* t, serialise& ser, network_state& net_state)
         no.owner_id = t->owner_id;
 
     no.serialise_id = t->serialise_id;
-
-    //std::cout << t->owner_id << " " << t->serialise_id << std::endl;
 
     net_state.forward_data(no, ser);
 }
@@ -72,9 +66,9 @@ struct update_strategy
     double time_elapsed_s = 0;
 
     template<typename T>
-    void update(T* t, network_state& net_state, bool transmit_dirty)
+    void update(T* t, network_state& net_state, int send_mode)
     {
-        serialise_data_helper::send_mode = 0;
+        serialise_data_helper::send_mode = send_mode;
         serialise_data_helper::ref_mode = 0;
 
         serialise ser;
@@ -87,11 +81,11 @@ struct update_strategy
         ser.handle_serialise(serialise_data_helper::send_mode, true);
         ser.force_serialise(t, true);
 
-        send_data(t, ser, net_state);
+        send_data(t, ser, net_state, send_mode);
     }
 
     template<typename T>
-    void do_update_strategy(float dt_s, float time_between_full_updates, const std::vector<T*>& to_manage, network_state& net_state, bool transmit_dirty)
+    void do_update_strategy(float dt_s, float time_between_full_updates, const std::vector<T*>& to_manage, network_state& net_state, int send_mode)
     {
         if(to_manage.size() == 0)
             return;
@@ -102,7 +96,7 @@ struct update_strategy
             {
                 T* t = to_manage[i];
 
-                update(t, net_state, transmit_dirty);
+                update(t, net_state, send_mode);
             }
 
             time_elapsed_s = 0.;
@@ -123,7 +117,7 @@ struct update_strategy
         {
             T* t = to_manage[num_updated];
 
-            update(t, net_state, transmit_dirty);
+            update(t, net_state, send_mode);
         }
 
         time_elapsed_s += dt_s;
@@ -183,10 +177,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     //    std::cout << orbitals.size() << std::endl;
 
     static update_strategy orbital_strategy;
-    orbital_strategy.do_update_strategy(dt_s, 0.1f, orbitals, net_state, false);
+    orbital_strategy.do_update_strategy(dt_s, 0.1f, orbitals, net_state, 0);
 
     static update_strategy body_strategy;
-    //body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, false);
+    body_strategy.do_update_strategy(dt_s, 5.f, bodies, net_state, 0);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate
@@ -211,8 +205,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     ///so. I think the problem is that we're giving the system references to orbitals that may get created
     ///but aren't fully initialised, hence the crash
+    ///mode 2 is diff mode, where we send diff updates
+    ///change in container size (num dirty), maybe diff hp as well
     static update_strategy system_strategy;
-    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, false);
+    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, 0);
 
     //std::cout << orbitals.size() << std::endl;
 

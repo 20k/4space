@@ -3535,11 +3535,11 @@ int main()
 
                 int32_t internal_counter = i.data.internal_counter;
 
-                int32_t disk_mode = 0;
+                int32_t send_mode = 0;
 
-                i.data.handle_serialise(disk_mode, false);
+                i.data.handle_serialise(send_mode, false);
 
-                if(disk_mode != 0)
+                if(send_mode != 0)
                 {
                     i.data.internal_counter = internal_counter;
 
@@ -3548,7 +3548,7 @@ int main()
 
                 //std::cout << "got mini packet" << std::endl;
 
-                serialise_data_helper::send_mode = 0;
+                serialise_data_helper::send_mode = send_mode;
                 serialise_data_helper::ref_mode = 0;
 
                 /*for(orbital_system* sys : system_manage.systems)
