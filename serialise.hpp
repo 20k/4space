@@ -89,21 +89,9 @@ struct serialise_data_helper
 
 struct serialise;
 
-/*template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value && std::is_arithmetic<typename std::remove_reference<T>::type>::type>>
+template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable, T> && std::is_standard_layout_v<std::remove_reference_t<T>>>>
 inline
 void lowest_add(T& v, serialise& s, std::vector<char>& data)
-{
-    char* pv = std::launder((char*)&v);
-
-    for(uint32_t i=0; i<sizeof(T); i++)
-    {
-        data.push_back(pv[i]);
-    }
-}*/
-
-template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable, T> && std::is_standard_layout_v<std::remove_reference_t<T>>>>
-         inline
-         void lowest_add(T& v, serialise& s, std::vector<char>& data)
 {
     char* pv = (char*)&v;
 
@@ -118,8 +106,8 @@ template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable
 }
 
 template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable, T> && std::is_standard_layout_v<std::remove_reference_t<T>>>>
-         inline
-         void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
+inline
+void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
 {
     int prev = internal_counter;
 
@@ -136,26 +124,6 @@ template<typename T, typename = std::enable_if_t<!std::is_base_of_v<serialisable
 
     v = *std::launder((T*)&data[prev]);
 }
-
-/*template<typename T, typename = std::enable_if_t<!std::is_base_of<serialisable, T>::value>>
-inline
-void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& data)
-{
-    int prev = internal_counter;
-
-    internal_counter += sizeof(T);
-
-    if(internal_counter > (int)data.size())
-    {
-        std::cout << "Error, invalid bytefetch" << std::endl;
-
-        v = T();
-    }
-
-    v = *std::launder((T*)&data[prev]);
-}*/
-
-
 
 inline
 void lowest_add(serialisable& v, serialise& s, std::vector<char>& data)
@@ -292,11 +260,6 @@ struct serialise_helper<T*>
         serialise_helper<serialise_dirty_type> helper_dirty;
         helper_dirty.get(dirty, s);
 
-        /*if(owner_id == -1)
-        {
-            owner_id = s.default_owner;
-        }*/
-
         T* ptr = (T*)serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id];
 
         bool was_nullptr = ptr == nullptr;
@@ -332,11 +295,6 @@ struct serialise_helper<T*>
             ptr->owned_by_host = false;
             ptr->host_id = host_id;
             ptr->serialise_id = serialise_id;
-
-            /*if(serialise_id == 3557)
-            {
-                std::cout << "hello" << owner_id << " " << ptr;
-            }*/
 
             ///we're reading this element for the first time
             if(follow_references)
