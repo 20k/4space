@@ -2080,19 +2080,11 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         s.handle_serialise(orbitals, ser);
         s.handle_serialise(universe_pos, ser);
         s.handle_serialise(advertised_empires, ser);
-
-        /*if(ser == false)
-        {
-            ensure_found_orbitals_handled();
-        }*/
-
         ///ADVERTISED EMPIRES?
     }
 
     if(serialise_data_helper::send_mode == 0)
     {
-        //printf("pre\n");
-
         //s.handle_serialise(toggle_fleet_ui, ser);
         //s.handle_serialise(accumulated_nonviewed_time, ser);
         //s.handle_serialise(highlight, ser);
@@ -2100,8 +2092,6 @@ void orbital_system::do_serialise(serialise& s, bool ser)
         s.handle_serialise(orbitals, ser);
         //s.handle_serialise(universe_pos, ser);
         //s.handle_serialise(advertised_empires, ser);
-
-        //printf("%i %i\n", s.data.size(), orbitals.size());
     }
 
     if(serialise_data_helper::send_mode == 2)
@@ -2118,8 +2108,6 @@ void orbital_system::do_serialise(serialise& s, bool ser)
                 }
             }
 
-            //std::cout << extra << std::endl;
-
             s.handle_serialise(extra, ser);
 
             for(orbital* o : orbitals)
@@ -2135,8 +2123,6 @@ void orbital_system::do_serialise(serialise& s, bool ser)
             int32_t extra = 0;
 
             s.handle_serialise(extra, ser);
-
-            //std::cout << "got " << extra << std::endl;
 
             for(int i=0; i<extra; i++)
             {
