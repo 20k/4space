@@ -455,6 +455,32 @@ struct network_state
             int max_requests = 10;
             int requests = 0;
 
+            if(packet_list.size() > 0)
+            {
+                forward_packet& first = packet_list[0];
+
+                packet_id_type next_packet_id = last_received_packet[first.no.owner_id] + 1;
+
+                if(first.header.packet_id != next_packet_id)
+                {
+                    wait_info& info = packet_wait_map[first.no.owner_id][next_packet_id];
+
+                    if(info.too_long())
+                    {
+                        packet_request request;
+                        request.owner_id = first.no.owner_id;
+                        request.packet_id = next_packet_id;
+                        request.sequence_id = 0;
+                        request.serialise_id = owner_to_packet_id_to_serialise[request.owner_id][first.header.packet_id];
+
+                        make_packet_request(request);
+                        info.request();
+                    }
+
+                    requests++;
+                }
+            }
+
             for(int i=1; i<packet_list.size() && requests < max_requests; i++)
             {
                 forward_packet& last = packet_list[i-1];
@@ -476,7 +502,8 @@ struct network_state
                     request.owner_id = last.no.owner_id;
                     request.packet_id = last.header.packet_id + 1;
                     request.sequence_id = 0;
-                    request.serialise_id = owner_to_packet_id_to_serialise[request.owner_id][request.packet_id];
+                    ///this is invalid right?
+                    request.serialise_id = owner_to_packet_id_to_serialise[request.owner_id][last.header.packet_id];
 
                     make_packet_request(request);
 

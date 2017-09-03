@@ -3578,6 +3578,12 @@ int main()
                     std::cout << i.second << std::endl;
                 }*/
 
+                //if(send_mode == 2)
+                {
+                    //std::cout << "yay" << send_mode << std::endl;
+                }
+
+
                 if(found_s == nullptr)
                 {
                     //std::cout << "nullptr" << std::endl;
@@ -3585,12 +3591,6 @@ int main()
                     i.set_complete();
                     continue;
                 }
-
-                if(send_mode == 0)
-                {
-                    std::cout << "yay" << std::endl;
-                }
-
                 //std::cout << "got" << std::endl;
 
                 //std::cout << "doing mini packet of " << i.data.data.size() << std::endl;
