@@ -414,20 +414,6 @@ struct network_state
                 }
             }
 
-            /*while(packet_list.size() >= 2)
-            {
-                forward_packet& first = packet_list[0];
-                forward_packet& second = packet_list[1];
-
-                if(first.header.packet_id + 1 != second.header.packet_id)
-                    break;
-
-                packet_wait_map[first.no.owner_id].erase(first.header.packet_id);
-                make_available(first.no.owner_id, 0);
-
-                packet_list.pop_front();
-            }*/
-
             for(int i=0; i<packet_list.size(); i++)
             {
                 forward_packet& current_packet = packet_list[i];
@@ -439,6 +425,8 @@ struct network_state
 
                 if(current_packet.header.packet_id == last_received_packet[current_packet.no.owner_id] + 1)
                 {
+                    last_received_packet[current_packet.no.owner_id] = current_packet.header.packet_id;
+
                     packet_wait_map[current_packet.no.owner_id].erase(current_packet.header.packet_id);
                     make_available(current_packet.no.owner_id, 0);
                     packet_list.pop_front();
@@ -620,7 +608,7 @@ struct network_state
                                 packet.data.data.clear();
                             }
 
-                            std::cout << s.data.size() << std::endl;
+                            //std::cout << s.data.size() << std::endl;
 
                             ///pipe back a response?
                             if(s.data.size() > 0)
