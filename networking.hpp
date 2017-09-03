@@ -706,7 +706,7 @@ struct network_state
         }
     }
 
-    byte_vector get_fragment(int id, const network_object& no, const std::vector<char>& data)
+    byte_vector get_fragment(int id, const network_object& no, const std::vector<char>& data, packet_id_type use_packet_id)
     {
         int fragments = get_packet_fragments(data.size());
 
@@ -715,7 +715,7 @@ struct network_state
         packet_header header;
         header.current_size = data.size() + header.calculate_size() + sizeof(no);
         header.overall_size = header.current_size;
-        header.packet_id = packet_id;
+        header.packet_id = use_packet_id;
 
         if(fragments == 1)
         {
@@ -789,7 +789,7 @@ struct network_state
 
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
-            byte_vector frag = get_fragment(i, no, s.data);
+            byte_vector frag = get_fragment(i, no, s.data, packet_id);
 
            // while(!sock_writable(sock)) {}
 
