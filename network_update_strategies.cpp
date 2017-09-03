@@ -162,7 +162,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
             if(!net_state.owns(o))
                 continue;
 
-            if(o->dirty)
+            if(o->is_dirty())
                 continue;
 
             if(o->type == orbital_info::FLEET)
@@ -213,6 +213,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///but aren't fully initialised, hence the crash
     ///mode 2 is diff mode, where we send diff updates
     ///change in container size (num dirty), maybe diff hp as well
+
+    ///transferring between systems not working because it relies on dirty strategy
     static update_strategy system_strategy;
     system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, 2);
 

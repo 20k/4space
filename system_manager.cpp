@@ -2183,7 +2183,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
             for(orbital* o : orbitals)
             {
-                if(o->dirty)
+                if(o->dirty > 0)
                 {
                     extra++;
                 }
@@ -2193,7 +2193,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
             for(orbital* o : orbitals)
             {
-                if(o->dirty)
+                if(o->dirty > 0)
                 {
                     s.handle_serialise(o, ser);
                 }

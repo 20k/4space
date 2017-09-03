@@ -53,9 +53,29 @@ struct serialisable
     serialise_host_type host_id = -1;
     serialise_dirty_type dirty = 0;
 
-    void make_dirty()
+    void make_full_dirty()
     {
         dirty = 1;
+    }
+
+    void make_partial_dirty()
+    {
+        dirty = 2;
+    }
+
+    bool is_full_dirty()
+    {
+        return dirty == 1;
+    }
+
+    bool is_partial_dirty()
+    {
+        return dirty == 2;
+    }
+
+    bool is_dirty()
+    {
+        return dirty > 0;
     }
 
     bool handled_by_client = true;
@@ -184,15 +204,15 @@ struct serialise_helper<T*>
         helper1.add(v->serialise_id, s);
         helper_dirty.add(v->dirty, s);
 
-        bool dirty = v->dirty;
+        int32_t dirty = v->dirty;
 
-        v->dirty = false;
+        v->dirty = 0;
 
         bool follow_references = serialise_data_helper::ref_mode == 1;
 
         auto old_send_mode = serialise_data_helper::send_mode;
 
-        if(dirty)
+        if(dirty == 1)
         {
             serialise_data_helper::send_mode = 1;
         }
@@ -217,18 +237,18 @@ struct serialise_helper<T*>
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(!did_serialise && dirty)
+        if(!did_serialise && dirty > 0)
         {
             did_serialise = true;
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(dirty && did_serialise)
+        if(dirty > 0 && did_serialise)
         {
             //std::cout << "dirty send " << typeid(v).name() << std::endl;
         }
 
-        if(dirty)
+        if(dirty == 1)
         {
             serialise_data_helper::send_mode = old_send_mode;
         }
@@ -273,7 +293,7 @@ struct serialise_helper<T*>
             serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id] = ptr;
         }
 
-        ptr->dirty = false;
+        ptr->dirty = 0;
 
         //serialise_helper<T> data_fetcher;
         //*ptr = data_fetcher.get(internal_counter);
@@ -282,7 +302,7 @@ struct serialise_helper<T*>
 
         auto old_send_mode = serialise_data_helper::send_mode;
 
-        if(dirty)
+        if(dirty == 1)
         {
             serialise_data_helper::send_mode = 1;
         }
@@ -310,13 +330,13 @@ struct serialise_helper<T*>
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
         }
 
-        if(dirty && !did_serialise)
+        if(dirty > 0 && !did_serialise)
         {
             did_serialise = true;
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
         }
 
-        if(dirty && did_serialise)
+        if(dirty > 0 && did_serialise)
         {
             //std::cout << "dirty recv " << typeid(ptr).name() << std::endl;
         }
@@ -327,7 +347,7 @@ struct serialise_helper<T*>
             serialise_data_helper::type_to_datas[typeid(ptr).hash_code()].type_name = typeid(ptr).name();
         }
 
-        if(dirty)
+        if(dirty == 1)
         {
             serialise_data_helper::send_mode = old_send_mode;
         }
