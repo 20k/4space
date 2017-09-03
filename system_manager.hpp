@@ -348,6 +348,8 @@ struct orbital_system : serialisable
     int unique_id = gid++;
 
     void do_serialise(serialise& s, bool ser) override;
+
+    void shuffle_networked_orbitals();
 };
 
 struct popup_info;
@@ -438,6 +440,8 @@ struct system_manager : serialisable
     void ensure_found_orbitals_handled();
 
     void erase_all();
+
+    //void shuffle_networked_orbitals();
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

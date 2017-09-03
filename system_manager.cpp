@@ -2240,32 +2240,32 @@ void orbital_system::do_serialise(serialise& s, bool ser)
                 {
                     orbitals.push_back(o);
                 }
-
-                if(o->requires_attention)
-                {
-                    o->requires_attention = 0;
-
-                    if(o->parent_system != this)
-                    {
-                        if(!o->parent_system->owns(o))
-                            o->parent_system->orbitals.push_back(o);
-
-                        orbitals.erase(std::find(orbitals.begin(), orbitals.end(), o));
-                    }
-                }
             }
         }
-
-        ///still getting what i think is double ownership problems
-
-        /*orbitals.erase(std::remove_if(orbitals.begin(), orbitals.end(),
-                                [this](const auto& o) {
-                                    return o->parent_system != this;
-                                }),
-                                orbitals.end());*/
     }
 
     handled_by_client = true;
+}
+
+void orbital_system::shuffle_networked_orbitals()
+{
+    for(int i=0; i<orbitals.size(); i++)
+    {
+        orbital* o = orbitals[i];
+
+        if(o->parent_system != this)
+        {
+            orbitals.erase(orbitals.begin() + i);
+            i--;
+
+            if(!o->parent_system->owns(o))
+            {
+                o->parent_system->orbitals.push_back(o);
+            }
+
+            continue;
+        }
+    }
 }
 
 system_manager::system_manager()
@@ -2484,6 +2484,7 @@ void system_manager::tick(float step_s)
 {
     for(auto& i : systems)
     {
+        i->shuffle_networked_orbitals();
         i->tick(step_s, currently_viewed);
     }
 
