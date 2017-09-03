@@ -517,6 +517,11 @@ void orbital::tick(float step_s)
     //if(transferring)
     //    do_transfer(this, step_s);
 
+    if(!owned_by_host)
+    {
+        command_queue.cancel();
+    }
+
     command_queue.tick(this, step_s);
 
     is_mining = false;
