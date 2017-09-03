@@ -109,8 +109,19 @@ struct empire_manager;
 struct system_manager;
 struct orbital_system;
 
+struct position_history_element
+{
+    static double max_history_s;
+
+    vec2f pos;
+    double time_s = 0.f;
+};
+
+
 struct orbital : serialisable
 {
+    std::deque<position_history_element> multiplayer_position_history;
+
     object_command_queue command_queue;
 
     static int gid;
@@ -124,7 +135,7 @@ struct orbital : serialisable
 
     int resource_type_for_flavour_text = 0;
 
-    float internal_time_s = 0.f;
+    double internal_time_s = 0.f;
 
     bool highlight = false;
     bool was_highlight = false;
@@ -262,6 +273,8 @@ struct orbital : serialisable
 
     void ensure_handled_by_client();
 };
+
+float get_orbital_update_rate(orbital_info::type type);
 
 struct popup_info;
 struct fleet_manager;

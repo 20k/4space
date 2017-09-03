@@ -21,6 +21,8 @@ int orbital_system::gid;
 
 float system_manager::universe_scale = 100.f;
 
+double position_history_element::max_history_s = 20;
+
 inline
 bool operator<(const empire_popup& e1, const empire_popup& e2)
 {
@@ -585,6 +587,43 @@ void orbital::tick(float step_s)
     //    orbital_angle -= 2*M_PIf;
 
     absolute_pos = orbital_length * (vec2f){impl_cos(orbital_angle), impl_sin(orbital_angle)} + parent->absolute_pos;
+
+    if(!owned_by_host)
+    {
+        if(multiplayer_position_history.size() == 1)
+        {
+            absolute_pos = multiplayer_position_history[0].pos;
+        }
+
+        if(type != orbital_info::FLEET && multiplayer_position_history.size() > 0)
+        {
+            absolute_pos = multiplayer_position_history.back().pos;
+            multiplayer_position_history.clear();
+            return;
+        }
+
+        for(int i=0; i<((int)multiplayer_position_history.size()) - 1; i++)
+        {
+            position_history_element& cur = multiplayer_position_history[i];
+            position_history_element& next = multiplayer_position_history[i + 1];
+
+            double minternal = internal_time_s - get_orbital_update_rate(type) * 2.f;
+
+            if(minternal >= cur.time_s && minternal < next.time_s)
+            {
+                double frac = (minternal - cur.time_s) / (next.time_s - cur.time_s);
+
+                absolute_pos = mix(cur.pos, next.pos, frac);
+
+                for(int kk=0; kk < i; kk++)
+                {
+                    multiplayer_position_history.pop_front();
+                }
+
+                break;
+            }
+        }
+    }
 }
 
 float orbital::calculate_orbital_drift_angle(float orbital_length, float step_s)
@@ -1150,6 +1189,8 @@ bool orbital::in_friendly_territory()
 
 void orbital::do_serialise(serialise& s, bool ser)
 {
+    position_history_element saved_history = {absolute_pos, internal_time_s};
+
     if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(expanded_window_clicked, ser);
@@ -1246,7 +1287,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(was_hovered, ser);
         //s.handle_serialise(was_highlight, ser);
         //s.handle_serialise(highlight, ser);
-        //s.handle_serialise(internal_time_s, ser);
+        s.handle_serialise(internal_time_s, ser);
         //s.handle_serialise(resource_type_for_flavour_text, ser);
         //s.handle_serialise(star_temperature_fraction, ser);
         //s.handle_serialise(description, ser);
@@ -1273,11 +1314,42 @@ void orbital::do_serialise(serialise& s, bool ser)
         //printf("well then\n");
     }
 
+    ///we've received a packet
+    if(ser == false)
+    {
+        multiplayer_position_history.push_back({absolute_pos, internal_time_s});
+
+        if(multiplayer_position_history.size() >= position_history_element::max_history_s)
+        {
+            double time_span = multiplayer_position_history.back().time_s
+                             - multiplayer_position_history.front().time_s;
+
+            while(multiplayer_position_history.size() > 2 && time_span > position_history_element::max_history_s)
+            {
+                time_span = multiplayer_position_history.back().time_s
+                          - multiplayer_position_history.front().time_s;
+
+                multiplayer_position_history.pop_front();
+            }
+        }
+    }
+
+    absolute_pos = saved_history.pos;
+    //internal_time_s = saved_history.time_s;
+
     //std::cout << serialise_data_helper::send_mode << std::endl;
 
     handled_by_client = true;
 
     //printf("what?\n");
+}
+
+float get_orbital_update_rate(orbital_info::type type)
+{
+    if(type == orbital_info::FLEET)
+        return 0.5f;
+
+    return 5.f;
 }
 
 /*void orbital::ensure_handled_by_client()
@@ -2403,8 +2475,11 @@ void repulse(orbital* o1, orbital* o2)
     vec2f new_o1_pos = -o1_to_o2.norm() + o1->absolute_pos;
     vec2f new_o2_pos = o1_to_o2.norm() + o2->absolute_pos;
 
-    o1->transfer(new_o1_pos, o1->parent_system, false);
-    o2->transfer(new_o2_pos, o2->parent_system, false);
+    if(o1->owned_by_host)
+        o1->transfer(new_o1_pos, o1->parent_system, false);
+
+    if(o2->owned_by_host)
+        o2->transfer(new_o2_pos, o2->parent_system, false);
 }
 
 void system_manager::repulse_fleets()
@@ -2418,6 +2493,9 @@ void system_manager::repulse_fleets()
             {
                 continue;
             }
+
+            if(!o->owned_by_host)
+                continue;
 
             for(orbital* k : sys->orbitals)
             {
