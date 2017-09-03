@@ -435,7 +435,10 @@ struct network_state
                 }
             }
 
-            for(int i=1; i<packet_list.size(); i++)
+            int max_requests = 10;
+            int requests = 0;
+
+            for(int i=1; i<packet_list.size() && requests < max_requests; i++)
             {
                 forward_packet& last = packet_list[i-1];
                 forward_packet& cur = packet_list[i];
@@ -445,7 +448,10 @@ struct network_state
                     wait_info& info = packet_wait_map[cur.no.owner_id][last.header.packet_id];
 
                     if(!info.too_long())
-                        break;
+                    {
+                        requests++;
+                        continue;
+                    }
 
                     info.request();
 
@@ -457,7 +463,7 @@ struct network_state
 
                     make_packet_request(request);
 
-                    break;
+                    requests++;
                 }
             }
         }
@@ -638,11 +644,11 @@ struct network_state
 
                         available_data.push_back({no, s, header.packet_id});*/
 
-                        if(received_packet[packet.no.owner_id][packet.header.packet_id] == false)
+                        if(received_packet[no.owner_id][header.packet_id] == false)
                         {
                             forward_packet full_forward = packet;
 
-                            full_forward.fetch.ptr = std::move(packet.fetch.ptr);
+                            full_forward.fetch.ptr = std::move(fetch.ptr);
 
                             forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
 

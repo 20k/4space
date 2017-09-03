@@ -3603,7 +3603,7 @@ int main()
 
         ImGui::BeginOverride("Networking");
 
-        if(ImGui::Button("Join"))
+        //if(ImGui::Button("Join"))
         {
             net_state.try_join = true;
         }
