@@ -2214,6 +2214,12 @@ void orbital_system::do_serialise(serialise& s, bool ser)
                 orbitals.push_back(o);
             }
         }
+
+        orbitals.erase(std::remove_if(orbitals.begin(), orbitals.end(),
+                                [this](const auto& o) {
+                                    return o->parent_system != this;
+                                }),
+                                orbitals.end());
     }
 
     handled_by_client = true;
