@@ -385,7 +385,7 @@ struct network_state
         serialise s;
         s.data = std::move(packet.fetch.ptr);
 
-        available_data.push_back({packet.no, std::move(s), packet.header.packet_id});
+        available_data.push_back({packet.no, s, packet.header.packet_id});
 
         //forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
     }
@@ -443,6 +443,10 @@ struct network_state
                 if(current_packet.header.packet_id == last_received_packet[current_packet.no.owner_id] + 1)
                 {
                     last_received_packet[current_packet.no.owner_id] = current_packet.header.packet_id;
+
+                    std::cout << "made available\n";
+
+                    std::cout << current_packet.fetch.ptr.size() << std::endl;
 
                     packet_wait_map[current_packet.no.owner_id].erase(current_packet.header.packet_id);
                     make_available(current_packet.no.owner_id, 0);
@@ -692,8 +696,6 @@ struct network_state
                         {
                             forward_packet full_forward = packet;
 
-                            full_forward.fetch.ptr = std::move(fetch.ptr);
-
                             forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
 
                             received_packet[packet.no.owner_id][packet.header.packet_id] = true;
@@ -834,6 +836,17 @@ struct network_state
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
             byte_vector frag = get_fragment(i, no, s.data, packet_id);
+
+            /*if(i == 0)
+            {
+                byte_vector vc = frag;
+
+                int32_t val;
+
+                memcpy(&val, &s.data[0], sizeof(int32_t));
+
+                std::cout << "VAL " << val << std::endl;
+            }*/
 
            // while(!sock_writable(sock)) {}
 

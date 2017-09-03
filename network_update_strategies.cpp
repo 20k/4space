@@ -213,7 +213,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///mode 2 is diff mode, where we send diff updates
     ///change in container size (num dirty), maybe diff hp as well
     static update_strategy system_strategy;
-    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, 2);
+    //system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, 2);
 
     //std::cout << orbitals.size() << std::endl;
 

@@ -3541,10 +3541,14 @@ int main()
 
                 if(send_mode != 0 && send_mode != 2)
                 {
+                    std::cout << "sm " << send_mode << std::endl;
+
                     i.data.internal_counter = internal_counter;
 
                     continue;
                 }
+
+                std::cout << "hi there\n";
 
                 serialise_host_type host_id;
 
