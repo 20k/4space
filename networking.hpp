@@ -258,21 +258,27 @@ struct network_state
             {
                 serialise_data_type serialise_id = serialise_ids.first;*/
 
+
                 for(auto& packet_ids : owners.second)
                 {
                     packet_id_type packet_id = packet_ids.first;
 
                     std::vector<packet_info>& packets = packet_ids.second;
 
+                    //if(packets.size() == 0)
+                    //    continue;
+
                     //if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
                     //    continue;
 
                     std::sort(packets.begin(), packets.end(), [](auto& p1, auto& p2){return p1.sequence_number < p2.sequence_number;});
 
-                    if(packets[0].sequence_number != 0)
+                    if(packets.size() > 0 && packets[0].sequence_number != 0)
                     {
                         requests.push_back({owner_id, 0, packet_id});
                     }
+
+                    sequence_data_type sequence_id = -1;
 
                     for(int i=1; i<packets.size(); i++)
                     {
@@ -283,11 +289,20 @@ struct network_state
                         {
                             requests.push_back({owner_id, cur.sequence_number - 1, packet_id});
                         }
+
+                        sequence_id = cur.sequence_number;
                     }
 
-                    for(int i=packets.size(); i<owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; i++)
+                    if(packets.size() == 1)
                     {
-                        requests.push_back({owner_id, i, packet_id});
+                        sequence_id = packets[0].sequence_number;
+                    }
+
+                    sequence_id++;
+
+                    for(; sequence_id < owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; sequence_id++)
+                    {
+                        requests.push_back({owner_id, sequence_id, packet_id});
                     }
                 }
             //}
