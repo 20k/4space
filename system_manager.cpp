@@ -1248,7 +1248,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(command_queue, ser);
     }
 
-    if(serialise_data_helper::send_mode == 0)
+    if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
     {
         //s.handle_serialise(expanded_window_clicked, ser);
         //s.handle_serialise(force_draw_expanded_window, ser);

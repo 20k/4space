@@ -1715,7 +1715,7 @@ void component::do_serialise(serialise& s, bool ser)
         s.handle_serialise(primary_attribute, ser);
     }
 
-    if(serialise_data_helper::send_mode == 0)
+    if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
     {
         s.handle_serialise(components, ser);
     }
@@ -4270,7 +4270,7 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(world_pos, ser);
     }
 
-    if(serialise_data_helper::send_mode == 0)
+    if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
     {
         //s.handle_serialise(editor_size_storage, ser);
         s.handle_serialise(colonise_target, ser);
@@ -5302,7 +5302,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(ships, ser);
     }
 
-    if(serialise_data_helper::send_mode == 0)
+    if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
     {
         //s.handle_serialise(in_friendly_territory, ser);
         //s.handle_serialise(can_merge, ser);
