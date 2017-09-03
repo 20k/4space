@@ -2484,7 +2484,6 @@ void system_manager::tick(float step_s)
 {
     for(auto& i : systems)
     {
-        i->shuffle_networked_orbitals();
         i->tick(step_s, currently_viewed);
     }
 
@@ -4062,4 +4061,12 @@ void system_manager::erase_all()
     }
 
     systems.clear();
+}
+
+void system_manager::shuffle_networked_orbitals()
+{
+    for(orbital_system* sys : systems)
+    {
+        sys->shuffle_networked_orbitals();
+    }
 }

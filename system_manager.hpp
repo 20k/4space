@@ -441,7 +441,7 @@ struct system_manager : serialisable
 
     void erase_all();
 
-    //void shuffle_networked_orbitals();
+    void shuffle_networked_orbitals();
 };
 
 #endif // SYSTEM_MANAGER_HPP_INCLUDED

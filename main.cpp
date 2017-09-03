@@ -3606,6 +3606,10 @@ int main()
             }
         }
 
+        ///do immediately after networking
+        ///not critical but useful
+        system_manage.shuffle_networked_orbitals();
+
         ImGui::BeginOverride("Networking");
 
         //if(ImGui::Button("Join"))
