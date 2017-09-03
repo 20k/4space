@@ -239,7 +239,7 @@ struct network_state
 
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
 
-        std::cout << "request\n";
+        //std::cout << "request\n";
     }
 
     std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>>> owner_to_request_timeouts;
@@ -538,7 +538,7 @@ struct network_state
                     {
                         auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
 
-                        std::cout << vec.vec.ptr.size() << std::endl;
+                        //std::cout << vec.vec.ptr.size() << std::endl;
 
                         while(!sock_writable(sock)){}
 

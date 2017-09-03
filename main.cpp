@@ -3586,6 +3586,11 @@ int main()
                     continue;
                 }
 
+                if(send_mode == 0)
+                {
+                    std::cout << "yay" << std::endl;
+                }
+
                 //std::cout << "got" << std::endl;
 
                 //std::cout << "doing mini packet of " << i.data.data.size() << std::endl;
