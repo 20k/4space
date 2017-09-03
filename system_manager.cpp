@@ -1346,6 +1346,12 @@ void orbital::do_serialise(serialise& s, bool ser)
     handled_by_client = true;
 
     //printf("what?\n");
+
+    /*if(parent_system != nullptr)
+    {
+        if(!parent_system->owns(this) && type != orbital_info::ASTEROID)
+            parent_system->orbitals.push_back(this);
+    }*/
 }
 
 float get_orbital_update_rate(orbital_info::type type)
@@ -1485,6 +1491,23 @@ orbital* orbital_system::make_in_place(orbital* n)
     }
 
     return n;
+}
+
+bool orbital_system::owns(orbital* o)
+{
+    for(orbital* kk : orbitals)
+    {
+        if(kk == o)
+            return true;
+    }
+
+    for(orbital* kk : asteroids)
+    {
+        if(kk == o)
+            return true;
+    }
+
+    return false;
 }
 
 /*void orbital_system::ensure_found_orbitals_handled()
@@ -1631,6 +1654,8 @@ void orbital_system::steal(orbital* o, orbital_system* s)
             break;
         }
     }*/
+
+    o->requires_attention = 1;
 
     orbitals.push_back(o);
     //total_orbitals.push_back(o);
@@ -2183,7 +2208,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
             for(orbital* o : orbitals)
             {
-                if(o->dirty)
+                if(o->dirty || o->requires_attention)
                 {
                     extra++;
                 }
@@ -2193,7 +2218,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
             for(orbital* o : orbitals)
             {
-                if(o->dirty)
+                if(o->dirty || o->requires_attention)
                 {
                     s.handle_serialise(o, ser);
                 }
@@ -2211,15 +2236,33 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 
                 s.handle_serialise(o, ser);
 
-                orbitals.push_back(o);
+                if(!owns(o))
+                {
+                    orbitals.push_back(o);
+                }
+
+                if(o->requires_attention)
+                {
+                    o->requires_attention = 0;
+
+                    if(o->parent_system != this)
+                    {
+                        if(!o->parent_system->owns(o))
+                            o->parent_system->orbitals.push_back(o);
+
+                        orbitals.erase(std::find(orbitals.begin(), orbitals.end(), o));
+                    }
+                }
             }
         }
 
-        orbitals.erase(std::remove_if(orbitals.begin(), orbitals.end(),
+        ///still getting what i think is double ownership problems
+
+        /*orbitals.erase(std::remove_if(orbitals.begin(), orbitals.end(),
                                 [this](const auto& o) {
                                     return o->parent_system != this;
                                 }),
-                                orbitals.end());
+                                orbitals.end());*/
     }
 
     handled_by_client = true;

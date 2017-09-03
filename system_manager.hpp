@@ -294,6 +294,8 @@ struct orbital_system : serialisable
 
     orbital* make_in_place(orbital* o);
 
+    bool owns(orbital* o);
+
     void ensure_found_orbitals_handled();
 
     ///with 0 ships

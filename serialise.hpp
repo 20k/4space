@@ -21,6 +21,7 @@ using serialise_host_type = int32_t;
 using serialise_owner_type = int32_t;
 using serialise_data_type = uint64_t;
 using serialise_dirty_type = uint8_t;
+using serialise_attention_type = uint8_t;
 
 
 //#define serialise_owner_type int32_t
@@ -52,6 +53,7 @@ struct serialisable
     bool owned_by_host = true;
     serialise_host_type host_id = -1;
     serialise_dirty_type dirty = 0;
+    serialise_attention_type requires_attention = 0;
 
     void make_dirty()
     {
@@ -159,6 +161,7 @@ struct serialise_helper<T*>
         serialise_helper<serialise_owner_type> helper_owner_id;
         serialise_helper<serialise_data_type> helper1;
         serialise_helper<serialise_dirty_type> helper_dirty;
+        serialise_helper<serialise_attention_type> helper_attention;
 
         if(v == nullptr)
         {
@@ -183,6 +186,7 @@ struct serialise_helper<T*>
         helper_owner_id.add(v->host_id, s);
         helper1.add(v->serialise_id, s);
         helper_dirty.add(v->dirty, s);
+        helper_attention.add(v->requires_attention, s);
 
         bool dirty = v->dirty;
 
@@ -260,6 +264,11 @@ struct serialise_helper<T*>
         serialise_helper<serialise_dirty_type> helper_dirty;
         helper_dirty.get(dirty, s);
 
+        serialise_attention_type requires_attention;
+
+        serialise_helper<serialise_attention_type> helper_requires;
+        helper_requires.get(requires_attention, s);
+
         T* ptr = (T*)serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id];
 
         bool was_nullptr = ptr == nullptr;
@@ -274,6 +283,7 @@ struct serialise_helper<T*>
         }
 
         ptr->dirty = false;
+        ptr->requires_attention = requires_attention;
 
         //serialise_helper<T> data_fetcher;
         //*ptr = data_fetcher.get(internal_counter);
