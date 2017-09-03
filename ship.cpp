@@ -4488,6 +4488,9 @@ void ship_manager::steal(ship* const s)
         }
     }
 
+    dirty = true;
+    other->dirty = true;
+
     s->owned_by = this;
 
     ships.push_back(s);

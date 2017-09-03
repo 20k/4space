@@ -137,10 +137,32 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     int num_orbitals = 0;
 
-    std::vector<orbital*> orbitals;
+    std::vector<orbital*> fleets;
     std::vector<orbital*> bodies;
 
     std::vector<orbital_system*> systems;
+
+    std::vector<ship_manager*> ship_managers;
+    std::vector<ship*> ships;
+
+    for(ship_manager* sm : fleet_manage.fleets)
+    {
+        if(!net_state.owns(sm))
+            continue;
+
+        //if(sm->dirty)
+        //    continue;
+
+        ship_managers.push_back(sm);
+
+        for(ship* s : sm->ships)
+        {
+            if(s->dirty)
+                continue;
+
+            ships.push_back(s);
+        }
+    }
 
     for(orbital_system* sys : system_manage.systems)
     {
@@ -162,12 +184,17 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
             if(!net_state.owns(o))
                 continue;
 
+            if(o->type == orbital_info::FLEET && o->data->dirty)
+            {
+                o->dirty = true;
+            }
+
             if(o->dirty)
                 continue;
 
             if(o->type == orbital_info::FLEET)
             {
-                orbitals.push_back(o);
+                fleets.push_back(o);
                 continue;
             }
             else
@@ -178,15 +205,21 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
         }
     }
 
-    //if(orbitals.size() > 0)
-    //    std::cout << orbitals.size() << std::endl;
+    //if(fleets.size() > 0)
+    //    std::cout << fleets.size() << std::endl;
 
     static update_strategy orbital_strategy;
-    orbital_strategy.do_update_strategy(dt_s, get_orbital_update_rate(orbital_info::FLEET), orbitals, net_state, 0);
+    orbital_strategy.do_update_strategy(dt_s, get_orbital_update_rate(orbital_info::FLEET), fleets, net_state, 0);
 
     ///doesn't matter what we use for the update rate below
     static update_strategy body_strategy;
     body_strategy.do_update_strategy(dt_s, get_orbital_update_rate(orbital_info::PLANET), bodies, net_state, 0);
+
+    static update_strategy ship_strategy;
+    ship_strategy.do_update_strategy(dt_s, 1.f, ships, net_state, 0);
+
+    static update_strategy ship_manager_strategy;
+    ship_manager_strategy.do_update_strategy(dt_s, 1, fleets, net_state, 0);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate
@@ -216,7 +249,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     static update_strategy system_strategy;
     system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, 2);
 
-    //std::cout << orbitals.size() << std::endl;
+    //std::cout << fleets.size() << std::endl;
 
     ///Hmm. This isn't the best plan
     ///the problem is, nobody owns these

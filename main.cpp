@@ -1867,6 +1867,10 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     if(my_o != nullptr && my_o->type == orbital_info::FLEET && sm != found_sm)
                     {
+                        my_o->dirty = true;
+                        found_sm->dirty = true;
+                        s->dirty = true;
+
                         if(found_sm->ships.size() == 1)
                         {
                             popup.schedule_rem(my_o);
