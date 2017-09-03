@@ -588,6 +588,10 @@ void orbital::tick(float step_s)
 
     absolute_pos = orbital_length * (vec2f){impl_cos(orbital_angle), impl_sin(orbital_angle)} + parent->absolute_pos;
 
+    ///the jittering is caused by the internal clock we receive
+    ///potentially being out compared to our own estimation of the clock
+    ///what would be really useful is to compare the differences between the two clocks
+    ///and distribute the error gradually rather than immediately
     if(!owned_by_host)
     {
         if(multiplayer_position_history.size() == 1)
