@@ -2253,11 +2253,17 @@ void orbital_system::shuffle_networked_orbitals()
     {
         orbital* o = orbitals[i];
 
+        if(o->requires_attention)
+        {
+            o->requires_attention = false;
+        }
+
         if(o->parent_system != this)
         {
             orbitals.erase(orbitals.begin() + i);
             i--;
 
+            ///I think with the requires attention system this should always be skipped
             if(!o->parent_system->owns(o))
             {
                 o->parent_system->orbitals.push_back(o);
