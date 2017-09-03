@@ -262,8 +262,8 @@ struct network_state
 
                     std::vector<packet_info>& packets = packet_ids.second;
 
-                    if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
-                        continue;
+                    //if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
+                    //    continue;
 
                     std::sort(packets.begin(), packets.end(), [](auto& p1, auto& p2){return p1.sequence_number < p2.sequence_number;});
 
@@ -293,26 +293,19 @@ struct network_state
 
         float request_timeout_s = 0.4f;
 
-        int num_requested = 0;
-
         for(int i=0; i<requests.size(); i++)
         {
             request_timeout_info& inf = owner_to_request_timeouts[requests[i].owner_id][requests[i].packet_id][requests[i].sequence_id];
 
-            if(!inf.ever)
-                continue;
-
             if(inf.clk.getElapsedTime().asMilliseconds() / 1000.f < request_timeout_s)
             {
-                num_requested++;
-
                 requests.erase(requests.begin() + i);
                 i--;
                 continue;
             }
         }
 
-        int num = max_fragments_to_request - num_requested;
+        int num = max_fragments_to_request;
 
         if(num < 0)
             num = 0;
@@ -344,7 +337,7 @@ struct network_state
 
     void cleanup_available_data_and_incomplete_packets()
     {
-        float cleanup_time_s = 1.f;
+        float cleanup_time_s = 10.f;
 
         for(int i=0; i<available_data.size(); i++)
         {
@@ -364,7 +357,7 @@ struct network_state
     }
 
     std::map<serialise_owner_type, std::deque<forward_packet>> forward_ordered_packets;
-    //std::map<serialise_owner_type, packet_id_type> last_received_id;
+    std::map<serialise_owner_type, packet_id_type> last_popped_id;
 
     //std::map<serialise_owner_type, packet_id_type> already_have;
 
@@ -377,7 +370,7 @@ struct network_state
 
         available_data.push_back({packet.no, std::move(s), packet.header.packet_id});
 
-        forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
+        //forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
     }
 
     struct wait_info
@@ -399,6 +392,7 @@ struct network_state
     ///there's a few structures here and there to do with packets that actually just pile up infinitely
     ///needs to be a general "after 10 seconds or so clean these up as those packets aren't comin"
     std::map<serialise_owner_type, std::map<packet_id_type, bool>> received_packet;
+    std::map<serialise_owner_type, packet_id_type> last_received_packet;
 
     void make_packets_available()
     {
@@ -406,10 +400,11 @@ struct network_state
         {
             std::deque<forward_packet>& packet_list = packet_data.second;
 
-              std::sort(packet_list.begin(), packet_list.end(),
-                  [](auto& p1, auto& p2){return p1.header.packet_id < p2.header.packet_id;});
+            std::sort(packet_list.begin(), packet_list.end(),
+                [](auto& p1, auto& p2){return p1.header.packet_id < p2.header.packet_id;});
 
-            for(int i=0; i<packet_list.size() - 1; i++)
+            ///I love you bjarne but also fuck you
+            for(int i=0; i<((int)packet_list.size()) - 1; i++)
             {
                 if(packet_list[i].header.packet_id == packet_list[i+1].header.packet_id)
                 {
@@ -419,7 +414,7 @@ struct network_state
                 }
             }
 
-            while(packet_list.size() >= 2)
+            /*while(packet_list.size() >= 2)
             {
                 forward_packet& first = packet_list[0];
                 forward_packet& second = packet_list[1];
@@ -429,6 +424,27 @@ struct network_state
 
                 packet_wait_map[first.no.owner_id].erase(first.header.packet_id);
                 make_available(first.no.owner_id, 0);
+
+                packet_list.pop_front();
+            }*/
+
+            for(int i=0; i<packet_list.size(); i++)
+            {
+                forward_packet& current_packet = packet_list[i];
+
+                if(last_received_packet.find(current_packet.no.owner_id) == last_received_packet.end())
+                {
+                    last_received_packet[current_packet.no.owner_id] = current_packet.header.packet_id - 1;
+                }
+
+                if(current_packet.header.packet_id == last_received_packet[current_packet.no.owner_id] + 1)
+                {
+                    packet_wait_map[current_packet.no.owner_id].erase(current_packet.header.packet_id);
+                    make_available(current_packet.no.owner_id, 0);
+                    packet_list.pop_front();
+                    i--;
+                    continue;
+                }
             }
 
             for(int i=1; i<packet_list.size(); i++)
@@ -468,7 +484,7 @@ struct network_state
         if(!sock.valid())
             return;
 
-        request_incomplete_packets(200);
+        request_incomplete_packets(10);
 
         cleanup_available_data_and_incomplete_packets();
 
@@ -550,10 +566,11 @@ struct network_state
 
                     int packet_fragments = get_packet_fragments(real_overall_data_length);
 
+                    owner_to_packet_id_to_serialise[no.owner_id][header.packet_id] = no.serialise_id;
+
                     if(packet_fragments > 1)
                     {
                         owner_to_packet_sequence_to_expected_size[no.owner_id][header.packet_id] = packet_fragments;
-                        owner_to_packet_id_to_serialise[no.owner_id][header.packet_id] = no.serialise_id;
 
                         std::vector<packet_info>& packets = incomplete_packets[no.owner_id][no.serialise_id][header.packet_id];
 
@@ -589,6 +606,9 @@ struct network_state
 
                         if(current_received_fragments == packet_fragments)
                         {
+                            //std::cout << "hello there \n";
+                            //std::cout << packets.size() << " " << packet_fragments << std::endl;
+
                             std::sort(packets.begin(), packets.end(), [](packet_info& p1, packet_info& p2){return p1.sequence_number < p2.sequence_number;});
 
                             serialise s;
@@ -599,6 +619,8 @@ struct network_state
 
                                 packet.data.data.clear();
                             }
+
+                            std::cout << s.data.size() << std::endl;
 
                             ///pipe back a response?
                             if(s.data.size() > 0)
