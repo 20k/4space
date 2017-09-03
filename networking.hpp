@@ -444,10 +444,6 @@ struct network_state
                 {
                     last_received_packet[current_packet.no.owner_id] = current_packet.header.packet_id;
 
-                    std::cout << "made available\n";
-
-                    std::cout << current_packet.fetch.ptr.size() << std::endl;
-
                     packet_wait_map[current_packet.no.owner_id].erase(current_packet.header.packet_id);
                     make_available(current_packet.no.owner_id, 0);
                     packet_list.pop_front();
@@ -836,19 +832,6 @@ struct network_state
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
             byte_vector frag = get_fragment(i, no, s.data, packet_id);
-
-            /*if(i == 0)
-            {
-                byte_vector vc = frag;
-
-                int32_t val;
-
-                memcpy(&val, &s.data[0], sizeof(int32_t));
-
-                std::cout << "VAL " << val << std::endl;
-            }*/
-
-           // while(!sock_writable(sock)) {}
 
             ///ah. we have a packet id conflict, if we pipe down on no.owner_id, our packet id will overlap
             ///and the data will never get delivered
