@@ -113,7 +113,7 @@ struct network_state
     float timeout = timeout_max;
 
     std::vector<network_data> available_data;
-    std::map<serialise_owner_type, std::map<serialise_data_type, std::map<packet_id_type, std::vector<packet_info>>>> incomplete_packets;
+    std::map<serialise_owner_type, std::map<packet_id_type, std::vector<packet_info>>> incomplete_packets;
     std::map<serialise_owner_type, std::map<packet_id_type, int>> owner_to_packet_sequence_to_expected_size;
     std::map<serialise_owner_type, std::map<packet_id_type, serialise_data_type>> owner_to_packet_id_to_serialise;
 
@@ -238,6 +238,8 @@ struct network_state
         while(!sock_writable(sock)) {}
 
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+
+        std::cout << "request\n";
     }
 
     std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>>> owner_to_request_timeouts;
@@ -252,11 +254,11 @@ struct network_state
         {
             serialise_owner_type owner_id = owners.first;
 
-            for(auto& serialise_ids : owners.second)
+            /*for(auto& serialise_ids : owners.second)
             {
-                serialise_data_type serialise_id = serialise_ids.first;
+                serialise_data_type serialise_id = serialise_ids.first;*/
 
-                for(auto& packet_ids : serialise_ids.second)
+                for(auto& packet_ids : owners.second)
                 {
                     packet_id_type packet_id = packet_ids.first;
 
@@ -288,7 +290,7 @@ struct network_state
                         requests.push_back({owner_id, i, packet_id});
                     }
                 }
-            }
+            //}
         }
 
         float request_timeout_s = 0.4f;
@@ -349,7 +351,7 @@ struct network_state
 
                 packet_id_type packet_id = data.packet_id;
 
-                incomplete_packets[net_obj.owner_id][net_obj.serialise_id].erase(packet_id);
+                incomplete_packets[net_obj.owner_id].erase(packet_id);
 
                 available_data[i].should_cleanup = true;
             }
@@ -536,7 +538,7 @@ struct network_state
                     {
                         auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
 
-                        //std::cout << vec.vec.ptr.size() << std::endl;
+                        std::cout << vec.vec.ptr.size() << std::endl;
 
                         while(!sock_writable(sock)){}
 
@@ -566,7 +568,7 @@ struct network_state
                     {
                         owner_to_packet_sequence_to_expected_size[no.owner_id][header.packet_id] = packet_fragments;
 
-                        std::vector<packet_info>& packets = incomplete_packets[no.owner_id][no.serialise_id][header.packet_id];
+                        std::vector<packet_info>& packets = incomplete_packets[no.owner_id][header.packet_id];
 
                         ///INSERT PACKET INTO PACKETS
                         packet_info next;
