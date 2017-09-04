@@ -3324,6 +3324,9 @@ int main()
 
         if(ImGui::Button("Save"))
         {
+            serialise_data_helper::ref_mode = 1;
+            serialise_data_helper::send_mode = 1;
+
             serialise ser;
             ser.default_owner = net_state.my_id;
 
@@ -3386,6 +3389,9 @@ int main()
             system_manage = system_manager();
             fleet_manage = fleet_manager();
             all_battles = all_battles_manager();
+
+            serialise_data_helper::ref_mode = 1;
+            serialise_data_helper::send_mode = 1;
 
             ser.handle_serialise(state, false);
             ser.handle_serialise(empire_manage, false);

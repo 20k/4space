@@ -117,7 +117,7 @@ void lowest_get(T& v, serialise& s, int& internal_counter, std::vector<char>& da
 
     if(internal_counter > (int)data.size())
     {
-        std::cout << "Error, invalid bytefetch low" << std::endl;
+        std::cout << "Error, invalid bytefetch low " << typeid(T).name() << std::endl;
 
         v = T();
 
@@ -214,7 +214,7 @@ struct serialise_helper<T*>
             v->do_serialise(reinterpret_cast<serialise&>(s), true);
         }
 
-        if(serialise_data_helper::ref_mode == 0 && force)
+        if(serialise_data_helper::ref_mode == 0 && force && !did_serialise)
         {
             did_serialise = true;
 
@@ -314,7 +314,7 @@ struct serialise_helper<T*>
             }
         }
 
-        if(serialise_data_helper::ref_mode == 0 && force)
+        if(serialise_data_helper::ref_mode == 0 && force && !did_serialise)
         {
             did_serialise = true;
             ptr->do_serialise(reinterpret_cast<serialise&>(s), false);
@@ -799,9 +799,6 @@ struct serialise : serialise_data
     void save(const std::string& file)
     {
         serialise_data_helper::host_to_id_to_pointer.clear();
-
-        serialise_data_helper::ref_mode = 1;
-        serialise_data_helper::send_mode = 1;
 
         if(data.size() == 0)
             return;
