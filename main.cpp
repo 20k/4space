@@ -3324,6 +3324,8 @@ int main()
 
         if(ImGui::Button("Save"))
         {
+            serialise_data_helper::host_to_id_to_pointer.clear();
+
             serialise_data_helper::ref_mode = 1;
             serialise_data_helper::send_mode = 1;
 
@@ -3336,7 +3338,6 @@ int main()
             ser.handle_serialise(fleet_manage, true);
             ser.handle_serialise(all_battles, true);
 
-            serialise_data_helper::host_to_id_to_pointer.clear();
 
             /*for(ship_manager* sm : fleet_manage.fleets)
             {
