@@ -5403,6 +5403,12 @@ void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
         {
             empire_manage.notify_removal(sm);
 
+            for(int kk=0; kk < sm->ships.size(); kk++)
+            {
+                ship* s = sm->ships[kk];
+                delete s;
+            }
+
             fleets.erase(fleets.begin() + i);
 
             delete sm;
