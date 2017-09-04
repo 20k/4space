@@ -758,8 +758,6 @@ struct ship_manager : serialisable
 
     void apply_disengage_penalty();
 
-    void cull_invalid();
-
     std::string get_engage_str();
     std::string get_fuel_message();
 
@@ -813,7 +811,6 @@ struct fleet_manager : serialisable
 
     void destroy(ship_manager*);
 
-    void cull_dead(empire_manager& empire_manage);
     void cull_dead_deferred();
     void destroy_cleanup(empire_manager& empire_manage);
 

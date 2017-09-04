@@ -314,7 +314,6 @@ struct orbital_system : serialisable
     ///currently viewed empire is drawn differently, see
     void draw(sf::RenderWindow& win, empire* viewer_empire);
 
-    void cull_empty_orbital_fleets(empire_manager& empire_manage, popup_info& popup);
     void cull_empty_orbital_fleets_deferred(popup_info& popup);
 
     orbital* get_by_element(void* element);
@@ -395,7 +394,6 @@ struct system_manager : serialisable
 
     void repulse_fleets();
 
-    void cull_empty_orbital_fleets(empire_manager& empire_manage, popup_info& popup);
     void cull_empty_orbital_fleets_deferred(popup_info& popup);
     void destroy_cleanup(empire_manager& empire_manage);
 

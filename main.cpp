@@ -2478,16 +2478,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     popup.remove_scheduled();
 
-    ///need to rework memory management strategy entirely
-    ///orbitals and fleet managers should have a .cleanup
-    ///set to true, and then everything is culled at the end of the frame
-    ///this means we can network its destruction very easily, and do away with all this nonsense
-    ///tomorrows job
-    /*system_manage.cull_empty_orbital_fleets(empires, popup);
-    fleet_manage.cull_dead(empires);
-    system_manage.cull_empty_orbital_fleets(empires, popup);
-    fleet_manage.cull_dead(empires);*/
-
     system_manage.cull_empty_orbital_fleets_deferred(popup);
     fleet_manage.cull_dead_deferred();
 

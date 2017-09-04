@@ -5082,19 +5082,6 @@ void ship_manager::apply_disengage_penalty()
     }
 }
 
-void ship_manager::cull_invalid()
-{
-    for(int i=0; i<ships.size(); i++)
-    {
-        if(ships[i]->cleanup)
-        {
-            ships.erase(ships.begin() + i);
-            i--;
-            continue;
-        }
-    }
-}
-
 bool ship_manager::any_colonising()
 {
     for(ship* s : ships)
@@ -5367,29 +5354,6 @@ void fleet_manager::destroy(ship_manager* ns)
             delete ns;
 
             return;
-        }
-    }
-}
-
-void fleet_manager::cull_dead(empire_manager& empire_manage)
-{
-    for(int i=0; i < fleets.size(); i++)
-    {
-        fleets[i]->cull_invalid();
-
-        if(fleets[i]->ships.size() == 0)
-        {
-            auto m = fleets[i];
-
-            empire_manage.notify_removal(m);
-
-            fleets.erase(fleets.begin() + i);
-
-            delete m;
-
-            i--;
-
-            continue;
         }
     }
 }
