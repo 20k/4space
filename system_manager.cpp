@@ -2585,7 +2585,7 @@ void system_manager::destroy_cleanup(empire_manager& empire_manage)
         {
             orbital* o = sys->orbitals[kk];
 
-            if(o->cleanup)
+            if(o->cleanup || (o->type == orbital_info::FLEET && o->data->cleanup))
             {
                 empire_manage.notify_removal(o);
 
