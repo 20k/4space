@@ -2478,9 +2478,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     popup.remove_scheduled();
 
-    system_manage.cull_empty_orbital_fleets_deferred(popup);
-    fleet_manage.cull_dead_deferred();
-
     ImGui::End();
 }
 
@@ -3725,8 +3722,8 @@ int main()
         ImGui::End();
 
 
-        system_manage.cull_empty_orbital_fleets_deferred(popup);
         fleet_manage.cull_dead_deferred();
+        system_manage.cull_empty_orbital_fleets_deferred(popup);
 
         net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, all_battles);
 
@@ -3777,8 +3774,8 @@ int main()
         net_state.tick();
 
         popup.remove_scheduled();
-        fleet_manage.destroy_cleanup(empire_manage);
         system_manage.destroy_cleanup(empire_manage);
+        fleet_manage.destroy_cleanup(empire_manage);
 
 
         if(key.isKeyPressed(sf::Keyboard::N))
