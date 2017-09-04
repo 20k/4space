@@ -283,6 +283,9 @@ struct fleet_manager;
 
 struct orbital_system : serialisable
 {
+    ///can never be true, is only here because of a bit of a screwup with the networking
+    bool cleanup = false;
+
     vec2f universe_pos = {0,0};
 
     orbital* get_base();

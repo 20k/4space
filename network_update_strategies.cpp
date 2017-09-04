@@ -89,10 +89,25 @@ struct update_strategy
     }
 
     template<typename T>
+    void enforce_cleanups_sent(const std::vector<T*>& to_manage, network_state& net_state, int send_mode, const std::vector<int>& sent)
+    {
+        for(int i=0; i<to_manage.size(); i++)
+        {
+            if((to_manage[i]->cleanup || to_manage[i]->dirty) && sent[i] == 0)
+            {
+                update(to_manage[i], net_state, send_mode);
+            }
+        }
+    }
+
+    template<typename T>
     void do_update_strategy(float dt_s, float time_between_full_updates, const std::vector<T*>& to_manage, network_state& net_state, int send_mode)
     {
         if(to_manage.size() == 0)
             return;
+
+        std::vector<int> updated;
+        updated.resize(to_manage.size());
 
         if(time_elapsed_s > time_between_full_updates)
         {
@@ -101,10 +116,14 @@ struct update_strategy
                 T* t = to_manage[i];
 
                 update(t, net_state, send_mode);
+
+                updated[i] = 1;
             }
 
             time_elapsed_s = 0.;
             num_updated = 0;
+
+            enforce_cleanups_sent(to_manage, net_state, send_mode, updated);
 
             return;
         }
@@ -122,7 +141,11 @@ struct update_strategy
             T* t = to_manage[num_updated];
 
             update(t, net_state, send_mode);
+
+            updated[num_updated] = 1;
         }
+
+        enforce_cleanups_sent(to_manage, net_state, send_mode, updated);
 
         time_elapsed_s += dt_s;
     }
@@ -222,6 +245,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     static update_strategy body_strategy;
     body_strategy.do_update_strategy(dt_s, get_orbital_update_rate(orbital_info::PLANET), bodies, net_state, 0);
 
+    ///the reason why ship cleaning isn't working accross the network is beause its not being sent
+    ///need to force packet sending on cleanup
     static update_strategy ship_strategy;
     ship_strategy.do_update_strategy(dt_s, 1.f, ships, net_state, 0);
 

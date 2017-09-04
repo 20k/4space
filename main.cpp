@@ -3773,6 +3773,14 @@ int main()
         net_state.tick_join_game(diff_s);
         net_state.tick();
 
+        for(ship_manager* sm : fleet_manage.fleets)
+        {
+            if(sm->cleanup)
+            {
+                std::cout << "cleaning\n";
+            }
+        }
+
         popup.remove_scheduled();
         system_manage.destroy_cleanup(empire_manage);
         fleet_manage.destroy_cleanup(empire_manage);
