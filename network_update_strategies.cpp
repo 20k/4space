@@ -175,8 +175,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
         if(!net_state.owns(sm))
             continue;
 
-        //if(sm->dirty)
-        //    continue;
+        if(sm->dirty)
+            continue;
 
         ship_managers.push_back(sm);
 

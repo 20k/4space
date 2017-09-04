@@ -3781,6 +3781,26 @@ int main()
             }
         }
 
+        for(orbital_system* sys : system_manage.systems)
+        {
+            for(orbital* o : sys->orbitals)
+            {
+                if(o->cleanup)
+                {
+                    std::cout << "clean_o\n";
+
+                    if(o->type == orbital_info::FLEET)
+                    {
+                        o->data->cleanup = true;
+
+                        popup.schedule_rem(o);
+                    }
+                }
+            }
+        }
+
+        fleet_manage.shuffle_networked_ships();
+
         popup.remove_scheduled();
         system_manage.destroy_cleanup(empire_manage);
         fleet_manage.destroy_cleanup(empire_manage);

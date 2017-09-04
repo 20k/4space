@@ -4492,6 +4492,7 @@ void ship_manager::steal(ship* const s)
     other->dirty = true;
 
     s->owned_by = this;
+    s->dirty = true;
 
     ships.push_back(s);
 }
@@ -5290,7 +5291,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_harvest_ore, ser);
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
-        s.handle_serialise(cleanup, ser);
+        //s.handle_serialise(cleanup, ser);
     }
 
     if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
@@ -5306,7 +5307,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_harvest_ore, ser);
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
-        s.handle_serialise(cleanup, ser);
+        //s.handle_serialise(cleanup, ser);
 
         ///when we call this fleet manage doesn't exist
         /*if(!handled_by_client)
@@ -5393,7 +5394,9 @@ void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
             {
                 sm->ships.erase(sm->ships.begin() + kk);
 
-                delete s;
+                //serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
+
+                //delete s;
                 kk--;
                 continue;
             }
@@ -5406,12 +5409,16 @@ void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
             for(int kk=0; kk < sm->ships.size(); kk++)
             {
                 ship* s = sm->ships[kk];
-                delete s;
+                //delete s;
+
+                //serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
             }
 
             fleets.erase(fleets.begin() + i);
 
-            delete sm;
+            //serialise_data_helper::host_to_id_to_pointer[sm->host_id][sm->serialise_id] = nullptr;
+
+            //delete sm;
             i--;
             continue;
         }
@@ -5573,4 +5580,22 @@ void fleet_manager::erase_all()
     }
 
     fleets.clear();
+}
+
+void fleet_manager::shuffle_networked_ships()
+{
+    for(ship_manager* sm : fleets)
+    {
+        for(int i=0; i<sm->ships.size(); i++)
+        {
+            ship* s = sm->ships[i];
+
+            if(s->owned_by != sm)
+            {
+                sm->ships.erase(sm->ships.begin() + i);
+                i--;
+                continue;
+            }
+        }
+    }
 }

@@ -1246,7 +1246,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(num_verts, ser);
 
         s.handle_serialise(command_queue, ser);
-        s.handle_serialise(cleanup, ser);
+        //s.handle_serialise(cleanup, ser);
     }
 
     if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
@@ -1300,7 +1300,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(num_verts, ser);
 
         //s.handle_serialise(command_queue, ser);
-        s.handle_serialise(cleanup, ser);
+        //s.handle_serialise(cleanup, ser);
 
         /*if(!handled_by_client)
         {
@@ -2587,11 +2587,18 @@ void system_manager::destroy_cleanup(empire_manager& empire_manage)
 
             if(o->cleanup || (o->type == orbital_info::FLEET && o->data->cleanup))
             {
+                if(o->type == orbital_info::FLEET)
+                {
+                    o->data->cleanup = true;
+                }
+
                 empire_manage.notify_removal(o);
 
                 sys->orbitals.erase(sys->orbitals.begin() + kk);
 
-                delete o;
+                serialise_data_helper::host_to_id_to_pointer[o->host_id][o->serialise_id] = nullptr;
+
+                //delete o;
                 kk--;
                 continue;
             }

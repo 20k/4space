@@ -830,6 +830,8 @@ struct fleet_manager : serialisable
     void do_serialise(serialise& s, bool ser) override;
 
     void erase_all();
+
+    void shuffle_networked_ships();
 };
 
 #endif // SHIP_HPP_INCLUDED
