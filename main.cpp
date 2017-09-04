@@ -3773,7 +3773,7 @@ int main()
         net_state.tick_join_game(diff_s);
         net_state.tick();
 
-        for(ship_manager* sm : fleet_manage.fleets)
+        /*for(ship_manager* sm : fleet_manage.fleets)
         {
             if(sm->cleanup)
             {
@@ -3797,7 +3797,7 @@ int main()
                     }
                 }
             }
-        }
+        }*/
 
         fleet_manage.shuffle_networked_ships();
 

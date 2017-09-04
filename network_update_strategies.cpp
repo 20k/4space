@@ -219,11 +219,6 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
             if(o->type == orbital_info::FLEET)
             {
-                if(o->cleanup)
-                {
-                    std::cout << "sending clean\n";
-                }
-
                 fleets.push_back(o);
                 continue;
             }
