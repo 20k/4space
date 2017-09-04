@@ -145,6 +145,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     std::vector<ship_manager*> ship_managers;
     std::vector<ship*> ships;
 
+    ///the reason why fleet merging doesn't work fully is because there's no longer an orbital
+    ///which exists as it gets cleaned up on player 1
     for(ship_manager* sm : fleet_manage.fleets)
     {
         if(!net_state.owns(sm))

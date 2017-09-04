@@ -689,6 +689,8 @@ struct orbital;
 ///can be used as a fleet
 struct ship_manager : serialisable
 {
+    bool cleanup = false;
+
     ai_fleet ai_controller;
 
     std::vector<ship*> ships;
@@ -812,6 +814,8 @@ struct fleet_manager : serialisable
     void destroy(ship_manager*);
 
     void cull_dead(empire_manager& empire_manage);
+    void cull_dead_deferred();
+    void destroy_cleanup(empire_manager& empire_manage);
 
     void tick_all(float step_s);
 

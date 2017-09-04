@@ -5303,6 +5303,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_harvest_ore, ser);
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
+        s.handle_serialise(cleanup, ser);
     }
 
     if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
@@ -5318,6 +5319,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_harvest_ore, ser);
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
+        s.handle_serialise(cleanup, ser);
 
         ///when we call this fleet manage doesn't exist
         /*if(!handled_by_client)
@@ -5387,6 +5389,60 @@ void fleet_manager::cull_dead(empire_manager& empire_manage)
 
             i--;
 
+            continue;
+        }
+    }
+}
+
+void fleet_manager::cull_dead_deferred()
+{
+    for(ship_manager* sm : fleets)
+    {
+        int num_cleanup = 0;
+
+        for(ship* s : sm->ships)
+        {
+            if(s->cleanup)
+            {
+                num_cleanup++;
+            }
+        }
+
+        if(num_cleanup == sm->ships.size())
+        {
+            sm->cleanup = true;
+        }
+    }
+}
+
+void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
+{
+    for(int i=0; i<fleets.size(); i++)
+    {
+        ship_manager* sm = fleets[i];
+
+        for(int kk=0; kk < sm->ships.size(); kk++)
+        {
+            ship* s = sm->ships[kk];
+
+            if(s->cleanup)
+            {
+                sm->ships.erase(sm->ships.begin() + kk);
+
+                delete s;
+                kk--;
+                continue;
+            }
+        }
+
+        if(sm->cleanup)
+        {
+            empire_manage.notify_removal(sm);
+
+            fleets.erase(fleets.begin() + i);
+
+            delete sm;
+            i--;
             continue;
         }
     }

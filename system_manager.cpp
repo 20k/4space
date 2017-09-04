@@ -1246,6 +1246,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(num_verts, ser);
 
         s.handle_serialise(command_queue, ser);
+        s.handle_serialise(cleanup, ser);
     }
 
     if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
@@ -1299,6 +1300,7 @@ void orbital::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(num_verts, ser);
 
         //s.handle_serialise(command_queue, ser);
+        s.handle_serialise(cleanup, ser);
 
         /*if(!handled_by_client)
         {
@@ -1707,6 +1709,24 @@ void orbital_system::cull_empty_orbital_fleets(empire_manager& empire_manage, po
                 destroy(o);
                 i--;
                 continue;
+            }
+        }
+    }
+}
+
+void orbital_system::cull_empty_orbital_fleets_deferred(popup_info& popup)
+{
+    for(orbital* o : orbitals)
+    {
+        if(o->type == orbital_info::FLEET)
+        {
+            ship_manager* smanage = o->data;
+
+            if(smanage->ships.size() == 0)
+            {
+                o->cleanup = true;
+
+                popup.schedule_rem(o);
             }
         }
     }
@@ -2581,6 +2601,36 @@ void system_manager::cull_empty_orbital_fleets(empire_manager& empire_manage, po
     for(auto& i : systems)
     {
         i->cull_empty_orbital_fleets(empire_manage, popup);
+    }
+}
+
+void system_manager::cull_empty_orbital_fleets_deferred(popup_info& popup)
+{
+    for(auto& i : systems)
+    {
+        i->cull_empty_orbital_fleets_deferred(popup);
+    }
+}
+
+void system_manager::destroy_cleanup(empire_manager& empire_manage)
+{
+    for(orbital_system* sys : systems)
+    {
+        for(int kk=0; kk < sys->orbitals.size(); kk++)
+        {
+            orbital* o = sys->orbitals[kk];
+
+            if(o->cleanup)
+            {
+                empire_manage.notify_removal(o);
+
+                sys->orbitals.erase(sys->orbitals.begin() + kk);
+
+                delete o;
+                kk--;
+                continue;
+            }
+        }
     }
 }
 

@@ -2478,10 +2478,18 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
     popup.remove_scheduled();
 
-    system_manage.cull_empty_orbital_fleets(empires, popup);
+    ///need to rework memory management strategy entirely
+    ///orbitals and fleet managers should have a .cleanup
+    ///set to true, and then everything is culled at the end of the frame
+    ///this means we can network its destruction very easily, and do away with all this nonsense
+    ///tomorrows job
+    /*system_manage.cull_empty_orbital_fleets(empires, popup);
     fleet_manage.cull_dead(empires);
     system_manage.cull_empty_orbital_fleets(empires, popup);
-    fleet_manage.cull_dead(empires);
+    fleet_manage.cull_dead(empires);*/
+
+    system_manage.cull_empty_orbital_fleets_deferred(popup);
+    fleet_manage.cull_dead_deferred();
 
     ImGui::End();
 }
@@ -3286,12 +3294,6 @@ int main()
         //if(system_manage.in_system_view())
             box_selector.tick(system_manage, system_manage.currently_viewed, window, popup, player_empire);
 
-
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
-
         //printf("ui\n");
 
         for(ship_manager* smanage : fleet_manage.fleets)
@@ -3732,6 +3734,10 @@ int main()
 
         ImGui::End();
 
+
+        system_manage.cull_empty_orbital_fleets_deferred(popup);
+        fleet_manage.cull_dead_deferred();
+
         net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, all_battles);
 
         for(auto& unprocessed : serialise_data_helper::type_to_datas)
@@ -3780,11 +3786,9 @@ int main()
         net_state.tick_join_game(diff_s);
         net_state.tick();
 
-
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
+        popup.remove_scheduled();
+        fleet_manage.destroy_cleanup(empire_manage);
+        system_manage.destroy_cleanup(empire_manage);
 
 
         if(key.isKeyPressed(sf::Keyboard::N))
@@ -3805,13 +3809,6 @@ int main()
         //printf("precull\n");
 
         empire_manage.tick_cleanup_colonising();
-
-        ///need to remove any dead items from popup
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
-
 
         if(state != 1)
         {
@@ -3847,15 +3844,6 @@ int main()
 
         all_events.draw_ui();
         all_events.tick(diff_s);
-
-        ///um ok. This is correct if slightly stupid
-        ///we cull empty orbital fleets, then we cull the dead fleet itself
-        ///ships might have been culled in cull_dead, so we then need to cull any fleets with nothing in them
-        ///and then actually remove those ships in the next cull dead
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
-        system_manage.cull_empty_orbital_fleets(empire_manage, popup);
-        fleet_manage.cull_dead(empire_manage);
 
         //printf("Prerender\n");
 
