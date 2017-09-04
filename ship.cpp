@@ -1527,7 +1527,11 @@ float component::get_tech_level_of_element(ship_component_elements::types type)
     //if(!has_element(type))
     //    return -1;
 
-    return components[type].get_tech_level();
+    float val = components[type].get_tech_level();
+
+    //printf("%f val %i\n", val, type);
+
+    return val;
 }
 
 float component::get_tech_level_of_primary()
@@ -1547,10 +1551,16 @@ float component::get_base_component_cost()
 
 float component::get_component_cost()
 {
+    //printf("%i\n", primary_attribute);
+
+    ///so for some reason, primary_attribute not being networked even though we're receiving it successfully
+
     float tech_level = get_tech_level_of_primary();
     float base_cost = get_base_component_cost();
 
     float cost = research_info::get_cost_scaling(tech_level, base_cost) * current_size * ship_size;
+
+    //std::cout << tech_level << " " << base_cost << " " << current_size << " " << ship_size << std::endl;
 
     /*if(tech_level > 0)
     {
@@ -1706,8 +1716,8 @@ void component::do_serialise(serialise& s, bool ser)
         s.handle_serialise(skip_in_derelict_calculations, ser);
         s.handle_serialise(scanning_difficulty, ser);
         s.handle_serialise(clicked, ser);
-        s.handle_serialise(tag_list, ser);
-        s.handle_serialise(components, ser);
+        s.handle_serialise_no_clear(tag_list, ser);
+        s.handle_serialise_no_clear(components, ser);
         s.handle_serialise(name, ser);
         s.handle_serialise(ship_size, ser);
         s.handle_serialise(current_size, ser);
@@ -1717,7 +1727,8 @@ void component::do_serialise(serialise& s, bool ser)
 
     if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
     {
-        s.handle_serialise(components, ser);
+        s.handle_serialise_no_clear(components, ser);
+        s.handle_serialise_no_clear(tag_list, ser);
     }
 }
 
@@ -4256,7 +4267,12 @@ void ship::do_serialise(serialise& s, bool ser)
         s.handle_serialise(highlight, ser);
         s.handle_serialise(has_element, ser);
 
-        s.handle_serialise(entity_list, ser);
+        ///ok so the problem is
+        ///new updates aren't updating the current elements, they're clearing the vector
+        ///and then doing it again
+        ///potential fix: New mode to address this situation
+        ///s.handle_serialise_update
+        s.handle_serialise_no_clear(entity_list, ser);
 
         s.handle_serialise(type_to_component_offsets, ser);
         s.handle_serialise(team, ser);
@@ -4299,7 +4315,7 @@ void ship::do_serialise(serialise& s, bool ser)
         //s.handle_serialise(highlight, ser);
         //s.handle_serialise(has_element, ser);
 
-        //s.handle_serialise(entity_list, ser);
+        s.handle_serialise_no_clear(entity_list, ser);
 
         //s.handle_serialise(type_to_component_offsets, ser);
         //s.handle_serialise(team, ser);

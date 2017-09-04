@@ -372,16 +372,14 @@ struct serialise_helper<std::vector<T>>
         if(length == 0)
             return;
 
-        v.reserve(length);
+        //v.reserve(length);
+        v.resize(length);
 
         for(int i=0; i<length; i++)
         {
             serialise_helper<T> type;
 
-            T t;
-            type.get(t, s);
-
-            v.push_back(std::move(t));
+            type.get(v[i], s);
         }
     }
 };
@@ -459,7 +457,7 @@ struct serialise_helper<std::map<T, U>>
             h1.get(first, s);
             h2.get(second, s);
 
-            v.insert(v.end(), {first, std::move(second)});
+            v[first] = std::move(second);
         }
     }
 };
@@ -503,7 +501,7 @@ struct serialise_helper<std::unordered_map<T, U>>
             h1.get(first, s);
             h2.get(second, s);
 
-            v.insert(v.end(), {first, std::move(second)});
+            v[first] = std::move(second);
         }
     }
 };
@@ -743,12 +741,9 @@ struct serialise : serialise_data
         }
     }
 
-    ///if pointer, look up in pointer map
     template<typename T>
-    void get(T& val, bool force = false)
+    void get_no_clear(T& val, bool force = false)
     {
-        val = T();
-
         if(force)
         {
             serialise_helper_force<T> helper;
@@ -761,6 +756,16 @@ struct serialise : serialise_data
 
             helper.get(val, *this);
         }
+    }
+
+
+    ///if pointer, look up in pointer map
+    template<typename T>
+    void get(T& val, bool force = false)
+    {
+        val = T();
+
+        return get_no_clear<T>(val, force);
     }
 
     template<typename T>
@@ -786,6 +791,19 @@ struct serialise : serialise_data
         else
         {
             get<T>(v);
+        }
+    }
+
+    template<typename T>
+    void handle_serialise_no_clear(T& v, bool ser)
+    {
+        if(ser)
+        {
+            push_back(v);
+        }
+        else
+        {
+            get_no_clear<T>(v);
         }
     }
 
