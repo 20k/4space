@@ -3773,32 +3773,6 @@ int main()
         net_state.tick_join_game(diff_s);
         net_state.tick();
 
-        /*for(ship_manager* sm : fleet_manage.fleets)
-        {
-            if(sm->cleanup)
-            {
-                std::cout << "cleaning\n";
-            }
-        }
-
-        for(orbital_system* sys : system_manage.systems)
-        {
-            for(orbital* o : sys->orbitals)
-            {
-                if(o->cleanup)
-                {
-                    std::cout << "clean_o\n";
-
-                    if(o->type == orbital_info::FLEET)
-                    {
-                        o->data->cleanup = true;
-
-                        popup.schedule_rem(o);
-                    }
-                }
-            }
-        }*/
-
         fleet_manage.shuffle_networked_ships();
 
         popup.remove_scheduled();
