@@ -487,48 +487,6 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
 {
     tick_ai(*this, step_s);
 
-    /*for(auto& i : ships)
-    {
-        for(auto& s : i.second)
-        {
-            s->tick_combat(step_s);
-
-            if(get_nearest_hostile(s) == nullptr)
-                continue;
-
-            std::vector<component> fired = s->fire();
-
-            for(component& kk : fired)
-            {
-                vec2f cpos = s->local_pos;
-
-                projectile* p = projectile_manage.make_new();
-
-                p->local_pos = cpos;
-                p->local_rot = s->local_rot;
-
-                p->dim = {3, 2};
-
-                float roffset = randf_s(-0.025f, 0.025f);
-
-                p->local_rot += roffset;
-
-                p->pteam = s->team;
-
-                p->base = kk;
-
-                float speed = kk.get_tag(component_tag::SPEED);
-
-                p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
-
-                p->load(kk.get_weapon_type());
-
-                p->fired_by = s->owned_by->parent_empire;
-                p->ship_fired_by = s;
-            }
-        }
-    }*/
-
     for(orbital* o : ship_map)
     {
         for(ship* s : o->data->ships)
@@ -596,6 +554,8 @@ void battle_manager::draw(sf::RenderWindow& win)
     }
 
     ///There must be a reason that this is backwards, there's no way I'd do this
+    ///Its because its the opposite order that highlighting is done, highlight does the first found
+    ///so this follows that convention
     for(int i = ((int)linear_vec.size())-1; i >= 0; i--)
     {
         ship* s = linear_vec[i];
@@ -635,87 +595,6 @@ void battle_manager::draw(sf::RenderWindow& win)
     }
 }
 
-/*void battle_manager::add_ship(ship* s)
-{
-    for(auto& i : ships)
-    {
-        for(auto& sh : i.second)
-        {
-            if(s == sh)
-                return;
-        }
-    }
-
-    s->enter_combat();
-
-    int prev_num = ships[s->team].size();
-
-    ships[s->team].push_back(s);
-
-    int slot_num = 0;
-    int num_in_slot = 0;
-    bool found = false;
-
-    for(auto& i : slots_filled)
-    {
-        if(s->owned_by->parent_empire->is_allied(i.first) || s->owned_by->parent_empire == i.first)
-        {
-            num_in_slot = ++i.second;
-
-            found = true;
-
-            break;
-        }
-
-        slot_num++;
-    }
-
-    if(!found)
-    {
-        slots_filled.push_back({s->owned_by->parent_empire, 0});
-
-        slot_num = slots_filled.size() - 1;
-    }
-
-    int num_teams_accommodated = 4;
-
-    vec2f pos;
-
-    if(slot_num == 0)
-    {
-        pos = {500 + num_in_slot * 50, 40};
-    }
-    if(slot_num == 1)
-    {
-        pos = {500 + num_in_slot * 50, 400};
-    }
-
-    if(slot_num == 2)
-    {
-        pos = {800 + num_in_slot * 50, 40};
-    }
-
-    if(slot_num == 3)
-    {
-        pos = {800 + num_in_slot * 50, 400};
-    }
-
-    if(slot_num >= 4)
-    {
-        pos = {500 + num_in_slot * 50 + 300 * (int)(slot_num/2), (slot_num % 2) * 400 + 40};
-    }
-
-    //printf("fpos %f %f\n", pos.x(), pos.y());
-
-    s->local_pos = pos;
-
-    //s->local_pos.x() += prev_num * 50;
-
-    s->dim = {100, 40};
-
-    s->check_load({s->dim.x(), s->dim.y()});
-}*/
-
 vec2f battle_manager::get_avg_centre_global()
 {
     if(ship_map.size() == 0)
@@ -749,6 +628,8 @@ void battle_manager::add_fleet(orbital* o)
 
     ship_manager* sm = o->data;
 
+    int sm_num = 0;
+
     for(ship* s : sm->ships)
     {
         s->enter_combat();
@@ -757,14 +638,23 @@ void battle_manager::add_fleet(orbital* o)
 
         vec2f perp = perpendicular(to_center);
 
+        if(perp.length() <= FLOAT_BOUND)
+        {
+            perp = {1, 0};
+        }
+
+        //printf("%f %f\n", EXPAND_2(perp));
+
         float battle_rad = 400;
 
-        vec2f spos = to_center.norm() * battle_rad + perp.norm() * 50.f;
+        vec2f spos = to_center.norm() * battle_rad + perp.norm() * 50.f * sm_num;
 
         s->local_pos = spos;
         s->dim = {100, 40};
 
         s->check_load({s->dim.x(), s->dim.y()});
+
+        sm_num++;
     }
 }
 
@@ -983,32 +873,6 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
 
 orbital_system* battle_manager::get_system_in(system_manager& system_manage)
 {
-    /*ship_manager* sm = nullptr;
-
-    for(orbital* o : ship_map)
-    {
-        bool should_break = false;
-
-        for(ship* s : o->data->ships)
-        {
-            sm = s->owned_by;
-
-            should_break = true;
-        }
-
-        if(should_break)
-            break;
-    }
-
-    if(sm == nullptr)
-        return nullptr;
-
-    ///sm is any fleet in the battle
-
-    orbital_system* sys = system_manage.get_by_element(sm);
-
-    return sys;*/
-
     if(ship_map.size() == 0)
     {
         return nullptr;
@@ -1022,14 +886,12 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(is_ui_opened, ser);
-        //s.handle_serialise(slots_filled, ser);
         s.handle_serialise(ship_map, ser);
         s.handle_serialise(projectile_manage, ser);
     }
 
     if(serialise_data_helper::send_mode == 0)
     {
-        //s.handle_serialise(slots_filled, ser);
         s.handle_serialise(ship_map, ser);
         s.handle_serialise(projectile_manage, ser);
     }
