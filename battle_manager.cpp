@@ -624,7 +624,8 @@ void battle_manager::add_fleet(orbital* o)
     if(o->type != orbital_info::FLEET)
         return;
 
-    ship_map.push_back(o);
+    if(std::find(ship_map.begin(), ship_map.end(), o) == ship_map.end())
+        ship_map.push_back(o);
 
     ship_manager* sm = o->data;
 
@@ -860,7 +861,7 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
         projectile_manage.projectiles.push_back(i);
     }
 
-    for(orbital* o : ship_map)
+    for(orbital* o : bm->ship_map)
     {
         add_fleet(o);
     }
@@ -872,7 +873,7 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
 
     if(all_battles.viewing(*bm))
     {
-
+        all_battles.current_view.involved_orbitals = bm->ship_map;
     }
 }
 
