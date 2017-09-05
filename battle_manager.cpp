@@ -635,6 +635,8 @@ void battle_manager::add_fleet(orbital* o)
     {
         s->enter_combat();
 
+        ship* nearest = get_nearest_hostile(s);
+
         vec2f to_center = o->absolute_pos - get_avg_centre_global();
 
         vec2f perp = perpendicular(to_center);
@@ -644,11 +646,21 @@ void battle_manager::add_fleet(orbital* o)
             perp = {1, 0};
         }
 
-        //printf("%f %f\n", EXPAND_2(perp));
-
         float battle_rad = 400;
 
         vec2f spos = to_center.norm() * battle_rad + perp.norm() * 50.f * sm_num;
+
+        if(nearest != nullptr)
+        {
+            vec2f nearest_to_me = spos - nearest->local_pos;
+
+            float exclusion_rad = battle_rad/2.f;
+
+            if(nearest_to_me.length() < exclusion_rad)
+            {
+                spos = to_center.norm() * battle_rad * 2 + perp.norm() * 50.f * sm_num;
+            }
+        }
 
         s->local_pos = spos;
         s->dim = {100, 40};
