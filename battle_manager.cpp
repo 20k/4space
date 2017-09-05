@@ -1149,3 +1149,16 @@ void all_battles_manager::erase_all()
 
     battles.clear();
 }
+
+void all_battles_manager::remove_bad_orbitals_from_view()
+{
+    for(int i=0; i<current_view.involved_orbitals.size(); i++)
+    {
+        if(current_view.involved_orbitals[i]->cleanup)
+        {
+            current_view.involved_orbitals.erase(current_view.involved_orbitals.begin() + i);
+            i--;
+            continue;
+        }
+    }
+}

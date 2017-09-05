@@ -195,6 +195,7 @@ struct all_battles_manager : serialisable
 
     void erase_all();
 
+    void remove_bad_orbitals_from_view();
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED
