@@ -103,15 +103,7 @@ struct battle_manager : serialisable
 
     void keep_fleets_together(system_manager& system_manage);
 
-    ///team -> ship
-    //std::map<int, std::vector<ship*>> ships;
-
     std::vector<orbital*> ship_map;
-
-    //std::map<empire*, std::vector<orbital*>> ship_map;
-    //std::vector<std::pair<empire*, int>> slots_filled;
-    //int num_slots = 0;
-
 
     void tick(float step_s, system_manager& system_manage);
 
@@ -159,7 +151,6 @@ struct orbital;
 struct all_battles_manager : serialisable
 {
     std::vector<battle_manager*> battles;
-    //battle_manager* currently_viewing = nullptr;
 
     ///view_data should persist between frames
     ///but should be overwritten with current fleets in battle at the beginning of the next tick
