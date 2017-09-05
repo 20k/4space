@@ -83,16 +83,22 @@ struct battle_manager : serialisable
     void keep_fleets_together(system_manager& system_manage);
 
     ///team -> ship
-    std::map<int, std::vector<ship*>> ships;
+    //std::map<int, std::vector<ship*>> ships;
 
-    std::vector<std::pair<empire*, int>> slots_filled;
+    std::vector<orbital*> ship_map;
+
+    //std::map<empire*, std::vector<orbital*>> ship_map;
+    //std::vector<std::pair<empire*, int>> slots_filled;
     //int num_slots = 0;
+
 
     void tick(float step_s, system_manager& system_manage);
 
     void draw(sf::RenderWindow& win);
 
-    void add_ship(ship* s);
+    vec2f get_avg_centre_global();
+    //void add_ship(ship* s);
+    void add_fleet(orbital* o);
 
     ship* get_nearest_hostile(ship* s);
 

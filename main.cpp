@@ -988,20 +988,17 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
         std::vector<std::string> names;
 
-        for(auto& i : bm->ships)
+        for(orbital* o : bm->ship_map)
         {
-            for(ship* kk : i.second)
+            for(ship* kk : o->data->ships)
             {
-                for(ship* kk : i.second)
-                {
-                    names.push_back(kk->name);
-                }
+                names.push_back(kk->name);
             }
         }
 
-        for(auto& i : bm->ships)
+        for(orbital* o : bm->ship_map)
         {
-            for(ship* kk : i.second)
+            for(ship* kk : o->data->ships)
             {
                 std::string name = format(kk->name, names);
                 std::string team = player_empire->get_single_digit_relations_str(kk->owned_by->parent_empire);
@@ -2690,7 +2687,7 @@ int main()
 
     fleet_manager fleet_manage;
 
-    #define ONLY_PLAYER
+    //#define ONLY_PLAYER
     #ifndef ONLY_PLAYER
 
     empire* hostile_empire = empire_manage.make_new();
