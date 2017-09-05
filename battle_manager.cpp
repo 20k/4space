@@ -935,6 +935,23 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage)
         i->tick(step_s, system_manage);
     }
 
+    bool any = false;
+
+    for(battle_manager* bm : battles)
+    {
+        if(viewing(*bm))
+        {
+            current_view.involved_orbitals = bm->ship_map;
+
+            any = true;
+        }
+    }
+
+    if(!any)
+    {
+        current_view.stop();
+    }
+
     /*if(currently_viewing == nullptr && battles.size() > 0)
     {
         currently_viewing = battles[0];
