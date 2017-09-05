@@ -76,6 +76,27 @@ struct all_battles_manager;
 struct orbital_system;
 struct system_manage;
 
+struct ship_manager;
+
+///So. Battles are shifting to being dynamically discovered rather than fixed objects
+///View data will be used to *find* a battle, rather than a battle being a pointer to a battle
+///object
+///need to integrate into memory management, but should be very straightforward
+struct view_data
+{
+    std::vector<orbital*> involved_orbitals;
+
+    bool any()
+    {
+        return involved_orbitals.size() > 0;
+    }
+
+    void stop()
+    {
+        involved_orbitals.clear();
+    }
+};
+
 struct battle_manager : serialisable
 {
     projectile_manager projectile_manage;
@@ -138,7 +159,12 @@ struct orbital;
 struct all_battles_manager : serialisable
 {
     std::vector<battle_manager*> battles;
-    battle_manager* currently_viewing = nullptr;
+    //battle_manager* currently_viewing = nullptr;
+
+    ///view_data should persist between frames
+    ///but should be overwritten with current fleets in battle at the beginning of the next tick
+    ///ie we iterate, then
+    view_data current_view;
 
     battle_manager* make_new();
 
@@ -148,6 +174,9 @@ struct all_battles_manager : serialisable
 
     void draw_viewing(sf::RenderWindow& win);
     void set_viewing(battle_manager* bm, system_manager& system_manage, bool jump = false);
+    bool viewing(battle_manager& battle);
+
+    battle_manager* get_currently_viewing();
 
     battle_manager* make_new_battle(std::vector<orbital*> t1);
 
@@ -165,6 +194,7 @@ struct all_battles_manager : serialisable
     void do_serialise(serialise& s, bool ser) override;
 
     void erase_all();
+
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

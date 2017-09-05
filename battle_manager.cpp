@@ -865,9 +865,14 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
         add_fleet(o);
     }
 
-    if(all_battles.currently_viewing == bm)
+    /*if(all_battles.currently_viewing == bm)
     {
         all_battles.currently_viewing = this;
+    }*/
+
+    if(all_battles.viewing(*bm))
+    {
+
     }
 }
 
@@ -930,29 +935,68 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage)
         i->tick(step_s, system_manage);
     }
 
-    if(currently_viewing == nullptr && battles.size() > 0)
+    /*if(currently_viewing == nullptr && battles.size() > 0)
     {
         currently_viewing = battles[0];
-    }
+    }*/
+
+    ///build list of battles here
 }
 
 void all_battles_manager::draw_viewing(sf::RenderWindow& win)
 {
-    if(currently_viewing == nullptr)
+    if(!current_view.any())
         return;
 
-    currently_viewing->draw(win);
+    for(battle_manager* bm : battles)
+    {
+        if(viewing(*bm))
+        {
+            bm->draw(win);
+        }
+    }
 }
 
 void all_battles_manager::set_viewing(battle_manager* bm, system_manager& system_manage, bool jump)
 {
-    currently_viewing = bm;
-
     if(bm == nullptr)
         return;
 
+    current_view.involved_orbitals = bm->ship_map;
+
     if(jump)
         bm->set_view(system_manage);
+}
+
+bool all_battles_manager::viewing(battle_manager& battle)
+{
+    ///look through known battles, pick best fit
+    ///for the moment just pick any fit :)
+    for(orbital* obm : battle.ship_map)
+    {
+        for(orbital* mbm : current_view.involved_orbitals)
+        {
+            if(obm == mbm)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+battle_manager* all_battles_manager::get_currently_viewing()
+{
+    for(battle_manager* bm : battles)
+    {
+        if(viewing(*bm))
+        {
+            return bm;
+        }
+    }
+
+    return nullptr;
 }
 
 battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
@@ -1014,8 +1058,13 @@ void all_battles_manager::disengage(battle_manager* bm, empire* disengaging_empi
 
     bm->projectile_manage.destroy_all();
 
-    if(bm == currently_viewing)
-        currently_viewing = nullptr;
+    /*if(bm == currently_viewing)
+        currently_viewing = nullptr;*/
+
+    if(viewing(*bm))
+    {
+        current_view.stop();
+    }
 
     destroy(bm);
 }
@@ -1046,7 +1095,7 @@ void all_battles_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(request_enter_battle_view, ser);
         s.handle_serialise(request_stay_in_battle_system, ser);
         s.handle_serialise(request_stay_id, ser);
-        s.handle_serialise(currently_viewing, ser);
+        s.handle_serialise(current_view.involved_orbitals, ser);
         s.handle_serialise(battles, ser);
     }
 

@@ -1128,7 +1128,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     ImGui::End();
 
     if(in_battle_view)
-        debug_battle(all_battles.currently_viewing, win, lclick, system_manage, player_empire);
+        debug_battle(all_battles.get_currently_viewing(), win, lclick, system_manage, player_empire);
 }
 
 ///mostly working except we cant rebox select if we have something selected
@@ -2180,7 +2180,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         ImGui::NeutralText("(Show Construction Window)");
                 }
 
-                if(ImGui::IsItemClicked_Registered())
+                if(ImGui::IsItemClicked_Registered() && can_construct)
                 {
                     o->construction_ui_open = !o->construction_ui_open;
                 }
@@ -3205,8 +3205,8 @@ int main()
             {
                 ///need way to view any battle
                 //battle->set_view(system_manage);
-                if(all_battles.currently_viewing != nullptr)
-                    all_battles.currently_viewing->set_view(system_manage);
+                if(all_battles.get_currently_viewing() != nullptr)
+                    all_battles.get_currently_viewing()->set_view(system_manage);
 
                 system_manage.set_viewed_system(nullptr);
             }
