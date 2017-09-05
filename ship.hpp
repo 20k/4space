@@ -689,6 +689,7 @@ struct orbital;
 ///can be used as a fleet
 struct ship_manager : serialisable
 {
+    bool requesting_or_in_battle = false;
     bool cleanup = false;
 
     ai_fleet ai_controller;

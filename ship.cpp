@@ -5308,6 +5308,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
         //s.handle_serialise(cleanup, ser);
+        s.handle_serialise(requesting_or_in_battle, ser);
     }
 
     if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
@@ -5324,6 +5325,7 @@ void ship_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(auto_resupply, ser);
         s.handle_serialise(ships, ser);
         //s.handle_serialise(cleanup, ser);
+        s.handle_serialise(requesting_or_in_battle, ser);
 
         ///when we call this fleet manage doesn't exist
         /*if(!handled_by_client)
