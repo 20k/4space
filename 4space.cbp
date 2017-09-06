@@ -38,8 +38,10 @@
 				<Option compiler="mingw64new" />
 				<Compiler>
 					<Add option="-pg" />
+					<Add option="-O1" />
 				</Compiler>
 				<Linker>
+					<Add option="-pg -lgmon" />
 					<Add option="-pg" />
 				</Linker>
 			</Target>

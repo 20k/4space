@@ -50,7 +50,7 @@ struct network_object
 };
 
 using packet_id_type = uint32_t;
-using sequence_data_type = uint32_t;
+using sequence_data_type = int32_t;
 
 ///update so that when processed, we keep around for 10 seconds or so then delete
 ///when we cleanup processed data, should we tie this to cleaning up incomplete packets?
@@ -140,7 +140,10 @@ struct network_state
             return;
 
         if(!sock.valid())
+        {
             sock = udp_connect("127.0.0.1", GAMESERVER_PORT);
+            sock_set_non_blocking(sock, 1);
+        }
 
         timeout += dt_s;
 
@@ -212,6 +215,13 @@ struct network_state
         serialise_data_type serialise_id;
     };
 
+    struct packet_ack
+    {
+        serialise_owner_type owner_id = 0;
+        sequence_data_type sequence_id = 0;
+        packet_id_type packet_id = 0;
+    };
+
     struct request_timeout_info
     {
         bool ever = false;
@@ -242,83 +252,142 @@ struct network_state
         //std::cout << "request\n";
     }
 
+    void make_packet_ack(packet_ack& ack)
+    {
+        byte_vector vec;
+        vec.push_back(canary_start);
+        vec.push_back(message::PACKET_ACK);
+        vec.push_back<int32_t>(sizeof(ack));
+        vec.push_back(ack);
+        vec.push_back(canary_end);
+
+        while(!sock_writable(sock)) {}
+
+        udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
+    }
+
     std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>>> owner_to_request_timeouts;
+
+    std::map<serialise_owner_type, std::map<packet_id_type, sequence_data_type>> current_packet_fragment;
+
+    std::minstd_rand random_gen;
 
     void request_incomplete_packets(int max_fragments_to_request)
     {
-        int fragments_requested = 0;
+        //std::vector<packet_request> requests;
 
-        std::vector<packet_request> requests;
+        std::map<packet_id_type, std::vector<packet_request>> requests;
 
         for(auto& owners : incomplete_packets)
         {
             serialise_owner_type owner_id = owners.first;
 
-            /*for(auto& serialise_ids : owners.second)
+            for(auto& packet_ids : owners.second)
             {
-                serialise_data_type serialise_id = serialise_ids.first;*/
+                packet_id_type packet_id = packet_ids.first;
 
+                sequence_data_type& current_packet_sequence = current_packet_fragment[owner_id][packet_id];
 
-                for(auto& packet_ids : owners.second)
+                std::vector<packet_info>& packets = packet_ids.second;
+
+                if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
+                    continue;
+
+                int total_requests = 0;
+
+                std::sort(packets.begin(), packets.end(), [](auto& p1, auto& p2){return p1.sequence_number < p2.sequence_number;});
+
+                if(packets.size() > 0 && packets[0].sequence_number != 0)
                 {
-                    packet_id_type packet_id = packet_ids.first;
+                    requests[packet_id].push_back({owner_id, 0, packet_id});
 
-                    std::vector<packet_info>& packets = packet_ids.second;
+                    total_requests++;
+                }
 
-                    //if(packets.size() == 0)
-                    //    continue;
+                /*sequence_data_type sequence_id = -1;
 
-                    if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
-                        continue;
+                for(int i=1; i<packets.size(); i++)
+                {
+                    packet_info& last = packets[i-1];
+                    packet_info& cur = packets[i];
 
-                    std::sort(packets.begin(), packets.end(), [](auto& p1, auto& p2){return p1.sequence_number < p2.sequence_number;});
-
-                    if(packets.size() > 0 && packets[0].sequence_number != 0)
+                    if(cur.sequence_number - 1 != last.sequence_number)
                     {
-                        requests.push_back({owner_id, 0, packet_id});
+                        requests.push_back({owner_id, cur.sequence_number - 1, packet_id});
                     }
 
-                    sequence_data_type sequence_id = -1;
+                    sequence_id = cur.sequence_number;
+                }
 
-                    for(int i=1; i<packets.size(); i++)
+                if(packets.size() == 1)
+                {
+                    sequence_id = packets[0].sequence_number;
+                }
+
+                sequence_id++;
+
+                for(; sequence_id < owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; sequence_id++)
+                {
+                    requests.push_back({owner_id, sequence_id, packet_id});
+                }*/
+
+                for(int i=current_packet_sequence; i < ((int)packets.size()) - 1; i++)
+                {
+                    if(packets[i].sequence_number + 1 == packets[i + 1].sequence_number)
                     {
-                        packet_info& last = packets[i-1];
-                        packet_info& cur = packets[i];
-
-                        if(cur.sequence_number - 1 != last.sequence_number)
-                        {
-                            requests.push_back({owner_id, cur.sequence_number - 1, packet_id});
-                        }
-
-                        sequence_id = cur.sequence_number;
-                    }
-
-                    if(packets.size() == 1)
-                    {
-                        sequence_id = packets[0].sequence_number;
-                    }
-
-                    sequence_id++;
-
-                    for(; sequence_id < owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; sequence_id++)
-                    {
-                        requests.push_back({owner_id, sequence_id, packet_id});
+                        current_packet_sequence++;
+                        break;
                     }
                 }
-            //}
+
+                sequence_data_type sequence_id = -1;
+
+                for(int i=current_packet_sequence; i<((int)packets.size()) - 1; i++)
+                {
+                    packet_info& last = packets[i];
+                    packet_info& cur = packets[i + 1];
+
+                    if(cur.sequence_number != last.sequence_number + 1)
+                    {
+                        requests[packet_id].push_back({owner_id, last.sequence_number + 1, packet_id});
+                        total_requests++;
+                    }
+
+                    sequence_id = cur.sequence_number;
+                }
+
+                if(packets.size() == 1)
+                {
+                    sequence_id = packets[0].sequence_number;
+                }
+
+                sequence_id++;
+
+                for(; sequence_id < owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; sequence_id++)
+                {
+                    total_requests++;
+                    requests[packet_id].push_back({owner_id, sequence_id, packet_id});
+                }
+
+                //printf("num requests %i\n", total_requests);
+            }
         }
 
         float request_timeout_s = 0.4f;
 
-        for(int i=0; i<requests.size(); i++)
+        //for(int i=0; i<requests.size(); i++)
+        for(auto& id : requests)
         {
-            request_timeout_info& inf = owner_to_request_timeouts[requests[i].owner_id][requests[i].packet_id][requests[i].sequence_id];
-
-            if(inf.clk.getElapsedTime().asMilliseconds() / 1000.f < request_timeout_s)
+            for(int i=0; i<id.second.size(); i++)
             {
-                requests.erase(requests.begin() + i);
-                i--;
-                continue;
+                request_timeout_info& inf = owner_to_request_timeouts[id.second[i].owner_id][id.second[i].packet_id][id.second[i].sequence_id];
+
+                if(inf.clk.getElapsedTime().asMilliseconds() / 1000.f < request_timeout_s)
+                {
+                    id.second.erase(id.second.begin() + i);
+                    i--;
+                    continue;
+                }
             }
         }
 
@@ -327,20 +396,48 @@ struct network_state
         if(num < 0)
             num = 0;
 
-        if(requests.size() > num)
+        /*if(requests.size() > num)
         {
             requests.resize(num);
+        }*/
+
+        //for(auto& req : requests)
+
+        if(requests.size() == 0)
+            return;
+
+        {
+            auto req = requests.begin();
+
+            if(req->second.size() > max_fragments_to_request)
+            {
+                req->second.resize(max_fragments_to_request);
+            }
+
+            for(packet_request& i : req->second)
+            {
+                i.serialise_id = owner_to_packet_id_to_serialise[i.owner_id][i.packet_id];
+
+                make_packet_request(i);
+
+                //std::cout << "req " << i.sequence_id << std::endl;
+
+                owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].clk.restart();
+                owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].ever = true;
+            }
         }
 
-        for(packet_request& i : requests)
+        /*for(packet_request& i : requests)
         {
             i.serialise_id = owner_to_packet_id_to_serialise[i.owner_id][i.packet_id];
 
             make_packet_request(i);
 
+            //std::cout << "req " << i.sequence_id << std::endl;
+
             owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].clk.restart();
             owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].ever = true;
-        }
+        }*/
     }
 
     ///hmm
@@ -352,9 +449,11 @@ struct network_state
         return true;
     }*/
 
+    ///the only reason to defer this is in case we receive duplicates
     void cleanup_available_data_and_incomplete_packets()
     {
         float cleanup_time_s = 4.f;
+        float hard_cleanup_time = 1.f;
 
         for(int i=0; i<available_data.size(); i++)
         {
@@ -370,11 +469,19 @@ struct network_state
 
                 available_data[i].should_cleanup = true;
             }
+
+            if(!data.processed && data.clk.getElapsedTime().asMilliseconds() / 1000.f > hard_cleanup_time)
+            {
+                network_object& net_obj = data.object;
+
+                packet_id_type packet_id = data.packet_id;
+
+                incomplete_packets[net_obj.owner_id].erase(packet_id);
+            }
         }
     }
 
     std::map<serialise_owner_type, std::deque<forward_packet>> forward_ordered_packets;
-    std::map<serialise_owner_type, packet_id_type> last_popped_id;
 
     //std::map<serialise_owner_type, packet_id_type> already_have;
 
@@ -388,6 +495,13 @@ struct network_state
         available_data.push_back({packet.no, s, packet.header.packet_id});
 
         //forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
+
+        packet_ack ack;
+        ack.owner_id = packet.no.owner_id;
+        ack.packet_id = packet.header.packet_id;
+        ack.sequence_id = packet.header.sequence_number;
+
+        make_packet_ack(ack);
     }
 
     struct wait_info
@@ -412,6 +526,10 @@ struct network_state
     ///needs to be a general "after 10 seconds or so clean these up as those packets aren't comin"
     std::map<serialise_owner_type, std::map<packet_id_type, bool>> received_packet;
     std::map<serialise_owner_type, packet_id_type> last_received_packet;
+
+    //std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type>>> last_confirmed_packets;
+
+    std::map<serialise_owner_type, packet_id_type> last_unconfirmed_packet;
 
     void make_packets_available()
     {
@@ -515,6 +633,16 @@ struct network_state
         }
     }
 
+    std::map<serialise_owner_type, sf::Clock> disconnection_timer;
+
+    bool disconnected(const serialise_owner_type& type)
+    {
+        if(disconnection_timer[type].getElapsedTime().asSeconds() > 10)
+            return true;
+
+        return false;
+    }
+
     ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
     ///I think the reason the data transfer is slow is because the framerate is bad
     ///if we threaded it i think the data transfer would go v high
@@ -563,6 +691,22 @@ struct network_state
 
                 int32_t type = fetch.get<int32_t>();
 
+                if(type == message::PACKET_ACK)
+                {
+                    int32_t len = fetch.get<int32_t>();
+
+                    packet_ack ack = fetch.get<packet_ack>();
+
+                    disconnection_timer[ack.owner_id].restart();
+
+                    fetch.get<decltype(canary_end)>();
+
+                    if(ack.packet_id > last_unconfirmed_packet[ack.owner_id])
+                    {
+                        last_unconfirmed_packet[ack.owner_id] = ack.packet_id;
+                    }
+                }
+
                 if(type == message::REQUEST)
                 {
                     int32_t len = fetch.get<int32_t>();
@@ -574,6 +718,8 @@ struct network_state
                     network_object no;
                     no.owner_id = request.owner_id;
                     no.serialise_id = request.serialise_id;
+
+                    disconnection_timer[no.owner_id].restart();
 
                     //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
 
@@ -608,6 +754,8 @@ struct network_state
 
                     owner_to_packet_id_to_serialise[no.owner_id][header.packet_id] = no.serialise_id;
 
+                    disconnection_timer[no.owner_id].restart();
+
                     if(packet_fragments > 1)
                     {
                         owner_to_packet_sequence_to_expected_size[no.owner_id][header.packet_id] = packet_fragments;
@@ -620,7 +768,10 @@ struct network_state
 
                         //if((header.sequence_number % 100) == 0)
                         if(header.sequence_number > 400 && (header.sequence_number % 100) == 0)
+                        {
                             std::cout << header.sequence_number << " ";
+                            std::cout << " " << packets.size() << std::endl;
+                        }
 
                         next.data.data = packet.fetch.ptr;
 
@@ -817,9 +968,25 @@ struct network_state
     ///change owns() to respect this. It should be a fairly transparent change
     void forward_data(const network_object& no, serialise& s)
     {
-        int max_to_send = 10;
+        int max_to_send = 5;
 
         int fragments = get_packet_fragments(s.data.size());
+
+        bool should_slowdown = false;
+
+        for(auto& i : last_unconfirmed_packet)
+        {
+            if(disconnected(i.first))
+                continue;
+
+            if(i.second < (int)packet_id - 20)
+                should_slowdown = true;
+        }
+
+        //std::cout << should_slowdown << std::endl;
+
+        if(should_slowdown)
+            max_to_send = 1;
 
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
