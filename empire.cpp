@@ -160,14 +160,14 @@ void empire::generate_resource_from_owned(float step_s)
 
     for(int kk=0; kk<backup_income_list.size() && dt_accum < max_time_s; kk++)
     {
-        resource_manager& res_manage = backup_income_list[backup_income_list.size() - 1 - kk];
+        resource_manager& res_manage = backup_income_list[(int)backup_income_list.size() - 1 - kk];
 
         for(int i=0; i<res_manage.resources.size(); i++)
         {
             last_income.resources[i].amount += res_manage.resources[i].amount;
         }
 
-        dt_accum += backup_dt_s[backup_dt_s.size() - 1 - kk];
+        dt_accum += backup_dt_s[(int)backup_dt_s.size() - 1 - kk];
     }
 
     if(dt_accum > FLOAT_BOUND)

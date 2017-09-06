@@ -38,6 +38,27 @@ struct serialise_data
     int internal_counter = 0;
 };
 
+struct serialisable;
+
+struct unhandled_types
+{
+    std::string type_name;
+    std::vector<serialisable*> data;
+};
+
+struct serialise_data_helper
+{
+    ///0 = don't follow references unless dirty, 1 = follow (and serialise) references
+    static int32_t ref_mode;
+
+    ///0 = partial update, 1 = full
+    static int32_t send_mode;
+
+    static std::map<serialise_host_type, std::map<serialise_data_type, serialisable*>> host_to_id_to_pointer;
+
+    static std::map<size_t, unhandled_types> type_to_datas;
+};
+
 struct serialisable
 {
     static serialise_data_type gserialise_id;
@@ -67,26 +88,7 @@ struct serialisable
 
     }
 
-    virtual ~serialisable() {}
-};
-
-struct unhandled_types
-{
-    std::string type_name;
-    std::vector<serialisable*> data;
-};
-
-struct serialise_data_helper
-{
-    ///0 = don't follow references unless dirty, 1 = follow (and serialise) references
-    static int32_t ref_mode;
-
-    ///0 = partial update, 1 = full
-    static int32_t send_mode;
-
-    static std::map<serialise_host_type, std::map<serialise_data_type, serialisable*>> host_to_id_to_pointer;
-
-    static std::map<size_t, unhandled_types> type_to_datas;
+    virtual ~serialisable() {serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id] = nullptr;}
 };
 
 struct serialise;
