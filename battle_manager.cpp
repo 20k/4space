@@ -864,6 +864,9 @@ bool battle_manager::any_in_empire_involved(empire* e)
 
 void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles)
 {
+    if(bm == this)
+        return;
+
     for(auto& i : bm->projectile_manage.projectiles)
     {
         projectile_manage.projectiles.insert(i);
@@ -1102,28 +1105,78 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
     ///find the last battle with this ship in, merge it destructively into the current battle
     ///if it exists, including projectiles
     ///otherwise simply add the fleets regularly to a new battle
+
+    new_battles.resize(found_fights.size());
+
+    int fight_id = 0;
+
     for(auto& i : found_fights)
     {
-        new_battles.push_back(new battle_manager);
+        for(auto& found : i)
+        {
+            battle_manager* last = get_battle_involving(found->data);
 
+            if(last != nullptr)
+            {
+                new_battles[fight_id] = last;
+                break;
+            }
+        }
+
+        fight_id++;
+    }
+
+    for(auto& i : new_battles)
+    {
+        if(i == nullptr)
+        {
+            i = new battle_manager;
+        }
+    }
+
+    fight_id = 0;
+
+    for(auto& i : found_fights)
+    {
         for(auto& found : i)
         {
             battle_manager* last = get_battle_involving(found->data);
 
             if(last == nullptr)
             {
-                new_battles.back()->add_fleet(found);
+                new_battles[fight_id]->add_fleet(found);
                 continue;
             }
 
-            new_battles.back()->destructive_merge_into_me(last, *this);
+            new_battles[fight_id]->destructive_merge_into_me(last, *this);
         }
+
+        fight_id++;
     }
 
     for(auto& i : battles)
     {
-        delete i;
+        bool found = false;
+
+        for(auto& kk : new_battles)
+        {
+            if(kk == i)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(!found)
+        {
+            delete i;
+        }
     }
+
+    /*for(auto& i : battles)
+    {
+        delete i;
+    }*/
 
     battles.clear();
 

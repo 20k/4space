@@ -154,6 +154,7 @@ struct orbital;
 struct all_battles_manager : serialisable
 {
     std::vector<battle_manager*> battles;
+    std::vector<projectile_manager*> projectiles;
 
     ///view_data should persist between frames
     ///but should be overwritten with current fleets in battle at the beginning of the next tick
