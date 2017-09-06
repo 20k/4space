@@ -3784,6 +3784,17 @@ int main()
                     obj->handled_by_client = true;
                 }
             }
+            else if(typeid(projectile*).hash_code() == type)
+            {
+                for(serialisable* obj : objects.data)
+                {
+                    projectile* proj = (projectile*)obj;
+
+                    proj->owned_by->projectile_manage.projectiles.insert(proj);
+
+                    obj->handled_by_client = true;
+                }
+            }
             else
             {
                 std::cout << "Warning unhandled type " << objects.type_name << std::endl;
