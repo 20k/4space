@@ -133,7 +133,7 @@ struct battle_manager : serialisable
     bool can_end_battle_peacefully(empire* leaving_empire);
     void end_battle_peacefully(); ///don't call on its own
 
-
+    bool shares_any_fleets_with(battle_manager* bm);
     bool any_in_fleet_involved(ship_manager* sm);
     bool any_in_empire_involved(empire* e);
 
@@ -171,6 +171,7 @@ struct all_battles_manager : serialisable
 
     void tick_find_battles(system_manager& system_manage);
     void tick(float step_s, system_manager& system_manage);
+    void merge_battles_together();
 
     void draw_viewing(sf::RenderWindow& win);
     void set_viewing(battle_manager* bm, system_manager& system_manage, bool jump = false);

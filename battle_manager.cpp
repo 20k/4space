@@ -844,6 +844,20 @@ void battle_manager::end_battle_peacefully()
     do_disengage(nullptr);
 }
 
+bool battle_manager::shares_any_fleets_with(battle_manager* bm)
+{
+    for(orbital* o : ship_map)
+    {
+        for(orbital* no : bm->ship_map)
+        {
+            if(o == no)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 bool battle_manager::any_in_fleet_involved(ship_manager* sm)
 {
     for(orbital* o : ship_map)
@@ -1202,9 +1216,78 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
 }
 #endif
 
+void all_battles_manager::merge_battles_together()
+{
+    for(battle_manager* bm : battles)
+    {
+        for(battle_manager* bo : battles)
+        {
+            if(bm == bo)
+                continue;
+
+            if(!bm->shares_any_fleets_with(bo))
+                continue;
+
+            ///playing offline, who cares
+            if(bo->host_id == bm->host_id && bo->serialise_id == bm->serialise_id)
+            {
+                bm->destructive_merge_into_me(bo, *this);
+                bo->cleanup = true;
+                continue;
+            }
+
+            if(bo->host_id == bm->host_id && bo->serialise_id != bm->serialise_id)
+            {
+                if(bo->serialise_id < bm->serialise_id)
+                {
+                    bo->destructive_merge_into_me(bm, *this);
+                    bm->cleanup = true;
+                }
+                else
+                {
+                    bm->destructive_merge_into_me(bo, *this);
+                    bo->cleanup = true;
+                }
+
+                continue;
+            }
+
+            if(bo->host_id != bm->host_id)
+            {
+                if(bo->host_id < bm->host_id)
+                {
+                    bo->destructive_merge_into_me(bm, *this);
+                    bm->cleanup = true;
+                }
+                else
+                {
+                    bm->destructive_merge_into_me(bo, *this);
+                    bo->cleanup = true;
+                }
+
+                continue;
+            }
+        }
+    }
+
+    for(auto it = battles.begin(); it != battles.end();)
+    {
+        if((*it)->cleanup)
+        {
+            it = battles.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+}
+
 void all_battles_manager::tick(float step_s, system_manager& system_manage)
 {
     //tick_find_battles(system_manage);
+
+    merge_battles_together();
 
     for(auto& i : battles)
     {
