@@ -233,6 +233,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     //if(fleets.size() > 0)
     //    std::cout << fleets.size() << std::endl;
 
+    ///have a super high frequency update for literally just absolute positions for orbitals
     static update_strategy orbital_strategy;
     orbital_strategy.do_update_strategy(dt_s, get_orbital_update_rate(orbital_info::FLEET), fleets, net_state, 0);
 
