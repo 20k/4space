@@ -177,6 +177,7 @@ struct all_battles_manager : serialisable
 
     battle_manager* get_battle_involving(ship_manager* ship_manage);
 
+    ///this is invalid now
     int request_stay_id = -1;
     bool request_stay_in_battle_system = false;
     bool request_enter_battle_view = false;
@@ -186,7 +187,7 @@ struct all_battles_manager : serialisable
 
     void erase_all();
 
-    void remove_bad_orbitals_from_view();
+    void remove_bad_orbitals();
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED

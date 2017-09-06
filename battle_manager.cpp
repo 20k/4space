@@ -654,7 +654,7 @@ void battle_manager::add_fleet(orbital* o)
         {
             vec2f nearest_to_me = spos - nearest->local_pos;
 
-            float exclusion_rad = battle_rad/2.f;
+            float exclusion_rad = battle_rad/1.3f;
 
             if(nearest_to_me.length() < exclusion_rad)
             {
@@ -1150,7 +1150,7 @@ void all_battles_manager::erase_all()
     battles.clear();
 }
 
-void all_battles_manager::remove_bad_orbitals_from_view()
+void all_battles_manager::remove_bad_orbitals()
 {
     for(int i=0; i<current_view.involved_orbitals.size(); i++)
     {
@@ -1159,6 +1159,19 @@ void all_battles_manager::remove_bad_orbitals_from_view()
             current_view.involved_orbitals.erase(current_view.involved_orbitals.begin() + i);
             i--;
             continue;
+        }
+    }
+
+    for(battle_manager* bm : battles)
+    {
+        for(int i=0; i<bm->ship_map.size(); i++)
+        {
+            if(bm->ship_map[i]->cleanup)
+            {
+                bm->ship_map.erase(bm->ship_map.begin() + i);
+                i--;
+                continue;
+            }
         }
     }
 }
