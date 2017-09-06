@@ -59,8 +59,8 @@ namespace sf
 struct projectile_manager : serialisable
 {
     ///if we use a set for this the networking becomes the easiest thing in the known universe
-    ///maybe i should create an ordered vector type for networking
-    std::vector<projectile*> projectiles;
+    ///maybe i should create an ordered vector type for networking (or find a flat set)
+    std::set<projectile*> projectiles;
 
     projectile* make_new();
 
@@ -99,6 +99,7 @@ struct view_data
     }
 };
 
+///no need to serialise this now
 struct battle_manager : serialisable
 {
     projectile_manager projectile_manage;

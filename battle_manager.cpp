@@ -185,7 +185,7 @@ projectile* projectile_manager::make_new()
 {
     projectile* p = new projectile;
 
-    projectiles.push_back(p);
+    projectiles.insert(p);
 
     p->make_dirty();
 
@@ -227,46 +227,17 @@ bool projectile_within_ship(projectile* p, ship* s)
 void projectile_manager::tick(battle_manager& manage, float step_s, system_manager& system_manage)
 {
     //for(auto& i : projectiles)
-    for(int kk=0; kk < projectiles.size(); kk++)
+    //for(int kk=0; kk < projectiles.size(); kk++)
+    for(auto it = projectiles.begin(); it != projectiles.end();)
     {
-        projectile* p = projectiles[kk];
+        projectile* p = *it;
 
         p->local_pos = p->local_pos + p->velocity * step_s;
 
-        /*for(auto& i : manage.ships)
-        {
-            bool term = false;
-
-            std::vector<ship*>& slist = i.second;
-
-            for(ship* found_ship : slist)
-            {
-                if(projectile_within_ship(p, found_ship))
-                {
-                    auto fully_merged = found_ship->get_fully_merged(1.f);
-
-                    bool hp_condition = fully_merged[ship_component_element::HP].cur_amount < 1.f && fully_merged[ship_component_element::HP].max_amount > 1.f;
-
-                    if(hp_condition)
-                        continue;
-
-                    found_ship->hit(p, system_manage);
-
-                    destroy(p);
-                    kk--;
-                    term = true;
-                    break;
-                }
-            }
-
-            if(term)
-                break;
-        }*/
+        bool term = false;
 
         for(orbital* o : manage.ship_map)
         {
-            bool term = false;
-
             for(ship* found_ship : o->data->ships)
             {
                 if(projectile_within_ship(p, found_ship))
@@ -281,8 +252,8 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                     found_ship->hit(p, system_manage);
 
                     ///problematic for network, defer calls
-                    destroy(p);
-                    kk--;
+                    //destroy(p);
+                    //kk--;
                     term = true;
                     break;
                 }
@@ -291,12 +262,21 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
             if(term)
                 break;
         }
+
+        if(term)
+        {
+            it = projectiles.erase(it);
+        }
+        else
+        {
+            it++;
+        }
     }
 }
 
 void projectile_manager::destroy(projectile* proj)
 {
-    for(int i=0; i<(int)projectiles.size(); i++)
+    /*for(int i=0; i<(int)projectiles.size(); i++)
     {
         if(projectiles[i] == proj)
         {
@@ -306,6 +286,16 @@ void projectile_manager::destroy(projectile* proj)
             delete proj;
 
             continue;
+        }
+    }*/
+
+    for(auto it = projectiles.begin(); it != projectiles.end(); it++)
+    {
+        if((*it) == proj)
+        {
+            projectiles.erase(it);
+            delete proj;
+            return;
         }
     }
 }
@@ -384,12 +374,12 @@ void projectile_manager::do_serialise(serialise& s, bool ser)
 {
     if(serialise_data_helper::send_mode == 1)
     {
-        s.handle_serialise(projectiles, ser);
+        s.handle_serialise_no_clear(projectiles, ser);
     }
 
     if(serialise_data_helper::send_mode == 0)
     {
-        s.handle_serialise(projectiles, ser);
+        s.handle_serialise_no_clear(projectiles, ser);
     }
 }
 
@@ -876,19 +866,7 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
 {
     for(auto& i : bm->projectile_manage.projectiles)
     {
-        bool found = false;
-
-        for(auto& kk : projectile_manage.projectiles)
-        {
-            if(kk == i)
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if(!found)
-            projectile_manage.projectiles.push_back(i);
+        projectile_manage.projectiles.insert(i);
     }
 
     /*for(orbital* o : bm->ship_map)
