@@ -59,6 +59,7 @@ namespace orbital_info
     };
 
     static float decolonise_time_s = 60.f;
+    static float engagement_radius = 40.f;
 }
 
 struct empire;
@@ -120,6 +121,9 @@ struct position_history_element
 
 struct orbital : serialisable
 {
+    std::vector<orbital*> in_combat_with;
+    std::vector<orbital*> last_in_combat_with;
+
     bool cleanup = false;
 
     std::deque<position_history_element> multiplayer_position_history;

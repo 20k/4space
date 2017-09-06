@@ -686,9 +686,14 @@ struct ship : positional, serialisable
 struct orbital_system;
 struct orbital;
 
+struct battle_manager;
+
 ///can be used as a fleet
 struct ship_manager : serialisable
 {
+    //int32_t this_fight_id = -1;
+    //int32_t last_fight_id = -1;
+
     bool requesting_or_in_battle = false;
     bool cleanup = false;
 

@@ -915,7 +915,7 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     }
 }
 
-battle_manager* all_battles_manager::make_new()
+/*battle_manager* all_battles_manager::make_new()
 {
     battle_manager* bm = new battle_manager;
 
@@ -924,7 +924,7 @@ battle_manager* all_battles_manager::make_new()
     bm->make_dirty();
 
     return bm;
-}
+}*/
 
 void all_battles_manager::destroy(battle_manager* bm)
 {
@@ -941,8 +941,164 @@ void all_battles_manager::destroy(battle_manager* bm)
     }
 }
 
+///a battles projectiles will always be valid, even if the orbitals that belong to it arent
+///so we can quite happily save the absolute pos of a battle, then integrate the projectiles
+///of two battles together, as long as we know which two we're integrating
+void all_battles_manager::tick_find_battles(system_manager& system_manage)
+{
+    int32_t temporary_fight_id = 0;
+
+    for(orbital_system* sys : system_manage.systems)
+    {
+        std::vector<orbital*> requesting_fight;
+
+        for(orbital* o : sys->orbitals)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            if(o->data->requesting_or_in_battle)
+            {
+                requesting_fight.push_back(o);
+            }
+        }
+
+        if(requesting_fight.size() > 0)
+        {
+            std::cout << "hello\n";
+        }
+
+        for(orbital* o1 : requesting_fight)
+        {
+            ///stash across frames
+            o1->last_in_combat_with = std::move(o1->in_combat_with);
+        }
+
+        //for(orbital* convergence_term : requesting_fight)
+        {
+            for(orbital* o1 : requesting_fight)
+            {
+                for(orbital* o2 : sys->orbitals)
+                {
+                    if(o1 == o2)
+                        continue;
+
+                    if(o2->type != orbital_info::FLEET)
+                        continue;
+
+                    if(o1->parent_system->can_engage(o1, o2))
+                    {
+                        o1->in_combat_with.push_back(o2);
+
+                        printf("hi\n");
+
+                        /*if(o1->this_fight_id == -1)
+                            o1->this_fight_id = o2->this_fight_id;
+
+                        if(o2->this_fight_id == -1)
+                            o2->this_fight_id = o1->this_fight_id;
+
+                        ///std::min here needs to propagate.. horribly n^3 solution
+                        if(o1->this_fight_id != -1 && o2->this_fight_id != -1)
+                        {
+                            auto minimum = std::min(o1->this_fight_id, o2->this_fight_id);
+
+                            o1->this_fight_id = minimum;
+                            o2->this_fight_id = minimum;
+                        }
+
+                        if(o1->this_fight_id == -1 && o2->this_fight_id == -1)
+                        {
+                            o1->this_fight_id = temporary_fight_id++;
+                            o2->this_fight_id = o1->this_fight_id;
+                        }*/
+                    }
+                }
+            }
+        }
+    }
+
+    /*std::map<int32_t, bool> has_real_id;
+    std::map<int32_t, int32_t> id_map;
+    int32_t fight_id = 0;
+
+    std::vector<battle_manager*> new_battles;
+
+    for(orbital_system* sys : system_manage.systems)
+    {
+        std::vector<orbital*> requesting_fight;
+
+        for(orbital* o : sys->orbitals)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            if(o->data->requesting_or_in_battle)
+            {
+                if(!has_real_id[o->data->this_fight_id])
+                {
+                    id_map[o->data->this_fight_id] = fight_id++;
+
+                    new_battles.push_back(new battle_manager);
+
+                    battle_manager* last_battle = o->data->last_battle;
+
+                    if(last_battle != nullptr)
+                    {
+
+                    }
+                }
+
+                o->data->this_fight_id = id_map[o->data->this_fight_id];
+            }
+        }
+    }*/
+
+    std::vector<std::set<orbital*>> found_fights;
+
+    for(orbital_system* sys : system_manage.systems)
+    {
+        for(orbital* o : sys->orbitals)
+        {
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            if(!o->data->requesting_or_in_battle)
+                continue;
+
+            if(o->in_combat_with.size() == 0)
+                continue;
+
+            bool found = false;
+
+            for(auto& i : found_fights)
+            {
+                if(i.find(o) != i.end())
+                {
+                    found = true;
+
+                    i.insert(o->in_combat_with.begin(), o->in_combat_with.end());
+                    i.insert(o);
+                }
+            }
+
+            if(!found)
+            {
+                found_fights.emplace_back();
+
+                found_fights.back().insert(o->in_combat_with.begin(), o->in_combat_with.end());
+                found_fights.back().insert(o);
+            }
+        }
+    }
+
+    std::cout << found_fights.size() << "\n";
+}
+
 void all_battles_manager::tick(float step_s, system_manager& system_manage)
 {
+    tick_find_battles(system_manage);
+
     for(auto& i : battles)
     {
         i->tick(step_s, system_manage);
@@ -1029,7 +1185,7 @@ battle_manager* all_battles_manager::get_currently_viewing()
     return nullptr;
 }
 
-battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
+/*battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
 {
     battle_manager* bm = make_new();
 
@@ -1077,7 +1233,7 @@ battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
     return bm;
 
     //printf("made new battle with %i %i\n", t1.size(), nships);
-}
+}*/
 
 void all_battles_manager::disengage(battle_manager* bm, empire* disengaging_empire)
 {

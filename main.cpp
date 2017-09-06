@@ -1990,13 +1990,13 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     ///is not a "hunting for fights" mode
                     o->data->requesting_or_in_battle = true;
 
-                    assert(parent_system);
+                    /*assert(parent_system);
 
                     std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(o, true);
 
                     hostile_fleets.push_back(o);
 
-                    all_battles.make_new_battle(hostile_fleets);
+                    all_battles.make_new_battle(hostile_fleets);*/
                 }
             }
 

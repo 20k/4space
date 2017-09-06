@@ -2050,7 +2050,7 @@ std::vector<orbital*> orbital_system::get_fleets_within_engagement_range(orbital
 
     vec2f ref_pos = me->absolute_pos;
 
-    float engagement_rad = 40.f;
+    float engagement_rad = orbital_info::engagement_radius;
 
     for(orbital* o : orbitals)
     {
@@ -2088,7 +2088,7 @@ bool orbital_system::can_engage(orbital* me, orbital* them)
 {
     float dist = (me->absolute_pos - them->absolute_pos).length();
 
-    float engagement_rad = 40.f;
+    float engagement_rad = orbital_info::engagement_radius;
 
     if(me->type != orbital_info::FLEET || them->type != orbital_info::FLEET)
         return false;

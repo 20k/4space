@@ -391,7 +391,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
     ///currently fine as check is above
     if(os->can_engage(o, nearest.first))
     {
-        battle_manager* bm = all_battles.make_new_battle({o, nearest.first});
+        //battle_manager* bm = all_battles.make_new_battle({o, nearest.first});
 
         o->data->requesting_or_in_battle = true;
     }
