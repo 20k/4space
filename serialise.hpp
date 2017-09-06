@@ -306,6 +306,8 @@ struct serialise_helper<T*>
             ptr->host_id = host_id;
             ptr->serialise_id = serialise_id;
 
+            std::cout << "got something\n";
+
             ///we're reading this element for the first time
             if(follow_references)
             {

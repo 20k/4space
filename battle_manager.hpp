@@ -102,6 +102,9 @@ struct view_data
 ///no need to serialise this now
 struct battle_manager : serialisable
 {
+    ///this is starting to be a bit of a snafu
+    bool cleanup = false;
+
     projectile_manager projectile_manage;
 
     void keep_fleets_together(system_manager& system_manage);
@@ -153,8 +156,9 @@ struct orbital;
 
 struct all_battles_manager : serialisable
 {
-    std::vector<battle_manager*> battles;
-    std::vector<projectile_manager*> projectiles;
+    bool cleanup = false;
+
+    std::set<battle_manager*> battles;
 
     ///view_data should persist between frames
     ///but should be overwritten with current fleets in battle at the beginning of the next tick

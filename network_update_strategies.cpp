@@ -287,7 +287,12 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     }
 
     static update_strategy projectile_strategy;
-    system_strategy.do_update_strategy(dt_s, 0.1f, projectiles, net_state, 0);*/
+    projectile_strategy.do_update_strategy(dt_s, 0.1f, projectiles, net_state, 0);*/
+
+    std::vector<all_battles_manager*> vec{&all_battles};
+
+    static update_strategy battle_strategy;
+    battle_strategy.do_update_strategy(dt_s, 0.1f, vec, net_state, 0);
 
     //std::cout << fleets.size() << std::endl;
 

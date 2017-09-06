@@ -977,11 +977,17 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
     ImGui::BeginOverride("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
-    for(int i=0; i<all_battles.battles.size(); i++)
+    //for(int i=0; i<all_battles.battles.size(); i++)
+    //for(battle_manager* bm : all_battles.battles)
+
+    auto it = all_battles.battles.begin();
+    int i = 0;
+
+    for(; it != all_battles.battles.end(); it++, i++)
     {
         std::string id_str = std::to_string(i);
 
-        battle_manager* bm = all_battles.battles[i];
+        battle_manager* bm = *it;
 
         if(!bm->any_in_empire_involved(player_empire))
             continue;
@@ -2786,7 +2792,7 @@ int main()
     float last_time_s = 0.f;
     float diff_s = 0.f;
 
-    all_battles_manager all_battles;
+    all_battles_manager* all_battles = new all_battles_manager;
 
     //battle_manager* battle = all_battles.make_new();
 
@@ -2882,7 +2888,9 @@ int main()
     //orbital_system* sys_2 = system_manage.make_new();
     //sys_2->generate_random_system(3, 100, 3, 5);
 
-    #ifndef ONLY_PLAYER
+    //#ifndef ONLY_PLAYER
+    #define NO_GALAXY
+    #ifndef NO_GALAXY
 
     empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
     e2->take_ownership_of_all(sys_3);
@@ -3135,7 +3143,7 @@ int main()
 
         }*/
 
-        all_battles.tick(diff_s, system_manage);
+        all_battles->tick(diff_s, system_manage);
 
         handle_camera(window, system_manage);
 
@@ -3155,45 +3163,45 @@ int main()
 
             if(state == 1)
             {
-                all_battles.request_leave_battle_view = true;
+                all_battles->request_leave_battle_view = true;
             }
         }
 
         //if(ONCE_MACRO(sf::Keyboard::F1))
 
-        if(all_battles.request_leave_battle_view || all_battles.request_enter_battle_view)
+        if(all_battles->request_leave_battle_view || all_battles->request_enter_battle_view)
         {
             //state = (state + 1) % 2;
 
-            if(all_battles.request_leave_battle_view)
+            if(all_battles->request_leave_battle_view)
             {
                 state = 0;
             }
 
-            if(all_battles.request_enter_battle_view)
+            if(all_battles->request_enter_battle_view)
             {
                 state = 1;
             }
 
-            if(all_battles.request_stay_in_battle_system && state == 0)
+            if(all_battles->request_stay_in_battle_system && state == 0)
             {
-                if(all_battles.request_stay_system != nullptr)
+                if(all_battles->request_stay_system != nullptr)
                 {
-                    system_manage.set_viewed_system(all_battles.request_stay_system);
+                    system_manage.set_viewed_system(all_battles->request_stay_system);
                 }
             }
 
-            all_battles.request_enter_battle_view = false;
-            all_battles.request_leave_battle_view = false;
+            all_battles->request_enter_battle_view = false;
+            all_battles->request_leave_battle_view = false;
 
-            if(state == 0 && !all_battles.request_stay_in_battle_system)
+            if(state == 0 && !all_battles->request_stay_in_battle_system)
             {
                 orbital_system* found_system = system_manage.backup_system;
 
                 #ifdef JUMP_TO_SYSTEM_AFTER_VIEWING_BATTLE
-                if(all_battles.currently_viewing != nullptr)
+                if(all_battles->currently_viewing != nullptr)
                 {
-                    found_system = all_battles.currently_viewing->get_system_in();
+                    found_system = all_battles->currently_viewing->get_system_in();
                 }
                 #endif // JUMP_TO_SYSTEM_AFTER_VIEWING_BATTLE
 
@@ -3203,13 +3211,13 @@ int main()
             {
                 ///need way to view any battle
                 //battle->set_view(system_manage);
-                if(all_battles.get_currently_viewing() != nullptr)
-                    all_battles.get_currently_viewing()->set_view(system_manage);
+                if(all_battles->get_currently_viewing() != nullptr)
+                    all_battles->get_currently_viewing()->set_view(system_manage);
 
                 system_manage.set_viewed_system(nullptr);
             }
 
-            all_battles.request_stay_in_battle_system = false;
+            all_battles->request_stay_in_battle_system = false;
 
         }
 
@@ -3241,14 +3249,14 @@ int main()
 
         handle_camera(window, system_manage);
 
-        debug_all_battles(all_battles, window, lclick, system_manage, player_empire, state == 1);
+        debug_all_battles(*all_battles, window, lclick, system_manage, player_empire, state == 1);
 
         if(state == 1)
         {
             //debug_battle(*battle, window, lclick);
 
 
-            all_battles.draw_viewing(window);
+            all_battles->draw_viewing(window);
 
             //battle->draw(window);
         }
@@ -3258,10 +3266,10 @@ int main()
         if(state == 0)
         {
             ///must happen before drawing system
-            debug_system(system_manage, window, lclick, rclick, popup, player_empire, all_battles, fleet_manage, all_events);
+            debug_system(system_manage, window, lclick, rclick, popup, player_empire, *all_battles, fleet_manage, all_events);
         }
 
-        do_popup(popup, window, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events, all_battles, rclick);
+        do_popup(popup, window, fleet_manage, system_manage, system_manage.currently_viewed, empire_manage, player_empire, all_events, *all_battles, rclick);
 
         if(state == 0)
         {
@@ -3377,13 +3385,15 @@ int main()
 
             fleet_manage.erase_all();
 
-            all_battles.erase_all();
+            all_battles->erase_all();
 
 
             empire_manage = empire_manager();
             system_manage = system_manager();
             fleet_manage = fleet_manager();
-            all_battles = all_battles_manager();
+            delete all_battles;
+            all_battles = nullptr;
+            //all_battles = new all_battles_manager();
 
             serialise_data_helper::ref_mode = 1;
             serialise_data_helper::send_mode = 1;
@@ -3456,7 +3466,7 @@ int main()
 
                 fleet_manage.erase_all();
 
-                all_battles.erase_all();
+                all_battles->erase_all();
 
                 serialise ser = i.data;
 
@@ -3726,7 +3736,7 @@ int main()
         fleet_manage.cull_dead_deferred();
         system_manage.cull_empty_orbital_fleets_deferred(popup);
 
-        net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, all_battles);
+        net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, *all_battles);
 
         for(auto& unprocessed : serialise_data_helper::type_to_datas)
         {
@@ -3776,7 +3786,7 @@ int main()
 
         fleet_manage.shuffle_networked_ships();
 
-        all_battles.remove_bad_orbitals();
+        all_battles->remove_bad_orbitals();
         popup.remove_scheduled();
         system_manage.destroy_cleanup(empire_manage);
         fleet_manage.destroy_cleanup(empire_manage);
@@ -3824,7 +3834,7 @@ int main()
         player_empire->draw_ui();
         ///this is slow
         //sf::Clock tclk;
-        empire_manage.tick_all(diff_s, all_battles, system_manage, fleet_manage, player_empire);
+        empire_manage.tick_all(diff_s, *all_battles, system_manage, fleet_manage, player_empire);
         //printf("%f dfdfdf\n", tclk.getElapsedTime().asMicroseconds() / 1000.f);
 
         empire_manage.tick_decolonisation();

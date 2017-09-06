@@ -475,6 +475,18 @@ void battle_manager::keep_fleets_together(system_manager& system_manage)
 
 void battle_manager::tick(float step_s, system_manager& system_manage)
 {
+    for(int i=0; i<ship_map.size(); i++)
+    {
+        if(ship_map[i]->data->should_be_removed_from_combat())
+        {
+            ship_map[i]->leave_battle();
+
+            ship_map.erase(ship_map.begin() + i);
+            i--;
+            continue;
+        }
+    }
+
     tick_ai(*this, step_s);
 
     for(orbital* o : ship_map)
@@ -518,6 +530,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
             }
         }
     }
+
 
     uint32_t keep_frames = 10;
 
@@ -917,7 +930,8 @@ void battle_manager::do_serialise(serialise& s, bool ser)
 
     if(serialise_data_helper::send_mode == 0)
     {
-        s.handle_serialise(ship_map, ser);
+        ///ships discovered automatically
+        //s.handle_serialise(ship_map, ser);
         s.handle_serialise(projectile_manage, ser);
     }
 }
@@ -935,21 +949,17 @@ void battle_manager::do_serialise(serialise& s, bool ser)
 
 void all_battles_manager::destroy(battle_manager* bm)
 {
-    for(int i=0; i<battles.size(); i++)
+    auto it = battles.find(bm);
+
+    if(it != battles.end())
     {
-        if(battles[i] == bm)
+        for(auto& i : bm->ship_map)
         {
-            for(auto& i : bm->ship_map)
-            {
-                i->leave_battle();
-            }
-
-            delete bm;
-            battles.erase(battles.begin() + i);
-            i--;
-
-            return;
+            i->leave_battle();
         }
+
+        delete bm;
+        battles.erase(it);
     }
 }
 
@@ -1169,7 +1179,7 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
 
         if(!found)
         {
-            delete i;
+            //delete i;
         }
     }
 
@@ -1180,7 +1190,9 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
 
     battles.clear();
 
-    battles = new_battles;
+    //battles = new_battles;
+
+    battles.insert(new_battles.begin(), new_battles.end());
 }
 
 void all_battles_manager::tick(float step_s, system_manager& system_manage)
@@ -1363,12 +1375,12 @@ void all_battles_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(request_stay_in_battle_system, ser);
         s.handle_serialise(request_stay_system, ser);
         s.handle_serialise(current_view.involved_orbitals, ser);
-        s.handle_serialise(battles, ser);
+        s.handle_serialise_no_clear(battles, ser);
     }
 
     if(serialise_data_helper::send_mode == 0)
     {
-        s.handle_serialise(battles, ser);
+        s.handle_serialise_no_clear(battles, ser);
     }
 }
 
