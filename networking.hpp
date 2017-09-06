@@ -268,8 +268,8 @@ struct network_state
                     //if(packets.size() == 0)
                     //    continue;
 
-                    //if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
-                    //    continue;
+                    if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
+                        continue;
 
                     std::sort(packets.begin(), packets.end(), [](auto& p1, auto& p2){return p1.sequence_number < p2.sequence_number;});
 
@@ -354,7 +354,7 @@ struct network_state
 
     void cleanup_available_data_and_incomplete_packets()
     {
-        float cleanup_time_s = 10.f;
+        float cleanup_time_s = 4.f;
 
         for(int i=0; i<available_data.size(); i++)
         {
@@ -404,6 +404,8 @@ struct network_state
             clk.restart();
         }
     };
+
+    std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, bool>>> has_packet_fragment;
 
     std::map<serialise_owner_type, std::map<packet_id_type, wait_info>> packet_wait_map;
     ///there's a few structures here and there to do with packets that actually just pile up infinitely
@@ -522,7 +524,7 @@ struct network_state
         if(!sock.valid())
             return;
 
-        request_incomplete_packets(10);
+        request_incomplete_packets(50);
 
         cleanup_available_data_and_incomplete_packets();
 
@@ -622,20 +624,10 @@ struct network_state
 
                         next.data.data = packet.fetch.ptr;
 
-                        bool has = false;
-
-                        for(packet_info& inf : packets)
+                        if(!has_packet_fragment[no.owner_id][header.packet_id][header.sequence_number])
                         {
-                            if(inf.sequence_number == header.sequence_number)
-                            {
-                                has = true;
-                                break;
-                            }
-                        }
-
-                        if(!has)
-                        {
-                            packets.push_back(next);
+                             packets.push_back(next);
+                             has_packet_fragment[no.owner_id][header.packet_id][header.sequence_number] = true;
                         }
 
                         int current_received_fragments = packets.size();

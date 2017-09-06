@@ -2889,7 +2889,7 @@ int main()
     //sys_2->generate_random_system(3, 100, 3, 5);
 
     //#ifndef ONLY_PLAYER
-    #define NO_GALAXY
+    //#define NO_GALAXY
     #ifndef NO_GALAXY
 
     empire* e2 = empire_manage.birth_empire(system_manage, fleet_manage, sys_2);
