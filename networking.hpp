@@ -401,21 +401,26 @@ struct network_state
             requests.resize(num);
         }*/
 
-        //for(auto& req : requests)
 
         if(requests.size() == 0)
             return;
 
-        {
-            auto req = requests.begin();
+        int current_requests = 0;
 
-            if(req->second.size() > max_fragments_to_request)
+        for(auto& req : requests)
+        {
+            //auto req = requests.begin();
+
+            /*if(req->second.size() > max_fragments_to_request)
             {
                 req->second.resize(max_fragments_to_request);
-            }
+            }*/
 
-            for(packet_request& i : req->second)
+            for(packet_request& i : req.second)
             {
+                if(current_requests > max_fragments_to_request)
+                    return;
+
                 i.serialise_id = owner_to_packet_id_to_serialise[i.owner_id][i.packet_id];
 
                 make_packet_request(i);
@@ -424,6 +429,8 @@ struct network_state
 
                 owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].clk.restart();
                 owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].ever = true;
+
+                current_requests++;
             }
         }
 
@@ -771,6 +778,7 @@ struct network_state
                         {
                             std::cout << header.sequence_number << " ";
                             std::cout << " " << packets.size() << std::endl;
+                            std::cout << packet_fragments << std::endl;
                         }
 
                         next.data.data = packet.fetch.ptr;
@@ -986,7 +994,7 @@ struct network_state
         //std::cout << should_slowdown << std::endl;
 
         if(should_slowdown)
-            max_to_send = 1;
+            max_to_send = 0;
 
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
