@@ -936,16 +936,16 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     }
 }
 
-/*battle_manager* all_battles_manager::make_new()
+battle_manager* all_battles_manager::make_new()
 {
     battle_manager* bm = new battle_manager;
 
-    battles.push_back(bm);
+    battles.insert(bm);
 
     bm->make_dirty();
 
     return bm;
-}*/
+}
 
 void all_battles_manager::destroy(battle_manager* bm)
 {
@@ -958,14 +958,20 @@ void all_battles_manager::destroy(battle_manager* bm)
             i->leave_battle();
         }
 
-        delete bm;
+        ///REMEMBER NETWORKING
+        ///Need to make this automatic on deletion
+
+        serialise_data_helper::host_to_id_to_pointer[bm->host_id][bm->serialise_id] = nullptr;
+
         battles.erase(it);
+        delete bm;
     }
 }
 
 ///a battles projectiles will always be valid, even if the orbitals that belong to it arent
 ///so we can quite happily save the absolute pos of a battle, then integrate the projectiles
 ///of two battles together, as long as we know which two we're integrating
+#if 0
 void all_battles_manager::tick_find_battles(system_manager& system_manage)
 {
     int32_t temporary_fight_id = 0;
@@ -1194,10 +1200,11 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
 
     battles.insert(new_battles.begin(), new_battles.end());
 }
+#endif
 
 void all_battles_manager::tick(float step_s, system_manager& system_manage)
 {
-    tick_find_battles(system_manage);
+    //tick_find_battles(system_manage);
 
     for(auto& i : battles)
     {
@@ -1278,14 +1285,15 @@ battle_manager* all_battles_manager::get_currently_viewing()
     return nullptr;
 }
 
-/*battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
+battle_manager* all_battles_manager::make_new_battle(std::vector<orbital*> t1)
 {
     battle_manager* bm = make_new();
 
     //for(battle_manager* bfind : battles)
-    for(int i=0; i<battles.size(); i++)
+    //for(int i=0; i<battles.size(); i++)
+    for(auto it = battles.begin(); it != battles.end();)
     {
-        battle_manager* bfind = battles[i];
+        battle_manager* bfind = *it;
 
         bool term = false;
 
@@ -1300,9 +1308,9 @@ battle_manager* all_battles_manager::get_currently_viewing()
             {
                 bm->destructive_merge_into_me(bfind, *this);
 
-                destroy(bfind);
+                /*destroy(bfind);
 
-                i--;
+                i--;*/
 
                 term = true;
 
@@ -1311,7 +1319,14 @@ battle_manager* all_battles_manager::get_currently_viewing()
         }
 
         if(term)
+        {
+            destroy(bfind);
             break;
+        }
+        else
+        {
+            it++;
+        }
     }
 
 
@@ -1326,7 +1341,7 @@ battle_manager* all_battles_manager::get_currently_viewing()
     return bm;
 
     //printf("made new battle with %i %i\n", t1.size(), nships);
-}*/
+}
 
 void all_battles_manager::disengage(battle_manager* bm, empire* disengaging_empire)
 {

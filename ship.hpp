@@ -695,7 +695,7 @@ struct ship_manager : serialisable
     //int32_t this_fight_id = -1;
     //int32_t last_fight_id = -1;
 
-    bool requesting_or_in_battle = false;
+    //bool requesting_or_in_battle = false;
     bool cleanup = false;
 
     ai_fleet ai_controller;

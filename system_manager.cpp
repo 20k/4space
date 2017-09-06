@@ -350,7 +350,7 @@ void orbital::leave_battle()
 
     if(type == orbital_info::FLEET)
     {
-        data->requesting_or_in_battle = false;
+        //data->requesting_or_in_battle = false;
     }
 }
 

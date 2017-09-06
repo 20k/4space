@@ -165,7 +165,7 @@ struct all_battles_manager : serialisable
     ///ie we iterate, then
     view_data current_view;
 
-    //battle_manager* make_new();
+    battle_manager* make_new();
 
     void destroy(battle_manager* bm);
 
@@ -178,7 +178,7 @@ struct all_battles_manager : serialisable
 
     battle_manager* get_currently_viewing();
 
-    //battle_manager* make_new_battle(std::vector<orbital*> t1);
+    battle_manager* make_new_battle(std::vector<orbital*> t1);
 
 
     ///disengaging empire can be nullptr
