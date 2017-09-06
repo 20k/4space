@@ -3779,7 +3779,7 @@ int main()
                 {
                     all_battles->battles.insert((battle_manager*)obj);
 
-                    std::cout << "got battle\n";
+                    //std::cout << "got battle\n";
 
                     obj->handled_by_client = true;
                 }
