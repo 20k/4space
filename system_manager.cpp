@@ -1257,6 +1257,7 @@ void orbital::do_serialise(serialise& s, bool ser)
 
         s.handle_serialise(command_queue, ser);
         //s.handle_serialise(cleanup, ser);
+        s.handle_serialise_no_clear(in_combat_with, ser);
     }
 
     if(serialise_data_helper::send_mode == 0 || serialise_data_helper::send_mode == 2)
@@ -1311,6 +1312,11 @@ void orbital::do_serialise(serialise& s, bool ser)
 
         //s.handle_serialise(command_queue, ser);
         //s.handle_serialise(cleanup, ser);
+        s.handle_serialise_no_clear(in_combat_with, ser);
+
+        ///on the subject of in_combat_with
+        ///all_battles_manager ensures that if we're meant to be leaving combat
+        ///we wont be force rejoined
 
         /*if(!handled_by_client)
         {

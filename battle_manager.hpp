@@ -58,6 +58,8 @@ namespace sf
 
 struct projectile_manager : serialisable
 {
+    ///if we use a set for this the networking becomes the easiest thing in the known universe
+    ///maybe i should create an ordered vector type for networking
     std::vector<projectile*> projectiles;
 
     projectile* make_new();
