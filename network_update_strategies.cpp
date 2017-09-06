@@ -295,6 +295,9 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     for(battle_manager* bm : all_battles.battles)
     {
+        if(!net_state.owns(bm))
+            continue;
+
         sync_battles.push_back(bm);
     }
 

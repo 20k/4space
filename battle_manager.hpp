@@ -46,6 +46,8 @@ struct projectile : positional, serialisable
     ship* ship_fired_by = nullptr;
 
     void do_serialise(serialise& s, bool ser) override;
+
+    virtual ~projectile(){}
 };
 
 struct battle_manager;
@@ -72,6 +74,8 @@ struct projectile_manager : serialisable
     void draw(sf::RenderWindow& win);
 
     void do_serialise(serialise& s, bool ser) override;
+
+    virtual ~projectile_manager(){}
 };
 
 struct all_battles_manager;
@@ -150,6 +154,8 @@ struct battle_manager : serialisable
     bool is_ui_opened = false;
 
     void do_serialise(serialise& s, bool ser) override;
+
+    virtual ~battle_manager(){}
 };
 
 struct orbital;
@@ -200,6 +206,8 @@ struct all_battles_manager : serialisable
     void erase_all();
 
     void remove_bad_orbitals();
+
+    virtual ~all_battles_manager(){}
 };
 
 #endif // BATTLE_MANAGER_HPP_INCLUDED
