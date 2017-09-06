@@ -625,7 +625,13 @@ void battle_manager::add_fleet(orbital* o)
         return;
 
     if(std::find(ship_map.begin(), ship_map.end(), o) == ship_map.end())
+    {
         ship_map.push_back(o);
+    }
+    else
+    {
+        return;
+    }
 
     ship_manager* sm = o->data;
 
@@ -870,12 +876,32 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
 {
     for(auto& i : bm->projectile_manage.projectiles)
     {
-        projectile_manage.projectiles.push_back(i);
+        bool found = false;
+
+        for(auto& kk : projectile_manage.projectiles)
+        {
+            if(kk == i)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if(!found)
+            projectile_manage.projectiles.push_back(i);
     }
+
+    /*for(orbital* o : bm->ship_map)
+    {
+        add_fleet(o);
+    }*/
 
     for(orbital* o : bm->ship_map)
     {
-        add_fleet(o);
+        if(std::find(ship_map.begin(), ship_map.end(), o) == ship_map.end())
+        {
+            ship_map.push_back(o);
+        }
     }
 
     /*if(all_battles.currently_viewing == bm)
@@ -963,15 +989,11 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
             }
         }
 
-        if(requesting_fight.size() > 0)
-        {
-            std::cout << "hello\n";
-        }
-
         for(orbital* o1 : requesting_fight)
         {
             ///stash across frames
-            o1->last_in_combat_with = std::move(o1->in_combat_with);
+            o1->last_in_combat_with = o1->in_combat_with;
+            //o1->in_combat_with = o1->last_in_combat_with;
         }
 
         //for(orbital* convergence_term : requesting_fight)
@@ -988,7 +1010,7 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
 
                     if(o1->parent_system->can_engage(o1, o2))
                     {
-                        o1->in_combat_with.push_back(o2);
+                        o1->in_combat_with.insert(o2);
                     }
                 }
             }
@@ -1033,7 +1055,76 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
         }
     }
 
-    std::cout << found_fights.size() << "\n";
+    ///merge transitive battles
+    for(int ii=0; ii<found_fights.size(); ii++)
+    {
+        std::set<orbital*>& fight1 = found_fights[ii];
+
+        for(int kk=ii+1; kk<found_fights.size(); kk++)
+        {
+            if(kk == ii)
+                continue;
+
+            std::set<orbital*>& fight2 = found_fights[kk];
+
+            bool should_merge = false;
+
+            for(orbital* o1 : fight1)
+            {
+                for(orbital* o2 : fight2)
+                {
+                    if(o1 == o2)
+                    {
+                        should_merge = true;
+                        break;
+                    }
+                }
+
+                if(should_merge)
+                    break;
+            }
+
+            if(should_merge)
+            {
+                fight1.insert(fight2.begin(), fight2.end());
+
+                found_fights.erase(found_fights.begin() + kk);
+                kk--;
+                continue;
+            }
+        }
+    }
+
+    std::vector<battle_manager*> new_battles;
+
+    for(auto& i : found_fights)
+    {
+        new_battles.push_back(new battle_manager);
+
+        ///HACK
+        //if(i.begin() != i.end())
+        for(auto& found : i)
+        {
+            battle_manager* last = get_battle_involving(found->data);
+
+            if(last == nullptr)
+            {
+                new_battles.back()->add_fleet(found);
+                continue;
+            }
+
+            new_battles.back()->destructive_merge_into_me(last, *this);
+        }
+    }
+
+    for(auto& i : battles)
+    {
+        delete i;
+    }
+
+    battles.clear();
+
+    battles = new_battles;
 }
 
 void all_battles_manager::tick(float step_s, system_manager& system_manage)

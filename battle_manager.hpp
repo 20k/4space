@@ -177,6 +177,7 @@ struct all_battles_manager : serialisable
     void disengage(battle_manager* bm, empire* disengaging_empire);
     void end_battle_peacefully(battle_manager* bm);
 
+    ///get battle by ships - ships are only ever in one battle at once as we're going to merge transitive relationss
     battle_manager* get_battle_involving(ship_manager* ship_manage);
 
     orbital_system* request_stay_system = nullptr;

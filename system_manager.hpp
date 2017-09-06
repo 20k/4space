@@ -121,8 +121,8 @@ struct position_history_element
 
 struct orbital : serialisable
 {
-    std::vector<orbital*> in_combat_with;
-    std::vector<orbital*> last_in_combat_with;
+    std::set<orbital*> in_combat_with;
+    std::set<orbital*> last_in_combat_with;
 
     bool cleanup = false;
 
