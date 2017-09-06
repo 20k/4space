@@ -3374,6 +3374,21 @@ bool ship::can_engage()
     return true;
 }
 
+bool ship::should_be_removed_from_combat()
+{
+    const float disengagement_timer_s = combat_variables::disengagement_time_s;
+
+    if(is_disengaging)
+    {
+        if(disengage_clock_s < disengagement_timer_s)
+            return true;
+
+        return false;
+    }
+
+    return false;
+}
+
 bool ship::fully_disabled()
 {
     return is_fully_disabled;
@@ -5078,6 +5093,17 @@ bool ship_manager::can_engage()
     for(ship* s : ships)
     {
         if(s->can_engage())
+            return true;
+    }
+
+    return false;
+}
+
+bool ship_manager::should_be_removed_from_combat()
+{
+    for(ship* s : ships)
+    {
+        if(s->should_be_removed_from_combat())
             return true;
     }
 

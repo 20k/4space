@@ -578,6 +578,7 @@ struct ship : positional, serialisable
     void apply_disengage_penalty();
     bool can_disengage();
     bool can_engage();
+    bool should_be_removed_from_combat();
 
     float disengage_clock_s = 9999.f;
     bool is_disengaging = false;
@@ -759,6 +760,7 @@ struct ship_manager : serialisable
     void enter_combat();
     bool any_in_combat();
     bool can_engage(); ///and be engaged
+    bool should_be_removed_from_combat();
 
     void random_damage_ships(float frac);
 

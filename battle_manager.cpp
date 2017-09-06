@@ -988,9 +988,32 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
             if(o->type != orbital_info::FLEET)
                 continue;
 
+            if(o->data->should_be_removed_from_combat())
+            {
+                o->leave_battle();
+                continue;
+            }
+
             if(o->data->requesting_or_in_battle)
             {
                 requesting_fight.push_back(o);
+            }
+        }
+
+        for(orbital* o : requesting_fight)
+        {
+            for(auto it = o->in_combat_with.begin(); it != o->in_combat_with.end();)
+            {
+                if((*it)->data->should_be_removed_from_combat())
+                {
+                    (*it)->leave_battle();
+
+                    it = o->in_combat_with.erase(it);
+                }
+                else
+                {
+                    it++;
+                }
             }
         }
 
