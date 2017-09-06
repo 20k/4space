@@ -3377,7 +3377,6 @@ int main()
             popup.clear();
 
             serialise ser;
-            ///textfile names are currently discarded!
             ser.load("Game.save");
 
             empire_manage.erase_all();
