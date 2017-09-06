@@ -989,70 +989,11 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
                     if(o1->parent_system->can_engage(o1, o2))
                     {
                         o1->in_combat_with.push_back(o2);
-
-                        printf("hi\n");
-
-                        /*if(o1->this_fight_id == -1)
-                            o1->this_fight_id = o2->this_fight_id;
-
-                        if(o2->this_fight_id == -1)
-                            o2->this_fight_id = o1->this_fight_id;
-
-                        ///std::min here needs to propagate.. horribly n^3 solution
-                        if(o1->this_fight_id != -1 && o2->this_fight_id != -1)
-                        {
-                            auto minimum = std::min(o1->this_fight_id, o2->this_fight_id);
-
-                            o1->this_fight_id = minimum;
-                            o2->this_fight_id = minimum;
-                        }
-
-                        if(o1->this_fight_id == -1 && o2->this_fight_id == -1)
-                        {
-                            o1->this_fight_id = temporary_fight_id++;
-                            o2->this_fight_id = o1->this_fight_id;
-                        }*/
                     }
                 }
             }
         }
     }
-
-    /*std::map<int32_t, bool> has_real_id;
-    std::map<int32_t, int32_t> id_map;
-    int32_t fight_id = 0;
-
-    std::vector<battle_manager*> new_battles;
-
-    for(orbital_system* sys : system_manage.systems)
-    {
-        std::vector<orbital*> requesting_fight;
-
-        for(orbital* o : sys->orbitals)
-        {
-            if(o->type != orbital_info::FLEET)
-                continue;
-
-            if(o->data->requesting_or_in_battle)
-            {
-                if(!has_real_id[o->data->this_fight_id])
-                {
-                    id_map[o->data->this_fight_id] = fight_id++;
-
-                    new_battles.push_back(new battle_manager);
-
-                    battle_manager* last_battle = o->data->last_battle;
-
-                    if(last_battle != nullptr)
-                    {
-
-                    }
-                }
-
-                o->data->this_fight_id = id_map[o->data->this_fight_id];
-            }
-        }
-    }*/
 
     std::vector<std::set<orbital*>> found_fights;
 
