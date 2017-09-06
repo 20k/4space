@@ -1985,6 +1985,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(ImGui::IsItemClicked_Registered())
                 {
+                    ///will automatically engage all applicable fleets within range
+                    ///instantly set to false if none applicable
+                    ///is not a "hunting for fights" mode
+                    o->data->requesting_or_in_battle = true;
+
                     assert(parent_system);
 
                     std::vector<orbital*> hostile_fleets = parent_system->get_fleets_within_engagement_range(o, true);
