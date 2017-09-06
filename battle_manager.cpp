@@ -944,8 +944,7 @@ void battle_manager::do_serialise(serialise& s, bool ser)
 
     if(serialise_data_helper::send_mode == 0)
     {
-        ///ships discovered automatically
-        //s.handle_serialise(ship_map, ser);
+        s.handle_serialise(ship_map, ser);
         s.handle_serialise(projectile_manage, ser);
     }
 }
@@ -1491,6 +1490,7 @@ void all_battles_manager::erase_all()
             delete proj;
         }
 
+        serialise_data_helper::host_to_id_to_pointer[battle->host_id][battle->serialise_id] = nullptr;
         delete battle;
     }
 
