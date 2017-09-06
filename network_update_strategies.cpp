@@ -289,7 +289,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     static update_strategy projectile_strategy;
     projectile_strategy.do_update_strategy(dt_s, 0.1f, projectiles, net_state, 0);*/
 
-    //std::vector<all_battles_manager*> vec{&all_battles};
+    std::vector<all_battles_manager*> all_battles_hack{&all_battles};
 
     std::vector<battle_manager*> sync_battles;
 
@@ -300,6 +300,9 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     static update_strategy battle_strategy;
     battle_strategy.do_update_strategy(dt_s, 0.1f, sync_battles, net_state, 0);
+
+    static update_strategy all_battle_strategy;
+    all_battle_strategy.do_update_strategy(dt_s, 0.5f, all_battles_hack, net_state, 0);
 
     //std::cout << fleets.size() << std::endl;
 
