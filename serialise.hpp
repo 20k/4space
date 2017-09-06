@@ -88,6 +88,7 @@ struct serialisable
 
     }
 
+    ///the reason why we crash at outro is, i believe, static initialisation fiasco
     virtual ~serialisable() {serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id] = nullptr;}
 };
 

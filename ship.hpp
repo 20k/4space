@@ -445,6 +445,8 @@ struct component : serialisable
     bool test_if_can_use_in_ship_customisation = false;
 
     void do_serialise(serialise& s, bool ser);
+
+    virtual ~component(){}
 };
 
 struct projectile;
@@ -550,7 +552,7 @@ struct ship : positional, serialisable
     void check_load(vec2i dim);
     void generate_image(vec2i dim);
 
-    ~ship();
+    virtual ~ship();
 
     sf::Image img;
     sf::Texture tex;
@@ -804,6 +806,8 @@ struct ship_manager : serialisable
     ///need to differentiate disk and network serialisation
     void do_serialise(serialise& s, bool ser) override;
 
+    virtual ~ship_manager(){}
+
     //fleet_manager* fleet_manage = nullptr;
 };
 
@@ -840,6 +844,8 @@ struct fleet_manager : serialisable
     void erase_all();
 
     void shuffle_networked_ships();
+
+    virtual ~fleet_manager(){}
 };
 
 #endif // SHIP_HPP_INCLUDED
