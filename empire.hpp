@@ -56,6 +56,7 @@ namespace relations_info
 
 struct empire : serialisable
 {
+    bool cleanup = false;
     bool is_player = false;
 
     ai_empire ai_empire_controller;

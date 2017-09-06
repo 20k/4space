@@ -307,6 +307,23 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     static update_strategy all_battle_strategy;
     all_battle_strategy.do_update_strategy(dt_s, 0.5f, all_battles_hack, net_state, 0);
 
+    std::vector<empire*> empires;
+
+    ///REMEMBER THIS WONT WORK IF WE SPAWN A NEW EMPIRE AT RUNTIME OK? OK
+    ///change empire manager to be the same hack as all battles
+    ///maybe codify this hack functionally
+    for(empire* e : empire_manage.empires)
+    {
+        if(!net_state.owns(e))
+            continue;
+
+        empires.push_back(e);
+    }
+
+    static update_strategy empire_strategy;
+    empire_strategy.do_update_strategy(dt_s, 2.f, empires, net_state, 0);
+
+
     //std::cout << fleets.size() << std::endl;
 
     ///Hmm. This isn't the best plan
