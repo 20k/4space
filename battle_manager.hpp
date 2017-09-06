@@ -133,7 +133,7 @@ struct battle_manager : serialisable
 
     void destructive_merge_into_me(battle_manager* bm, all_battles_manager& all_battles);
 
-    orbital_system* get_system_in(system_manager& system_manage);
+    orbital_system* get_system_in();
 
     ///to show the player why they can't disengage
 
@@ -177,8 +177,8 @@ struct all_battles_manager : serialisable
 
     battle_manager* get_battle_involving(ship_manager* ship_manage);
 
-    ///this is invalid now
-    int request_stay_id = -1;
+    orbital_system* request_stay_system = nullptr;
+
     bool request_stay_in_battle_system = false;
     bool request_enter_battle_view = false;
     bool request_leave_battle_view = false;

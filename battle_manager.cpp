@@ -889,7 +889,7 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
     }
 }
 
-orbital_system* battle_manager::get_system_in(system_manager& system_manage)
+orbital_system* battle_manager::get_system_in()
 {
     if(ship_map.size() == 0)
     {
@@ -1124,7 +1124,7 @@ void all_battles_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(request_leave_battle_view, ser);
         s.handle_serialise(request_enter_battle_view, ser);
         s.handle_serialise(request_stay_in_battle_system, ser);
-        s.handle_serialise(request_stay_id, ser);
+        s.handle_serialise(request_stay_system, ser);
         s.handle_serialise(current_view.involved_orbitals, ser);
         s.handle_serialise(battles, ser);
     }

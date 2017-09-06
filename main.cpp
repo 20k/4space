@@ -1073,7 +1073,7 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         {
             all_battles.request_leave_battle_view = true;
             all_battles.request_stay_in_battle_system = true;
-            all_battles.request_stay_id = i;
+            all_battles.request_stay_system = bm->get_system_in();
         }
 
         if(!bm->can_end_battle_peacefully(player_empire))
@@ -3177,16 +3177,9 @@ int main()
 
             if(all_battles.request_stay_in_battle_system && state == 0)
             {
-                if(all_battles.request_stay_id < all_battles.battles.size() && all_battles.request_stay_id >= 0)
+                if(all_battles.request_stay_system != nullptr)
                 {
-                    battle_manager* bm = all_battles.battles[all_battles.request_stay_id];
-
-                    if(bm != nullptr)
-                    {
-                        orbital_system* to_view = bm->get_system_in(system_manage);
-
-                        system_manage.set_viewed_system(to_view);
-                    }
+                    system_manage.set_viewed_system(all_battles.request_stay_system);
                 }
             }
 
@@ -3200,7 +3193,7 @@ int main()
                 #ifdef JUMP_TO_SYSTEM_AFTER_VIEWING_BATTLE
                 if(all_battles.currently_viewing != nullptr)
                 {
-                    found_system = all_battles.currently_viewing->get_system_in(system_manage);
+                    found_system = all_battles.currently_viewing->get_system_in();
                 }
                 #endif // JUMP_TO_SYSTEM_AFTER_VIEWING_BATTLE
 
