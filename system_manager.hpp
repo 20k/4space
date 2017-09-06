@@ -122,7 +122,7 @@ struct position_history_element
 struct orbital : serialisable
 {
     std::set<orbital*> in_combat_with;
-    std::set<orbital*> last_in_combat_with;
+    //std::set<orbital*> last_in_combat_with;
 
     bool cleanup = false;
 
@@ -180,6 +180,9 @@ struct orbital : serialisable
 
     void set_orbit(float ang, float len);
     void set_orbit(vec2f pos);
+
+    ///on the most technical level
+    void leave_battle();
 
     int vision_test_counter = 0;
     void do_vision_test();

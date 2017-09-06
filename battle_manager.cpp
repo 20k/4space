@@ -958,6 +958,11 @@ void all_battles_manager::destroy(battle_manager* bm)
     {
         if(battles[i] == bm)
         {
+            for(auto& i : bm->ship_map)
+            {
+                i->leave_battle();
+            }
+
             delete bm;
             battles.erase(battles.begin() + i);
             i--;
@@ -989,29 +994,25 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
             }
         }
 
-        for(orbital* o1 : requesting_fight)
+        /*for(orbital* o1 : requesting_fight)
         {
             ///stash across frames
             o1->last_in_combat_with = o1->in_combat_with;
-            //o1->in_combat_with = o1->last_in_combat_with;
-        }
+        }*/
 
-        //for(orbital* convergence_term : requesting_fight)
+        for(orbital* o1 : requesting_fight)
         {
-            for(orbital* o1 : requesting_fight)
+            for(orbital* o2 : sys->orbitals)
             {
-                for(orbital* o2 : sys->orbitals)
+                if(o1 == o2)
+                    continue;
+
+                if(o2->type != orbital_info::FLEET)
+                    continue;
+
+                if(o1->parent_system->can_engage(o1, o2))
                 {
-                    if(o1 == o2)
-                        continue;
-
-                    if(o2->type != orbital_info::FLEET)
-                        continue;
-
-                    if(o1->parent_system->can_engage(o1, o2))
-                    {
-                        o1->in_combat_with.insert(o2);
-                    }
+                    o1->in_combat_with.insert(o2);
                 }
             }
         }
@@ -1097,12 +1098,13 @@ void all_battles_manager::tick_find_battles(system_manager& system_manage)
 
     std::vector<battle_manager*> new_battles;
 
+    ///find the last battle with this ship in, merge it destructively into the current battle
+    ///if it exists, including projectiles
+    ///otherwise simply add the fleets regularly to a new battle
     for(auto& i : found_fights)
     {
         new_battles.push_back(new battle_manager);
 
-        ///HACK
-        //if(i.begin() != i.end())
         for(auto& found : i)
         {
             battle_manager* last = get_battle_involving(found->data);

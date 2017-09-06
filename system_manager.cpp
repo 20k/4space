@@ -344,6 +344,16 @@ void orbital::set_orbit(vec2f pos)
     set_orbit(rel.angle(), rel.length());
 }
 
+void orbital::leave_battle()
+{
+    in_combat_with.clear();
+
+    if(type == orbital_info::FLEET)
+    {
+        data->requesting_or_in_battle = false;
+    }
+}
+
 /*inline
 float impl_cos(float x)
 {

@@ -2332,6 +2332,7 @@ void ship::enter_combat()
 void ship::leave_combat()
 {
     currently_in_combat = false;
+    owned_by->requesting_or_in_battle = false;
 }
 
 bool ship::in_combat()
