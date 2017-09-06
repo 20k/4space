@@ -3143,7 +3143,7 @@ int main()
 
         }*/
 
-        all_battles->tick(diff_s, system_manage);
+        all_battles->tick(diff_s, system_manage, net_state);
 
         handle_camera(window, system_manage);
 

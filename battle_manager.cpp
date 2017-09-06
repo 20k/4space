@@ -4,6 +4,7 @@
 #include "empire.hpp"
 #include "util.hpp"
 #include <set>
+#include "networking.hpp"
 
 uint32_t battle_manager::gid = 0;
 
@@ -149,6 +150,7 @@ void projectile::do_serialise(serialise& s, bool ser)
         s.handle_serialise(local_pos, ser);
         s.handle_serialise(world_rot, ser);
         s.handle_serialise(world_pos, ser);
+        s.handle_serialise(owned_by, ser);
 
         if(handled_by_client == false)
         {
@@ -171,6 +173,7 @@ void projectile::do_serialise(serialise& s, bool ser)
         s.handle_serialise(local_pos, ser);
         s.handle_serialise(world_rot, ser);
         s.handle_serialise(world_pos, ser);
+        s.handle_serialise(owned_by, ser);
 
         if(handled_by_client == false)
         {
@@ -181,13 +184,14 @@ void projectile::do_serialise(serialise& s, bool ser)
     handled_by_client = true;
 }
 
-projectile* projectile_manager::make_new()
+projectile* projectile_manager::make_new(battle_manager& battle_manage)
 {
     projectile* p = new projectile;
 
     projectiles.insert(p);
 
     p->make_dirty();
+    p->owned_by = &battle_manage;
 
     return p;
 }
@@ -224,7 +228,7 @@ bool projectile_within_ship(projectile* p, ship* s)
     return point_within_ship(p->local_pos, s);
 }
 
-void projectile_manager::tick(battle_manager& manage, float step_s, system_manager& system_manage)
+void projectile_manager::tick(battle_manager& manage, float step_s, system_manager& system_manage, network_state& net_state)
 {
     //for(auto& i : projectiles)
     //for(int kk=0; kk < projectiles.size(); kk++)
@@ -240,6 +244,9 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
         {
             for(ship* found_ship : o->data->ships)
             {
+                if(!net_state.owns(found_ship))
+                    continue;
+
                 if(projectile_within_ship(p, found_ship))
                 {
                     auto fully_merged = found_ship->get_fully_merged(1.f);
@@ -473,7 +480,7 @@ void battle_manager::keep_fleets_together(system_manager& system_manage)
     }
 }
 
-void battle_manager::tick(float step_s, system_manager& system_manage)
+void battle_manager::tick(float step_s, system_manager& system_manage, network_state& net_state)
 {
     for(int i=0; i<ship_map.size(); i++)
     {
@@ -504,7 +511,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
             {
                 vec2f cpos = s->local_pos;
 
-                projectile* p = projectile_manage.make_new();
+                projectile* p = projectile_manage.make_new(*this);
 
                 p->local_pos = cpos;
                 p->local_rot = s->local_rot;
@@ -537,7 +544,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage)
     if(((frame_counter + unique_battle_id) % keep_frames) == 0)
         keep_fleets_together(system_manage);
 
-    projectile_manage.tick(*this, step_s, system_manage);
+    projectile_manage.tick(*this, step_s, system_manage, net_state);
 
     frame_counter++;
 }
@@ -1282,7 +1289,7 @@ void all_battles_manager::merge_battles_together()
     }
 }
 
-void all_battles_manager::tick(float step_s, system_manager& system_manage)
+void all_battles_manager::tick(float step_s, system_manager& system_manage, network_state& net_state)
 {
     //tick_find_battles(system_manage);
 
@@ -1290,7 +1297,7 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage)
 
     for(auto& i : battles)
     {
-        i->tick(step_s, system_manage);
+        i->tick(step_s, system_manage, net_state);
     }
 
     bool any = false;

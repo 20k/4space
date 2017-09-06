@@ -48,6 +48,8 @@ struct projectile : positional, serialisable
     void do_serialise(serialise& s, bool ser) override;
 
     virtual ~projectile(){}
+
+    battle_manager* owned_by = nullptr;
 };
 
 struct battle_manager;
@@ -58,15 +60,17 @@ namespace sf
     struct RenderWindow;
 }
 
+struct network_state;
+
 struct projectile_manager : serialisable
 {
     ///if we use a set for this the networking becomes the easiest thing in the known universe
     ///maybe i should create an ordered vector type for networking (or find a flat set)
     std::set<projectile*> projectiles;
 
-    projectile* make_new();
+    projectile* make_new(battle_manager& battle_manage);
 
-    void tick(battle_manager& manager, float step_s, system_manager& system_manage);
+    void tick(battle_manager& manager, float step_s, system_manager& system_manage, network_state& net_state);
 
     void destroy(projectile* proj);
     void destroy_all();
@@ -76,6 +80,7 @@ struct projectile_manager : serialisable
     void do_serialise(serialise& s, bool ser) override;
 
     virtual ~projectile_manager(){}
+
 };
 
 struct all_battles_manager;
@@ -115,7 +120,7 @@ struct battle_manager : serialisable
 
     std::vector<orbital*> ship_map;
 
-    void tick(float step_s, system_manager& system_manage);
+    void tick(float step_s, system_manager& system_manage, network_state& net_state);
 
     void draw(sf::RenderWindow& win);
 
@@ -176,7 +181,7 @@ struct all_battles_manager : serialisable
     void destroy(battle_manager* bm);
 
     void tick_find_battles(system_manager& system_manage);
-    void tick(float step_s, system_manager& system_manage);
+    void tick(float step_s, system_manager& system_manage, network_state& net_state);
     void merge_battles_together();
 
     void draw_viewing(sf::RenderWindow& win);

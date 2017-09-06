@@ -1493,6 +1493,9 @@ void empire::do_serialise(serialise& s, bool ser)
         ///LAST_INCOME
         ///BACKUP_INCOME
 
+        ///relations need to be defined in terms of relation changes
+        ///ie we take a diff and network it if we need to affect our relations with another player
+        ///although... if diplomacy with players is manual, this may not matter
         s.handle_serialise(relations_map, ser);
         s.handle_serialise(owned_fleets, ser);
         s.handle_serialise(owned, ser);
