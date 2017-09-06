@@ -1177,13 +1177,6 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage)
     {
         current_view.stop();
     }
-
-    /*if(currently_viewing == nullptr && battles.size() > 0)
-    {
-        currently_viewing = battles[0];
-    }*/
-
-    ///build list of battles here
 }
 
 void all_battles_manager::draw_viewing(sf::RenderWindow& win)
