@@ -558,7 +558,7 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
 
         float ivz = 1.f - star.pos.z();
 
-        ivz = mix(ivz, 1.f, 0.3f);
+        ivz = mix(ivz, 1.f, 0.1f);
         vec2f star_pos = star.pos.xy() / ivz;
 
         vec2f disp = (vec2f){star_pos.x() - center.x, star_pos.y() - center.y};
@@ -569,13 +569,9 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
         if(spos.x < 0 || spos.x >= win.getSize().x || spos.y < 0 || spos.y >= win.getSize().y)
             continue;
 
-        float min_size = 0.25f;
-
         float star_size_frac = system_manager::temperature_fraction_to_size_fraction(star.temp);
 
         float scale = mix(star_size_frac/8.f, star_size_frac, 1.f - star.pos.z());
-        //float scale = mix(min_size, x, 1.f - star.pos.z());
-
         float est_scale = scale * 16 / system_manage.zoom_level;
 
         if(est_scale < 0.1f)
