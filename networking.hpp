@@ -316,9 +316,14 @@ struct network_state
 
                 if(packets.size() > 0 && packets[0].sequence_number != 0)
                 {
-                    requests[packet_id].push_back({owner_id, 0, packet_id});
+                    //requests[packet_id].push_back({owner_id, 0, packet_id});
 
-                    total_requests++;
+                    //total_requests++;
+
+                    for(sequence_data_type kk = 0; kk < packets[0].sequence_number; kk++)
+                    {
+                        requests[packet_id].push_back({owner_id, kk, packet_id});
+                    }
                 }
 
                 sequence_data_type sequence_id = -1;
@@ -480,7 +485,7 @@ struct network_state
 
         available_data.push_back({packet.no, s, packet.header.packet_id});
 
-        std::cout << "av" << packet.header.packet_id << std::endl;
+        //std::cout << "av" << packet.header.packet_id << std::endl;
 
         //forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
 
