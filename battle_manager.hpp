@@ -139,7 +139,7 @@ struct star_map
 
             star.pos.z() = randf_s(0.4f, 0.99998f);
 
-            star.simple_renderable.init(3, 1.f, 3.f);
+            star.simple_renderable.init(3, 2.f, 2.f);
 
             star.temp = temp_gen.generate_star_temperature_fraction();
 

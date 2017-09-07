@@ -577,9 +577,13 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
         if(est_scale < 0.1f)
             continue;
 
+        vec3f col = system_manager::temperature_fraction_to_colour(star.temp) / 255.f;
+
+        col = {1,1,1};
+
         star.simple_renderable.main_rendering(win, 0.f, star_pos.xy() - disp,
                                               scale * 16,
-                                              system_manager::temperature_fraction_to_colour(star.temp) / 255.f);
+                                              col);
     }
 }
 
