@@ -121,8 +121,6 @@ vec2f map_pixel_to_coords(vec2f pos, const sf::RenderTarget& target)
 
 void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col, bool show_detail, orbital* o)
 {
-    col = col * 255.f;
-
     auto real_coord = win.mapCoordsToPixel({absolute_pos.x(), absolute_pos.y()});
 
     if(real_coord.x < 0 || real_coord.x > win.getSize().x || real_coord.y < 0 || real_coord.y >= win.getSize().y)
@@ -188,6 +186,8 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
 void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
 {
+    col = col * 255.f;
+
     #if 1
     for(int i=0; i<vert_dist.size(); i++)
     {
@@ -3191,7 +3191,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 orbital* o = resource_asteroids[kk];
 
-                vec3f col = o->col * 255.f;
+                vec3f col = o->col;
 
                 orbital_simple_renderable& renderable = o->simple_renderable;
 

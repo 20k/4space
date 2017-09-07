@@ -549,8 +549,39 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
     frame_counter++;
 }
 
+void star_map::draw(sf::RenderWindow& win)
+{
+    sf::CircleShape shape;
+    shape.setRadius(10.f);
+
+    for(star_map_star& star : stars)
+    {
+        /*shape.setPosition(star.pos.x(), star.pos.y());
+
+        win.draw(shape);*/
+
+        //auto apos = win.mapCoordToPixel({star.pos.x(), star.pos.y()});
+
+        sf::View view = win.getView();
+        //sf::View backup = win.getView();
+
+        auto center = view.getCenter();
+
+        vec2f disp = (vec2f){star.pos.x() - center.x, star.pos.y() - center.y};
+
+        disp = disp / star.pos.z();
+
+        //view.setCenter(center.x + disp.x(), center.y + disp.y());
+
+        star.simple_renderable.main_rendering(win, 0.f, star.pos.xy() + disp, 1.f, (vec3f){1,1,1});
+
+        //win.setView(backup);
+    }
+}
+
 void battle_manager::draw(sf::RenderWindow& win)
 {
+    stars.draw(win);
     projectile_manage.draw(win);
 
     std::vector<ship*> linear_vec;
@@ -956,6 +987,11 @@ void battle_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(ship_map, ser);
         s.handle_serialise(projectile_manage, ser);
     }
+}
+
+battle_manager::battle_manager() : stars(2000)
+{
+
 }
 
 battle_manager* all_battles_manager::make_new()

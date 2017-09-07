@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "serialise.hpp"
+#include "system_manager.hpp"
 
 struct empire;
 struct ship;
@@ -108,9 +109,47 @@ struct view_data
     }
 };
 
+///do comets after this! :)
+///Both in system comets, and in battle comets
+///then debris too!
+///z position of star represents scaling for camera, its a star field in 3d
+///make stars simple renderable triangles! :)
+///twinkle!
+struct star_map_star
+{
+    vec3f pos;
+    vec3f col = {1,1,1};
+    orbital_simple_renderable simple_renderable;
+};
+
+struct star_map
+{
+    std::vector<star_map_star> stars;
+
+
+    star_map(int num)
+    {
+        for(int i=0; i<num; i++)
+        {
+            star_map_star star;
+            star.pos = randv<3, float>(-1.f, 1.f) * 1000.f;
+
+            star.pos.z() = randf_s(1.f, 3.f);
+
+            star.simple_renderable.init(3, 1.f, 3.f);
+
+            stars.push_back(star);
+        }
+    }
+
+    void draw(sf::RenderWindow& win);
+};
+
 ///no need to serialise this now
 struct battle_manager : serialisable
 {
+    star_map stars;
+
     ///this is starting to be a bit of a snafu
     bool cleanup = false;
 
@@ -160,6 +199,7 @@ struct battle_manager : serialisable
 
     void do_serialise(serialise& s, bool ser) override;
 
+    battle_manager();
     virtual ~battle_manager(){}
 };
 
