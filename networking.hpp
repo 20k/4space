@@ -355,44 +355,6 @@ struct network_state
                 {
                     requests[packet_id].push_back({owner_id, sequence_id, packet_id});
                 }
-
-                /*for(int i=current_packet_sequence; i < ((int)packets.size()) - 1; i++)
-                {
-                    if(packets[i].sequence_number + 1 == packets[i + 1].sequence_number)
-                    {
-                        current_packet_sequence++;
-                        break;
-                    }
-                }
-
-                sequence_data_type sequence_id = -1;
-
-                for(int i=current_packet_sequence; i<((int)packets.size()) - 1; i++)
-                {
-                    packet_info& last = packets[i];
-                    packet_info& cur = packets[i + 1];
-
-                    if(cur.sequence_number != last.sequence_number + 1)
-                    {
-                        requests[packet_id].push_back({owner_id, last.sequence_number + 1, packet_id});
-                        total_requests++;
-                    }
-
-                    sequence_id = cur.sequence_number;
-                }
-
-                if(packets.size() == 1)
-                {
-                    sequence_id = packets[0].sequence_number;
-                }
-
-                sequence_id++;
-
-                for(; sequence_id < owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; sequence_id++)
-                {
-                    total_requests++;
-                    requests[packet_id].push_back({owner_id, sequence_id, packet_id});
-                }*/
             }
         }
 
