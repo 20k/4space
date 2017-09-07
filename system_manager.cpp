@@ -189,44 +189,104 @@ void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rota
     col = col * 255.f;
 
     #if 1
-    for(int i=0; i<vert_dist.size(); i++)
+    if(vert_dist.size() == 3)
     {
-        int cur = i;
-        int next = (i + 1) % vert_dist.size();
+        for(int i=0; i<vert_dist.size(); i++)
+        {
+            int prev = (i + vert_dist.size() - 1) % vert_dist.size();
+            int cur = i;
+            int next = (i + 1) % vert_dist.size();
+            int super_next = (i + 2) % vert_dist.size();
 
-        float d1 = vert_dist[cur];
-        float d2 = vert_dist[next];
+            float d0 = vert_dist[prev];
+            float d1 = vert_dist[cur];
+            float d2 = vert_dist[next];
+            float d3 = vert_dist[super_next];
 
-        float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
-        float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
+            float a0 = ((float)prev / (vert_dist.size())) * 2 * M_PI;
+            float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
+            float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
+            float a3 = ((float)super_next / (vert_dist.size())) * 2 * M_PI;
 
-        a1 += rotation;
-        a2 += rotation;
+            a0 += rotation;
+            a1 += rotation;
+            a2 += rotation;
+            a3 += rotation;
 
-        vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)} * scale;
-        vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)} * scale;
+            vec2f l0 = d0 * (vec2f){cosf(a0), sinf(a0)} * scale;
+            vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)} * scale;
+            vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)} * scale;
+            vec2f l3 = d3 * (vec2f){cosf(a3), sinf(a3)} * scale;
 
-        l1 += absolute_pos;
-        l2 += absolute_pos;
+            l0 += absolute_pos;
+            l1 += absolute_pos;
+            l2 += absolute_pos;
+            l3 += absolute_pos;
 
-        vec2f perp = perpendicular((l2 - l1).norm());
+            vec2f perp = perpendicular((l2 - l1).norm());
 
-        sf::Vertex v[4];
+            vec2f far_perp = (perp + perpendicular(l3 - l2).norm()).norm();
+            vec2f close_perp = (perp + perpendicular(l1 - l0).norm()).norm();
 
-        v[0].position = sf::Vector2f(l1.x(), l1.y());
-        v[1].position = sf::Vector2f(l2.x(), l2.y());
-        v[2].position = sf::Vector2f(l2.x() + perp.x() * scale, l2.y() + perp.y() * scale);
-        v[3].position = sf::Vector2f(l1.x() + perp.x() * scale, l1.y() + perp.y() * scale);
+            sf::Vertex v[4];
 
-        sf::Color scol = sf::Color(col.x(), col.y(), col.z());
+            v[0].position = sf::Vector2f(l1.x(), l1.y());
+            v[1].position = sf::Vector2f(l2.x(), l2.y());
+            v[2].position = sf::Vector2f(l2.x() + far_perp.x() * scale, l2.y() + far_perp.y() * scale);
+            v[3].position = sf::Vector2f(l1.x() + close_perp.x() * scale, l1.y() + close_perp.y() * scale);
 
-        v[0].color = scol;
-        v[1].color = scol;
-        v[2].color = scol;
-        v[3].color = scol;
+            sf::Color scol = sf::Color(col.x(), col.y(), col.z());
 
-        win.draw(v, 4, sf::Quads);
+            v[0].color = scol;
+            v[1].color = scol;
+            v[2].color = scol;
+            v[3].color = scol;
+
+            win.draw(v, 4, sf::Quads);
+        }
     }
+    else
+    {
+        for(int i=0; i<vert_dist.size(); i++)
+        {
+            int cur = i;
+            int next = (i + 1) % vert_dist.size();
+
+            float d1 = vert_dist[cur];
+            float d2 = vert_dist[next];
+
+            float a1 = ((float)cur / (vert_dist.size())) * 2 * M_PI;
+            float a2 = ((float)next / (vert_dist.size())) * 2 * M_PI;
+
+            a1 += rotation;
+            a2 += rotation;
+
+            vec2f l1 = d1 * (vec2f){cosf(a1), sinf(a1)} * scale;
+            vec2f l2 = d2 * (vec2f){cosf(a2), sinf(a2)} * scale;
+
+            l1 += absolute_pos;
+            l2 += absolute_pos;
+
+            vec2f perp = perpendicular((l2 - l1).norm());
+
+            sf::Vertex v[4];
+
+            v[0].position = sf::Vector2f(l1.x(), l1.y());
+            v[1].position = sf::Vector2f(l2.x(), l2.y());
+            v[2].position = sf::Vector2f(l2.x() + perp.x() * scale, l2.y() + perp.y() * scale);
+            v[3].position = sf::Vector2f(l1.x() + perp.x() * scale, l1.y() + perp.y() * scale);
+
+            sf::Color scol = sf::Color(col.x(), col.y(), col.z());
+
+            v[0].color = scol;
+            v[1].color = scol;
+            v[2].color = scol;
+            v[3].color = scol;
+
+            win.draw(v, 4, sf::Quads);
+        }
+    }
+
     #endif
 }
 
