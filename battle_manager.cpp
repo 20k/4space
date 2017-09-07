@@ -320,15 +320,15 @@ void projectile::do_serialise(serialise& s, bool ser)
 
     if(serialise_data_helper::send_mode == 0)
     {
-        s.handle_serialise(ship_fired_by, ser);
-        s.handle_serialise(fired_by, ser);
-        s.handle_serialise(base, ser);
-        s.handle_serialise(pteam, ser);
+        //s.handle_serialise(ship_fired_by, ser);
+        //s.handle_serialise(fired_by, ser);
+        //s.handle_serialise(base, ser);
+        //s.handle_serialise(pteam, ser);
         s.handle_serialise(velocity, ser);
-        s.handle_serialise(type, ser);
-        s.handle_serialise(options, ser);
+        //s.handle_serialise(type, ser);
+        //s.handle_serialise(options, ser);
 
-        s.handle_serialise(dim, ser);
+        //s.handle_serialise(dim, ser);
         s.handle_serialise(local_rot, ser);
         s.handle_serialise(local_pos, ser);
         s.handle_serialise(world_rot, ser);
@@ -530,6 +530,9 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
     for(projectile* p : projectiles)
     {
+        if(p->owned_by->clientside_hit[p])
+            continue;
+
         sf::Sprite spr(p->tex);
 
         spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
@@ -599,10 +602,13 @@ void tick_ship_ai(battle_manager& battle_manage, ship& s, float step_s)
     //printf("%f angle\n", to_them);
 }
 
-void tick_ai(battle_manager& battle_manage, float step_s)
+void tick_ai(battle_manager& battle_manage, float step_s, network_state& net_state)
 {
     for(orbital* o : battle_manage.ship_map)
     {
+        if(!net_state.owns(o))
+            continue;
+
         for(ship* s : o->data->ships)
         {
             tick_ship_ai(battle_manage, *s, step_s);
@@ -679,12 +685,15 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
 
     sparks.tick(step_s);
 
-    tick_ai(*this, step_s);
+    tick_ai(*this, step_s, net_state);
 
     float global_weapon_speed = 60.f;
 
     for(orbital* o : ship_map)
     {
+        if(!net_state.owns(o))
+            continue;
+
         for(ship* s : o->data->ships)
         {
             s->tick_combat(step_s);
