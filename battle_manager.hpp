@@ -147,7 +147,7 @@ struct star_map
         }
     }
 
-    void draw(sf::RenderWindow& win);
+    void draw(sf::RenderWindow& win, system_manager& system_manage);
 };
 
 ///no need to serialise this now
@@ -166,7 +166,7 @@ struct battle_manager : serialisable
 
     void tick(float step_s, system_manager& system_manage, network_state& net_state);
 
-    void draw(sf::RenderWindow& win);
+    void draw(sf::RenderWindow& win, system_manager& system_manage);
 
     vec2f get_avg_centre_global();
     //void add_ship(ship* s);
@@ -229,7 +229,7 @@ struct all_battles_manager : serialisable
     void tick(float step_s, system_manager& system_manage, network_state& net_state);
     void merge_battles_together();
 
-    void draw_viewing(sf::RenderWindow& win);
+    void draw_viewing(sf::RenderWindow& win, system_manager& system_manage);
     void set_viewing(battle_manager* bm, system_manager& system_manage, bool jump = false);
     bool viewing(battle_manager& battle);
 

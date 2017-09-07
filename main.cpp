@@ -3256,7 +3256,7 @@ int main()
             //debug_battle(*battle, window, lclick);
 
 
-            all_battles->draw_viewing(window);
+            all_battles->draw_viewing(window, system_manage);
 
             //battle->draw(window);
         }

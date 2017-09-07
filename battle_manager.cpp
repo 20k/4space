@@ -549,7 +549,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
     frame_counter++;
 }
 
-void star_map::draw(sf::RenderWindow& win)
+void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
 {
     for(star_map_star& star : stars)
     {
@@ -576,15 +576,20 @@ void star_map::draw(sf::RenderWindow& win)
         float scale = mix(star_size_frac/8.f, star_size_frac, 1.f - star.pos.z());
         //float scale = mix(min_size, x, 1.f - star.pos.z());
 
+        float est_scale = scale * 16 / system_manage.zoom_level;
+
+        if(est_scale < 0.1f)
+            continue;
+
         star.simple_renderable.main_rendering(win, 0.f, star_pos.xy() - disp,
                                               scale * 16,
                                               system_manager::temperature_fraction_to_colour(star.temp) / 255.f);
     }
 }
 
-void battle_manager::draw(sf::RenderWindow& win)
+void battle_manager::draw(sf::RenderWindow& win, system_manager& system_manage)
 {
-    stars.draw(win);
+    stars.draw(win, system_manage);
     projectile_manage.draw(win);
 
     std::vector<ship*> linear_vec;
@@ -1359,7 +1364,7 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage, netw
     }
 }
 
-void all_battles_manager::draw_viewing(sf::RenderWindow& win)
+void all_battles_manager::draw_viewing(sf::RenderWindow& win, system_manager& system_manage)
 {
     if(!current_view.any())
         return;
@@ -1368,7 +1373,7 @@ void all_battles_manager::draw_viewing(sf::RenderWindow& win)
     {
         if(viewing(*bm))
         {
-            bm->draw(win);
+            bm->draw(win, system_manage);
         }
     }
 }
