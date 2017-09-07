@@ -551,31 +551,23 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
 
 void star_map::draw(sf::RenderWindow& win)
 {
-    sf::CircleShape shape;
-    shape.setRadius(10.f);
-
     for(star_map_star& star : stars)
     {
-        /*shape.setPosition(star.pos.x(), star.pos.y());
-
-        win.draw(shape);*/
-
-        //auto apos = win.mapCoordToPixel({star.pos.x(), star.pos.y()});
-
         sf::View view = win.getView();
-        //sf::View backup = win.getView();
-
         auto center = view.getCenter();
 
         vec2f disp = (vec2f){star.pos.x() - center.x, star.pos.y() - center.y};
 
-        disp = disp / star.pos.z();
+        disp = mix((vec2f){0.f, 0.f}, disp, star.pos.z());
 
-        //view.setCenter(center.x + disp.x(), center.y + disp.y());
+        auto spos = win.mapCoordsToPixel({star.pos.x() - disp.x(), star.pos.y() - disp.y()});
 
-        star.simple_renderable.main_rendering(win, 0.f, star.pos.xy() + disp, 1.f, (vec3f){1,1,1});
+        if(spos.x < 0 || spos.x >= win.getSize().x || spos.y < 0 || spos.y >= win.getSize().y)
+            continue;
 
-        //win.setView(backup);
+        star.simple_renderable.main_rendering(win, 0.f, star.pos.xy() - disp,
+                                              system_manager::temperature_fraction_to_size_fraction(star.temp),
+                                              system_manager::temperature_fraction_to_colour(star.temp) / 255.f);
     }
 }
 

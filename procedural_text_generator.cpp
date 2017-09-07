@@ -168,7 +168,7 @@ std::string procedural_text_generator::generate_planetary_text(orbital* o)
     return fix_grammar(description);
 }
 
-float procedural_text_generator::generate_star_temperature_fraction(orbital* o)
+float procedural_text_generator::generate_star_temperature_fraction()
 {
     float temperature_fraction = randf_s(0.f, 1.f) * randf_s(0.f, 1.f);
 

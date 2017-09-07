@@ -432,10 +432,12 @@ struct system_manager : serialisable
     float zoom_level = 1.f;
     vec2f camera;
     static float universe_scale;
-    float sun_universe_rad = 200;
+    static inline float sun_universe_rad = 200;
     float border_universe_rad = sun_universe_rad * 6.5;
 
-    float temperature_fraction_to_star_size(float temperature_frac);
+    static float temperature_fraction_to_star_size(float temperature_frac);
+    static float temperature_fraction_to_size_fraction(float temperature_frac);
+    static vec3f temperature_fraction_to_colour(float temperature_fraction);
 
     ///also generate empires in universe, in a separate function
     void generate_universe(int num);

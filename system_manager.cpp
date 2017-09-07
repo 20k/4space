@@ -1443,7 +1443,7 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     {
         n->name = generator.generate_star_name();
 
-        float temperature_fraction = generator.generate_star_temperature_fraction(n);
+        float temperature_fraction = generator.generate_star_temperature_fraction();
         n->description = generator.generate_star_text(n, temperature_fraction);
 
         n->star_temperature_fraction = temperature_fraction;
@@ -2807,7 +2807,7 @@ void piecewise_linear(T& accumulator, T mstart, T mend, float mstart_frac, float
     accumulator = mix(mstart, mend, modified);
 }
 
-vec3f temperature_fraction_to_colour(float temperature_fraction)
+vec3f system_manager::temperature_fraction_to_colour(float temperature_fraction)
 {
     vec3f rcol = {1, 0, 1};
 
@@ -2820,7 +2820,7 @@ vec3f temperature_fraction_to_colour(float temperature_fraction)
     return rcol;
 }
 
-float temperature_fraction_to_size_fraction(float temperature_fraction)
+float system_manager::temperature_fraction_to_size_fraction(float temperature_fraction)
 {
     float size_fraction = 1.f;
 

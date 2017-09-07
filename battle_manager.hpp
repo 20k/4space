@@ -6,6 +6,7 @@
 
 #include "serialise.hpp"
 #include "system_manager.hpp"
+#include "procedural_text_generator.hpp"
 
 struct empire;
 struct ship;
@@ -120,23 +121,27 @@ struct star_map_star
     vec3f pos;
     vec3f col = {1,1,1};
     orbital_simple_renderable simple_renderable;
+    float temp = 0.f;
 };
 
 struct star_map
 {
     std::vector<star_map_star> stars;
 
-
     star_map(int num)
     {
+        procedural_text_generator temp_gen;
+
         for(int i=0; i<num; i++)
         {
             star_map_star star;
-            star.pos = randv<3, float>(-1.f, 1.f) * 1000.f;
+            star.pos = randv<3, float>(-1.f, 1.f) * 100000.f;
 
-            star.pos.z() = randf_s(1.f, 3.f);
+            star.pos.z() = randf_s(0.f, 1.f);
 
             star.simple_renderable.init(3, 1.f, 3.f);
+
+            star.temp = temp_gen.generate_star_temperature_fraction();
 
             stars.push_back(star);
         }

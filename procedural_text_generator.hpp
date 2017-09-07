@@ -31,7 +31,7 @@ struct procedural_text_generator
 
     std::string generate_star_name();
     //std::string generate_star_text(orbital* o);
-    float generate_star_temperature_fraction(orbital* o);
+    float generate_star_temperature_fraction();
     std::string generate_star_text(orbital* o, float temperature_fraction);
 
     ///ship names, and empire names
