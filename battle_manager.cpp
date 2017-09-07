@@ -496,6 +496,8 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
 
     tick_ai(*this, step_s);
 
+    float global_weapon_speed = 60.f;
+
     for(orbital* o : ship_map)
     {
         for(ship* s : o->data->ships)
@@ -526,7 +528,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
 
                 p->base = kk;
 
-                float speed = kk.get_tag(component_tag::SPEED);
+                float speed = kk.get_tag(component_tag::SPEED) * global_weapon_speed;
 
                 p->velocity = speed * (vec2f){cos(p->local_rot), sin(p->local_rot)};
 
