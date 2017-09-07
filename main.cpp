@@ -3416,17 +3416,6 @@ int main()
             ser.handle_serialise(fleet_manage, true);
             ser.handle_serialise(all_battles, true);
 
-
-            /*for(ship_manager* sm : fleet_manage.fleets)
-            {
-                std::cout << "a " << sm << std::endl;
-
-                for(ship* s : sm->ships)
-                {
-                    std::cout << s << std::endl;
-                }
-            }*/
-
             ser.save("Game.save");
         }
 
@@ -3473,6 +3462,8 @@ int main()
             serialise_data_helper::ref_mode = 1;
             serialise_data_helper::send_mode = 1;
 
+            serialise_data_helper::host_to_id_to_pointer.clear();
+
             ser.handle_serialise(state, false);
             ser.handle_serialise(empire_manage, false);
             ser.handle_serialise(system_manage, false);
@@ -3489,19 +3480,37 @@ int main()
                 }
             }*/
 
+            serialise_host_type host_id = -1;
+
             for(empire* e : empire_manage.empires)
             {
                 if(e->is_player)
                 {
                     player_empire = e;
 
+                    host_id = e->host_id;
+
                     break;
                 }
             }
 
+            for(auto& i : serialise_data_helper::host_to_id_to_pointer[host_id])
+            {
+                if(i.second == nullptr)
+                    continue;
+
+                i.second->host_id = net_state.my_id;
+
+                serialise_data_helper::host_to_id_to_pointer[net_state.my_id][i.second->serialise_id] = i.second;
+
+                i.second->owned_by_host = true;
+
+                serialise_data_helper::host_to_id_to_pointer[host_id][i.second->serialise_id] = nullptr;
+            }
+
             //system_manage.ensure_found_orbitals_handled();
 
-            serialise_data_helper::host_to_id_to_pointer.clear();
+            //serialise_data_helper::host_to_id_to_pointer.clear();
         }
 
 
