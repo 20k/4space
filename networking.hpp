@@ -266,7 +266,6 @@ struct network_state
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
     }
 
-
     struct wait_info
     {
         bool first = true;
@@ -274,7 +273,7 @@ struct network_state
 
         bool too_long()
         {
-            return (clk.getElapsedTime().asMilliseconds() > 500) || first;
+            return (clk.getElapsedTime().asMilliseconds() > 100) || first;
         }
 
         void request()
@@ -514,7 +513,7 @@ struct network_state
             std::sort(packet_list.begin(), packet_list.end(),
                 [](auto& p1, auto& p2){return p1.header.packet_id < p2.header.packet_id;});
 
-            for(int i=0; i<packet_list.size(); i++)
+            for(int i=0; i<(int)packet_list.size(); i++)
             {
                 forward_packet& current_packet = packet_list[i];
 
@@ -937,7 +936,7 @@ struct network_state
     ///change owns() to respect this. It should be a fairly transparent change
     void forward_data(const network_object& no, serialise& s)
     {
-        int max_to_send = 5;
+        int max_to_send = 20;
 
         int fragments = get_packet_fragments(s.data.size());
 
@@ -948,14 +947,14 @@ struct network_state
             if(disconnected(i.first))
                 continue;
 
-            if(i.second < (int)packet_id - 20)
+            if(i.second < (int)packet_id - 2000)
                 should_slowdown = true;
         }
 
         //std::cout << should_slowdown << std::endl;
 
         if(should_slowdown)
-            max_to_send = 0;
+            max_to_send = 1;
 
         //std::cout << packet_id << std::endl;
 
