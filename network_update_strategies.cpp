@@ -42,9 +42,6 @@ struct update_strategy
         no.serialise_id = t->serialise_id;
 
         net_state.forward_data(no, ser);
-
-
-        //std::cout << t->serialise_id << std::endl;
     }
 
     template<typename T>
@@ -158,13 +155,6 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
         for(orbital* o : sys->orbitals)
         {
-            /*if(o->owner_id != 1 && o->owner_id != net_state.my_id)
-            {
-                continue;
-            }*/
-
-            //std::cout << o->owner_id << std::endl;
-
             if(!net_state.owns(o))
                 continue;
 
@@ -285,27 +275,6 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     static update_strategy empire_strategy;
     empire_strategy.do_update_strategy(dt_s, 10.f, empires, net_state, 0);
-
-
-    //std::cout << fleets.size() << std::endl;
-
-    ///Hmm. This isn't the best plan
-    ///the problem is, nobody owns these
-    ///sort this out through dirty and make_new
-    /*network_object no;
-    ///CONFLICT BETWEEN PLAYERS
-    no.owner_id = net_state.my_id;
-    no.serialise_id = -1;
-
-    serialise ser;
-
-    ser.handle_serialise<decltype(serialise_data_helper::disk_mode)>(2, true);
-    ser.force_serialise(empire_manage, true);
-    ser.force_serialise(system_manage, true);
-    ser.force_serialise(fleet_manage, true);
-    ser.force_serialise(all_battles, true);
-
-    send_data(t, ser, net_state);*/
 
     elapsed_time_s += dt_s;
 }
