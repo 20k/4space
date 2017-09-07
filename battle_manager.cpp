@@ -151,6 +151,9 @@ void spark_manager::init_effect(vec2f pos, vec2f dir)
 
         sp.dir = sp.dir * dir.length();
 
+        ///spark size should scale with damage being received ideally, but requires a 'standard' damage
+        ///maybe procedurally find the average damage and scale it
+
         if(randf_s(0.f, 1.f) < 0.3f)
             sp.dir = sp.dir + sp.dir * randf_s(-random_amount, random_amount);
 
