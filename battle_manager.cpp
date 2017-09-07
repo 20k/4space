@@ -102,8 +102,8 @@ void spark::load()
     tex.loadFromImage(img);
     tex.setSmooth(true);
 
-    options.overall_scale = 1/5.f;
-    options.scale = {1.f, 5.f};
+    options.overall_scale = 1/10.f;
+    options.scale = {1.5f, 5.f};
     options.blur = false;
     center = false;
 
@@ -133,7 +133,9 @@ void spark_manager::init_effect(vec2f pos, vec2f dir)
 
     for(int i=0; i<num; i++)
     {
-        float frac = (float)i / (num + 1);
+        float frac = (float)i / (num);
+
+        frac = frac - 0.5f;
 
         vec2f cone_dir = -dir;
 
