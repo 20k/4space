@@ -124,6 +124,11 @@ bool do_transfer(orbital* o, float step_s, queue_type& type)
 
     vec2f calc_real_next = calculated_cur + calc_dir;
 
+    if((end_pos - calculated_cur).length() < speed)
+    {
+        calc_real_next = end_pos;
+    }
+
     iangle = calc_real_next.angle();
     irad = calc_real_next.length();
 

@@ -467,16 +467,21 @@ void battle_manager::keep_fleets_together(system_manager& system_manage)
 
     avg = avg / (float)avg_num;
 
+    float maintenance_distance = 20.f;
+
     for(orbital* o : ship_map)
     {
         vec2f m_pos = o->absolute_pos;
 
         float dist = (o->absolute_pos - avg).length();
 
-        if(dist < 40.f)
+        //if(dist < maintenance_distance + maintenance_distance*0.5f && dist >= maintenance_distance - maintenance_distance*0.1f)
+        //    continue;
+
+        if(dist > maintenance_distance)
             continue;
 
-        o->transfer(avg, o->parent_system, false, true);
+        o->transfer((o->absolute_pos - avg).norm() * maintenance_distance * 0.6 + avg, o->parent_system, false, true);
     }
 }
 
