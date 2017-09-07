@@ -117,15 +117,6 @@ struct network_state
     std::map<serialise_owner_type, std::map<packet_id_type, int>> owner_to_packet_sequence_to_expected_size;
     std::map<serialise_owner_type, std::map<packet_id_type, serialise_data_type>> owner_to_packet_id_to_serialise;
 
-    ///ok. If this is nullptr, either the data is intentionally nullptr (impossible because we wouldn't
-    ///be receiving updates about it)
-    ///or we haven't discovered this object yet... in which case maybe its a good time to make
-    ///a disk request about it, or whatever. That will be the most complex part of the networking
-    /*serialisable* get_serialisable(network_object& obj)
-    {
-        return serialise_data_helper::owner_to_id_to_pointer[obj.owner_id][obj.serialise_id];
-    }*/
-
     serialisable* get_serialisable(serialise_host_type& host_id, serialise_data_type& serialise_id)
     {
         return serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id];
@@ -222,12 +213,6 @@ struct network_state
         packet_id_type packet_id = 0;
     };
 
-    /*struct request_timeout_info
-    {
-        bool ever = false;
-        sf::Clock clk;
-    };*/
-
     bool owns(serialisable* s)
     {
         if(s->host_id == -1 || s->host_id == my_id)
@@ -248,8 +233,6 @@ struct network_state
         while(!sock_writable(sock)) {}
 
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
-
-        //std::cout << "request\n";
     }
 
     void make_packet_ack(packet_ack& ack)
@@ -291,8 +274,6 @@ struct network_state
 
     void request_incomplete_packets(int max_fragments_to_request)
     {
-        //std::vector<packet_request> requests;
-
         std::map<packet_id_type, std::vector<packet_request>> requests;
 
         for(auto& owners : incomplete_packets)
@@ -677,8 +658,6 @@ struct network_state
                         }
 
                         int current_received_fragments = packets.size();
-
-                        //std::cout << "FHAS " << current_received_fragments << " ";
 
                         if(current_received_fragments == packet_fragments)
                         {
