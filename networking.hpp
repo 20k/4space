@@ -307,8 +307,8 @@ struct network_state
 
                 std::vector<packet_info>& packets = packet_ids.second;
 
-                //if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
-                //    continue;
+                if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
+                    continue;
 
                 int total_requests = 0;
 
@@ -316,10 +316,6 @@ struct network_state
 
                 if(packets.size() > 0 && packets[0].sequence_number != 0)
                 {
-                    //requests[packet_id].push_back({owner_id, 0, packet_id});
-
-                    //total_requests++;
-
                     for(sequence_data_type kk = 0; kk < packets[0].sequence_number; kk++)
                     {
                         requests[packet_id].push_back({owner_id, kk, packet_id});
@@ -333,12 +329,9 @@ struct network_state
                     packet_info& last = packets[i-1];
                     packet_info& cur = packets[i];
 
-                    //if(cur.sequence_number - 1 != last.sequence_number)
+                    for(int kk=last.sequence_number + 1; kk < cur.sequence_number; kk++)
                     {
-                        for(int kk=last.sequence_number + 1; kk < cur.sequence_number; kk++)
-                        {
-                            requests[packet_id].push_back({owner_id, kk, packet_id});
-                        }
+                        requests[packet_id].push_back({owner_id, kk, packet_id});
                     }
 
                     sequence_id = cur.sequence_number;
@@ -393,15 +386,6 @@ struct network_state
         }
     }
 
-    ///hmm
-    /*bool is_data_complete(int data_id)
-    {
-        if(data_id < 0 || data_id >= data_complete.size())
-            return false;
-
-        return true;
-    }*/
-
     ///the only reason to defer this is in case we receive duplicates
     void cleanup_available_data_and_incomplete_packets()
     {
@@ -422,21 +406,10 @@ struct network_state
 
                 available_data[i].should_cleanup = true;
             }
-
-            /*if(!data.processed && data.clk.getElapsedTime().asMilliseconds() / 1000.f > hard_cleanup_time)
-            {
-                network_object& net_obj = data.object;
-
-                packet_id_type packet_id = data.packet_id;
-
-                incomplete_packets[net_obj.owner_id].erase(packet_id);
-            }*/
         }
     }
 
     std::map<serialise_owner_type, std::deque<forward_packet>> forward_ordered_packets;
-
-    //std::map<serialise_owner_type, packet_id_type> already_have;
 
     void make_available(const serialise_owner_type& owner, int id)
     {
@@ -446,10 +419,6 @@ struct network_state
         s.data = std::move(packet.fetch.ptr);
 
         available_data.push_back({packet.no, s, packet.header.packet_id});
-
-        //std::cout << "av" << packet.header.packet_id << std::endl;
-
-        //forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
 
         packet_ack ack;
         ack.owner_id = packet.no.owner_id;
@@ -500,10 +469,6 @@ struct network_state
                     i--;
                     continue;
                 }
-                /*else
-                {
-                    break;
-                }*/
             }
 
             int max_requests = 50;
@@ -515,7 +480,6 @@ struct network_state
 
                 packet_id_type next_packet_id = last_received_packet[first.no.owner_id] + 1;
 
-                //if(first.header.packet_id != next_packet_id)
                 for(packet_id_type kk = next_packet_id; kk < first.header.packet_id && requests < max_requests; kk++)
                 {
                     wait_info& info = packet_wait_map[first.no.owner_id][kk];
@@ -540,7 +504,6 @@ struct network_state
                 forward_packet& last = packet_list[i-1];
                 forward_packet& cur = packet_list[i];
 
-                //if(last.header.packet_id + 1 != cur.header.packet_id)
                 for(packet_id_type kk=last.header.packet_id + 1; kk < cur.header.packet_id; kk++)
                 {
                     wait_info& info = packet_wait_map[cur.no.owner_id][last.header.packet_id];
@@ -656,14 +619,10 @@ struct network_state
 
                     disconnection_timer[no.owner_id].restart();
 
-                    //auto vec = get_fragment(request.sequence_id, no, packet_id_to_sequence_number_to_data[request.packet_id][request.sequence_id].vec.ptr);
-
                     if(owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].find(request.sequence_id) !=
                        owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].end())
                     {
                         auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
-
-                        //std::cout << vec.vec.ptr.size() << std::endl;
 
                         while(!sock_writable(sock)){}
 
