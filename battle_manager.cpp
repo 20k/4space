@@ -556,11 +556,15 @@ void star_map::draw(sf::RenderWindow& win)
         sf::View view = win.getView();
         auto center = view.getCenter();
 
-        vec2f disp = (vec2f){star.pos.x() - center.x, star.pos.y() - center.y};
+        float ivz = 1.f - star.pos.z();
 
+        ivz = mix(ivz, 1.f, 0.3f);
+        vec2f star_pos = star.pos.xy() / ivz;
+
+        vec2f disp = (vec2f){star_pos.x() - center.x, star_pos.y() - center.y};
         disp = mix((vec2f){0.f, 0.f}, disp, star.pos.z());
 
-        auto spos = win.mapCoordsToPixel({star.pos.x() - disp.x(), star.pos.y() - disp.y()});
+        auto spos = win.mapCoordsToPixel({star_pos.x() - disp.x(), star_pos.y() - disp.y()});
 
         if(spos.x < 0 || spos.x >= win.getSize().x || spos.y < 0 || spos.y >= win.getSize().y)
             continue;
@@ -572,7 +576,7 @@ void star_map::draw(sf::RenderWindow& win)
         float scale = mix(star_size_frac/8.f, star_size_frac, 1.f - star.pos.z());
         //float scale = mix(min_size, x, 1.f - star.pos.z());
 
-        star.simple_renderable.main_rendering(win, 0.f, star.pos.xy() - disp,
+        star.simple_renderable.main_rendering(win, 0.f, star_pos.xy() - disp,
                                               scale * 16,
                                               system_manager::temperature_fraction_to_colour(star.temp) / 255.f);
     }
@@ -988,7 +992,7 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     }
 }
 
-battle_manager::battle_manager() : stars(2000)
+battle_manager::battle_manager() : stars(20000)
 {
 
 }
