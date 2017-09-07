@@ -903,6 +903,8 @@ void battle_manager::destructive_merge_into_me(battle_manager* bm, all_battles_m
 
     for(auto& i : bm->projectile_manage.projectiles)
     {
+        i->owned_by = this;
+
         projectile_manage.projectiles.insert(i);
     }
 

@@ -3390,6 +3390,13 @@ int main()
                 }
             }
 
+            fleet_manage.shuffle_networked_ships();
+
+            all_battles->remove_bad_orbitals();
+            popup.remove_scheduled();
+            system_manage.destroy_cleanup(empire_manage);
+            fleet_manage.destroy_cleanup(empire_manage);
+
             serialise_data_helper::type_to_datas.clear();
         };
 
