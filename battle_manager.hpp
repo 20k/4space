@@ -68,6 +68,8 @@ void premultiply(sf::Image& image);
 ///need to ensure loaded after serialisation
 struct projectile : positional, serialisable
 {
+    bool cleanup = false;
+
     projectile_options options;
 
     int type = 0;

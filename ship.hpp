@@ -26,6 +26,8 @@ struct positional
     float local_rot = 0;
 
     vec2f dim;
+
+    virtual ~positional(){}
 };
 
 struct component_attribute;

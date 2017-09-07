@@ -310,6 +310,7 @@ void projectile::do_serialise(serialise& s, bool ser)
         s.handle_serialise(world_rot, ser);
         s.handle_serialise(world_pos, ser);
         s.handle_serialise(owned_by, ser);
+        s.handle_serialise(cleanup, ser);
 
         if(handled_by_client == false)
         {
@@ -333,6 +334,7 @@ void projectile::do_serialise(serialise& s, bool ser)
         s.handle_serialise(world_rot, ser);
         s.handle_serialise(world_pos, ser);
         s.handle_serialise(owned_by, ser);
+        s.handle_serialise(cleanup, ser);
 
         if(handled_by_client == false)
         {
@@ -389,9 +391,11 @@ bool projectile_within_ship(projectile* p, ship* s)
 
 void projectile_manager::tick(battle_manager& manage, float step_s, system_manager& system_manage, network_state& net_state)
 {
+    remove_cleanups_from_set(projectiles);
+
     //for(auto& i : projectiles)
     //for(int kk=0; kk < projectiles.size(); kk++)
-    for(auto it = projectiles.begin(); it != projectiles.end();)
+    for(auto it = projectiles.begin(); it != projectiles.end(); it++)
     {
         projectile* p = *it;
 
@@ -421,6 +425,9 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
 
                 if(projectile_within_ship(p, found_ship))
                 {
+                    p->cleanup = true;
+                    p->make_dirty();
+
                     auto fully_merged = found_ship->get_fully_merged(1.f);
 
                     bool hp_condition = fully_merged[ship_component_element::HP].cur_amount < 1.f && fully_merged[ship_component_element::HP].max_amount > 1.f;
@@ -429,6 +436,7 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                         continue;
 
                     found_ship->hit(p, system_manage);
+
 
                     ///problematic for network, defer calls
                     ///wait am I just not cleaning these up? oops
@@ -442,18 +450,10 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
             if(term)
                 break;
         }
-
-        if(term)
-        {
-            it = projectiles.erase(it);
-        }
-        else
-        {
-            it++;
-        }
     }
 }
 
+#if 0
 void projectile_manager::destroy(projectile* proj)
 {
     /*for(int i=0; i<(int)projectiles.size(); i++)
@@ -479,6 +479,8 @@ void projectile_manager::destroy(projectile* proj)
         }
     }
 }
+#endif
+
 
 void projectile_manager::destroy_all()
 {

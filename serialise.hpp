@@ -33,6 +33,23 @@ void remove_cleanups_from(T& container)
                     container.end());
 }
 
+template<typename T>
+void remove_cleanups_from_set(T& container)
+{
+    for(auto it = container.begin(); it != container.end();)
+    {
+        if((*it)->cleanup)
+        {
+            delete *it;
+            it = container.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+}
+
 
 //#define serialise_owner_type int32_t
 //#define serialise_data_type uint64_t
