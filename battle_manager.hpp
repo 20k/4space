@@ -21,6 +21,7 @@ struct projectile_options
 struct spark
 {
     projectile_options options;
+    bool center = true;
 
     bool loaded = false;
 
@@ -42,6 +43,8 @@ struct spark
     float get_time_frac() {return cur_duration_s / max_duration_s;}
 
     vec2f get_adjusted_scale();
+
+    float get_alpha();
 };
 
 struct spark_manager

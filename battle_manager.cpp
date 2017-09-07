@@ -105,6 +105,7 @@ void spark::load()
     options.overall_scale = 1/5.f;
     options.scale = {1.f, 5.f};
     options.blur = false;
+    center = false;
 
     loaded = true;
 }
@@ -112,6 +113,16 @@ void spark::load()
 vec2f spark::get_adjusted_scale()
 {
     return mix((vec2f){options.scale.x(), options.scale.x() * 1.5f}, options.scale, 1.f - get_time_frac());
+}
+
+float spark::get_alpha()
+{
+    if(get_time_frac() < 0.1f)
+    {
+        return get_time_frac() / 0.1f;
+    }
+
+    return (1.f - (get_time_frac() + 0.1f) / (1 + 0.1f));
 }
 
 void spark_manager::init_effect(vec2f pos, vec2f dir)
@@ -122,8 +133,6 @@ void spark_manager::init_effect(vec2f pos, vec2f dir)
 
     for(int i=0; i<num; i++)
     {
-        //fangle = (float)i / (num + 1);
-
         float frac = (float)i / (num + 1);
 
         vec2f cone_dir = -dir;
@@ -132,13 +141,15 @@ void spark_manager::init_effect(vec2f pos, vec2f dir)
 
         float fangle = frac * cone_angle + cone_dir.angle();
 
-        //fangle *= 2 * M_PI;
-
         spark sp;
         sp.pos = pos;
         sp.dir = {cos(fangle), sin(fangle)};
 
         sp.dir = sp.dir * dir.length();
+
+        sp.load();
+
+        sp.pos += sp.dir.norm() * 12;
 
         sparks.push_back(sp);
     }
@@ -148,13 +159,11 @@ void spark_manager::tick(float step_s)
 {
     for(spark& s : sparks)
     {
-        s.load();
-
         s.cur_duration_s += step_s;
 
         s.pos = s.pos + s.dir * step_s * s.speed * (1.f - s.get_time_frac());
 
-        s.alpha = 1.f - s.get_time_frac();
+        s.alpha = s.get_alpha();
 
         s.alpha = clamp(s.alpha, 0.f, 1.f);
 
@@ -189,7 +198,10 @@ void spark_manager::draw(sf::RenderWindow& win)
     {
         sf::Sprite spr(s.tex);
 
-        spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+        if(s.center)
+            spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+        else
+            spr.setOrigin(0.f, spr.getLocalBounds().height/2);
 
         spr.setPosition(s.pos.x(), s.pos.y());
 
