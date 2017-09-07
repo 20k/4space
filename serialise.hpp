@@ -28,7 +28,7 @@ void remove_cleanups_from(T& container)
 {
     container.erase(std::remove_if(container.begin(),
                                    container.end(),
-                                   [&](const auto v)
+                                   [&](const auto& v)
                                        { return v.cleanup; }),
                     container.end());
 }
