@@ -905,9 +905,9 @@ void battle_manager::add_fleet(orbital* o)
         }
 
         s->local_pos = spos;
-        s->dim = {100, 40};
+        //s->dim = {100, 40};
 
-        s->check_load({s->dim.x(), s->dim.y()});
+        //s->check_load({s->dim.x(), s->dim.y()});
 
         sm_num++;
     }

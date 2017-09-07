@@ -1745,6 +1745,9 @@ ship::ship()
 {
     has_element.resize(ship_component_elements::NONE + 1);
     type_to_component_offsets.resize(ship_component_elements::NONE + 1);
+
+    dim = {100, 40};
+    check_load({dim.x(), dim.y()});
 }
 
 void ship::tick_all_components(float step_s)
