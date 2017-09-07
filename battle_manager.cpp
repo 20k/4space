@@ -93,7 +93,7 @@ void spark::load()
 
     //tone_options.power_weights = {4, 4, 0.5};
 
-    tone_options.power_weights = {0.5f, 0.5f, 4.f};
+    tone_options.power_weights = {0.6f, 0.6f, 3.f};
 
     sf::Image img;
 
