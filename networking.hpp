@@ -548,23 +548,23 @@ struct network_state
 
                 packet_id_type next_packet_id = last_received_packet[first.no.owner_id] + 1;
 
-                if(first.header.packet_id != next_packet_id)
+                //if(first.header.packet_id != next_packet_id)
+                for(packet_id_type kk = next_packet_id; kk < first.header.packet_id && requests < max_requests; kk++)
                 {
-                    wait_info& info = packet_wait_map[first.no.owner_id][next_packet_id];
+                    wait_info& info = packet_wait_map[first.no.owner_id][kk];
 
                     if(info.too_long())
                     {
                         packet_request request;
                         request.owner_id = first.no.owner_id;
-                        request.packet_id = next_packet_id;
+                        request.packet_id = kk;
                         request.sequence_id = 0;
                         request.serialise_id = owner_to_packet_id_to_serialise[request.owner_id][first.header.packet_id];
 
                         make_packet_request(request);
                         info.request();
+                        requests++;
                     }
-
-                    requests++;
                 }
             }
 
@@ -574,7 +574,7 @@ struct network_state
                 forward_packet& cur = packet_list[i];
 
                 //if(last.header.packet_id + 1 != cur.header.packet_id)
-                for(int kk=last.header.packet_id + 1; kk < cur.header.packet_id; kk++)
+                for(packet_id_type kk=last.header.packet_id + 1; kk < cur.header.packet_id; kk++)
                 {
                     wait_info& info = packet_wait_map[cur.no.owner_id][last.header.packet_id];
 
