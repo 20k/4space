@@ -445,7 +445,7 @@ inline component make_default_railgun()
 
     gun.set_tag(component_tag::DAMAGE, 20.f);
     gun.set_tag(component_tag::SPEED, 2.f);
-    gun.set_tag(component_tag::SCALE, 0.5f);
+    gun.set_tag(component_tag::SCALE, 1.f);
 
     gun.name = "Railgun";
     gun.primary_attribute = ship_component_elements::RAILGUN;
@@ -488,7 +488,7 @@ inline component make_default_torpedo()
 
     torp.set_tag(component_tag::DAMAGE, 25);
     torp.set_tag(component_tag::SPEED, 1);
-    torp.set_tag(component_tag::SCALE, 0.5f);
+    torp.set_tag(component_tag::SCALE, 1.f);
 
     torp.name = "Torpedo";
     torp.primary_attribute = ship_component_elements::TORPEDO;

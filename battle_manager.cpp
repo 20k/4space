@@ -65,7 +65,6 @@ void tonemap(sf::Image& image, tonemap_options options)
     return tonemap({image.getSize().x, image.getSize().y}, options, image);
 }
 
-
 void premultiply(sf::Image& image)
 {
     auto dim = image.getSize();
@@ -87,18 +86,77 @@ void premultiply(sf::Image& image)
 
 void spark::load()
 {
-    tonemap_options options;
+    if(loaded)
+        return;
 
-    options.power_weights = {4, 4, 0.5};
+    tonemap_options tone_options;
+
+    //tone_options.power_weights = {4, 4, 0.5};
+
+    tone_options.power_weights = {0.5f, 0.5f, 4.f};
+
+    sf::Image img;
+
+    tonemap({12, 12}, tone_options, img);
+
+    tex.loadFromImage(img);
+    tex.setSmooth(true);
+
+    options.overall_scale = 1/5.f;
+    options.scale = {1.f, 5.f};
+    options.blur = false;
+
+    loaded = true;
+}
+
+vec2f spark::get_adjusted_scale()
+{
+    return mix((vec2f){options.scale.x(), options.scale.x() * 1.5f}, options.scale, 1.f - get_time_frac());
+}
+
+void spark_manager::init_effect(vec2f pos, vec2f dir)
+{
+    float fangle = 0.f;
+
+    int num = 5;
+
+    for(int i=0; i<num; i++)
+    {
+        //fangle = (float)i / (num + 1);
+
+        float frac = (float)i / (num + 1);
+
+        vec2f cone_dir = -dir;
+
+        float cone_angle = M_PI/8;
+
+        float fangle = frac * cone_angle + cone_dir.angle();
+
+        //fangle *= 2 * M_PI;
+
+        spark sp;
+        sp.pos = pos;
+        sp.dir = {cos(fangle), sin(fangle)};
+
+        sp.dir = sp.dir * dir.length();
+
+        sparks.push_back(sp);
+    }
 }
 
 void spark_manager::tick(float step_s)
 {
     for(spark& s : sparks)
     {
+        s.load();
+
         s.cur_duration_s += step_s;
 
-        s.pos = s.pos + s.dir * step_s;
+        s.pos = s.pos + s.dir * step_s * s.speed * (1.f - s.get_time_frac());
+
+        s.alpha = 1.f - s.get_time_frac();
+
+        s.alpha = clamp(s.alpha, 0.f, 1.f);
 
         if(s.cur_duration_s >= s.max_duration_s)
             s.cleanup = true;
@@ -109,11 +167,49 @@ void spark_manager::tick(float step_s)
 
 void spark_manager::draw(sf::RenderWindow& win)
 {
+    static sf::Shader shader;
+    static bool has_shader;
+
+    if(!has_shader)
+    {
+        shader.loadFromFile("gauss.fglsl", sf::Shader::Type::Fragment);
+        shader.setUniform("texture", sf::Shader::CurrentTexture);
+
+        has_shader = true;
+    }
+
+    sf::RenderStates states;
+    states.shader = &shader;
+
+    ///
+    sf::BlendMode mode(sf::BlendMode::SrcAlpha, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
+    states.blendMode = mode;
+
     for(spark& s : sparks)
     {
         sf::Sprite spr(s.tex);
 
-        win.draw(spr);
+        spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
+
+        spr.setPosition(s.pos.x(), s.pos.y());
+
+        spr.setRotation(r2d(s.dir.angle() + M_PI/2));
+
+        float scale = 1.f;
+        float base_scale = 0.5f;
+
+        scale *= base_scale;
+
+        vec2f s_scale = scale * s.options.scale * s.options.overall_scale * s.get_adjusted_scale();
+
+        spr.setScale(s_scale.x(), s_scale.y());
+
+        spr.setColor(sf::Color(255, 255, 255, 255 * s.alpha));
+
+        if(!s.options.blur)
+            win.draw(spr, mode);
+        else
+            win.draw(spr, states);
     }
 }
 
@@ -292,11 +388,7 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                 {
                     if(!p->owned_by->clientside_hit[p])
                     {
-                        spark sp;
-                        sp.dir = p->velocity;
-                        sp.pos = p->local_pos;
-
-                        p->owned_by->sparks.sparks.push_back(sp);
+                        p->owned_by->sparks.init_effect(p->local_pos, p->velocity);
                     }
 
                      p->owned_by->clientside_hit[p] = true;
@@ -423,9 +515,12 @@ void projectile_manager::draw(sf::RenderWindow& win)
         spr.setRotation(r2d(p->local_rot + M_PI/2));
 
         float scale = 1.f;
+        float base_scale = 0.5f;
 
         if(p->base.has_tag(component_tag::SCALE))
             scale = p->base.get_tag(component_tag::SCALE);
+
+        scale *= base_scale;
 
         spr.setScale(scale * p->options.scale.x() * p->options.overall_scale, scale * p->options.scale.y() * p->options.overall_scale);
 

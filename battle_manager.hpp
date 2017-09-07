@@ -11,8 +11,17 @@
 struct empire;
 struct ship;
 
+struct projectile_options
+{
+    vec2f scale = {1,1};
+    float overall_scale = 1.f;
+    bool blur = false;
+};
+
 struct spark
 {
+    projectile_options options;
+
     bool loaded = false;
 
     float cur_duration_s = 0.f;
@@ -20,13 +29,19 @@ struct spark
 
     vec2f pos;
     vec2f dir = {0, 1};
-    float speed = 1.f;
+    float speed = 1.f; ///not an overall control
 
     bool cleanup = false;
 
     sf::Texture tex;
 
+    float alpha = 1.f;
+
     void load();
+
+    float get_time_frac() {return cur_duration_s / max_duration_s;}
+
+    vec2f get_adjusted_scale();
 };
 
 struct spark_manager
@@ -35,18 +50,13 @@ struct spark_manager
 
     void tick(float step_s);
     void draw(sf::RenderWindow& win);
+
+    void init_effect(vec2f pos, vec2f dir);
 };
 
 struct tonemap_options
 {
     vec3f power_weights = {1, 1, 1};
-};
-
-struct projectile_options
-{
-    vec2f scale = {1,1};
-    float overall_scale = 1.f;
-    bool blur = false;
 };
 
 void tonemap(sf::Image& image, tonemap_options options = {{4, 4, 0.5}});
