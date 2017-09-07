@@ -137,7 +137,7 @@ struct star_map
             star_map_star star;
             star.pos = randv<3, float>(-1.f, 1.f) * 100000.f;
 
-            star.pos.z() = randf_s(0.f, 0.99998f);
+            star.pos.z() = randf_s(0.4f, 0.99998f);
 
             star.simple_renderable.init(3, 1.f, 3.f);
 
