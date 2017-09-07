@@ -6,47 +6,6 @@
 #include "battle_manager.hpp"
 #include "networking.hpp"
 
-/*void orbital_update_strategy(float time_between, system_manager& system_manage)
-{
-
-}
-
-void fleet_update_strategy(fleet_manager& fleet_manage)
-{
-
-}
-
-void battle_update_strategy(all_battles_manager& all_battles)
-{
-
-}
-
-void empire_update_strategy(empire_manager& empire_manage)
-{
-
-}*/
-
-///for updating orbitals and ships
-///have a separate one for updating.. basically managers and higher level info
-///eg for a system, we need to pipe the vector which contains references to orbitals
-/*void update_strategy(float current_time, float time_between_updates, int my_id, int max_ids, serialisable* object)
-{
-
-}*/
-
-/*void send_data(network_object& no, serialise& ser, network_state& net_state)
-{
-    serialise_data_helper::send_mode = 0;
-    serialise_data_helper::ref_mode = 0;
-
-    net_state.forward_data(no, ser);
-}*/
-
-/*void send_data(serialisable* t, serialise& ser, network_state& net_state, int send_mode)
-{
-
-}*/
-
 struct update_strategy
 {
     int num_updated = 0;
