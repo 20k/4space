@@ -143,11 +143,16 @@ void spark_manager::init_effect(vec2f pos, vec2f dir)
 
         float fangle = frac * cone_angle + cone_dir.angle();
 
+        float random_amount = 0.1f;
+
         spark sp;
         sp.pos = pos;
         sp.dir = {cos(fangle), sin(fangle)};
 
         sp.dir = sp.dir * dir.length();
+
+        if(randf_s(0.f, 1.f) < 0.3f)
+            sp.dir = sp.dir + sp.dir * randf_s(-random_amount, random_amount);
 
         sp.load();
 
