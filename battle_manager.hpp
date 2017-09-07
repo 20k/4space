@@ -13,17 +13,28 @@ struct ship;
 
 struct spark
 {
+    bool loaded = false;
+
     float cur_duration_s = 0.f;
     float max_duration_s = 1.f;
 
     vec2f pos;
     vec2f dir = {0, 1};
     float speed = 1.f;
+
+    bool cleanup = false;
+
+    sf::Texture tex;
+
+    void load();
 };
 
 struct spark_manager
 {
     std::vector<spark> sparks;
+
+    void tick(float step_s);
+    void draw(sf::RenderWindow& win);
 };
 
 struct tonemap_options

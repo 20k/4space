@@ -8,25 +8,26 @@
 
 uint32_t battle_manager::gid = 0;
 
-void tonemap(sf::Image& image, tonemap_options options)
+void tonemap(vec2i dim, tonemap_options options, sf::Image& img)
 {
-    auto dim = image.getSize();
-
     vec2f image_center_bias = {0.0f, -0.2f};
 
-    vec2f bias_factor = image_center_bias * (vec2f){dim.x, dim.y};
+    vec2f bias_factor = image_center_bias * (vec2f){dim.x(), dim.y()};
 
-    vec2f center = {(dim.x - 1)/2.f, (dim.y - 1)/2.f};
+    vec2f center = {(dim.x() - 1)/2.f, (dim.y() - 1)/2.f};
 
     float radius = center.x();
 
-    for(int y=0; y<dim.y; y++)
+    if(img.getSize().x != dim.x() || img.getSize().y != dim.y())
     {
-        for(int x=0; x<dim.x; x++)
+        img.create(dim.x(), dim.y());
+    }
+
+    for(int y=0; y<dim.y(); y++)
+    {
+        for(int x=0; x<dim.x(); x++)
         {
             vec2f pos = {x, y};
-
-            sf::Color col = image.getPixel(x, y);
 
             //float intensity = col.a / 255.f;
 
@@ -54,10 +55,16 @@ void tonemap(sf::Image& image, tonemap_options options)
 
             sf::Color ncol(test_col.x() * 255, test_col.y() * 255, test_col.z() * 255, intensity * 255);
 
-            image.setPixel(x, y, ncol);
+            img.setPixel(x, y, ncol);
         }
     }
 }
+
+void tonemap(sf::Image& image, tonemap_options options)
+{
+    return tonemap({image.getSize().x, image.getSize().y}, options, image);
+}
+
 
 void premultiply(sf::Image& image)
 {
@@ -75,6 +82,38 @@ void premultiply(sf::Image& image)
 
             image.setPixel(x, y, col);
         }
+    }
+}
+
+void spark::load()
+{
+    tonemap_options options;
+
+    options.power_weights = {4, 4, 0.5};
+}
+
+void spark_manager::tick(float step_s)
+{
+    for(spark& s : sparks)
+    {
+        s.cur_duration_s += step_s;
+
+        s.pos = s.pos + s.dir * step_s;
+
+        if(s.cur_duration_s >= s.max_duration_s)
+            s.cleanup = true;
+    }
+
+    remove_cleanups_from(sparks);
+}
+
+void spark_manager::draw(sf::RenderWindow& win)
+{
+    for(spark& s : sparks)
+    {
+        sf::Sprite spr(s.tex);
+
+        win.draw(spr);
     }
 }
 
@@ -278,6 +317,7 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                     found_ship->hit(p, system_manage);
 
                     ///problematic for network, defer calls
+                    ///wait am I just not cleaning these up? oops
                     //destroy(p);
                     //kk--;
                     term = true;
@@ -518,6 +558,8 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
         }
     }
 
+    sparks.tick(step_s);
+
     tick_ai(*this, step_s);
 
     float global_weapon_speed = 60.f;
@@ -668,6 +710,8 @@ void battle_manager::draw(sf::RenderWindow& win, system_manager& system_manage)
 
         s->highlight = false;
     }
+
+    sparks.draw(win);
 }
 
 vec2f battle_manager::get_avg_centre_global()

@@ -23,6 +23,16 @@ using serialise_data_type = uint64_t;
 using serialise_dirty_type = uint8_t;
 using serialise_attention_type = uint8_t;
 
+template<typename T>
+void remove_cleanups_from(T& container)
+{
+    container.erase(std::remove_if(container.begin(),
+                                   container.end(),
+                                   [&](const auto v)
+                                       { return v.cleanup; }),
+                    container.end());
+}
+
 
 //#define serialise_owner_type int32_t
 //#define serialise_data_type uint64_t
