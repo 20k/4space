@@ -558,6 +558,8 @@ void projectile_manager::draw(sf::RenderWindow& win)
     }
 }
 
+///So. I think projectiles are only being networked when they're made and then all other calculations are clientside
+///this is suboptimal
 void projectile_manager::do_serialise(serialise& s, bool ser)
 {
     if(serialise_data_helper::send_mode == 1)

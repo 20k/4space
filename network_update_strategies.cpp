@@ -224,7 +224,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///mode 2 is diff mode, where we send diff updates
     ///change in container size (num dirty), maybe diff hp as well
     static update_strategy system_strategy;
-    system_strategy.do_update_strategy(dt_s, 0.5f, systems, net_state, 2);
+    system_strategy.do_update_strategy(dt_s, 1.f, systems, net_state, 2);
 
     /*std::vector<projectile*> projectiles;
 
@@ -255,7 +255,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     }
 
     static update_strategy battle_strategy;
-    battle_strategy.do_update_strategy(dt_s, 2.f, sync_battles, net_state, 0);
+    battle_strategy.do_update_strategy(dt_s, 1.f, sync_battles, net_state, 0);
 
     static update_strategy all_battle_strategy;
     all_battle_strategy.do_update_strategy(dt_s, 5.f, all_battles_hack, net_state, 0);
