@@ -565,8 +565,15 @@ void star_map::draw(sf::RenderWindow& win)
         if(spos.x < 0 || spos.x >= win.getSize().x || spos.y < 0 || spos.y >= win.getSize().y)
             continue;
 
+        float min_size = 0.25f;
+
+        float star_size_frac = system_manager::temperature_fraction_to_size_fraction(star.temp);
+
+        float scale = mix(star_size_frac/8.f, star_size_frac, 1.f - star.pos.z());
+        //float scale = mix(min_size, x, 1.f - star.pos.z());
+
         star.simple_renderable.main_rendering(win, 0.f, star.pos.xy() - disp,
-                                              system_manager::temperature_fraction_to_size_fraction(star.temp),
+                                              scale * 16,
                                               system_manager::temperature_fraction_to_colour(star.temp) / 255.f);
     }
 }
