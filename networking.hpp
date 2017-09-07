@@ -903,6 +903,9 @@ struct network_state
     ///change owns() to respect this. It should be a fairly transparent change
     void forward_data(const network_object& no, serialise& s)
     {
+        if(!connected())
+            return;
+
         int max_to_send = 20;
 
         int fragments = get_packet_fragments(s.data.size());
@@ -929,9 +932,7 @@ struct network_state
         {
             byte_vector frag = get_fragment(i, no, s.data, packet_id);
 
-            ///ah. we have a packet id conflict, if we pipe down on no.owner_id, our packet id will overlap
-            ///and the data will never get delivered
-            ///no.owner_id actually needs to be the id of the client, not who owns the data
+            ///no.owner_id is.. always me here?
             owner_to_packet_id_to_sequence_number_to_data[no.owner_id][packet_id][i] = {frag};
 
             if(i < max_to_send)
