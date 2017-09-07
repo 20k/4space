@@ -661,9 +661,6 @@ struct network_state
 
                         if(current_received_fragments == packet_fragments)
                         {
-                            //std::cout << "hello there \n";
-                            //std::cout << packets.size() << " " << packet_fragments << std::endl;
-
                             std::sort(packets.begin(), packets.end(), [](packet_info& p1, packet_info& p2){return p1.sequence_number < p2.sequence_number;});
 
                             serialise s;
@@ -675,13 +672,9 @@ struct network_state
                                 packet.data.data.clear();
                             }
 
-                            //std::cout << s.data.size() << std::endl;
-
                             ///pipe back a response?
                             if(s.data.size() > 0)
                             {
-                                //available_data.push_back({no, s, header.packet_id});
-
                                 if(received_packet[packet.no.owner_id][packet.header.packet_id] == false)
                                 {
                                     packet.fetch = byte_fetch();
@@ -699,11 +692,6 @@ struct network_state
                     }
                     else
                     {
-                        /*serialise s;
-                        s.data = packet.fetch.ptr;
-
-                        available_data.push_back({no, s, header.packet_id});*/
-
                         if(received_packet[no.owner_id][header.packet_id] == false)
                         {
                             forward_packet full_forward = packet;
@@ -859,12 +847,8 @@ struct network_state
                 should_slowdown = true;
         }
 
-        //std::cout << should_slowdown << std::endl;
-
         if(should_slowdown)
             max_to_send = 1;
-
-        //std::cout << packet_id << std::endl;
 
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
@@ -883,60 +867,6 @@ struct network_state
 
         packet_id = packet_id + 1;
     }
-
-    /*void forward_data(int player_id, int object_id, int system_network_id, const byte_vector& vec)
-    {
-        network_variable nv(player_id, object_id, system_network_id);
-
-        uint32_t data_size = sizeof(nv) + vec.ptr.size();
-
-        byte_vector cv;
-        cv.push_back(canary_start);
-        cv.push_back(message::FORWARDING);
-        cv.push_back(data_size);
-        cv.push_back<network_variable>(nv);
-        cv.push_vector(vec);
-        cv.push_back(canary_end);
-
-        udp_send_to(sock, cv.ptr, (const sockaddr*)&store);
-    }
-
-    int16_t get_next_object_id()
-    {
-        return next_object_id++;
-    }*/
-
-    /*template<typename manager_type, typename real_type>
-    void check_create_network_entity(manager_type& generic_manager)
-    {
-        for(auto& i : available_data)
-        {
-            network_variable& var = std::get<0>(i);
-
-            if(var.system_network_id != generic_manager.system_network_id)
-                continue;
-
-            if(var.player_id == my_id)
-                continue;
-
-            if(generic_manager.owns(var.object_id, var.player_id))
-                continue;
-
-            ///make new slave entity here!
-
-            ///when reading this, ignore the template keyword
-            ///its because this is a dependent type
-            auto new_entity = generic_manager.template make_new<real_type>();
-
-            real_type* found_entity = dynamic_cast<real_type*>(new_entity);
-
-            //real_type* found_entity = dynamic_cast<real_type*>(generic_manager.make_new<real_type>());
-
-            found_entity->object_id = var.object_id;
-            found_entity->set_owner(var.player_id);
-            found_entity->ownership_class = var.player_id;
-        }
-    }*/
 
     void tick_cleanup()
     {
