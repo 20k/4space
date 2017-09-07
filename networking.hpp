@@ -49,7 +49,7 @@ struct network_object
     serialise_data_type serialise_id = -1;
 };
 
-using packet_id_type = uint32_t;
+using packet_id_type = int32_t;
 using sequence_data_type = int32_t;
 
 ///update so that when processed, we keep around for 10 seconds or so then delete
@@ -222,11 +222,11 @@ struct network_state
         packet_id_type packet_id = 0;
     };
 
-    struct request_timeout_info
+    /*struct request_timeout_info
     {
         bool ever = false;
         sf::Clock clk;
-    };
+    };*/
 
     bool owns(serialisable* s)
     {
@@ -266,7 +266,25 @@ struct network_state
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
     }
 
-    std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, request_timeout_info>>> owner_to_request_timeouts;
+
+    struct wait_info
+    {
+        bool first = true;
+        sf::Clock clk;
+
+        bool too_long()
+        {
+            return (clk.getElapsedTime().asMilliseconds() > 500) || first;
+        }
+
+        void request()
+        {
+            first = false;
+            clk.restart();
+        }
+    };
+
+    std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, wait_info>>> owner_to_request_timeouts;
 
     std::map<serialise_owner_type, std::map<packet_id_type, sequence_data_type>> current_packet_fragment;
 
@@ -290,8 +308,8 @@ struct network_state
 
                 std::vector<packet_info>& packets = packet_ids.second;
 
-                if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
-                    continue;
+                //if(packets.size() == owner_to_packet_sequence_to_expected_size[owner_id][packet_id])
+                //    continue;
 
                 int total_requests = 0;
 
@@ -304,16 +322,19 @@ struct network_state
                     total_requests++;
                 }
 
-                /*sequence_data_type sequence_id = -1;
+                sequence_data_type sequence_id = -1;
 
                 for(int i=1; i<packets.size(); i++)
                 {
                     packet_info& last = packets[i-1];
                     packet_info& cur = packets[i];
 
-                    if(cur.sequence_number - 1 != last.sequence_number)
+                    //if(cur.sequence_number - 1 != last.sequence_number)
                     {
-                        requests.push_back({owner_id, cur.sequence_number - 1, packet_id});
+                        for(int kk=last.sequence_number + 1; kk < cur.sequence_number; kk++)
+                        {
+                            requests[packet_id].push_back({owner_id, kk, packet_id});
+                        }
                     }
 
                     sequence_id = cur.sequence_number;
@@ -328,10 +349,10 @@ struct network_state
 
                 for(; sequence_id < owner_to_packet_sequence_to_expected_size[owner_id][packet_id]; sequence_id++)
                 {
-                    requests.push_back({owner_id, sequence_id, packet_id});
-                }*/
+                    requests[packet_id].push_back({owner_id, sequence_id, packet_id});
+                }
 
-                for(int i=current_packet_sequence; i < ((int)packets.size()) - 1; i++)
+                /*for(int i=current_packet_sequence; i < ((int)packets.size()) - 1; i++)
                 {
                     if(packets[i].sequence_number + 1 == packets[i + 1].sequence_number)
                     {
@@ -367,22 +388,17 @@ struct network_state
                 {
                     total_requests++;
                     requests[packet_id].push_back({owner_id, sequence_id, packet_id});
-                }
-
-                //printf("num requests %i\n", total_requests);
+                }*/
             }
         }
 
-        float request_timeout_s = 0.4f;
-
-        //for(int i=0; i<requests.size(); i++)
         for(auto& id : requests)
         {
             for(int i=0; i<id.second.size(); i++)
             {
-                request_timeout_info& inf = owner_to_request_timeouts[id.second[i].owner_id][id.second[i].packet_id][id.second[i].sequence_id];
+                wait_info& inf = owner_to_request_timeouts[id.second[i].owner_id][id.second[i].packet_id][id.second[i].sequence_id];
 
-                if(inf.clk.getElapsedTime().asMilliseconds() / 1000.f < request_timeout_s)
+                if(!inf.too_long())
                 {
                     id.second.erase(id.second.begin() + i);
                     i--;
@@ -391,60 +407,24 @@ struct network_state
             }
         }
 
-        int num = max_fragments_to_request;
-
-        if(num < 0)
-            num = 0;
-
-        /*if(requests.size() > num)
-        {
-            requests.resize(num);
-        }*/
-
-
-        if(requests.size() == 0)
-            return;
-
         int current_requests = 0;
 
         for(auto& req : requests)
         {
-            //auto req = requests.begin();
-
-            /*if(req->second.size() > max_fragments_to_request)
-            {
-                req->second.resize(max_fragments_to_request);
-            }*/
-
             for(packet_request& i : req.second)
             {
-                if(current_requests > max_fragments_to_request)
+                if(current_requests >= max_fragments_to_request)
                     return;
+
+                owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].request();
 
                 i.serialise_id = owner_to_packet_id_to_serialise[i.owner_id][i.packet_id];
 
                 make_packet_request(i);
 
-                //std::cout << "req " << i.sequence_id << std::endl;
-
-                owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].clk.restart();
-                owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].ever = true;
-
                 current_requests++;
             }
         }
-
-        /*for(packet_request& i : requests)
-        {
-            i.serialise_id = owner_to_packet_id_to_serialise[i.owner_id][i.packet_id];
-
-            make_packet_request(i);
-
-            //std::cout << "req " << i.sequence_id << std::endl;
-
-            owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].clk.restart();
-            owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].ever = true;
-        }*/
     }
 
     ///hmm
@@ -477,14 +457,14 @@ struct network_state
                 available_data[i].should_cleanup = true;
             }
 
-            if(!data.processed && data.clk.getElapsedTime().asMilliseconds() / 1000.f > hard_cleanup_time)
+            /*if(!data.processed && data.clk.getElapsedTime().asMilliseconds() / 1000.f > hard_cleanup_time)
             {
                 network_object& net_obj = data.object;
 
                 packet_id_type packet_id = data.packet_id;
 
                 incomplete_packets[net_obj.owner_id].erase(packet_id);
-            }
+            }*/
         }
     }
 
@@ -501,6 +481,8 @@ struct network_state
 
         available_data.push_back({packet.no, s, packet.header.packet_id});
 
+        std::cout << "av" << packet.header.packet_id << std::endl;
+
         //forward_ordered_packets[owner].erase(forward_ordered_packets[owner].begin() + id);
 
         packet_ack ack;
@@ -510,21 +492,6 @@ struct network_state
 
         make_packet_ack(ack);
     }
-
-    struct wait_info
-    {
-        sf::Clock clk;
-
-        bool too_long()
-        {
-            return clk.getElapsedTime().asMilliseconds() > 500;
-        }
-
-        void request()
-        {
-            clk.restart();
-        }
-    };
 
     std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, bool>>> has_packet_fragment;
 
@@ -547,17 +514,6 @@ struct network_state
             std::sort(packet_list.begin(), packet_list.end(),
                 [](auto& p1, auto& p2){return p1.header.packet_id < p2.header.packet_id;});
 
-            ///I love you bjarne but also fuck you
-            for(int i=0; i<((int)packet_list.size()) - 1; i++)
-            {
-                if(packet_list[i].header.packet_id == packet_list[i+1].header.packet_id)
-                {
-                    packet_list.erase(packet_list.begin() + i);
-                    i--;
-                    continue;
-                }
-            }
-
             for(int i=0; i<packet_list.size(); i++)
             {
                 forward_packet& current_packet = packet_list[i];
@@ -567,9 +523,10 @@ struct network_state
                     last_received_packet[current_packet.no.owner_id] = current_packet.header.packet_id - 1;
                 }
 
-                if(current_packet.header.packet_id == last_received_packet[current_packet.no.owner_id] + 1)
+                if(current_packet.header.packet_id <= last_received_packet[current_packet.no.owner_id] + 1)
                 {
-                    last_received_packet[current_packet.no.owner_id] = current_packet.header.packet_id;
+                    if(current_packet.header.packet_id == last_received_packet[current_packet.no.owner_id] + 1)
+                        last_received_packet[current_packet.no.owner_id]++;
 
                     packet_wait_map[current_packet.no.owner_id].erase(current_packet.header.packet_id);
                     make_available(current_packet.no.owner_id, 0);
@@ -577,9 +534,13 @@ struct network_state
                     i--;
                     continue;
                 }
+                /*else
+                {
+                    break;
+                }*/
             }
 
-            int max_requests = 10;
+            int max_requests = 50;
             int requests = 0;
 
             if(packet_list.size() > 0)
@@ -613,7 +574,8 @@ struct network_state
                 forward_packet& last = packet_list[i-1];
                 forward_packet& cur = packet_list[i];
 
-                if(last.header.packet_id + 1 != cur.header.packet_id)
+                //if(last.header.packet_id + 1 != cur.header.packet_id)
+                for(int kk=last.header.packet_id + 1; kk < cur.header.packet_id; kk++)
                 {
                     wait_info& info = packet_wait_map[cur.no.owner_id][last.header.packet_id];
 
@@ -627,7 +589,7 @@ struct network_state
 
                     packet_request request;
                     request.owner_id = last.no.owner_id;
-                    request.packet_id = last.header.packet_id + 1;
+                    request.packet_id = kk;
                     request.sequence_id = 0;
                     ///this is invalid right?
                     request.serialise_id = owner_to_packet_id_to_serialise[request.owner_id][last.header.packet_id];
@@ -814,7 +776,6 @@ struct network_state
                             ///pipe back a response?
                             if(s.data.size() > 0)
                             {
-                                //std::cout << "got full dataset " << s.data.size() << std::endl;
                                 //available_data.push_back({no, s, header.packet_id});
 
                                 if(received_packet[packet.no.owner_id][packet.header.packet_id] == false)
@@ -995,6 +956,8 @@ struct network_state
 
         if(should_slowdown)
             max_to_send = 0;
+
+        //std::cout << packet_id << std::endl;
 
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {

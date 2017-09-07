@@ -244,10 +244,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///the reason why ship cleaning isn't working accross the network is beause its not being sent
     ///need to force packet sending on cleanup
     static update_strategy ship_strategy;
-    ship_strategy.do_update_strategy(dt_s, 1.f, ships, net_state, 0);
+    ship_strategy.do_update_strategy(dt_s, 10.f, ships, net_state, 0);
 
     static update_strategy ship_manager_strategy;
-    ship_manager_strategy.do_update_strategy(dt_s, 1, fleets, net_state, 0);
+    ship_manager_strategy.do_update_strategy(dt_s, 10, fleets, net_state, 0);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate
@@ -303,10 +303,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     }
 
     static update_strategy battle_strategy;
-    battle_strategy.do_update_strategy(dt_s, 0.1f, sync_battles, net_state, 0);
+    battle_strategy.do_update_strategy(dt_s, 2.f, sync_battles, net_state, 0);
 
     static update_strategy all_battle_strategy;
-    all_battle_strategy.do_update_strategy(dt_s, 0.5f, all_battles_hack, net_state, 0);
+    all_battle_strategy.do_update_strategy(dt_s, 5.f, all_battles_hack, net_state, 0);
 
     std::vector<empire*> empires;
 
@@ -322,7 +322,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     }
 
     static update_strategy empire_strategy;
-    empire_strategy.do_update_strategy(dt_s, 2.f, empires, net_state, 0);
+    empire_strategy.do_update_strategy(dt_s, 10.f, empires, net_state, 0);
 
 
     //std::cout << fleets.size() << std::endl;

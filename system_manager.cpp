@@ -1375,9 +1375,9 @@ void orbital::do_serialise(serialise& s, bool ser)
 float get_orbital_update_rate(orbital_info::type type)
 {
     if(type == orbital_info::FLEET)
-        return 0.5f;
+        return 2.f;
 
-    return 5.f;
+    return 20.f;
 }
 
 /*void orbital::ensure_handled_by_client()

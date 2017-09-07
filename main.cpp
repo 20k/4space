@@ -3646,6 +3646,9 @@ int main()
             net_state.forward_data(no_test, ser);
         }
 
+        if(key.isKeyPressed(sf::Keyboard::H))
+            std::cout << "pid " << net_state.packet_id << std::endl;
+
         //if(ImGui::Button("Try mini packet") && net_state.my_id != -1)
 
         ///ok. This is fine. What we need to do now is mark serialisation strategies with priorities
