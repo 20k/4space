@@ -11,6 +11,21 @@
 struct empire;
 struct ship;
 
+struct spark
+{
+    float cur_duration_s = 0.f;
+    float max_duration_s = 1.f;
+
+    vec2f pos;
+    vec2f dir = {0, 1};
+    float speed = 1.f;
+};
+
+struct spark_manager
+{
+    std::vector<spark> sparks;
+};
+
 struct tonemap_options
 {
     vec3f power_weights = {1, 1, 1};
@@ -153,6 +168,11 @@ struct star_map
 ///no need to serialise this now
 struct battle_manager : serialisable
 {
+    ///this is compensating for an error that projectile cleanup state is not networked
+    std::map<projectile*, bool> clientside_hit;
+
+    spark_manager sparks;
+
     star_map stars;
 
     ///this is starting to be a bit of a snafu

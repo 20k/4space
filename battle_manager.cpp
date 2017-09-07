@@ -78,6 +78,8 @@ void premultiply(sf::Image& image)
     }
 }
 
+///really need to load things lazily (on first draw), as well as from a cache
+///lets do sparks on hit
 void projectile::load(int _type)
 {
     using namespace ship_component_elements;
@@ -244,6 +246,23 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
         {
             for(ship* found_ship : o->data->ships)
             {
+                ///projectile cleanup state not networked
+                ///relying on local hit detection is an error ALERT
+                ///not an issue currently but will graphically cause errors later
+                if(projectile_within_ship(p, found_ship))
+                {
+                    if(!p->owned_by->clientside_hit[p])
+                    {
+                        spark sp;
+                        sp.dir = p->velocity;
+                        sp.pos = p->local_pos;
+
+                        p->owned_by->sparks.sparks.push_back(sp);
+                    }
+
+                     p->owned_by->clientside_hit[p] = true;
+                }
+
                 if(!net_state.owns(found_ship))
                     continue;
 
