@@ -342,9 +342,6 @@ void projectile::do_serialise(serialise& s, bool ser)
         }
     }
 
-
-    std::cout << owned_by << std::endl;
-
     //handled_by_client = true;
 }
 
@@ -410,6 +407,12 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
         {
             for(ship* found_ship : o->data->ships)
             {
+                if(p->requires_attention)
+                {
+                    //p->cleanup = true;
+                    //p->make_dirty();
+                }
+
                 ///projectile cleanup state not networked
                 ///relying on local hit detection is an error ALERT
                 ///not an issue currently but will graphically cause errors later
@@ -432,10 +435,12 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                 if(!net_state.owns(found_ship))
                     continue;
 
-                if(projectile_within_ship(p, found_ship))
+                if(projectile_within_ship(p, found_ship) && !p->requires_attention)
                 {
                     //p->cleanup = true;
                     //p->make_dirty();
+
+                    p->requires_attention = 1;
 
                     auto fully_merged = found_ship->get_fully_merged(1.f);
 
@@ -443,6 +448,8 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
 
                     if(hp_condition)
                         continue;
+
+                    std::cout << "hit\n";
 
                     found_ship->hit(p, system_manage);
 
@@ -1257,7 +1264,7 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     }
 }
 
-battle_manager::battle_manager() : stars(2000)
+battle_manager::battle_manager() : stars(200)
 {
 
 }
