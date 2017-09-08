@@ -3429,6 +3429,9 @@ int main()
                     {
                         projectile* proj = (projectile*)obj;
 
+                        //std::cout << proj << std::endl;
+                        //std::cout << proj->owned_by << std::endl;
+
                         proj->owned_by->projectile_manage.projectiles.insert(proj);
 
                         obj->handled_by_client = true;

@@ -342,7 +342,10 @@ void projectile::do_serialise(serialise& s, bool ser)
         }
     }
 
-    handled_by_client = true;
+
+    std::cout << owned_by << std::endl;
+
+    //handled_by_client = true;
 }
 
 projectile* projectile_manager::make_new(battle_manager& battle_manage)
@@ -418,6 +421,12 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                     }
 
                      p->owned_by->clientside_hit[p] = true;
+
+                     if(net_state.owns(p))
+                     {
+                         p->cleanup = true;
+                         p->make_dirty();
+                     }
                 }
 
                 if(!net_state.owns(found_ship))
@@ -425,8 +434,8 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
 
                 if(projectile_within_ship(p, found_ship))
                 {
-                    p->cleanup = true;
-                    p->make_dirty();
+                    //p->cleanup = true;
+                    //p->make_dirty();
 
                     auto fully_merged = found_ship->get_fully_merged(1.f);
 
