@@ -73,6 +73,8 @@ void orbital_simple_renderable::init(int n, float min_rad, float max_rad)
 {
     vert_dist.clear();
 
+    vert_dist.reserve(n);
+
     for(int i=0; i<n; i++)
     {
         vert_dist.push_back(randf_s(min_rad, max_rad));

@@ -3356,6 +3356,9 @@ int main()
 
 
         auto handle_unprocessed = [&](){
+
+            bool handled = true;
+
             for(auto& unprocessed : serialise_data_helper::type_to_datas)
             {
                 const size_t type = unprocessed.first;
@@ -3402,7 +3405,20 @@ int main()
                         obj->handled_by_client = true;
                     }
                 }
-                else if(typeid(projectile*).hash_code() == type)
+                else
+                {
+                    handled = false;
+                }
+            }
+
+            bool h2 = true;
+
+            for(auto& unprocessed : serialise_data_helper::type_to_datas)
+            {
+                const size_t type = unprocessed.first;
+                unhandled_types& objects = unprocessed.second;
+
+                if(typeid(projectile*).hash_code() == type)
                 {
                     for(serialisable* obj : objects.data)
                     {
@@ -3414,6 +3430,11 @@ int main()
                     }
                 }
                 else
+                {
+                    h2 = false;
+                }
+
+                if(!handled && !h2)
                 {
                     std::cout << "Warning unhandled type " << objects.type_name << std::endl;
                 }

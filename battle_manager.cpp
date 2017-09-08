@@ -752,9 +752,11 @@ star_map::star_map(int num)
 {
     procedural_text_generator temp_gen;
 
+    stars.resize(num);
+
     for(int i=0; i<num; i++)
     {
-        star_map_star star;
+        star_map_star& star = stars[i];
         star.pos = randv<3, float>(-1.f, 1.f) * 20000.f;
 
         /*float max_rad = 20000;
@@ -773,8 +775,6 @@ star_map::star_map(int num)
 
         star.drift_direction = randv<2, float>(-1.f, 1.f);
         star.drift_speed = randf_s(0.f, 1.f);
-
-        stars.push_back(star);
     }
 }
 
@@ -1246,7 +1246,7 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     }
 }
 
-battle_manager::battle_manager() : stars(20000)
+battle_manager::battle_manager() : stars(2000)
 {
 
 }

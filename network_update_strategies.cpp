@@ -254,12 +254,11 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
         sync_battles.push_back(bm);
     }
 
-    static update_strategy battle_strategy;
-    battle_strategy.do_update_strategy(dt_s, 1.f, sync_battles, net_state, 0);
-
     static update_strategy all_battle_strategy;
     all_battle_strategy.do_update_strategy(dt_s, 5.f, all_battles_hack, net_state, 0);
 
+    static update_strategy battle_strategy;
+    battle_strategy.do_update_strategy(dt_s, 1.f, sync_battles, net_state, 0);
     std::vector<empire*> empires;
 
     ///REMEMBER THIS WONT WORK IF WE SPAWN A NEW EMPIRE AT RUNTIME OK? OK
