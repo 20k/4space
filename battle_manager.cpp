@@ -571,6 +571,8 @@ void projectile_manager::do_serialise(serialise& s, bool ser)
     {
         s.handle_serialise_no_clear(projectiles, ser);
     }
+
+    handled_by_client = true;
 }
 
 void tick_ship_ai(battle_manager& battle_manage, ship& s, float step_s)
@@ -1779,6 +1781,8 @@ void all_battles_manager::do_serialise(serialise& s, bool ser)
     {
         s.handle_serialise_no_clear(battles, ser);
     }
+
+    handled_by_client = true;
 }
 
 void all_battles_manager::erase_all()

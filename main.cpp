@@ -3046,6 +3046,11 @@ int main()
 
     network_updater net_update;
 
+    //empire_manage.explicit_register();
+    //fleet_manage.explicit_register();
+    //system_manage.explicit_register();
+    //all_battles->explicit_register();
+
     while(window.isOpen())
     {
         /*playing_music.tick(diff_s);

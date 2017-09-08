@@ -104,6 +104,8 @@ struct serialisable
     serialise_dirty_type dirty = 0;
     serialise_attention_type requires_attention = 0;
 
+    static inline serialise_data_type explicit_serialise_id = 0;
+
     //bool owned = true;
 
     void make_dirty()
@@ -116,6 +118,12 @@ struct serialisable
     virtual void do_serialise(serialise& s, bool ser)
     {
 
+    }
+
+    void explicit_register()
+    {
+        host_id = -2;
+        serialise_id = explicit_serialise_id++;
     }
 
     ///the reason why we crash at outro is, i believe, static initialisation fiasco
@@ -652,7 +660,7 @@ struct serialise_helper<std::string>
 
         if(s.internal_counter + length * sizeof(char) > (int)s.data.size())
         {
-            std::cout << "Error, invalid bytefetch st" << std::endl;
+            std::cout << "Error, invalid bytefetch st " << length << " " << s.data.size() << std::endl;
 
             v = std::string();
 
