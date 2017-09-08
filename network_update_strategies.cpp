@@ -266,7 +266,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
             if(p->dirty)
             {
                 p->owned_by->make_dirty();
-                all_battles.make_dirty();
+                //all_battles.make_dirty();
                 continue;
             }
 
