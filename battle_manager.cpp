@@ -1025,6 +1025,34 @@ ship* battle_manager::get_nearest_hostile(ship* s)
         }
     }
 
+    if(found_ship == nullptr)
+    {
+        for(orbital* o : ship_map)
+        {
+            for(ship* os : o->data->ships)
+            {
+                empire* other = o->parent_empire;
+
+                if(my_empire->is_allied(other))
+                    continue;
+
+                if(os->fully_disabled())
+                    continue;
+
+                vec2f my_pos = s->local_pos;
+                vec2f their_pos = os->local_pos;
+
+                float dist = (my_pos - their_pos).length();
+
+                if(dist < min_dist)
+                {
+                    min_dist = dist;
+                    found_ship = os;
+                }
+            }
+        }
+    }
+
     return found_ship;
 }
 
