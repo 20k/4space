@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <vec/vec.hpp>
 
 #define IMGUI_WINDOW_FLAGS ImGuiWindowFlags_NoFocusOnAppearing
 
@@ -43,7 +44,7 @@ struct top_bar
     //void set_str(top_bar_info::types type, std::string str);
     static bool get_active(top_bar_info::types type);
 
-    static void display();
+    static void display(vec2i window_dim);
 };
 
 #endif // TOP_BAR_HPP_INCLUDED

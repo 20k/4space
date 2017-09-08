@@ -3910,7 +3910,7 @@ int main()
 
         ship_customise.tick(scrollwheel_delta, lclick, mpos - mouse_last);
 
-        top_bar::display();
+        top_bar::display({window.getSize().x, window.getSize().y});
         tooltip::set_clear_tooltip();
 
         ImGui::tick_suppress_frames();

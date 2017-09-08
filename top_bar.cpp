@@ -10,9 +10,23 @@ bool top_bar::get_active(top_bar_info::types type)
     return active[type];
 }
 
-void top_bar::display()
+void top_bar::display(vec2i window_dim)
 {
-    ImGui::BeginOverride("###TOP_BAR", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+    static vec2i last_size;
+    static bool has_size = false;
+
+    if(has_size)
+    {
+        //ImGui::SetNextWindowSize(ImVec2(last_size.x(), last_size.y()));
+        ImGui::SetNextWindowPos(ImVec2(window_dim.x()/2 - last_size.x()/2, 0));
+    }
+    else
+    {
+        ///this is not an error
+        ImGui::SetNextWindowPos(ImVec2(0, window_dim.y() * 2));
+    }
+
+    ImGui::BeginOverride("###TOP_BAR", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
     int num = 0;
 
@@ -42,6 +56,10 @@ void top_bar::display()
         num++;
     }
 
+    auto dim = ImGui::GetWindowSize();
+
+    last_size = {dim.x, dim.y};
+    has_size = true;
 
     ImGui::End();
 }
