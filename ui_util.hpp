@@ -129,7 +129,7 @@ namespace ImGui
     }
 
     inline
-    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0}, int thickness = 1, bool force_hover = false, vec3f hover_col = {-1, -1, -1})
+    void OutlineHoverText(const std::string& txt, vec3f col, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0}, int thickness = 1, bool force_hover = false, vec3f hover_col = {-1, -1, -1}, int force_hover_thickness = 0)
     {
         ImGui::BeginGroup();
 
@@ -168,7 +168,7 @@ namespace ImGui
 
             if(force_hover && !currently_hovered)
             {
-                thickness = 0;
+                thickness = force_hover_thickness;
             }
 
             ImGui::SetCursorScreenPos(ImVec2(screen_pos.x - thickness, screen_pos.y - thickness));

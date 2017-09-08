@@ -1,6 +1,7 @@
 #include "top_bar.hpp"
 #include "../../render_projects/imgui/imgui.h"
 #include "ui_util.hpp"
+#include "popup.hpp"
 
 std::vector<std::string> top_bar::headers = top_bar_info::names;
 std::map<top_bar_info::types, bool> top_bar::active;
@@ -18,7 +19,7 @@ void top_bar::display(vec2i window_dim)
     if(has_size)
     {
         //ImGui::SetNextWindowSize(ImVec2(last_size.x(), last_size.y()));
-        ImGui::SetNextWindowPos(ImVec2(window_dim.x()/2 - last_size.x()/2, 0));
+        ImGui::SetNextWindowPos(ImVec2(window_dim.x()/2 - last_size.x()/2, last_size.y()/8));
     }
     else
     {
@@ -39,7 +40,16 @@ void top_bar::display(vec2i window_dim)
             pad = "+";
         }
 
-        ImGui::Text((pad + i + pad).c_str());
+        /*ImGui::NeutralText(pad + i + pad);
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            active[(top_bar_info::types)num] = !active[(top_bar_info::types)num];
+        }*/
+
+        bool is_active = active[(top_bar_info::types)num];
+        vec3f highlight_col = {0.4, 0.4, 0.4};
+        ImGui::OutlineHoverText(i, highlight_col, {1,1,1}, true, {8,2}, 1, is_active, highlight_col/2, is_active);
 
         if(ImGui::IsItemClicked_Registered())
         {
