@@ -685,6 +685,7 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
         }
     }
 
+    stars.tick(step_s);
     sparks.tick(step_s);
 
     tick_ai(*this, step_s, net_state);
@@ -770,7 +771,26 @@ star_map::star_map(int num)
 
         star.temp = temp_gen.generate_star_temperature_fraction();
 
+        star.drift_direction = randv<2, float>(-1.f, 1.f);
+        star.drift_speed = randf_s(0.f, 1.f);
+
         stars.push_back(star);
+    }
+}
+
+void star_map::tick(float step_s)
+{
+    for(star_map_star& star : stars)
+    {
+        //s.pos +=
+
+        vec2f dir = star.drift_direction;
+
+        dir = mix((vec2f){0,0}, dir, 1.f - star.pos.z());
+
+        dir = dir * star.drift_speed * 30.f;
+
+        star.pos.xy() += dir * step_s;
     }
 }
 

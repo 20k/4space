@@ -163,6 +163,8 @@ struct star_map_star
     vec3f col = {1,1,1};
     orbital_simple_renderable simple_renderable;
     float temp = 0.f;
+    vec2f drift_direction;
+    float drift_speed = 1.f;
 };
 
 struct star_map
@@ -170,6 +172,7 @@ struct star_map
     std::vector<star_map_star> stars;
 
     star_map(int num);
+    void tick(float step_s);
     void draw(sf::RenderWindow& win, system_manager& system_manage);
 };
 
