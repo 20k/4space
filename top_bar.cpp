@@ -33,14 +33,14 @@ void top_bar::display(vec2i window_dim)
 
     for(auto& i : headers)
     {
-        std::string pad = "-";
+        /*std::string pad = "-";
 
         if(active[(top_bar_info::types)num])
         {
             pad = "+";
         }
 
-        /*ImGui::NeutralText(pad + i + pad);
+        ImGui::NeutralText(pad + i + pad);
 
         if(ImGui::IsItemClicked_Registered())
         {
