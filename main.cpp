@@ -3376,6 +3376,12 @@ int main()
                         //std::cout << proj << std::endl;
                         //std::cout << proj->owned_by << std::endl;
 
+                        if(proj->owned_by == nullptr)
+                        {
+                            obj->handled_by_client = true;
+                            continue;
+                        }
+
                         proj->owned_by->projectile_manage.projectiles.insert(proj);
 
                         obj->handled_by_client = true;
