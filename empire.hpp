@@ -54,10 +54,24 @@ namespace relations_info
     constexpr vec3f alt_owned_col = {0.4f, 0.4f, 1.f};
 }
 
+struct network_state;
+
 struct empire : serialisable
 {
+    ///who owns, not hosting
+    ///although if we take ownership, also host
+    serialise_owner_type potential_owner = -1;
+    serialise_owner_type original_owner = -1;
+
     bool cleanup = false;
     bool is_player = false;
+    bool is_claimed = false;
+    bool net_claim = false;
+    bool me_claiming = false;
+
+    int claim_attempts = 0;
+
+    sf::Clock claim_clock;
 
     ai_empire ai_empire_controller;
 
@@ -237,6 +251,10 @@ struct empire : serialisable
     int frame_counter = 0;
 
     void do_serialise(serialise& s, bool ser) override;
+
+    void network_take_ownership(serialise_host_type& host);
+    void try_network_take_ownership(network_state& net_state);
+    bool tick_network_take_ownership(network_state& net_state);
 };
 
 struct fleet_manager;

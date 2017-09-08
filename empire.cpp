@@ -1438,6 +1438,10 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
 
 void empire::do_serialise(serialise& s, bool ser)
 {
+    decltype(is_claimed) claimed = false;
+
+    decltype(potential_owner) received_potential = -1;
+
     if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(frame_counter, ser);
@@ -1471,6 +1475,9 @@ void empire::do_serialise(serialise& s, bool ser)
         s.handle_serialise(has_ai, ser);
 
         s.handle_serialise(is_player, ser);
+        s.handle_serialise(is_claimed, ser);
+
+        s.handle_serialise(potential_owner, ser);
 
         ///AI EMPIRE CONTROLLER
     }
@@ -1511,6 +1518,134 @@ void empire::do_serialise(serialise& s, bool ser)
         s.handle_serialise(has_ai, ser);
 
         s.handle_serialise(is_player, ser);
+        s.handle_serialise(claimed, ser);
+
+        s.handle_serialise(net_claim, ser);
+
+        if(net_claim)
+        {
+            if(ser == true)
+            {
+                s.handle_serialise(potential_owner, ser);
+            }
+            else if(ser == false)
+            {
+                s.handle_serialise(received_potential, ser);
+
+                if(claim_attempts > 1)
+                {
+                    network_take_ownership(original_owner);
+                    potential_owner = -1;
+                    is_claimed = false;
+                    claim_attempts = 0;
+                }
+                else if(claim_attempts == 1)
+                {
+                    network_take_ownership(received_potential);
+                    potential_owner = received_potential;
+                    is_claimed = false;
+                }
+
+                ///someone sending updates for an empire they don't own
+                ///that has no owner
+                /*if(received_potential != -1)
+                {
+                    ///somebody else thinks they've taken the empire
+                    ///if we get a potential that's different from the current potential
+                    ///and its not a case of the potential owner being nobody
+                    if((received_potential != potential_owner) && (potential_owner != -1))
+                    {
+                        ///revert to original host
+                        network_take_ownership(original_owner);
+                        potential_owner = -1;
+                        is_claimed = false;
+                    }
+                    ///received someone who thinks they own the empire
+                    ///and original owner is nothing useful
+                    else if(received_potential != potential_owner && potential_owner == -1)
+                    {
+                        network_take_ownership(received_potential);
+                        potential_owner = received_potential;
+                    }
+                }*/
+
+                /*///someone already owns this
+                if(is_claimed && claimed)
+                {
+                    network_take_ownership(original_owner);
+                    potential_owner = -1;
+                    is_claimed = false;
+                }
+                else if(!is_claimed && claimed)
+                {
+                    network_take_ownership(received_potential);
+                    potential_owner = received_potential;
+                    is_claimed = true;
+                }
+
+                if(me_claiming)
+                {
+                    me_claiming = false;
+                }*/
+            }
+
+            net_claim = false;
+        }
+    }
+}
+
+void empire::network_take_ownership(serialise_host_type& host)
+{
+    /*for(auto& i : serialise_data_helper::host_to_id_to_pointer[host])
+    {
+        if(i.second == nullptr)
+            continue;
+
+        i.second->host = net_state.my_id;
+
+        serialise_data_helper::host_to_id_to_pointer[net_state.my_id][i.second->serialise_id] = i.second;
+
+        i.second->owned_by_host = true;
+
+        serialise_data_helper::host_to_id_to_pointer[host][i.second->serialise_id] = nullptr;
+    }*/
+}
+
+void empire::try_network_take_ownership(network_state& net_state)
+{
+    if(is_claimed || potential_owner != -1)
+        return;
+
+    //is_claimed = true;
+
+    ///HOST_ID DANGER
+    ///this is fine and completely intentional, but code using host_id needs to be
+    ///really aware of what it is, what it means, and how it interacts with pointers
+    original_owner = host_id;
+
+    potential_owner = net_state.my_id;
+
+    claim_clock.restart();
+
+    net_claim = true;
+    me_claiming = true;
+
+    claim_attempts = 1;
+}
+
+bool empire::tick_network_take_ownership(network_state& net_state)
+{
+    if(is_claimed)
+        return;
+
+    float time_s = 5;
+
+    float elapsed_s = claim_clock.getElapsedTime().asMilliseconds() / 1000.f;
+
+    if(elapsed_s >= time_s)
+    {
+        if(potential_owner != net_state.my_id)
+            return;
     }
 }
 

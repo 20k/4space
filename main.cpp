@@ -2685,6 +2685,7 @@ int main()
 
     empire* player_empire = empire_manage.make_new();
     player_empire->is_player = true;
+    player_empire->is_claimed = true;
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
     player_empire->ship_prefix = "SS";
 
@@ -3487,6 +3488,7 @@ int main()
                 if(e->is_player)
                 {
                     player_empire = e;
+                    e->is_claimed = false;
 
                     host_id = e->host_id;
 
@@ -3494,6 +3496,11 @@ int main()
                 }
             }
 
+            ///not 100% sure this is sufficient
+            ///hmm. I think it only affects pointers actually, and every pointer
+            ///should be in here right?
+            ///except pointers not touched by the serialisation system
+            ///this steals everything from that host... not ideal
             for(auto& i : serialise_data_helper::host_to_id_to_pointer[host_id])
             {
                 if(i.second == nullptr)
