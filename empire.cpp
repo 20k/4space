@@ -1522,13 +1522,17 @@ void empire::do_serialise(serialise& s, bool ser)
         s.handle_serialise(is_player, ser);
         s.handle_serialise(claimed, ser);
 
-        s.handle_serialise(net_claim, ser);
+        bool found_claim = net_claim;
 
-        if(net_claim)
+        s.handle_serialise(found_claim, ser);
+
+        if(found_claim)
         {
             if(ser == true)
             {
                 s.handle_serialise(potential_owner, ser);
+
+                net_claim = false;
             }
             else if(ser == false)
             {
@@ -1552,8 +1556,6 @@ void empire::do_serialise(serialise& s, bool ser)
                     claim_dirty = true;
                 }
             }
-
-            net_claim = false;
         }
     }
 }
@@ -1593,7 +1595,7 @@ void empire::network_take_ownership(network_state& net_state, serialise_host_typ
 
         if(o->type == orbital_info::FLEET)
         {
-             net_state.claim_for(o->data, host);
+            net_state.claim_for(o->data, host);
 
             for(ship* s : o->data->ships)
             {
@@ -1602,11 +1604,20 @@ void empire::network_take_ownership(network_state& net_state, serialise_host_typ
                 ///not a pointer type
                 for(component& c : s->entity_list)
                 {
-                     net_state.claim_for(s, host);
+                    net_state.claim_for(s, host);
+
+                    c.make_dirty();
                 }
+
+                s->make_dirty();
             }
+
         }
+
+        o->make_dirty();
     }
+
+    make_dirty();
 }
 
 void empire::try_network_take_ownership(network_state& net_state)
@@ -1625,9 +1636,11 @@ void empire::try_network_take_ownership(network_state& net_state)
 
     net_claim = true;
 
+    std::cout << "net_claim" << std::endl;
+
     claim_attempts++;
 
-    network_take_ownership(net_state, net_state.my_id);
+    //network_take_ownership(net_state, net_state.my_id);
 
     is_claimed = true;
 }
@@ -1661,6 +1674,13 @@ void empire::tick_network_take_ownership(network_state& net_state)
             network_take_ownership(net_state, potential_owner);
         }
     }
+
+    if(!net_state.owns(this) && potential_owner == net_state.my_id)
+    {
+        network_take_ownership(net_state, net_state.my_id);
+    }
+
+    std::cout << "transfer ownership\n";
 
     claim_dirty = false;
 }

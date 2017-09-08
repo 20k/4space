@@ -196,7 +196,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ship_strategy.do_update_strategy(dt_s, 10.f, ships, net_state, 0);
 
     static update_strategy ship_manager_strategy;
-    ship_manager_strategy.do_update_strategy(dt_s, 10, fleets, net_state, 0);
+    ship_manager_strategy.do_update_strategy(dt_s, 10, ship_managers, net_state, 0);
 
     ///we're getting a null unformed orbital on the other client
     ///investigate
@@ -267,14 +267,18 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///maybe codify this hack functionally
     for(empire* e : empire_manage.empires)
     {
-        if(!net_state.owns(e))
+        if(!net_state.owns(e) && !e->net_claim)
             continue;
 
         empires.push_back(e);
     }
 
+    //std::cout << fleets.size() << std::endl;
+    //if(empires.size() > 0)
+    //    std::cout << empires.size() << std::endl;
+
     static update_strategy empire_strategy;
-    empire_strategy.do_update_strategy(dt_s, 10.f, empires, net_state, 0);
+    empire_strategy.do_update_strategy(dt_s, 1.f, empires, net_state, 0);
 
     elapsed_time_s += dt_s;
 }
