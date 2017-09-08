@@ -48,8 +48,8 @@ void top_bar::display(vec2i window_dim)
         }*/
 
         bool is_active = active[(top_bar_info::types)num];
-        vec3f highlight_col = {0.4, 0.4, 0.4};
-        ImGui::OutlineHoverText(i, highlight_col, {1,1,1}, true, {8,2}, 1, is_active, highlight_col/2, is_active);
+        vec3f highlight_col = {0.8, 0.8, 0.8};
+        ImGui::OutlineHoverText(i, highlight_col, {1,1,1}, true, {8,2}, 1, is_active, highlight_col/4, is_active);
 
         if(ImGui::IsItemClicked_Registered())
         {
