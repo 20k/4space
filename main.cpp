@@ -712,62 +712,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
-    serialise ser;
-
-    ImGui::NeutralText("Save Ship");
-
-    if(ImGui::IsItemClicked_Registered())
-    {
-        //ship* sp = &s;
-
-        ser.handle_serialise(o, true);
-
-        ser.save("Test.txt");
-    }
-
-    ImGui::NeutralText("Load Ship");
-
-    ///ok, it crashes because we modify the fleet list while iterating through it
-    if(ImGui::IsItemClicked_Registered())
-    {
-        //ship* sp = &s;
-
-        //ser.load("Test.txt");
-
-        /*orbital* next_o;
-
-        ser.handle_serialise(next_o, false);
-
-        fleet_manage.fleets.push_back(next_o->data);
-
-        next_o->parent = o->parent_system->get_base();
-        o->parent_system->make_in_place(next_o);
-
-        std::cout << (next_o->type == orbital_info::FLEET) << std::endl;
-
-        //o->parent_system->orbitals.push_back(next_o);
-        o->parent_empire->take_ownership(next_o);
-        o->parent_empire->take_ownership(next_o->data);
-        next_o->command_queue.cancel();
-
-        std::cout << (o->parent_empire->owns(next_o)) << std::endl;
-
-        std::cout << o->data << " " << next_o->data << " " << next_o->data->ships[0]->owned_by << std::endl;
-
-        for(ship* s : next_o->data->ships)
-        {
-            std::cout << s->name << std::endl;
-        }*/
-
-
-        ///removing this fixes the crash
-        ///is next_o->data bad?
-
-        //std::cout << fleet_manage.fleets.size() << std::endl;
-
-        //s = sp->duplicate();
-    }
-
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
