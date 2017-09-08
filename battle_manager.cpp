@@ -747,6 +747,33 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
     frame_counter++;
 }
 
+star_map::star_map(int num)
+{
+    procedural_text_generator temp_gen;
+
+    for(int i=0; i<num; i++)
+    {
+        star_map_star star;
+        star.pos = randv<3, float>(-1.f, 1.f) * 20000.f;
+
+        /*float max_rad = 20000;
+
+        float angle = randf_s(0.f, 2 * M_PI);
+
+        float rad = randf_s(0.f, max_rad);
+
+        star.pos.xy() = {cos(angle) * rad, sin(angle) * rad};*/
+
+        star.pos.z() = randf_s(0.4f, 0.99998f);
+
+        star.simple_renderable.init(3, 2.f, 2.f);
+
+        star.temp = temp_gen.generate_star_temperature_fraction();
+
+        stars.push_back(star);
+    }
+}
+
 void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
 {
     for(star_map_star& star : stars)
@@ -772,7 +799,7 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
         float scale = mix(star_size_frac/8.f, star_size_frac, 1.f - star.pos.z());
         float est_scale = scale * 16 / system_manage.zoom_level;
 
-        if(est_scale < 0.1f)
+        if(est_scale < 0.2f)
             continue;
 
         vec3f col = system_manager::temperature_fraction_to_colour(star.temp) / 255.f;

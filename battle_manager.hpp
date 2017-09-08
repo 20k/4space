@@ -169,25 +169,7 @@ struct star_map
 {
     std::vector<star_map_star> stars;
 
-    star_map(int num)
-    {
-        procedural_text_generator temp_gen;
-
-        for(int i=0; i<num; i++)
-        {
-            star_map_star star;
-            star.pos = randv<3, float>(-1.f, 1.f) * 100000.f;
-
-            star.pos.z() = randf_s(0.4f, 0.99998f);
-
-            star.simple_renderable.init(3, 2.f, 2.f);
-
-            star.temp = temp_gen.generate_star_temperature_fraction();
-
-            stars.push_back(star);
-        }
-    }
-
+    star_map(int num);
     void draw(sf::RenderWindow& win, system_manager& system_manage);
 };
 

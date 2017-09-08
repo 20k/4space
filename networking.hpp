@@ -132,7 +132,7 @@ struct network_state
 
         if(!sock.valid())
         {
-            sock = udp_connect("127.0.0.1", GAMESERVER_PORT);
+            sock = udp_connect("192.168.0.54", GAMESERVER_PORT);
             sock_set_non_blocking(sock, 1);
         }
 
