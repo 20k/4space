@@ -132,7 +132,7 @@ struct serialisable
         serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id] = nullptr;
 
         ///remove duplicates
-        for(auto& i : serialise_data_helper::host_to_id_to_pointer)
+        /*for(auto& i : serialise_data_helper::host_to_id_to_pointer)
         {
             for(auto it = i.second.begin(); it != i.second.end();)
             {
@@ -141,7 +141,7 @@ struct serialisable
                 else
                     it++;
             }
-        }
+        }*/
     }
 };
 
