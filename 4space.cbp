@@ -23,7 +23,6 @@
 				<Option compiler="mingw64new" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
-					<Add option="-march=native" />
 					<Add option="-ffast-math" />
 					<Add option="-Ofast" />
 				</Compiler>
