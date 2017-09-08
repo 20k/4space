@@ -817,6 +817,8 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
         float star_size_frac = system_manager::temperature_fraction_to_size_fraction(star.temp);
 
         float scale = mix(star_size_frac/8.f, star_size_frac, 1.f - star.pos.z());
+        //float scale = 1.f - star.pos.z();
+
         float est_scale = scale * 16 / system_manage.zoom_level;
 
         if(est_scale < 0.2f)
