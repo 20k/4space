@@ -1533,10 +1533,14 @@ void empire::do_serialise(serialise& s, bool ser)
                 s.handle_serialise(potential_owner, ser);
 
                 net_claim = false;
+
+                std::cout << "yay" << std::endl;
             }
             else if(ser == false)
             {
                 claim_attempts++;
+
+                std::cout << "hiya " << claim_attempts << std::endl;
 
                 s.handle_serialise(received_potential, ser);
 
@@ -1560,6 +1564,7 @@ void empire::do_serialise(serialise& s, bool ser)
     }
 }
 
+///the problem is, we can't claim this for someone else as we don't know its serialisation id
 void empire::network_take_ownership(network_state& net_state, serialise_host_type& host)
 {
     if(host == net_state.my_id)
@@ -1592,18 +1597,21 @@ void empire::network_take_ownership(network_state& net_state, serialise_host_typ
                 {
                     net_state.claim_for(s, host);
 
-                    c.make_dirty();
+                    if(host == net_state.my_id)
+                        c.make_dirty();
                 }
-
-                s->make_dirty();
+                if(host == net_state.my_id)
+                    s->make_dirty();
             }
 
         }
 
-        o->make_dirty();
+        if(host == net_state.my_id)
+            o->make_dirty();
     }
 
-    make_dirty();
+    if(host == net_state.my_id)
+        make_dirty();
 }
 
 void empire::try_network_take_ownership(network_state& net_state)
@@ -1649,6 +1657,9 @@ void empire::try_network_take_ownership(network_state& net_state)
 
 void empire::tick_network_take_ownership(network_state& net_state)
 {
+    if(net_claim)
+        return;
+
     if(claim_dirty)
     {
         if(!is_claimed)

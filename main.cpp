@@ -3379,7 +3379,7 @@ int main()
                 }
                 else if(typeid(empire*).hash_code() == type)
                 {
-                    //std::cout << "potential orphaned empire" << std::endl;
+                    std::cout << "potential orphaned empire" << std::endl;
 
                     ///hmm
                     for(serialisable* obj : objects.data)

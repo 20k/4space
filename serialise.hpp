@@ -104,6 +104,8 @@ struct serialisable
     serialise_dirty_type dirty = 0;
     serialise_attention_type requires_attention = 0;
 
+    //bool owned = true;
+
     void make_dirty()
     {
         dirty = 1;

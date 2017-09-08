@@ -215,10 +215,12 @@ struct network_state
 
     bool owns(serialisable* s)
     {
-        if(s->host_id == -1 || s->host_id == my_id)
+        /*if(s->host_id == -1 || s->host_id == my_id)
             return true;
 
-        return false;
+        return false;*/
+
+        return s->owned_by_host;
     }
 
     void claim_for(serialisable* s, serialise_host_type new_host)
@@ -228,7 +230,7 @@ struct network_state
 
         //serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
 
-        s->host_id = new_host;
+        /*s->host_id = new_host;
 
         serialise_data_type new_id = serialisable::gserialise_id++;
 
@@ -239,13 +241,30 @@ struct network_state
         if(s->host_id == my_id)
         {
             s->owned_by_host = true;
+        }*/
+
+        if(new_host == my_id)
+        {
+            s->owned_by_host = true;
+        }
+        else
+        {
+            s->owned_by_host = false;
         }
     }
 
-    static
-    void claim_for(serialisable& s, serialise_host_type new_id)
+    void claim_for(serialisable& s, serialise_host_type new_host)
     {
-        s.host_id = new_id;
+        //s.host_id = new_id;
+
+        if(new_host == my_id)
+        {
+            s.owned_by_host = true;
+        }
+        else
+        {
+            s.owned_by_host = false;
+        }
     }
 
     void make_packet_request(packet_request& request)
