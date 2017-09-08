@@ -5428,6 +5428,7 @@ void fleet_manager::cull_dead_deferred()
     }
 }
 
+///wait what ALERT we're just leaking memory!!!
 void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
 {
     for(int i=0; i<fleets.size(); i++)
@@ -5441,8 +5442,6 @@ void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
             if(s->cleanup)
             {
                 sm->ships.erase(sm->ships.begin() + kk);
-
-                //serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
 
                 //delete s;
                 kk--;
@@ -5458,13 +5457,9 @@ void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
             {
                 ship* s = sm->ships[kk];
                 //delete s;
-
-                //serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
             }
 
             fleets.erase(fleets.begin() + i);
-
-            //serialise_data_helper::host_to_id_to_pointer[sm->host_id][sm->serialise_id] = nullptr;
 
             //delete sm;
             i--;

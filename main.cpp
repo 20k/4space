@@ -3524,25 +3524,6 @@ int main()
                 }
             }
 
-            ///not 100% sure this is sufficient
-            ///hmm. I think it only affects pointers actually, and every pointer
-            ///should be in here right?
-            ///except pointers not touched by the serialisation system
-            ///this steals everything from that host... not ideal
-            /*for(auto& i : serialise_data_helper::host_to_id_to_pointer[host_id])
-            {
-                if(i.second == nullptr)
-                    continue;
-
-                i.second->host_id = net_state.my_id;
-
-                serialise_data_helper::host_to_id_to_pointer[net_state.my_id][i.second->serialise_id] = i.second;
-
-                i.second->owned_by_host = true;
-
-                serialise_data_helper::host_to_id_to_pointer[host_id][i.second->serialise_id] = nullptr;
-            }*/
-
             player_empire->network_take_ownership(net_state, net_state.my_id);
 
             //system_manage.ensure_found_orbitals_handled();

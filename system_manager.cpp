@@ -2672,8 +2672,6 @@ void system_manager::destroy_cleanup(empire_manager& empire_manage)
 
                 sys->orbitals.erase(sys->orbitals.begin() + kk);
 
-                serialise_data_helper::host_to_id_to_pointer[o->host_id][o->serialise_id] = nullptr;
-
                 //delete o;
                 kk--;
                 continue;

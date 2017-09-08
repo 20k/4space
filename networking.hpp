@@ -226,7 +226,7 @@ struct network_state
         if(s == nullptr)
             return;
 
-        serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
+        //serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
 
         s->host_id = new_host;
 

@@ -1276,8 +1276,6 @@ void all_battles_manager::destroy(battle_manager* bm)
         ///REMEMBER NETWORKING
         ///Need to make this automatic on deletion
 
-        serialise_data_helper::host_to_id_to_pointer[bm->host_id][bm->serialise_id] = nullptr;
-
         battles.erase(it);
         delete bm;
     }
@@ -1792,7 +1790,6 @@ void all_battles_manager::erase_all()
             delete proj;
         }
 
-        serialise_data_helper::host_to_id_to_pointer[battle->host_id][battle->serialise_id] = nullptr;
         delete battle;
     }
 

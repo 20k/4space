@@ -81,6 +81,7 @@ struct serialise_data_helper
     ///0 = partial update, 1 = full
     static int32_t send_mode;
 
+    ///this table may contain duplicates, don't iterate through me
     static inline std::map<serialise_host_type, std::map<serialise_data_type, serialisable*>> host_to_id_to_pointer;
 
     static std::map<size_t, unhandled_types> type_to_datas;
@@ -116,7 +117,22 @@ struct serialisable
     }
 
     ///the reason why we crash at outro is, i believe, static initialisation fiasco
-    virtual ~serialisable() {serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id] = nullptr;}
+    virtual ~serialisable()
+    {
+        serialise_data_helper::host_to_id_to_pointer[host_id][serialise_id] = nullptr;
+
+        ///remove duplicates
+        for(auto& i : serialise_data_helper::host_to_id_to_pointer)
+        {
+            for(auto it = i.second.begin(); it != i.second.end();)
+            {
+                if(it->second == this)
+                    it = i.second.erase(it);
+                else
+                    it++;
+            }
+        }
+    }
 };
 
 struct serialise;

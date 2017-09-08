@@ -1562,20 +1562,6 @@ void empire::do_serialise(serialise& s, bool ser)
 
 void empire::network_take_ownership(network_state& net_state, serialise_host_type& host)
 {
-    /*for(auto& i : serialise_data_helper::host_to_id_to_pointer[host])
-    {
-        if(i.second == nullptr)
-            continue;
-
-        i.second->host = net_state.my_id;
-
-        serialise_data_helper::host_to_id_to_pointer[net_state.my_id][i.second->serialise_id] = i.second;
-
-        i.second->owned_by_host = true;
-
-        serialise_data_helper::host_to_id_to_pointer[host][i.second->serialise_id] = nullptr;
-    }*/
-
     if(host == net_state.my_id)
     {
         has_ai = false;
@@ -1668,19 +1654,20 @@ void empire::tick_network_take_ownership(network_state& net_state)
         if(!is_claimed)
         {
             network_take_ownership(net_state, original_owner);
+            std::cout << "transfer ownershipbb\n";
         }
         else
         {
             network_take_ownership(net_state, potential_owner);
+            std::cout << "transfer ownershiperer\n";
         }
     }
 
     if(!net_state.owns(this) && potential_owner == net_state.my_id)
     {
         network_take_ownership(net_state, net_state.my_id);
+        std::cout << "transfer ownershipqqq\n";
     }
-
-    std::cout << "transfer ownership\n";
 
     claim_dirty = false;
 }
