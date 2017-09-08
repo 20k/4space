@@ -9,6 +9,7 @@
 #include "util.hpp"
 #include "procedural_text_generator.hpp"
 #include "ui_util.hpp"
+#include "networking.hpp"
 
 empire::empire()
 {
@@ -1363,11 +1364,11 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
 
     for(orbital_system* os : effectively_owned)
     {
-        auto near = system_manage.get_nearest_n(os, 10);
+        auto near_sys = system_manage.get_nearest_n(os, 10);
 
         int cnt = 0;
 
-        for(orbital_system* i : near)
+        for(orbital_system* i : near_sys)
         {
             if(!i->is_owned())
                 continue;
@@ -1478,6 +1479,7 @@ void empire::do_serialise(serialise& s, bool ser)
         s.handle_serialise(is_claimed, ser);
 
         s.handle_serialise(potential_owner, ser);
+        s.handle_serialise(original_owner, ser);
 
         ///AI EMPIRE CONTROLLER
     }
@@ -1530,63 +1532,25 @@ void empire::do_serialise(serialise& s, bool ser)
             }
             else if(ser == false)
             {
+                claim_attempts++;
+
                 s.handle_serialise(received_potential, ser);
 
                 if(claim_attempts > 1)
                 {
-                    network_take_ownership(original_owner);
+                    //network_take_ownership(original_owner);
                     potential_owner = -1;
                     is_claimed = false;
                     claim_attempts = 0;
+                    claim_dirty = true;
                 }
                 else if(claim_attempts == 1)
                 {
-                    network_take_ownership(received_potential);
-                    potential_owner = received_potential;
-                    is_claimed = false;
-                }
-
-                ///someone sending updates for an empire they don't own
-                ///that has no owner
-                /*if(received_potential != -1)
-                {
-                    ///somebody else thinks they've taken the empire
-                    ///if we get a potential that's different from the current potential
-                    ///and its not a case of the potential owner being nobody
-                    if((received_potential != potential_owner) && (potential_owner != -1))
-                    {
-                        ///revert to original host
-                        network_take_ownership(original_owner);
-                        potential_owner = -1;
-                        is_claimed = false;
-                    }
-                    ///received someone who thinks they own the empire
-                    ///and original owner is nothing useful
-                    else if(received_potential != potential_owner && potential_owner == -1)
-                    {
-                        network_take_ownership(received_potential);
-                        potential_owner = received_potential;
-                    }
-                }*/
-
-                /*///someone already owns this
-                if(is_claimed && claimed)
-                {
-                    network_take_ownership(original_owner);
-                    potential_owner = -1;
-                    is_claimed = false;
-                }
-                else if(!is_claimed && claimed)
-                {
-                    network_take_ownership(received_potential);
+                    //network_take_ownership(received_potential);
                     potential_owner = received_potential;
                     is_claimed = true;
+                    claim_dirty = true;
                 }
-
-                if(me_claiming)
-                {
-                    me_claiming = false;
-                }*/
             }
 
             net_claim = false;
@@ -1594,7 +1558,7 @@ void empire::do_serialise(serialise& s, bool ser)
     }
 }
 
-void empire::network_take_ownership(serialise_host_type& host)
+void empire::network_take_ownership(network_state& net_state, serialise_host_type& host)
 {
     /*for(auto& i : serialise_data_helper::host_to_id_to_pointer[host])
     {
@@ -1609,14 +1573,35 @@ void empire::network_take_ownership(serialise_host_type& host)
 
         serialise_data_helper::host_to_id_to_pointer[host][i.second->serialise_id] = nullptr;
     }*/
+
+    net_state.claim_for(this, host);
+
+    for(orbital* o : owned)
+    {
+        net_state.claim_for(o, host);
+
+        if(o->type == orbital_info::FLEET)
+        {
+             net_state.claim_for(o->data, host);
+
+            for(ship* s : o->data->ships)
+            {
+                net_state.claim_for(s, host);
+
+                ///not a pointer type
+                for(component& c : s->entity_list)
+                {
+                     net_state.claim_for(s, host);
+                }
+            }
+        }
+    }
 }
 
 void empire::try_network_take_ownership(network_state& net_state)
 {
-    if(is_claimed || potential_owner != -1)
+    if(is_claimed || potential_owner != -1 || claim_attempts > 0)
         return;
-
-    //is_claimed = true;
 
     ///HOST_ID DANGER
     ///this is fine and completely intentional, but code using host_id needs to be
@@ -1628,12 +1613,13 @@ void empire::try_network_take_ownership(network_state& net_state)
     claim_clock.restart();
 
     net_claim = true;
-    me_claiming = true;
 
-    claim_attempts = 1;
+    claim_attempts++;
+
+    network_take_ownership(net_state, net_state.my_id);
 }
 
-bool empire::tick_network_take_ownership(network_state& net_state)
+/*bool empire::tick_network_take_ownership(network_state& net_state)
 {
     if(is_claimed)
         return;
@@ -1646,6 +1632,31 @@ bool empire::tick_network_take_ownership(network_state& net_state)
     {
         if(potential_owner != net_state.my_id)
             return;
+    }
+}*/
+
+void empire::tick_network_take_ownership(network_state& net_state)
+{
+    if(claim_dirty)
+    {
+        if(!is_claimed)
+        {
+            network_take_ownership(net_state, original_owner);
+        }
+        else
+        {
+            network_take_ownership(net_state, potential_owner);
+        }
+    }
+
+    claim_dirty = false;
+}
+
+void empire_manager::tick_network_take_ownership(network_state& net_state)
+{
+    for(empire* e : empires)
+    {
+        e->tick_network_take_ownership(net_state);
     }
 }
 

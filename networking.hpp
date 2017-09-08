@@ -221,6 +221,33 @@ struct network_state
         return false;
     }
 
+    void claim_for(serialisable* s, serialise_host_type new_host)
+    {
+        if(s == nullptr)
+            return;
+
+        serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
+
+        s->host_id = new_host;
+
+        serialise_data_type new_id = serialisable::gserialise_id++;
+
+        s->serialise_id = new_id;
+
+        serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = s;
+
+        if(s->host_id == my_id)
+        {
+            s->owned_by_host = true;
+        }
+    }
+
+    static
+    void claim_for(serialisable& s, serialise_host_type new_id)
+    {
+        s.host_id = new_id;
+    }
+
     void make_packet_request(packet_request& request)
     {
         byte_vector vec;

@@ -3488,7 +3488,7 @@ int main()
                 if(e->is_player)
                 {
                     player_empire = e;
-                    e->is_claimed = false;
+                    e->is_claimed = true;
 
                     host_id = e->host_id;
 
@@ -3501,7 +3501,7 @@ int main()
             ///should be in here right?
             ///except pointers not touched by the serialisation system
             ///this steals everything from that host... not ideal
-            for(auto& i : serialise_data_helper::host_to_id_to_pointer[host_id])
+            /*for(auto& i : serialise_data_helper::host_to_id_to_pointer[host_id])
             {
                 if(i.second == nullptr)
                     continue;
@@ -3513,7 +3513,9 @@ int main()
                 i.second->owned_by_host = true;
 
                 serialise_data_helper::host_to_id_to_pointer[host_id][i.second->serialise_id] = nullptr;
-            }
+            }*/
+
+            player_empire->network_take_ownership(net_state, net_state.my_id);
 
             //system_manage.ensure_found_orbitals_handled();
 
@@ -3704,6 +3706,8 @@ int main()
                 handle_unprocessed();
             }
         }
+
+        empire_manage.tick_network_take_ownership(net_state);
 
         ///do immediately after networking
         ///not critical but useful

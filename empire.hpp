@@ -67,9 +67,10 @@ struct empire : serialisable
     bool is_player = false;
     bool is_claimed = false;
     bool net_claim = false;
-    bool me_claiming = false;
 
     int claim_attempts = 0;
+
+    bool claim_dirty = false;
 
     sf::Clock claim_clock;
 
@@ -252,9 +253,9 @@ struct empire : serialisable
 
     void do_serialise(serialise& s, bool ser) override;
 
-    void network_take_ownership(serialise_host_type& host);
+    void network_take_ownership(network_state& net_state, serialise_host_type& host);
     void try_network_take_ownership(network_state& net_state);
-    bool tick_network_take_ownership(network_state& net_state);
+    void tick_network_take_ownership(network_state& net_state);
 };
 
 struct fleet_manager;
@@ -286,6 +287,8 @@ struct empire_manager : serialisable
     void notify_removal(ship_manager* s);
 
     void tick_all(float step_s, all_battles_manager& all_battles, system_manager& system_manage, fleet_manager& fleet_manage, empire* player_empire);
+
+    void tick_network_take_ownership(network_state& net_state);
 
     void tick_cleanup_colonising();
     void tick_decolonisation();
