@@ -1574,6 +1574,17 @@ void empire::network_take_ownership(network_state& net_state, serialise_host_typ
         serialise_data_helper::host_to_id_to_pointer[host][i.second->serialise_id] = nullptr;
     }*/
 
+    if(host == net_state.my_id)
+    {
+        has_ai = false;
+        is_player = true;
+    }
+    else
+    {
+        has_ai = true;
+        is_player = false;
+    }
+
     net_state.claim_for(this, host);
 
     for(orbital* o : owned)
@@ -1617,6 +1628,8 @@ void empire::try_network_take_ownership(network_state& net_state)
     claim_attempts++;
 
     network_take_ownership(net_state, net_state.my_id);
+
+    is_claimed = true;
 }
 
 /*bool empire::tick_network_take_ownership(network_state& net_state)

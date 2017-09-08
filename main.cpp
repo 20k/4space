@@ -2646,6 +2646,34 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
     return built;
 }
 
+void do_ownership_ui(empire_manager& empire_manage, network_state& net_state)
+{
+    for(empire* e : empire_manage.empires)
+    {
+        if(e->host_id == net_state.my_id)
+            return;
+    }
+
+    ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiSetCond_Appearing);
+
+    ImGui::BeginOverride("Pick an Empire", 0, ImGuiWindowFlags_AlwaysAutoResize);
+
+    for(empire* e : empire_manage.empires)
+    {
+        if(e->is_claimed)
+            continue;
+
+        ImGui::NeutralText(e->name);
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            e->try_network_take_ownership(net_state);
+        }
+    }
+
+    ImGui::End();
+}
+
 void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 {
     sf::View view = window.getDefaultView();
@@ -3709,6 +3737,14 @@ int main()
 
         empire_manage.tick_network_take_ownership(net_state);
 
+        for(empire* e : empire_manage.empires)
+        {
+            if(e->is_player && e->potential_owner == net_state.my_id)
+            {
+                player_empire = e;
+            }
+        }
+
         ///do immediately after networking
         ///not critical but useful
         system_manage.shuffle_networked_orbitals();
@@ -3867,6 +3903,8 @@ int main()
         ///being post do_popup seems to fix some flickering
         ///i guess its an imgui ordering thing
         system_manage.draw_ship_ui(player_empire, popup);
+
+        do_ownership_ui(empire_manage, net_state);
 
         //printf("precull\n");
 
