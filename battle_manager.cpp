@@ -407,7 +407,7 @@ bool projectile_within_ship(projectile* p, ship* s)
 {
     //vec2f tl = i->local_pos -
 
-    if(p->pteam == s->team)
+    if(p->fired_by->is_allied(s->owned_by->parent_empire) || p->fired_by == s->owned_by->parent_empire)
         return false;
 
     return point_within_ship(p->local_pos, s);
@@ -440,8 +440,13 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                 ///projectile cleanup state not networked
                 ///relying on local hit detection is an error ALERT
                 ///not an issue currently but will graphically cause errors later
+                ///still crashing
+                ///often due to accessing owned_by
+                ///something is fucked
                 if(projectile_within_ship(p, found_ship))
                 {
+                    std::cout << "yay" << std::endl;
+
                     if(!p->owned_by->clientside_hit[p])
                     {
                         p->owned_by->sparks.init_effect(p->local_pos, p->velocity);
