@@ -280,13 +280,15 @@ void projectile::load(int _type)
     img.loadFromFile(str);
 
     if(experimental_particle)
-        tonemap(img, tone_options);
+        tonemap({24, 24}, tone_options, img);
     else
         premultiply(img);
 
     tex.loadFromImage(img);
 
     tex.setSmooth(true);
+
+    std::cout << type << std::endl;
 }
 
 void projectile::do_serialise(serialise& s, bool ser)
@@ -335,11 +337,6 @@ void projectile::do_serialise(serialise& s, bool ser)
         s.handle_serialise(world_pos, ser);
         s.handle_serialise(owned_by, ser);
         s.handle_serialise(cleanup, ser);
-
-        if(handled_by_client == false)
-        {
-            load(type);
-        }
     }
 
     if(serialise_data_helper::send_mode == 2)
@@ -359,11 +356,6 @@ void projectile::do_serialise(serialise& s, bool ser)
         s.handle_serialise(world_pos, ser);
         s.handle_serialise(owned_by, ser);
         s.handle_serialise(cleanup, ser);
-
-        if(handled_by_client == false)
-        {
-            load(type);
-        }
     }
 
     //handled_by_client = true;
@@ -377,6 +369,8 @@ projectile* projectile_manager::make_new(battle_manager& battle_manage)
 
     p->make_dirty();
     p->owned_by = &battle_manage;
+
+    //std::cout << "Make Projectile" << std::endl;
 
     return p;
 }
@@ -415,6 +409,17 @@ bool projectile_within_ship(projectile* p, ship* s)
 
 void projectile_manager::tick(battle_manager& manage, float step_s, system_manager& system_manage, network_state& net_state)
 {
+    int cnum = 0;
+
+    for(projectile* c : projectiles)
+    {
+        if(c->cleanup)
+            cnum++;
+    }
+
+    if(cnum > 0)
+        std::cout << "Clean Num " << cnum << std::endl;
+
     remove_cleanups_from_set(projectiles);
 
     //for(auto& i : projectiles)
@@ -448,17 +453,19 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                     ///this is not the cause of projectiles disappearing on the host
                     //std::cout << "yay" << std::endl;
 
-                    if(!p->owned_by->clientside_hit[p])
+                    if(!p->owned_by->clientside_hit[p->host_id][p->serialise_id])
                     {
                         p->owned_by->sparks.init_effect(p->local_pos, p->velocity);
                     }
 
-                     p->owned_by->clientside_hit[p] = true;
+                     p->owned_by->clientside_hit[p->host_id][p->serialise_id] = true;
 
                      if(net_state.owns(p))
                      {
                          p->cleanup = true;
                          p->make_dirty();
+
+                         //std::cout << "try clean" << std::endl;
                      }
                 }
 
@@ -576,7 +583,7 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
     for(projectile* p : projectiles)
     {
-        if(p->owned_by->clientside_hit[p])
+        if(p->owned_by->clientside_hit[p->host_id][p->serialise_id])
             continue;
 
         sf::Sprite spr(p->tex);

@@ -180,7 +180,7 @@ struct star_map
 struct battle_manager : serialisable
 {
     ///this is compensating for an error that projectile cleanup state is not networked
-    std::map<projectile*, bool> clientside_hit;
+    std::map<serialise_host_type, std::map<serialise_data_type, bool>> clientside_hit;
 
     spark_manager sparks;
 
