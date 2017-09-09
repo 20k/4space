@@ -3345,6 +3345,8 @@ int main()
                 }
                 else if(typeid(battle_manager*).hash_code() == type)
                 {
+                    std::cout << "got battle" << std::endl;
+
                     for(serialisable* obj : objects.data)
                     {
                         all_battles->battles.insert((battle_manager*)obj);

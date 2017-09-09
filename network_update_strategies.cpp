@@ -248,13 +248,16 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
         //if(!net_state.owns(bm))
         //    continue;
 
-        //if(bm->dirty)
-        //    continue;
+        if(bm->dirty)
+        {
+            all_battles.make_dirty();
+            continue;
+        }
 
         sync_battles.push_back(bm);
     }
 
-    std::vector<projectile*> projectiles;
+    /*std::vector<projectile*> projectiles;
 
     for(battle_manager* bm : all_battles.battles)
     {
@@ -272,7 +275,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
             projectiles.push_back(p);
         }
-    }
+    }*/
 
     static update_strategy all_battle_strategy;
     all_battle_strategy.do_update_strategy(dt_s, 5.f, all_battles_hack, net_state, 0);
@@ -281,8 +284,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     battle_strategy.do_update_strategy(dt_s, 1.f, sync_battles, net_state, 2);
 
     ///optional?
-    static update_strategy projectiles_strategy;
-    projectiles_strategy.do_update_strategy(dt_s, 0.2, projectiles, net_state, 0);
+    //static update_strategy projectiles_strategy;
+    //projectiles_strategy.do_update_strategy(dt_s, 0.2, projectiles, net_state, 0);
 
 
     std::vector<empire*> empires;

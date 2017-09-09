@@ -445,7 +445,8 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                 ///something is fucked
                 if(projectile_within_ship(p, found_ship))
                 {
-                    std::cout << "yay" << std::endl;
+                    ///this is not the cause of projectiles disappearing on the host
+                    //std::cout << "yay" << std::endl;
 
                     if(!p->owned_by->clientside_hit[p])
                     {
@@ -607,7 +608,7 @@ void projectile_manager::draw(sf::RenderWindow& win)
 ///this is suboptimal
 void projectile_manager::do_serialise(serialise& s, bool ser)
 {
-    if(serialise_data_helper::send_mode == 1)
+    /*if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise_no_clear(projectiles, ser);
     }
@@ -618,6 +619,25 @@ void projectile_manager::do_serialise(serialise& s, bool ser)
     }
 
     if(serialise_data_helper::send_mode == 2)
+    {
+        s.handle_serialise_no_clear(projectiles, ser);
+    }*/
+
+    if(ser)
+    {
+        std::set<projectile*> projs;
+
+        for(projectile* p : projectiles)
+        {
+            if(p->owned_by_host)
+            {
+                projs.insert(p);
+            }
+        }
+
+        s.handle_serialise_no_clear(projs, ser);
+    }
+    else
     {
         s.handle_serialise_no_clear(projectiles, ser);
     }
@@ -1310,24 +1330,28 @@ orbital_system* battle_manager::get_system_in()
     return ship_map[0]->parent_system;
 }
 
+///so i think the problem is
+///we're piping projectiles we don't own here
+///try doing this manually when *sending*
+///ie handle in projectile_manage
 void battle_manager::do_serialise(serialise& s, bool ser)
 {
     if(serialise_data_helper::send_mode == 1)
     {
         s.handle_serialise(is_ui_opened, ser);
         s.handle_serialise(ship_map, ser);
-        s.handle_serialise_no_clear(projectile_manage.projectiles, ser);
+        s.handle_serialise_no_clear(projectile_manage, ser);
     }
 
     if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(ship_map, ser);
-        s.handle_serialise_no_clear(projectile_manage.projectiles, ser);
+        s.handle_serialise_no_clear(projectile_manage, ser);
     }
 
     if(serialise_data_helper::send_mode == 2)
     {
-        s.handle_serialise_no_clear(projectile_manage.projectiles, ser);
+        s.handle_serialise_no_clear(projectile_manage, ser);
     }
 
     for(projectile* proj : projectile_manage.projectiles)
