@@ -2594,7 +2594,7 @@ void do_ownership_ui(empire_manager& empire_manage, network_state& net_state)
 {
     for(empire* e : empire_manage.empires)
     {
-        if(e->host_id == net_state.my_id)
+        if(net_state.owns(e))
             return;
     }
 
