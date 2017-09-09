@@ -863,6 +863,21 @@ struct serialise : serialise_data
         }
     }
 
+    ///force only applies to the first pointer we encounter no more
+    ///so this is kind of useless for containers
+    template<typename T>
+    void handle_serialise_no_clear_force(T& v, bool ser)
+    {
+        if(ser)
+        {
+            push_back(v, true);
+        }
+        else
+        {
+            get_no_clear<T>(v, true);
+        }
+    }
+
     bool finished_deserialising()
     {
         return internal_counter >= (int)data.size();

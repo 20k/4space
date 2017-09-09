@@ -1282,13 +1282,13 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     {
         s.handle_serialise(is_ui_opened, ser);
         s.handle_serialise(ship_map, ser);
-        s.handle_serialise(projectile_manage, ser);
+        s.handle_serialise_no_clear(projectile_manage, ser);
     }
 
     if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(ship_map, ser);
-        s.handle_serialise(projectile_manage, ser);
+        s.handle_serialise_no_clear(projectile_manage, ser);
     }
 }
 

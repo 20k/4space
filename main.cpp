@@ -3378,7 +3378,8 @@ int main()
 
                         if(proj->owned_by == nullptr)
                         {
-                            obj->handled_by_client = true;
+                            //serialise_data_helper::host_to_id_to_pointer[proj->host_id][proj->serialise_id] = nullptr;
+                            delete proj;
                             continue;
                         }
 
