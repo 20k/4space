@@ -3383,7 +3383,7 @@ int main()
                             std::cout << "super bad proj" << std::endl;
 
                             //serialise_data_helper::host_to_id_to_pointer[proj->host_id][proj->serialise_id] = nullptr;
-                            delete proj;
+                            //delete proj;
                             continue;
                         }
 

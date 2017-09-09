@@ -282,7 +282,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     ///optional?
     static update_strategy projectiles_strategy;
-    projectiles_strategy.do_update_strategy(dt_s, 1.f, projectiles, net_state, 0);
+    projectiles_strategy.do_update_strategy(dt_s, 0.2, projectiles, net_state, 0);
 
 
     std::vector<empire*> empires;
