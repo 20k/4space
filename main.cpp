@@ -3376,8 +3376,12 @@ int main()
                         //std::cout << proj << std::endl;
                         //std::cout << proj->owned_by << std::endl;
 
+                        std::cout << "bad_proj" << std::endl;
+
                         if(proj->owned_by == nullptr)
                         {
+                            std::cout << "super bad proj" << std::endl;
+
                             //serialise_data_helper::host_to_id_to_pointer[proj->host_id][proj->serialise_id] = nullptr;
                             delete proj;
                             continue;

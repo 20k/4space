@@ -342,6 +342,30 @@ void projectile::do_serialise(serialise& s, bool ser)
         }
     }
 
+    if(serialise_data_helper::send_mode == 2)
+    {
+        //s.handle_serialise(ship_fired_by, ser);
+        //s.handle_serialise(fired_by, ser);
+        //s.handle_serialise(base, ser);
+        //s.handle_serialise(pteam, ser);
+        s.handle_serialise(velocity, ser);
+        //s.handle_serialise(type, ser);
+        //s.handle_serialise(options, ser);
+
+        //s.handle_serialise(dim, ser);
+        s.handle_serialise(local_rot, ser);
+        s.handle_serialise(local_pos, ser);
+        s.handle_serialise(world_rot, ser);
+        s.handle_serialise(world_pos, ser);
+        s.handle_serialise(owned_by, ser);
+        s.handle_serialise(cleanup, ser);
+
+        if(handled_by_client == false)
+        {
+            load(type);
+        }
+    }
+
     //handled_by_client = true;
 }
 
@@ -584,6 +608,11 @@ void projectile_manager::do_serialise(serialise& s, bool ser)
     }
 
     if(serialise_data_helper::send_mode == 0)
+    {
+        s.handle_serialise_no_clear(projectiles, ser);
+    }
+
+    if(serialise_data_helper::send_mode == 2)
     {
         s.handle_serialise_no_clear(projectiles, ser);
     }
@@ -1282,13 +1311,24 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     {
         s.handle_serialise(is_ui_opened, ser);
         s.handle_serialise(ship_map, ser);
-        s.handle_serialise_no_clear(projectile_manage, ser);
+        s.handle_serialise_no_clear(projectile_manage.projectiles, ser);
     }
 
     if(serialise_data_helper::send_mode == 0)
     {
         s.handle_serialise(ship_map, ser);
-        s.handle_serialise_no_clear(projectile_manage, ser);
+        s.handle_serialise_no_clear(projectile_manage.projectiles, ser);
+    }
+
+    if(serialise_data_helper::send_mode == 2)
+    {
+        s.handle_serialise_no_clear(projectile_manage.projectiles, ser);
+    }
+
+    for(projectile* proj : projectile_manage.projectiles)
+    {
+        proj->owned_by = this;
+        proj->handled_by_client = true;
     }
 }
 

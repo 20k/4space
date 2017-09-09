@@ -245,8 +245,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     for(battle_manager* bm : all_battles.battles)
     {
-        if(!net_state.owns(bm))
-            continue;
+        //if(!net_state.owns(bm))
+        //    continue;
 
         //if(bm->dirty)
         //    continue;
@@ -278,7 +278,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     all_battle_strategy.do_update_strategy(dt_s, 5.f, all_battles_hack, net_state, 0);
 
     static update_strategy battle_strategy;
-    battle_strategy.do_update_strategy(dt_s, 1.f, sync_battles, net_state, 0);
+    battle_strategy.do_update_strategy(dt_s, 1.f, sync_battles, net_state, 2);
 
     ///optional?
     static update_strategy projectiles_strategy;
