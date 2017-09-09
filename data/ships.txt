@@ -23,3 +23,5 @@ Spacehall
 Spacebreaker
 Titan
 Woodpile
+Quigley
+Dibley
