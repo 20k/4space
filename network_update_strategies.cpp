@@ -49,7 +49,7 @@ struct update_strategy
     {
         for(int i=0; i<to_manage.size(); i++)
         {
-            if((to_manage[i]->cleanup || to_manage[i]->dirty) && sent[i] == 0)
+            if((to_manage[i]->cleanup || to_manage[i]->dirty || to_manage[i]->force_send) && sent[i] == 0)
             {
                 update(to_manage[i], net_state, send_mode);
             }
@@ -290,6 +290,8 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
 
     std::vector<empire*> empires;
 
+    std::vector<empire*> needs_attention;
+
     ///REMEMBER THIS WONT WORK IF WE SPAWN A NEW EMPIRE AT RUNTIME OK? OK
     ///change empire manager to be the same hack as all battles
     ///maybe codify this hack functionally
@@ -301,12 +303,28 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
         empires.push_back(e);
     }
 
+    for(empire* e : empire_manage.empires)
+    {
+        if(e->force_send)
+        {
+            needs_attention.push_back(e);
+        }
+    }
+
     //std::cout << fleets.size() << std::endl;
-    //if(empires.size() > 0)
+    //if(empires.size() > 0 && randf_s(0.f, 1.f) < 0.1f)
     //    std::cout << empires.size() << std::endl;
+
+    if(needs_attention.size() > 0)
+    {
+        //std::cout << needs_attention.size() << std::endl;
+    }
 
     static update_strategy empire_strategy;
     empire_strategy.do_update_strategy(dt_s, 1.f, empires, net_state, 0);
+
+    static update_strategy empire_attention_strategy;
+    empire_attention_strategy.do_update_strategy(dt_s, 1.f, needs_attention, net_state, 3);
 
     elapsed_time_s += dt_s;
 }

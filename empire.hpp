@@ -30,6 +30,12 @@ struct faction_relations
     float positivity = 0; ///For precursors, but also a generally short term happiness meter
 };
 
+///diffs
+struct net_faction_relations
+{
+    float friendliness = 0.f;
+};
+
 struct empire_manager;
 struct fleet_manager;
 
@@ -103,6 +109,11 @@ struct empire : serialisable
     std::unordered_set<orbital_system*> calculated_owned_systems;
 
     std::unordered_map<empire*, faction_relations> relations_map;
+
+    ///for networking
+    ///currently only applying to friendliness, the base relations
+    ///stat
+    std::map<empire*, net_faction_relations> relations_diff;
 
     empire();
 

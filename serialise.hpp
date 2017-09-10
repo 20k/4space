@@ -104,6 +104,8 @@ struct serialisable
     serialise_dirty_type dirty = 0;
     serialise_attention_type requires_attention = 0;
 
+    bool force_send = false;
+
     static inline serialise_data_type explicit_serialise_id = 0;
 
     //bool owned = true;

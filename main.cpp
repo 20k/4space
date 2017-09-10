@@ -3618,7 +3618,7 @@ int main()
 
                 i.data.handle_serialise(send_mode, false);
 
-                if(send_mode != 0 && send_mode != 2)
+                if(send_mode == 1)
                 {
                     i.data.internal_counter = internal_counter;
 

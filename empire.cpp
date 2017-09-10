@@ -315,10 +315,9 @@ void empire::positive_relations(empire* e, float amount)
     if(e == nullptr)
         return;
 
-    relations_map[e].friendliness += amount;
-    relations_map[e].positivity += amount;
+    offset_relations(e, amount);
 
-    e->relations_map[this].friendliness += amount;
+    relations_map[e].positivity += amount;
     e->relations_map[this].positivity += amount;
 }
 
@@ -327,10 +326,9 @@ void empire::negative_relations(empire* e, float amount)
     if(e == nullptr)
         return;
 
-    relations_map[e].friendliness -= amount;
-    relations_map[e].hostility += amount;
+    offset_relations(e, -amount);
 
-    e->relations_map[this].friendliness -= amount;
+    relations_map[e].hostility += amount;
     e->relations_map[this].hostility += amount;
 }
 
@@ -341,6 +339,24 @@ void empire::offset_relations(empire* e, float amount)
 
     relations_map[e].friendliness += amount;
     e->relations_map[this].friendliness += amount;
+
+    ///only need to do relations diffs for empires we don't own on this host
+    ///if we don't do this, we'll get double relations changes
+    if(!owned_by_host)
+    {
+        relations_diff[e].friendliness += amount;
+
+        force_send = true;
+
+        //std::cout << amount << std::endl;
+    }
+
+    if(!e->owned_by_host)
+    {
+        e->relations_diff[this].friendliness += amount;
+
+        e->force_send = true;
+    }
 }
 
 void empire::dispense_resource(const resource_manager& res)
@@ -656,7 +672,7 @@ void empire::become_hostile(empire* e)
     relations_map[e].hostile = true;
     e->relations_map[this].hostile = true;
 
-    negative_interaction(e, 0.5f);
+    negative_relations(e, 0.5f);
 
     trade_space_access(e, false);
 
@@ -1441,8 +1457,11 @@ void empire::do_serialise(serialise& s, bool ser)
 
     decltype(potential_owner) received_potential = -1;
 
+    auto net_relations_diff = relations_diff;
+
     if(serialise_data_helper::send_mode == 1)
     {
+        //s.handle_serialise(relations_diff, ser);
         s.handle_serialise(frame_counter, ser);
         s.handle_serialise(accumulated_dt_s, ser);
         s.handle_serialise(desired_empire_size, ser);
@@ -1558,6 +1577,34 @@ void empire::do_serialise(serialise& s, bool ser)
                     claim_dirty = true;
                 }
             }
+        }
+    }
+
+    if(serialise_data_helper::send_mode == 3)
+    {
+        s.handle_serialise(net_relations_diff, ser);
+
+        if(ser == true)
+        {
+            relations_diff.clear();
+
+            force_send = false;
+
+            //std::cout << "serd " << std::endl;
+        }
+        else
+        {
+            for(auto& i : net_relations_diff)
+            {
+                relations_map[i.first].friendliness += i.second.friendliness;
+            }
+
+            if(net_relations_diff.size() > 0)
+            {
+                //std::cout << "yaydfdfdfs\n";
+            }
+
+            //std::cout << "test" << std::endl;
         }
     }
 }
