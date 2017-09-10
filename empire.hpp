@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <deque>
 #include "serialise.hpp"
+#include <optional>
 
 struct orbital;
 struct orbital_system;
@@ -31,9 +32,16 @@ struct faction_relations
 };
 
 ///diffs
-struct net_faction_relations
+struct net_faction_relations : serialisable
 {
+    ///maybe... make friendliness an optional as well? :)
     float friendliness = 0.f;
+
+    std::optional<bool> hostile;
+    std::optional<bool> allied;
+    std::optional<bool> have_passage_rights;
+
+    virtual void do_serialise(serialise& s, bool ser) override;
 };
 
 struct empire_manager;

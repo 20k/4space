@@ -672,6 +672,16 @@ void empire::become_hostile(empire* e)
     relations_map[e].hostile = true;
     e->relations_map[this].hostile = true;
 
+    if(!e->owned_by_host)
+    {
+        e->relations_diff[this].hostile = true;
+    }
+
+    if(!owned_by_host)
+    {
+        relations_diff[e].hostile = true;
+    }
+
     negative_relations(e, 0.5f);
 
     trade_space_access(e, false);
@@ -688,8 +698,17 @@ void empire::become_unhostile(empire* e)
         return;
 
     relations_map[e].hostile = false;
-
     e->relations_map[this].hostile = false;
+
+    if(!e->owned_by_host)
+    {
+        e->relations_diff[this].hostile = false;
+    }
+
+    if(!owned_by_host)
+    {
+        relations_diff[e].hostile = false;
+    }
 
     positive_relations(e, 0.5f);
 
@@ -701,6 +720,16 @@ void empire::trade_space_access(empire* e, bool status)
 {
     relations_map[e].have_passage_rights = status;
     e->relations_map[this].have_passage_rights = status;
+
+    if(!e->owned_by_host)
+    {
+        e->relations_diff[this].have_passage_rights = status;
+    }
+
+    if(!owned_by_host)
+    {
+        relations_diff[e].have_passage_rights = status;
+    }
 }
 
 ///this doesn't work well for MP
@@ -730,8 +759,17 @@ void empire::ally(empire* e)
         become_unhostile(e);
 
     relations_map[e].allied = true;
-
     e->relations_map[this].allied = true;
+
+    if(!e->owned_by_host)
+    {
+        e->relations_diff[this].allied = true;
+    }
+
+    if(!owned_by_host)
+    {
+        relations_diff[e].allied = true;
+    }
 
     positive_relations(e, 0.5f);
 
@@ -762,6 +800,16 @@ void empire::unally(empire* e)
 
     relations_map[e].allied = false;
     e->relations_map[this].allied = false;
+
+    if(!e->owned_by_host)
+    {
+        e->relations_diff[this].allied = false;
+    }
+
+    if(!owned_by_host)
+    {
+        relations_diff[e].allied = false;
+    }
 
     negative_relations(e, 0.5f);
 
@@ -1451,6 +1499,14 @@ void empire::tick_invasion_timer(float step_s, system_manager& system_manage, fl
     //printf("INVADE\n");
 }
 
+void net_faction_relations::do_serialise(serialise& s, bool ser)
+{
+    s.handle_serialise(friendliness, ser);
+    s.handle_serialise(hostile, ser);
+    s.handle_serialise(allied, ser);
+    s.handle_serialise(have_passage_rights, ser);
+}
+
 void empire::do_serialise(serialise& s, bool ser)
 {
     decltype(is_claimed) claimed = false;
@@ -1584,6 +1640,8 @@ void empire::do_serialise(serialise& s, bool ser)
     {
         s.handle_serialise(net_relations_diff, ser);
 
+
+
         if(ser == true)
         {
             relations_diff.clear();
@@ -1597,6 +1655,21 @@ void empire::do_serialise(serialise& s, bool ser)
             for(auto& i : net_relations_diff)
             {
                 relations_map[i.first].friendliness += i.second.friendliness;
+
+                if(i.second.hostile)
+                {
+                    relations_map[i.first].hostile = *i.second.hostile;
+                }
+
+                if(i.second.allied)
+                {
+                    relations_map[i.first].allied = *i.second.allied;
+                }
+
+                if(i.second.have_passage_rights)
+                {
+                    relations_map[i.first].have_passage_rights = *i.second.have_passage_rights;
+                }
             }
 
             if(net_relations_diff.size() > 0)
