@@ -3306,8 +3306,6 @@ int main()
 
         auto handle_unprocessed = [&](){
 
-            bool handled = true;
-
             for(auto& unprocessed : serialise_data_helper::type_to_datas)
             {
                 const size_t type = unprocessed.first;
@@ -3356,13 +3354,7 @@ int main()
                         obj->handled_by_client = true;
                     }
                 }
-                else
-                {
-                    handled = false;
-                }
             }
-
-            bool h2 = true;
 
             for(auto& unprocessed : serialise_data_helper::type_to_datas)
             {
@@ -3378,7 +3370,7 @@ int main()
                         //std::cout << proj << std::endl;
                         //std::cout << proj->owned_by << std::endl;
 
-                        std::cout << "bad_proj" << std::endl;
+                        //std::cout << "bad_proj" << std::endl;
 
                         if(proj->owned_by == nullptr)
                         {
@@ -3394,14 +3386,18 @@ int main()
                         obj->handled_by_client = true;
                     }
                 }
-                else
-                {
-                    h2 = false;
-                }
 
-                if(!handled || !h2)
+            }
+
+            for(auto& unprocessed : serialise_data_helper::type_to_datas)
+            {
+                const size_t type = unprocessed.first;
+                unhandled_types& objects = unprocessed.second;
+
+                for(serialisable* obj : objects.data)
                 {
-                    std::cout << "Warning unhandled type " << objects.type_name << std::endl;
+                    if(!obj->handled_by_client)
+                        std::cout << "Warning unhandled type " << objects.type_name << std::endl;
                 }
             }
 
