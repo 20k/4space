@@ -4,6 +4,8 @@
 #include <net/shared.hpp>
 #include "../4space_server/master_server/network_messages.hpp"
 #include "serialise.hpp"
+#include <thread>
+#include <mutex>
 
 ///intent: Make this file increasingly more general so eventually we can port it between projects
 
@@ -568,6 +570,62 @@ struct network_state
         return false;
     }
 
+
+    std::vector<byte_vector> to_send_to_game_server;
+    byte_fetch threaded_network_receive;
+    std::mutex threaded_network_mutex;
+    volatile int should_die = 0;
+
+    static
+    void thread_network_receive(network_state* net_state)
+    {
+        while(1)
+        {
+            int max_mutex_recv = 100;
+            int cur_recv = 0;
+
+            Sleep(1);
+
+            std::lock_guard<std::mutex> guard(net_state->threaded_network_mutex);
+
+            net_state->request_incomplete_packets(50);
+
+            bool any_recv = true;
+
+            while(any_recv && sock_readable(net_state->sock))
+            {
+                auto data = udp_receive_from(net_state->sock, &net_state->store);
+
+                any_recv = data.size() > 0;
+
+                net_state->threaded_network_receive.ptr.insert(net_state->threaded_network_receive.ptr.end(), data.begin(), data.end());
+
+                ///very basic dos protection
+                if(cur_recv >= max_mutex_recv)
+                    break;
+
+                cur_recv++;
+            }
+
+            if(net_state->should_die)
+                return;
+        }
+    }
+
+    bool network_thread_launched = false;
+
+    std::thread net_thread;
+
+    network_state() : net_thread(&network_state::thread_network_receive, this)
+    {
+        net_thread.detach();
+    }
+
+    ~network_state()
+    {
+        should_die = 1;
+    }
+
     ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
     ///I think the reason the data transfer is slow is because the framerate is bad
     ///if we threaded it i think the data transfer would go v high
@@ -577,7 +635,9 @@ struct network_state
         if(!sock.valid())
             return;
 
-        request_incomplete_packets(50);
+        std::lock_guard<std::mutex> guard(threaded_network_mutex);
+
+        //request_incomplete_packets(50);
 
         cleanup_available_data_and_incomplete_packets();
 
@@ -594,6 +654,8 @@ struct network_state
 
         bool any_recv = true;
 
+        /*bool any_recv = true;
+
         while(any_recv && sock_readable(sock))
         {
             auto data = udp_receive_from(sock, &store);
@@ -601,7 +663,13 @@ struct network_state
             any_recv = data.size() > 0;
 
             byte_fetch fetch;
-            fetch.ptr.swap(data);
+            fetch.ptr.swap(data);*/
+
+        {
+            byte_fetch fetch;
+            fetch.ptr.swap(threaded_network_receive.ptr);
+            threaded_network_receive = byte_fetch();
+
 
             //this_frame_stats.bytes_in += data.size();
 
