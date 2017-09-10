@@ -5,7 +5,7 @@
 #include "util.hpp"
 #include "empire.hpp"
 #include "procedural_text_generator.hpp"
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 #include "text.hpp"
 #include "tooltip_handler.hpp"
 #include "top_bar.hpp"
