@@ -584,14 +584,14 @@ struct network_state
     {
         while(1)
         {
-            int max_mutex_recv = 100;
+            int max_mutex_recv = 200;
             int cur_recv = 0;
 
             Sleep(1);
 
             std::lock_guard<std::mutex> guard(net_state->threaded_network_mutex);
 
-            net_state->request_incomplete_packets(50);
+            net_state->request_incomplete_packets(100);
 
             bool any_recv = true;
 
@@ -722,7 +722,7 @@ struct network_state
                     {
                         auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
 
-                        while(!sock_writable(sock)){}
+                        //while(!sock_writable(sock)){}
 
                         udp_send_to(sock, vec.vec.ptr, (const sockaddr*)&store);
                     }
@@ -976,7 +976,7 @@ struct network_state
 
             if(i < max_to_send)
             {
-                while(!sock_writable(sock)) {}
+                //while(!sock_writable(sock)) {}
 
                 udp_send_to(sock, frag.ptr, (const sockaddr*)&store);
             }
