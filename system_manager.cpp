@@ -23,6 +23,8 @@ float system_manager::universe_scale = 100.f;
 
 double position_history_element::max_history_s = 20;
 
+float orbital_info::chevron_separation_distance = 6;
+
 inline
 bool operator<(const empire_popup& e1, const empire_popup& e2)
 {

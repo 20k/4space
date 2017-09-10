@@ -62,7 +62,7 @@ namespace orbital_info
     static float decolonise_time_s = 60.f;
     static float engagement_radius = 40.f;
 
-    static inline float chevron_separation_distance = 4;
+    extern float chevron_separation_distance;
 }
 
 struct empire;
