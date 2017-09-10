@@ -181,6 +181,7 @@ struct network_state
         int32_t canary_second;
     };
 
+    static
     forward_packet decode_forward(byte_fetch& fetch)
     {
         forward_packet ret;
@@ -576,6 +577,9 @@ struct network_state
     std::mutex threaded_network_mutex;
     volatile int should_die = 0;
 
+    std::mutex request_mutex;
+    std::mutex forward_mutex;
+
     static
     void thread_network_receive(network_state* net_state)
     {
@@ -587,6 +591,21 @@ struct network_state
             Sleep(1);
 
             std::lock_guard<std::mutex> guard(net_state->threaded_network_mutex);
+
+            net_state->cleanup_available_data_and_incomplete_packets();
+
+            {
+                std::lock_guard<std::mutex> g2(net_state->forward_mutex);
+
+                for(to_network& ton : net_state->forward_data_list)
+                {
+                    net_state->forward_data_impl(ton.no, ton.s);
+                }
+
+                {
+                    net_state->forward_data_list.clear();
+                }
+            }
 
             net_state->request_incomplete_packets(50);
 
@@ -609,67 +628,10 @@ struct network_state
 
             if(net_state->should_die)
                 return;
-        }
-    }
-
-    bool network_thread_launched = false;
-
-    std::thread net_thread;
-
-    network_state() : net_thread(&network_state::thread_network_receive, this)
-    {
-        net_thread.detach();
-    }
-
-    ~network_state()
-    {
-        should_die = 1;
-    }
-
-    ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
-    ///I think the reason the data transfer is slow is because the framerate is bad
-    ///if we threaded it i think the data transfer would go v high
-    ///may be worth just threading the actual socket itself
-    void tick()
-    {
-        if(!sock.valid())
-            return;
-
-        std::lock_guard<std::mutex> guard(threaded_network_mutex);
-
-        //request_incomplete_packets(50);
-
-        cleanup_available_data_and_incomplete_packets();
-
-        make_packets_available();
-
-        tick_cleanup();
-
-        byte_vector v1;
-        v1.push_back(canary_start);
-        v1.push_back(message::KEEP_ALIVE);
-        v1.push_back(canary_end);
-
-        udp_send_to(sock, v1.ptr, (const sockaddr*)&store);
-
-        bool any_recv = true;
-
-        /*bool any_recv = true;
-
-        while(any_recv && sock_readable(sock))
-        {
-            auto data = udp_receive_from(sock, &store);
-
-            any_recv = data.size() > 0;
 
             byte_fetch fetch;
-            fetch.ptr.swap(data);*/
-
-        {
-            byte_fetch fetch;
-            fetch.ptr.swap(threaded_network_receive.ptr);
-            threaded_network_receive = byte_fetch();
-
+            fetch.ptr.swap(net_state->threaded_network_receive.ptr);
+            net_state->threaded_network_receive = byte_fetch();
 
             //this_frame_stats.bytes_in += data.size();
 
@@ -690,13 +652,13 @@ struct network_state
 
                     packet_ack ack = fetch.get<packet_ack>();
 
-                    disconnection_timer[ack.owner_id].restart();
+                    net_state->disconnection_timer[ack.owner_id].restart();
 
                     fetch.get<decltype(canary_end)>();
 
-                    if(ack.packet_id > last_unconfirmed_packet[ack.owner_id])
+                    if(ack.packet_id > net_state->last_unconfirmed_packet[ack.owner_id])
                     {
-                        last_unconfirmed_packet[ack.owner_id] = ack.packet_id;
+                        net_state->last_unconfirmed_packet[ack.owner_id] = ack.packet_id;
                     }
                 }
 
@@ -712,16 +674,18 @@ struct network_state
                     no.owner_id = request.owner_id;
                     no.serialise_id = request.serialise_id;
 
-                    disconnection_timer[no.owner_id].restart();
+                    std::lock_guard<std::mutex> lock(net_state->request_mutex);
 
-                    if(owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].find(request.sequence_id) !=
-                       owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].end())
+                    net_state->disconnection_timer[no.owner_id].restart();
+
+                    if(net_state->owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].find(request.sequence_id) !=
+                       net_state->owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id].end())
                     {
-                        auto& vec = owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
+                        auto& vec = net_state->owner_to_packet_id_to_sequence_number_to_data[no.owner_id][request.packet_id][request.sequence_id];
 
-                        while(!sock_writable(sock)){}
+                        while(!sock_writable(net_state->sock)){}
 
-                        udp_send_to(sock, vec.vec.ptr, (const sockaddr*)&store);
+                        udp_send_to(net_state->sock, vec.vec.ptr, (const sockaddr*)&net_state->store);
                     }
                     else
                     {
@@ -741,15 +705,15 @@ struct network_state
 
                     int packet_fragments = get_packet_fragments(real_overall_data_length);
 
-                    owner_to_packet_id_to_serialise[no.owner_id][header.packet_id] = no.serialise_id;
+                    net_state->owner_to_packet_id_to_serialise[no.owner_id][header.packet_id] = no.serialise_id;
 
-                    disconnection_timer[no.owner_id].restart();
+                    net_state->disconnection_timer[no.owner_id].restart();
 
                     if(packet_fragments > 1)
                     {
-                        owner_to_packet_sequence_to_expected_size[no.owner_id][header.packet_id] = packet_fragments;
+                        net_state->owner_to_packet_sequence_to_expected_size[no.owner_id][header.packet_id] = packet_fragments;
 
-                        std::vector<packet_info>& packets = incomplete_packets[no.owner_id][header.packet_id];
+                        std::vector<packet_info>& packets = net_state->incomplete_packets[no.owner_id][header.packet_id];
 
                         ///INSERT PACKET INTO PACKETS
                         packet_info next;
@@ -765,10 +729,10 @@ struct network_state
 
                         next.data.data = packet.fetch.ptr;
 
-                        if(!has_packet_fragment[no.owner_id][header.packet_id][header.sequence_number])
+                        if(!net_state->has_packet_fragment[no.owner_id][header.packet_id][header.sequence_number])
                         {
                              packets.push_back(next);
-                             has_packet_fragment[no.owner_id][header.packet_id][header.sequence_number] = true;
+                             net_state->has_packet_fragment[no.owner_id][header.packet_id][header.sequence_number] = true;
                         }
 
                         int current_received_fragments = packets.size();
@@ -789,7 +753,7 @@ struct network_state
                             ///pipe back a response?
                             if(s.data.size() > 0)
                             {
-                                if(received_packet[packet.no.owner_id][packet.header.packet_id] == false)
+                                if(net_state->received_packet[packet.no.owner_id][packet.header.packet_id] == false)
                                 {
                                     packet.fetch = byte_fetch();
 
@@ -797,22 +761,22 @@ struct network_state
 
                                     full_forward.fetch.ptr = std::move(s.data);
 
-                                    forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
+                                    net_state->forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
 
-                                    received_packet[packet.no.owner_id][packet.header.packet_id] = true;
+                                    net_state->received_packet[packet.no.owner_id][packet.header.packet_id] = true;
                                 }
                             }
                         }
                     }
                     else
                     {
-                        if(received_packet[no.owner_id][header.packet_id] == false)
+                        if(net_state->received_packet[no.owner_id][header.packet_id] == false)
                         {
                             forward_packet full_forward = packet;
 
-                            forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
+                            net_state->forward_ordered_packets[no.owner_id].push_back(std::move(full_forward));
 
-                            received_packet[packet.no.owner_id][packet.header.packet_id] = true;
+                            net_state->received_packet[packet.no.owner_id][packet.header.packet_id] = true;
                         }
                     }
 
@@ -831,7 +795,7 @@ struct network_state
                     int32_t canary_found = fetch.get<int32_t>();
 
                     if(canary_found == canary_end)
-                        my_id = recv_id;
+                        net_state->my_id = recv_id;
                     else
                     {
                         printf("err in CLIENTJOINACK\n");
@@ -863,6 +827,62 @@ struct network_state
                     fetch.get<decltype(canary_end)>();
                 }
             }
+        }
+    }
+
+    bool network_thread_launched = false;
+
+    std::thread net_thread;
+
+    network_state() : net_thread(&network_state::thread_network_receive, this)
+    {
+        net_thread.detach();
+    }
+
+    ~network_state()
+    {
+        should_die = 1;
+    }
+
+    ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
+    ///I think the reason the data transfer is slow is because the framerate is bad
+    ///if we threaded it i think the data transfer would go v high
+    ///may be worth just threading the actual socket itself
+    void tick()
+    {
+        if(!sock.valid())
+            return;
+
+        std::lock_guard<std::mutex> guard(threaded_network_mutex);
+
+        //request_incomplete_packets(50);
+
+        make_packets_available();
+
+        tick_cleanup();
+
+        byte_vector v1;
+        v1.push_back(canary_start);
+        v1.push_back(message::KEEP_ALIVE);
+        v1.push_back(canary_end);
+
+        udp_send_to(sock, v1.ptr, (const sockaddr*)&store);
+
+        bool any_recv = true;
+
+        /*bool any_recv = true;
+
+        while(any_recv && sock_readable(sock))
+        {
+            auto data = udp_receive_from(sock, &store);
+
+            any_recv = data.size() > 0;
+
+            byte_fetch fetch;
+            fetch.ptr.swap(data);*/
+
+        {
+
         }
     }
 
@@ -936,12 +956,20 @@ struct network_state
 
     std::map<serialise_owner_type, std::map<packet_id_type, std::map<sequence_data_type, resend_info>>> owner_to_packet_id_to_sequence_number_to_data;
 
+    struct to_network
+    {
+        network_object no;
+        serialise s;
+    };
+
+    std::vector<to_network> forward_data_list;
+
     ///ok so the issue is that no.owner_id is wrong
     ///we're treating it like the client id, but its actually who owns the object
     ///which means that packet ids are getting trampled
     ///what we really need to do is make it the client's id, and then change
     ///change owns() to respect this. It should be a fairly transparent change
-    void forward_data(const network_object& no, serialise& s)
+    void forward_data_impl(const network_object& no, serialise& s)
     {
         if(!connected())
             return;
@@ -964,6 +992,8 @@ struct network_state
         if(should_slowdown)
             max_to_send = 1;
 
+        std::lock_guard<std::mutex> lock(request_mutex);
+
         for(int i=0; i<get_packet_fragments(s.data.size()); i++)
         {
             byte_vector frag = get_fragment(i, no, s.data, packet_id);
@@ -980,6 +1010,13 @@ struct network_state
         }
 
         packet_id = packet_id + 1;
+    }
+
+    void forward_data(const network_object& no, serialise& s)
+    {
+        std::lock_guard<std::mutex> lock(forward_mutex);
+
+        forward_data_list.push_back({no, s});
     }
 
     void tick_cleanup()
