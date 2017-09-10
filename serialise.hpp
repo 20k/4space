@@ -16,6 +16,7 @@
 #include <vec/vec.hpp>
 #include <deque>
 #include <typeinfo>
+#include <optional>
 
 using serialise_host_type = int32_t;
 using serialise_owner_type = int32_t;
@@ -682,6 +683,46 @@ struct serialise_helper<std::string>
             type.get(c, s);
 
             v.push_back(c);
+        }
+    }
+};
+
+template<typename T>
+struct serialise_helper<std::optional<T>>
+{
+    void add(std::optional<T>& v, serialise_data& s)
+    {
+        serialise_helper<int32_t> helper;
+
+        int32_t has = v.has_value();
+
+        helper.add(has, s);
+
+        if(has)
+        {
+            serialise_helper<decltype(v.value())> h2;
+
+            h2.add(*v, s);
+        }
+    }
+
+    void get(std::optional<T>& v, serialise_data& s)
+    {
+        serialise_helper<int32_t> helper;
+
+        int32_t has;
+
+        helper.get(has, s);
+
+        if(has)
+        {
+            T val;
+
+            serialise_helper<decltype(v.value())> h2;
+
+            h2.get(val, s);
+
+            v = std::move(val);
         }
     }
 };
