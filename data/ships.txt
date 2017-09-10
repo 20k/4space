@@ -25,3 +25,5 @@ Titan
 Woodpile
 Quigley
 Dibley
+Artemis
+Borealis
