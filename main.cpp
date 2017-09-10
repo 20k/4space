@@ -3399,7 +3399,7 @@ int main()
                     h2 = false;
                 }
 
-                if(!handled && !h2)
+                if(!handled || !h2)
                 {
                     std::cout << "Warning unhandled type " << objects.type_name << std::endl;
                 }
