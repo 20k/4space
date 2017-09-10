@@ -847,7 +847,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
         {
             int num_ships = data->ships.size();
 
-            int chevron_separation = 4;
+            int chevron_separation = orbital_info::chevron_separation_distance;
 
             float ycentre = chevron_separation * num_ships / 2;
 
