@@ -3199,17 +3199,6 @@ int main()
 
         }
 
-        if(ONCE_MACRO(sf::Keyboard::F3))
-        {
-            system_manage.set_viewed_system(sys_2);
-            state = 0;
-        }
-
-        /*if(once<sf::Keyboard::F2>())
-        {
-            test_ship->resupply(*player_empire);
-        }*/
-
         bool lclick = ONCE_MACRO(sf::Mouse::Left) && no_suppress_mouse;
         bool rclick = ONCE_MACRO(sf::Mouse::Right) && no_suppress_mouse;
 
