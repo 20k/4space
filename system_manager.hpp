@@ -10,7 +10,6 @@
 #include <unordered_map>
 #include "context_menu.hpp"
 #include "serialise.hpp"
-#include "ai_empire.hpp"
 
 namespace orbital_info
 {
