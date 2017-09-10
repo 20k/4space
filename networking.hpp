@@ -278,7 +278,7 @@ struct network_state
         vec.push_back(request);
         vec.push_back(canary_end);
 
-        while(!sock_writable(sock)) {}
+        //while(!sock_writable(sock)) {}
 
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
     }
@@ -292,7 +292,7 @@ struct network_state
         vec.push_back(ack);
         vec.push_back(canary_end);
 
-        while(!sock_writable(sock)) {}
+        //while(!sock_writable(sock)) {}
 
         udp_send_to(sock, vec.ptr, (const sockaddr*)&store);
     }
