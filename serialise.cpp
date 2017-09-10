@@ -338,6 +338,34 @@ void test_serialisation()
         }
     }
 
+    {
+        std::optional<int> test;
+
+        serialise ser;
+        ser.handle_serialise(test, true);
+
+        std::optional<int> recv;
+
+        ser.handle_serialise(recv, false);
+
+        assert(recv.has_value() == false);
+    }
+
+    {
+        std::optional<int> test = 12;
+
+        serialise ser;
+        ser.handle_serialise(test, true);
+
+        std::optional<int> recv;
+
+        ser.handle_serialise(recv, false);
+
+        assert(recv.has_value() == true);
+
+        assert(*recv == 12);
+    }
+
     ///ensure tests don't interfere with global state. It shouldn't affect it even without this call
     ///but it may make debugging easier
     serialise_data_helper::host_to_id_to_pointer.clear();
