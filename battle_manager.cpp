@@ -287,8 +287,6 @@ void projectile::load(int _type)
     tex.loadFromImage(img);
 
     tex.setSmooth(true);
-
-    std::cout << type << std::endl;
 }
 
 void projectile::do_serialise(serialise& s, bool ser)
@@ -417,8 +415,8 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
             cnum++;
     }
 
-    if(cnum > 0)
-        std::cout << "Clean Num " << cnum << std::endl;
+    //if(cnum > 0)
+    //    std::cout << "Clean Num " << cnum << std::endl;
 
     remove_cleanups_from_set(projectiles);
 
@@ -486,7 +484,7 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                     if(hp_condition)
                         continue;
 
-                    std::cout << "hit\n";
+                    //std::cout << "hit\n";
 
                     found_ship->hit(p, system_manage);
 
@@ -829,6 +827,8 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
 
 star_map::star_map(int num)
 {
+    simple_renderable.init(3, 2, 2);
+
     procedural_text_generator temp_gen;
 
     stars.resize(num);
@@ -848,7 +848,7 @@ star_map::star_map(int num)
 
         star.pos.z() = randf_s(0.4f, 0.99998f);
 
-        star.simple_renderable.init(3, 2.f, 2.f);
+        //star.simple_renderable.init(3, 2.f, 2.f);
 
         star.temp = temp_gen.generate_star_temperature_fraction();
 
@@ -907,7 +907,7 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
 
         col = {1,1,1};
 
-        star.simple_renderable.main_rendering(win, 0.f, star_pos.xy() - disp,
+        simple_renderable.main_rendering(win, 0.f, star_pos.xy() - disp,
                                               scale * 16,
                                               col);
     }
@@ -1368,7 +1368,7 @@ void battle_manager::do_serialise(serialise& s, bool ser)
     }
 }
 
-battle_manager::battle_manager() : stars(200)
+battle_manager::battle_manager() : stars(20000)
 {
 
 }
