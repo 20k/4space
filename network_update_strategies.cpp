@@ -193,7 +193,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///the reason why ship cleaning isn't working accross the network is beause its not being sent
     ///need to force packet sending on cleanup
     static update_strategy ship_strategy;
-    ship_strategy.do_update_strategy(dt_s, 10.f, ships, net_state, 0);
+    ship_strategy.do_update_strategy(dt_s, 2.f, ships, net_state, 0);
 
     static update_strategy ship_manager_strategy;
     ship_manager_strategy.do_update_strategy(dt_s, 10, ship_managers, net_state, 0);

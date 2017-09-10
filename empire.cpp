@@ -654,10 +654,9 @@ void empire::become_hostile(empire* e)
         return;
 
     relations_map[e].hostile = true;
-    relations_map[e].friendliness -= 0.5f;
-
     e->relations_map[this].hostile = true;
-    e->relations_map[this].friendliness -= 0.5f;
+
+    negative_interaction(e, 0.5f);
 
     trade_space_access(e, false);
 
@@ -673,10 +672,10 @@ void empire::become_unhostile(empire* e)
         return;
 
     relations_map[e].hostile = false;
-    relations_map[e].friendliness += 0.5f;
 
     e->relations_map[this].hostile = false;
-    e->relations_map[this].friendliness += 0.5f;
+
+    positive_relations(e, 0.5f);
 
     offset_relations(e, get_relation_constraint_offset_lower(e, relations_info::hostility_threshold));
     e->offset_relations(this, e->get_relation_constraint_offset_lower(this, relations_info::hostility_threshold));
@@ -688,6 +687,7 @@ void empire::trade_space_access(empire* e, bool status)
     e->relations_map[this].have_passage_rights = status;
 }
 
+///this doesn't work well for MP
 void empire::trade_vision(empire* e)
 {
     for(orbital* o : e->owned)
@@ -714,10 +714,10 @@ void empire::ally(empire* e)
         become_unhostile(e);
 
     relations_map[e].allied = true;
-    relations_map[e].friendliness += 0.5f;
 
     e->relations_map[this].allied = true;
-    e->relations_map[this].friendliness += 0.5f;
+
+    positive_relations(e, 0.5f);
 
     offset_relations(e, get_relation_constraint_offset_lower(e, relations_info::unally_threshold));
     e->offset_relations(this, e->get_relation_constraint_offset_lower(this, relations_info::unally_threshold));
@@ -747,8 +747,7 @@ void empire::unally(empire* e)
     relations_map[e].allied = false;
     e->relations_map[this].allied = false;
 
-    relations_map[e].friendliness -= 0.5f;
-    e->relations_map[this].friendliness -= 0.5f;
+    negative_relations(e, 0.5f);
 
     trade_space_access(e, false);
 
@@ -998,13 +997,12 @@ void empire::positive_interaction(empire* e)
 
 void empire::propagage_relationship_modification_from_damaging_ship(empire* damaged)
 {
-    float relationship_change = 0.01f;
+    float relationship_change = 0.05f;
 
-    if(relations_map[damaged].friendliness > -1)
-        relations_map[damaged].friendliness -= relationship_change;
-
-    if(damaged->relations_map[this].friendliness > -1)
-        damaged->relations_map[this].friendliness -= relationship_change;
+    if(relations_map[damaged].friendliness > -1 && damaged->relations_map[this].friendliness > -1)
+    {
+        negative_relations(damaged, relationship_change);
+    }
 
     for(auto& rel : damaged->relations_map)
     {
