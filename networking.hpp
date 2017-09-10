@@ -380,7 +380,7 @@ struct network_state
             }
         }
 
-        for(auto& id : requests)
+        /*for(auto& id : requests)
         {
             for(int i=0; i<id.second.size(); i++)
             {
@@ -393,7 +393,7 @@ struct network_state
                     continue;
                 }
             }
-        }
+        }*/
 
         int current_requests = 0;
 
@@ -403,6 +403,9 @@ struct network_state
             {
                 if(current_requests >= max_fragments_to_request)
                     return;
+
+                if(!owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].too_long())
+                    continue;
 
                 owner_to_request_timeouts[i.owner_id][i.packet_id][i.sequence_id].request();
 
@@ -756,7 +759,7 @@ struct network_state
                         next.sequence_number = header.sequence_number;
 
                         //if((header.sequence_number % 100) == 0)
-                        if(header.sequence_number > 400 && (header.sequence_number % 100) == 0)
+                        if(header.sequence_number > 400 && (header.sequence_number % 1000) == 0)
                         {
                             std::cout << header.sequence_number << " ";
                             std::cout << " " << packets.size() << std::endl;
