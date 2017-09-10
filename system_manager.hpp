@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include "context_menu.hpp"
 #include "serialise.hpp"
+#include "ai_empire.hpp"
 
 namespace orbital_info
 {
@@ -105,6 +106,8 @@ struct sprite_renderable
     void load(const std::string& str);
 
     void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col = {1,1,1}, bool highlight = false);
+
+    static void draw(sf::Texture& tex, sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col = {1,1,1}, bool highlight = false);
 };
 
 struct empire;

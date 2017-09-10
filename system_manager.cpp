@@ -326,6 +326,11 @@ void sprite_renderable::load(const std::string& str)
 
 void sprite_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
 {
+    sprite_renderable::draw(tex, win, rotation, absolute_pos, col, highlight);
+}
+
+void sprite_renderable::draw(sf::Texture& tex, sf::RenderWindow& win, float rotation, vec2f absolute_pos, vec3f col, bool highlight)
+{
     col = col * 255.f;
 
     col = clamp(col, 0.f, 255.f);
@@ -853,13 +858,15 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
             ycentre -= sprite.tex.getSize().y/2;
 
+            std::sort(data->ships.begin(), data->ships.end(), [](ship* s1, ship* s2){return s1->estimated_type < s2->estimated_type;});
+
             for(int i = num_ships - 1; i >= 0; i--)
             {
                 vec2f offset = {0.f, i * chevron_separation};
 
                 offset.y() -= ycentre;
 
-                sprite.draw(win, rotation, last_viewed_position + offset, current_sprite_col, highlight);
+                sprite_renderable::draw(*data->ships[i]->get_world_texture(), win, rotation, last_viewed_position + offset, current_sprite_col, highlight);
             }
         }
         else

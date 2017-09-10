@@ -1750,6 +1750,50 @@ ship::ship()
     check_load({dim.x(), dim.y()});
 }
 
+ship_type::types ship::estimate_ship_type()
+{
+    float total_scanner_size = 0.f;
+    float total_weapon_size = 0.f;
+
+    for(component& c : entity_list)
+    {
+        if(c.primary_attribute == ship_component_elements::COLONISER)
+            return ship_type::COLONY;
+
+        if(c.primary_attribute == ship_component_elements::ORE_HARVESTER)
+            return ship_type::MINING;
+
+        if(c.is_weapon())
+        {
+            total_weapon_size += c.current_size;
+        }
+
+        if(c.primary_attribute == ship_component_elements::SCANNING_POWER)
+        {
+            total_scanner_size += c.current_size;
+        }
+    }
+
+
+    if(total_scanner_size == total_weapon_size)
+    {
+        return ship_type::SCOUT;
+    }
+
+    if(total_scanner_size > total_weapon_size)
+    {
+        return ship_type::SCOUT;
+    }
+
+    else if(total_scanner_size < total_weapon_size)
+    {
+        return ship_type::MILITARY;
+    }
+
+    ///just in case
+    return ship_type::MILITARY;
+}
+
 void ship::tick_all_components(float step_s)
 {
     auto timer = MAKE_AUTO_TIMER();
@@ -2926,6 +2970,8 @@ void ship::add(const component& c)
     }
 
     entity_list.push_back(c);
+
+    estimated_type = estimate_ship_type();
 }
 
 void ship::hit(projectile* p, system_manager& system_manage)
@@ -4240,6 +4286,26 @@ bool ship::is_ship_design_valid()
     float max_space = ship_component_elements::max_components_total_size;
 
     return get_total_components_size() <= max_space + FLOAT_BOUND;
+}
+
+sf::Texture* ship::get_world_texture()
+{
+    static sf::Texture textures[ship_type::COUNT];
+
+    for(int i=0; i<ship_type::COUNT; i++)
+    {
+        if(textures[i].getSize().x == 0)
+        {
+            sf::Image img;
+            img.loadFromFile(ship_type::type_to_png[(ship_type::types)i]);
+            premultiply(img);
+
+            textures[i].loadFromImage(img);
+            textures[i].setSmooth(true);
+        }
+    }
+
+    return &textures[estimated_type];
 }
 
 void ship::set_size(float new_size)

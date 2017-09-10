@@ -24,18 +24,6 @@ namespace ai_empire_info
     };
 }
 
-namespace ship_type
-{
-    enum types
-    {
-        COLONY,
-        MINING,
-        MILITARY,
-        SCOUT,
-        COUNT,
-    };
-}
-
 struct system_manager;
 struct orbital_system;
 

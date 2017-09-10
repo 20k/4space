@@ -469,9 +469,31 @@ namespace ship_info
     int attribute_offset = 0;
 };*/
 
+namespace ship_type
+{
+    enum types
+    {
+        MINING,
+        COLONY,
+        SCOUT,
+        MILITARY,
+        COUNT,
+    };
+
+    static std::map<types, std::string> type_to_png
+    {
+        {MINING, "pics/fleet_chevron_ore.png"},
+        {COLONY, "pics/fleet_chevron_colony.png"},
+        {SCOUT, "pics/fleet_chevron_scout.png"},
+        {MILITARY, "pics/fleet_chevron_military.png"},
+    };
+}
+
 struct ship : positional, serialisable
 {
     ship_type::types ai_fleet_type = ship_type::COUNT;
+    ///for ui purposes
+    ship_type::types estimated_type = ship_type::MILITARY;
 
     std::string name;
 
@@ -486,6 +508,8 @@ struct ship : positional, serialisable
     ship duplicate();
 
     ship();
+
+    ship_type::types estimate_ship_type();
 
     int team = 0;
 
@@ -664,6 +688,8 @@ struct ship : positional, serialisable
 
     float get_total_components_size();
     bool is_ship_design_valid();
+
+    sf::Texture* get_world_texture();
 
     static sf::RenderTexture* intermediate;
 
