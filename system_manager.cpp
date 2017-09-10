@@ -842,7 +842,31 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     if(render_type == 0)
         simple_renderable.draw(win, rotation, last_viewed_position, force_high_quality, draw_name_window, name, current_simple_col, show_detail, this);
     if(render_type == 1)
-        sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
+    {
+        if(type == orbital_info::FLEET)
+        {
+            int num_ships = data->ships.size();
+
+            int chevron_separation = 4;
+
+            float ycentre = chevron_separation * num_ships / 2;
+
+            ycentre -= sprite.tex.getSize().y/2;
+
+            for(int i = num_ships - 1; i >= 0; i--)
+            {
+                vec2f offset = {0.f, i * chevron_separation};
+
+                offset.y() -= ycentre;
+
+                sprite.draw(win, rotation, last_viewed_position + offset, current_sprite_col, highlight);
+            }
+        }
+        else
+        {
+            sprite.draw(win, rotation, last_viewed_position, current_sprite_col, highlight);
+        }
+    }
 
     auto real_coord = mapCoordsToPixel_float(last_viewed_position.x(), last_viewed_position.y(), win.getView(), win);
 
@@ -912,8 +936,17 @@ void orbital::center_camera(system_manager& system_manage)
 
 bool orbital::point_within(vec2f pos)
 {
+    int num_ships = 1;
+
+    if(type == orbital_info::FLEET)
+    {
+        num_ships = std::max(data->ships.size()/2.f, (float)num_ships);
+    }
+
     vec2f dim = rad * 1.5f;
     vec2f apos = last_viewed_position;
+
+    dim.y() += orbital_info::chevron_separation_distance * (num_ships - 1);
 
     if(pos.x() < apos.x() + dim.x() && pos.x() >= apos.x() - dim.x() && pos.y() < apos.y() + dim.y() && pos.y() >= apos.y() - dim.y())
     {
@@ -1532,6 +1565,8 @@ orbital* orbital_system::make_new(orbital_info::type type, float rad, int num_ve
     else if(n->render_type == 1)
     {
         n->sprite.load(orbital_info::load_strs[type]);
+
+        n->rad = std::max(n->sprite.tex.getSize().x/2.f, n->sprite.tex.getSize().y/2.f);
     }
 
     if(n->type == orbital_info::ASTEROID)

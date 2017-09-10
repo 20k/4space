@@ -53,13 +53,15 @@ namespace orbital_info
         "",
         "",
         "",
-        "pics/fleet.png",
+        "pics/fleet_chevron.png",
         "",
         ""
     };
 
     static float decolonise_time_s = 60.f;
     static float engagement_radius = 40.f;
+
+    static inline float chevron_separation_distance = 4;
 }
 
 struct empire;
