@@ -37,9 +37,9 @@ vec3f hp_frac_to_col(float hp_frac)
 }
 
 inline
-void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
+void imgui_hp_bar(float fraction, vec4f col, vec2f dim)
 {
-    constexpr int num_divisions = 100;
+    constexpr int num_divisions = 20;
 
     float num_filled = floor(fraction * num_divisions);
 
@@ -63,7 +63,11 @@ void imgui_hp_bar(float fraction, vec3f col, vec2f dim)
         }
     }
 
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(col.x(), col.y(), col.z(), col.w()));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
     ImGui::PlotHistogram("", vals, num_divisions, 0, nullptr, 0, 1, ImVec2(dim.x(), dim.y()));
+    ImGui::PopStyleVar(1);
+    ImGui::PopStyleColor(1);
 }
 
 namespace sf

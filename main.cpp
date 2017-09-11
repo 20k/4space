@@ -1760,19 +1760,37 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     ship* cur_ship = nullptr;
                     vec3f draw_col = {1,1,1};
 
+                    float hp_frac = 1.f;
+
                     if(o->type == orbital_info::FLEET)
                     {
                         cur_ship = sm->ships[i];
 
                         auto fully_merged = cur_ship->get_fully_merged(1.f);
 
-                        float hp_frac = fully_merged[ship_component_elements::HP].cur_amount / fully_merged[ship_component_elements::HP].max_amount;
+                        hp_frac = fully_merged[ship_component_elements::HP].cur_amount / fully_merged[ship_component_elements::HP].max_amount;
 
                         draw_col = hp_frac_to_col(hp_frac);
                     }
 
                     if(o->type == orbital_info::FLEET)
+                    {
+                        ship_manager* sm = o->data;
+
+                        ship* s = o->data->ships[i];
+
+                        #ifdef HEALTH_BAR_EXPERIMENT
+                        ImVec2 text_dim = ImGui::CalcTextSize(str.c_str());
+
+                        auto pos = ImGui::GetCursorPos();
+
+                        imgui_hp_bar(hp_frac, {draw_col.x(), draw_col.y(), draw_col.z(), 0.2f}, {text_dim.x, text_dim.y});
+
+                        ImGui::SetCursorPos(pos);
+                        #endif
+
                         ImGui::ColourHoverText(str, draw_col);
+                    }
                     else
                         ImGui::Text(str.c_str());
 
