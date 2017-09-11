@@ -856,9 +856,20 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
             int chevron_separation = orbital_info::chevron_separation_distance;
 
-            float ycentre = chevron_separation * num_ships / 2;
+            /*float ycentre = chevron_separation * num_ships / 2;
 
-            ycentre -= sprite.tex.getSize().y/2;
+            ycentre -= sprite.tex.getSize().y/2;*/
+
+            float ycentre = 0.f;
+
+            for(ship* s : data->ships)
+            {
+                ycentre += s->get_world_texture()->getSize().y;
+            }
+
+            ycentre /= 2.f;
+
+            ycentre -= sprite.tex.getSize().y;
 
             std::sort(data->ships.begin(), data->ships.end(), [](ship* s1, ship* s2){return s1->estimated_type < s2->estimated_type;});
 
@@ -945,17 +956,23 @@ void orbital::center_camera(system_manager& system_manage)
 
 bool orbital::point_within(vec2f pos)
 {
-    int num_ships = 1;
+    float extra_dist = 0;
 
     if(type == orbital_info::FLEET)
     {
-        num_ships = std::max(data->ships.size()/2.f, (float)num_ships);
+        for(ship* s : data->ships)
+        {
+            extra_dist += s->get_world_texture()->getSize().y;
+        }
     }
+
+    extra_dist /= 2.f;
 
     vec2f dim = rad * 1.5f;
     vec2f apos = last_viewed_position;
 
-    dim.y() += orbital_info::chevron_separation_distance * (num_ships - 1);
+    if(extra_dist > 0)
+        dim.y() += extra_dist * 0.8;
 
     if(pos.x() < apos.x() + dim.x() && pos.x() >= apos.x() - dim.x() && pos.y() < apos.y() + dim.y() && pos.y() >= apos.y() - dim.y())
     {
