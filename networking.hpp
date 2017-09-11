@@ -621,12 +621,13 @@ struct network_state
 
     network_state() : net_thread(&network_state::thread_network_receive, this)
     {
-        net_thread.detach();
+
     }
 
     ~network_state()
     {
         should_die = 1;
+        net_thread.join();
     }
 
     ///need to write ACKs for forwarding packets so we know to resend them if they didn't arrive
