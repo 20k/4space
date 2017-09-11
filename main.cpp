@@ -1894,61 +1894,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
             {
                 bool can_resupply = orb->type == orbital_info::FLEET && (orb->parent_empire == player_empire || orb->parent_empire->is_allied(player_empire)) && !(sm->any_in_combat() || sm->all_derelict());
 
-                if(can_resupply)
-                {
-                    //ImGui::GoodText("(Resupply)");
-
-                    ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, sm->auto_resupply);
-
-                    ImGui::SameLine();
-
-                    if(ImGui::IsItemClicked_Registered())
-                    {
-                        ship_manager* sm = (ship_manager*)o->data;
-
-                        sm->resupply(player_empire, false);
-                    }
-
-                    if(ImGui::IsItemClicked_Registered(1))
-                    {
-                        sm->auto_resupply = !sm->auto_resupply;
-                    }
-
-                    if(ImGui::IsItemHovered())
-                    {
-                        if(sm->auto_resupply)
-                            tooltip::add("Right click to disable auto resupply");
-                        else
-                            tooltip::add("Right click to enable auto resupply");
-                    }
-                }
-
-                bool any_damaged = sm->any_damaged();
-
-                if(can_resupply && any_damaged)
-                {
-                    ImGui::GoodText("(Repair)");
-
-                    ImGui::SameLine();
-
-                    if(ImGui::IsItemClicked_Registered())
-                    {
-                        sm->repair(player_empire);
-                    }
-                }
-
-                if(can_resupply && sm->any_with_element(ship_component_elements::RESOURCE_STORAGE))
-                {
-                    ImGui::GoodText("(Refill Cargo)");
-
-                    ImGui::SameLine();
-
-                    if(ImGui::IsItemClicked_Registered())
-                    {
-                        sm->refill_resources(player_empire);
-                    }
-                }
-
                 ///disabling merging here and resupply invalides all fleet actions except moving atm
                 ///unexpected fix to fleet merging problem
                 ///disable resupply if in combat
