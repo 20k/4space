@@ -1822,15 +1822,13 @@ void ship::context_handle_menu(empire* player_empire)
     bool friendly = owned_by->parent_empire == player_empire || player_empire->is_allied(owned_by->parent_empire);
 
     ///RESUPPLY
-    if(friendly)
+    if(friendly && !fully_disabled())
     {
         ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, owned_by->auto_resupply);
 
-        ImGui::SameLine();
-
         if(ImGui::IsItemClicked_Registered())
         {
-            owned_by->resupply(player_empire, false);
+            resupply(player_empire);
         }
 
         if(owned_by->parent_empire == player_empire)
@@ -1851,9 +1849,24 @@ void ship::context_handle_menu(empire* player_empire)
     }
 
     ///REPAIR
-    if(friendly)
+    if(friendly && damaged() && !fully_disabled())
     {
+        ImGui::GoodText("(Repair)");
 
+        if(ImGui::IsItemClicked_Registered())
+        {
+            repair(player_empire);
+        }
+    }
+
+    if(friendly && !fully_disabled())
+    {
+        ImGui::GoodText("(Refill Cargo)");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            refill_resources(player_empire);
+        }
     }
 
     if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
@@ -3395,6 +3408,16 @@ void ship::resupply(empire* emp, int num)
 void ship::repair(empire* emp, int num)
 {
     return resupply_elements(emp, {ship_component_elements::HP, ship_component_elements::ARMOUR}, num);
+}
+
+bool ship::damaged()
+{
+    auto fully_merged = get_fully_merged(1.f);
+
+    if(fully_merged[ship_component_element::HP].cur_amount < fully_merged[ship_component_element::HP].max_amount)
+        return true;
+
+    return false;
 }
 
 bool ship::can_move_in_system()
@@ -5303,9 +5326,7 @@ bool ship_manager::any_damaged()
 {
     for(ship* s : ships)
     {
-        auto fully_merged = s->get_fully_merged(1.f);
-
-        if(fully_merged[ship_component_element::HP].cur_amount < fully_merged[ship_component_element::HP].max_amount)
+        if(s->damaged())
             return true;
     }
 

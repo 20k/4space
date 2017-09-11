@@ -603,6 +603,8 @@ struct ship : positional, serialisable, has_context_menu
     void resupply(empire* emp, int num = 1);
     void repair(empire* emp, int num = 1);
 
+    bool damaged();
+
     bool can_move_in_system();
     float get_move_system_speed();
 
