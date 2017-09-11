@@ -957,6 +957,9 @@ bool orbital::point_within(vec2f pos)
     {
         for(ship* s : data->ships)
         {
+            if(s == data->ships.back())
+                continue;
+
             extra_dist += s->get_world_texture()->getSize().y;
         }
     }
@@ -967,7 +970,7 @@ bool orbital::point_within(vec2f pos)
     vec2f apos = last_viewed_position;
 
     if(extra_dist > 0)
-        dim.y() += extra_dist * 0.8;
+        dim.y() += extra_dist;
 
     if(pos.x() < apos.x() + dim.x() && pos.x() >= apos.x() - dim.x() && pos.y() < apos.y() + dim.y() && pos.y() >= apos.y() - dim.y())
     {
