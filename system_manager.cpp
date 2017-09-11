@@ -864,7 +864,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
             ycentre /= 2.f;
 
-            std::sort(data->ships.begin(), data->ships.end(), [](ship* s1, ship* s2){return s1->estimated_type < s2->estimated_type;});
+            std::stable_sort(data->ships.begin(), data->ships.end(), [](ship* s1, ship* s2){return s1->estimated_type < s2->estimated_type;});
 
             float yoffset = 0.f;
 
