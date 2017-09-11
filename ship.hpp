@@ -781,6 +781,8 @@ struct ship_manager : serialisable, has_context_menu
     float get_move_system_speed();
 
     void draw_alerts(sf::RenderWindow& win, vec2f abs_pos);
+    ///if we need just one texture for a whole fleet
+    sf::Texture* get_universe_texture();
 
     void force_warp(orbital_system* fin, orbital_system* cur, orbital* o);
     void try_warp(orbital_system* fin, orbital* o);

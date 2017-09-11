@@ -5183,6 +5183,32 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     text_manager::render(win, alert_symbol, abs_pos + (vec2f){8, -20}, alert_colour);
 }
 
+sf::Texture* ship_manager::get_universe_texture()
+{
+    std::vector<int> counts;
+    counts.resize(ship_type::COUNT+1);
+
+    for(ship* s : ships)
+    {
+        counts[s->estimated_type]++;
+    }
+
+    ship_type::types type = (ship_type::types)std::distance(ships.begin(), ships.begin() + *std::max_element(counts.begin(), counts.end()));
+
+    for(ship* s : ships)
+    {
+        if(s->estimated_type == type)
+            return s->get_world_texture();
+    }
+
+    if(ships.size() > 0)
+    {
+        return ships.front()->get_world_texture();
+    }
+
+    return nullptr;
+}
+
 void ship_manager::try_warp(orbital_system* fin, orbital* o)
 {
     //if(!can_warp(fin, o->parent_system, o))
