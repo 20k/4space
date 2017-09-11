@@ -1283,18 +1283,30 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     if(system_manage.currently_viewed != nullptr && system_manage.in_system_view())
     {
+        float min_dist = FLT_MAX;
+        orbital* min_orb = nullptr;
+
         for(orbital* orb : system_manage.currently_viewed->orbitals)
         {
             orb->was_hovered = false;
 
             if(orb->point_within({transformed.x, transformed.y}))
             {
-                valid_selection_targets.push_back(orb);
+                vec2f dist = (vec2f){transformed.x, transformed.y} - orb->absolute_pos;
 
-                orb->was_hovered = true;
-
-                break;
+                if(dist.length() < min_dist)
+                {
+                    min_dist = dist.length();
+                    min_orb = orb;
+                }
             }
+        }
+
+        if(min_orb != nullptr)
+        {
+            valid_selection_targets.push_back(min_orb);
+
+            min_orb->was_hovered = true;
         }
     }
 
