@@ -1842,9 +1842,9 @@ void ship::context_handle_menu(empire* player_empire)
             if(ImGui::IsItemHovered())
             {
                 if(owned_by->auto_resupply)
-                    tooltip::add("Right click to disable auto resupply");
+                    tooltip::add("Right click to disable auto resupply for fleet");
                 else
-                    tooltip::add("Right click to enable auto resupply");
+                    tooltip::add("Right click to enable auto resupply for fleet");
             }
         }
     }
@@ -1888,6 +1888,113 @@ void ship::context_handle_menu(empire* player_empire)
                 if(!player_empire->is_hostile(owned_by->parent_empire))
                 {
                     player_empire->become_hostile(owned_by->parent_empire);
+                }
+
+                context_are_you_sure_war = false;
+            }
+
+        }
+    }
+
+    if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
+    {
+        ImGui::CloseCurrentPopup();
+    }
+
+    ImGui::EndPopup();
+}
+
+void ship_manager::context_handle_menu(empire* player_empire)
+{
+    context_tick_menu();
+
+    if(context_request_open)
+    {
+        context_request_open = false;
+
+        ImGui::OpenPopup("TestPopup");
+    }
+
+    if(!context_is_open)
+        return;
+
+    bool open = ImGui::BeginPopup("TestPopup");
+
+    if(!open)
+    {
+        context_are_you_sure_war = false;
+        context_is_open = false;
+        return;
+    }
+
+    bool friendly = parent_empire == player_empire || player_empire->is_allied(parent_empire);
+
+    ///RESUPPLY
+    if(friendly && !any_derelict())
+    {
+        ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, auto_resupply);
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            resupply(player_empire);
+        }
+
+        if(parent_empire == player_empire)
+        {
+            if(ImGui::IsItemClicked_Registered(1))
+            {
+                auto_resupply = !auto_resupply;
+            }
+
+            if(ImGui::IsItemHovered())
+            {
+                if(auto_resupply)
+                    tooltip::add("Right click to disable auto resupply");
+                else
+                    tooltip::add("Right click to enable auto resupply");
+            }
+        }
+    }
+
+    ///REPAIR
+    if(friendly && any_damaged() && !any_derelict())
+    {
+        ImGui::GoodText("(Repair)");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            repair(player_empire);
+        }
+    }
+
+    if(friendly && !any_derelict())
+    {
+        ImGui::GoodText("(Refill Cargo)");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            refill_resources(player_empire);
+        }
+    }
+
+    bool neutral_or_allied = (!player_empire->is_hostile(parent_empire) || player_empire->is_allied(parent_empire)) && player_empire != parent_empire;
+
+    if(neutral_or_allied)
+    {
+        ImGui::BadText("(Declare War)");
+
+        if(ImGui::IsItemClicked_Registered())
+            context_are_you_sure_war = true;
+
+        if(context_are_you_sure_war)
+        {
+            ImGui::BadText("(Are you sure?)");
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                if(!player_empire->is_hostile(parent_empire))
+                {
+                    player_empire->become_hostile(parent_empire);
                 }
 
                 context_are_you_sure_war = false;

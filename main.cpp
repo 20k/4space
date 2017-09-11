@@ -1566,7 +1566,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(grouped_orbitals.second.size() > 1 || orbitals_grouped_by_empire.size() > 1)
                 {
-                    ImGui::ColourHoverText(name, {1,1,1});
+                    ImGui::NeutralText(name);
 
                     if(ImGui::IsItemHovered())
                     {
@@ -1585,7 +1585,17 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
                 else
                 {
-                    ImGui::ColourNoHoverText(name, {1,1,1});
+                    ImGui::NeutralText(name);
+                }
+
+                if(ImGui::IsItemHovered())
+                {
+                    tooltip::add("Right Click for fleet options");
+                }
+
+                if(o->type == orbital_info::FLEET && ImGui::IsItemClicked_Registered(1))
+                {
+                    o->data->context_request_open = true;
                 }
 
                 ///do warp charging info here
@@ -1803,14 +1813,14 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     {
                         bool shift = key.isKeyPressed(sf::Keyboard::LShift);
 
-                        bool can_open_window = true;
-
-                        if(can_open_window && ImGui::IsItemHovered())
-                            ImGui::SetTooltip("Left Click to view ship");
+                        if(ImGui::IsItemHovered())
+                            tooltip::add("Left Click to view ship");
+                        if(ImGui::IsItemHovered())
+                            tooltip::add("Right Click for ship options");
                         if(sm->can_merge && ImGui::IsItemHovered())
-                            ImGui::SetTooltip("Shift-Click to add to fleet");
+                            tooltip::add("Shift-Click to add to fleet");
 
-                        if(ImGui::IsItemClicked_DragCompatible() && !shift && !lctrl && can_open_window)
+                        if(ImGui::IsItemClicked_DragCompatible() && !shift && !lctrl)
                         {
                             cur_ship->display_ui = !cur_ship->display_ui;
                         }
@@ -3220,6 +3230,8 @@ int main()
                 ///ever an issue
                 s->context_handle_menu(player_empire);
             }
+
+            smanage->context_handle_menu(player_empire);
         }
 
         for(orbital_system* os : system_manage.systems)

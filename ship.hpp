@@ -750,6 +750,8 @@ struct ship_manager : serialisable, has_context_menu
     std::vector<std::string> get_info_strs();
     std::vector<std::string> get_info_strs_with_info_warfare(empire* viewing, orbital* my_orbital, bool full_detail);
 
+    virtual void context_handle_menu(empire* player_empire) override;
+
     void merge_into_me(ship_manager& other);
 
     ///from other ship manager
