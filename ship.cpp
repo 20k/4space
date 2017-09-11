@@ -11,6 +11,7 @@
 #include <iterator>
 #include "popup.hpp"
 #include <imgui/imgui_internal.h>
+#include "tooltip_handler.hpp"
 
 int ship_manager::gid;
 
@@ -1820,7 +1821,27 @@ void ship::context_handle_menu(empire* player_empire)
 
     if(owned_by->parent_empire == player_empire)
     {
-        ImGui::GoodText("(Resupply)");
+        ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, owned_by->auto_resupply);
+
+        ImGui::SameLine();
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            owned_by->resupply(player_empire, false);
+        }
+
+        if(ImGui::IsItemClicked_Registered(1))
+        {
+            owned_by->auto_resupply = !owned_by->auto_resupply;
+        }
+
+        if(ImGui::IsItemHovered())
+        {
+            if(owned_by->auto_resupply)
+                tooltip::add("Right click to disable auto resupply");
+            else
+                tooltip::add("Right click to enable auto resupply");
+        }
     }
 
     if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
