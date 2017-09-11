@@ -10,6 +10,7 @@
 #include "profile.hpp"
 #include <iterator>
 #include "popup.hpp"
+#include <imgui/imgui_internal.h>
 
 int ship_manager::gid;
 
@@ -1795,7 +1796,7 @@ ship_type::types ship::estimate_ship_type()
     return ship_type::MILITARY;
 }
 
-void ship::context_handle_menu()
+void ship::context_handle_menu(empire* player_empire)
 {
     context_tick_menu();
 
@@ -1817,7 +1818,15 @@ void ship::context_handle_menu()
         return;
     }
 
-    ImGui::NeutralText("Test");
+    if(owned_by->parent_empire == player_empire)
+    {
+        ImGui::GoodText("(Resupply)");
+    }
+
+    if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
+    {
+        ImGui::CloseCurrentPopup();
+    }
 
     ImGui::EndPopup();
 }

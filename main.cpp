@@ -3306,7 +3306,7 @@ int main()
                 ///if we modify ship state this will crash
                 ///however in the current model of memory management I think this is no longer
                 ///ever an issue
-                s->context_handle_menu();
+                s->context_handle_menu(player_empire);
             }
         }
 

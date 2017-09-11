@@ -512,7 +512,7 @@ struct ship : positional, serialisable, has_context_menu
 
     ship_type::types estimate_ship_type();
 
-    virtual void context_handle_menu() override;
+    virtual void context_handle_menu(empire* player_empire) override;
 
     int team = 0;
 

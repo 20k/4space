@@ -70,6 +70,8 @@ void imgui_hp_bar(float fraction, vec4f col, vec2f dim)
     ImGui::PopStyleColor(1);
 }
 
+struct empire;
+
 struct has_context_menu
 {
     bool context_request_open = false;
@@ -79,7 +81,7 @@ struct has_context_menu
 
     void context_tick_menu();
 
-    virtual void context_handle_menu() {};
+    virtual void context_handle_menu(empire* player_empire) {};
 };
 
 namespace sf
