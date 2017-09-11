@@ -1750,7 +1750,6 @@ ship::ship()
     type_to_component_offsets.resize(ship_component_elements::NONE + 1);
 
     dim = {100, 40};
-    check_load({dim.x(), dim.y()});
 }
 
 ship_type::types ship::estimate_ship_type()
@@ -5022,6 +5021,8 @@ void ship_manager::tick_all(float step_s)
 
     for(ship* s : ships)
     {
+        s->check_load({s->dim.x(), s->dim.y()});
+
         s->tick_all_components(step_s);
         s->tick_other_systems(step_s);
 
