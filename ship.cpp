@@ -1815,6 +1815,7 @@ void ship::context_handle_menu(empire* player_empire)
 
     if(!open)
     {
+        context_are_you_sure_war = false;
         context_is_open = false;
         return;
     }
@@ -1866,6 +1867,32 @@ void ship::context_handle_menu(empire* player_empire)
         if(ImGui::IsItemClicked_Registered())
         {
             refill_resources(player_empire);
+        }
+    }
+
+    bool neutral_or_allied = (!player_empire->is_hostile(owned_by->parent_empire) || player_empire->is_allied(owned_by->parent_empire)) && player_empire != owned_by->parent_empire;
+
+    if(neutral_or_allied)
+    {
+        ImGui::BadText("(Declare War)");
+
+        if(ImGui::IsItemClicked_Registered())
+            context_are_you_sure_war = true;
+
+        if(context_are_you_sure_war)
+        {
+            ImGui::BadText("(Are you sure?)");
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                if(!player_empire->is_hostile(owned_by->parent_empire))
+                {
+                    player_empire->become_hostile(owned_by->parent_empire);
+                }
+
+                context_are_you_sure_war = false;
+            }
+
         }
     }
 

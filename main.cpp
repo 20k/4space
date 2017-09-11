@@ -1930,39 +1930,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
             }
 
-            bool can_declare_war = orb->parent_empire != nullptr && !orb->parent_empire->is_hostile(player_empire) && orb->parent_empire != player_empire;
-
-            if(can_declare_war)
-            {
-                ImGui::BadText("(Declare War)");
-
-                ImGui::SameLine();
-
-                if(ImGui::IsItemClicked_Registered() && popup.fetch(orb) != nullptr)
-                    popup.fetch(orb)->declaring_war = true;
-
-                if(popup.fetch(orb) != nullptr && popup.fetch(orb)->declaring_war)
-                {
-                    ImGui::BadText("(Are you sure?)");
-
-                    ImGui::SameLine();
-
-                    if(ImGui::IsItemClicked_Registered())
-                    {
-                        orbital* o = orb;
-
-                        assert(o);
-
-                        empire* parent = o->parent_empire;
-
-                        if(!parent->is_hostile(player_empire))
-                        {
-                            parent->become_hostile(player_empire);
-                        }
-                    }
-                }
-            }
-
             if(orb->type == orbital_info::FLEET)
             {
                 bool enable_engage_cooldown = !sm->can_engage() && sm->parent_empire == player_empire;
