@@ -1819,7 +1819,10 @@ void ship::context_handle_menu(empire* player_empire)
         return;
     }
 
-    if(owned_by->parent_empire == player_empire)
+    bool friendly = owned_by->parent_empire == player_empire || player_empire->is_allied(owned_by->parent_empire);
+
+    ///RESUPPLY
+    if(friendly)
     {
         ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, owned_by->auto_resupply);
 
@@ -1830,18 +1833,27 @@ void ship::context_handle_menu(empire* player_empire)
             owned_by->resupply(player_empire, false);
         }
 
-        if(ImGui::IsItemClicked_Registered(1))
+        if(owned_by->parent_empire == player_empire)
         {
-            owned_by->auto_resupply = !owned_by->auto_resupply;
-        }
+            if(ImGui::IsItemClicked_Registered(1))
+            {
+                owned_by->auto_resupply = !owned_by->auto_resupply;
+            }
 
-        if(ImGui::IsItemHovered())
-        {
-            if(owned_by->auto_resupply)
-                tooltip::add("Right click to disable auto resupply");
-            else
-                tooltip::add("Right click to enable auto resupply");
+            if(ImGui::IsItemHovered())
+            {
+                if(owned_by->auto_resupply)
+                    tooltip::add("Right click to disable auto resupply");
+                else
+                    tooltip::add("Right click to enable auto resupply");
+            }
         }
+    }
+
+    ///REPAIR
+    if(friendly)
+    {
+
     }
 
     if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
