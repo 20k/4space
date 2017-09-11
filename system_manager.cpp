@@ -852,14 +852,6 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     {
         if(type == orbital_info::FLEET)
         {
-            int num_ships = data->ships.size();
-
-            int chevron_separation = orbital_info::chevron_separation_distance;
-
-            /*float ycentre = chevron_separation * num_ships / 2;
-
-            ycentre -= sprite.tex.getSize().y/2;*/
-
             float ycentre = 0.f;
 
             for(ship* s : data->ships)
@@ -872,32 +864,9 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
             ycentre /= 2.f;
 
-            //ycentre -= sprite.tex.getSize().y;
-
             std::sort(data->ships.begin(), data->ships.end(), [](ship* s1, ship* s2){return s1->estimated_type < s2->estimated_type;});
 
-            /*for(int i = num_ships - 1; i >= 0; i--)
-            {
-                //vec2f offset = {0.f, i * chevron_separation};
-
-                //offset.y() -= ycentre;
-
-                vec2f offset = {0, yoffset};
-
-                yoffset -= data->ships[i]->get_world_texture()->getSize().y - 1;
-
-                sprite_renderable::draw(*data->ships[i]->get_world_texture(), win, rotation, last_viewed_position + offset, current_sprite_col, highlight);
-            }*/
-
-            //yoffset = -ycentre;
-
             float yoffset = 0.f;
-
-            sf::CircleShape shape;
-            shape.setRadius(2.f);
-            shape.setOrigin(2.f, 2.f);
-
-            shape.setPosition(conv_implicit<sf::Vector2f>(last_viewed_position + (vec2f){0.f, 0.f}));
 
             for(ship* s : data->ships)
             {
@@ -907,8 +876,6 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
                 sprite_renderable::draw(*s->get_world_texture(), win, rotation, last_viewed_position + offset, current_sprite_col, highlight);
             }
-
-            win.draw(shape);
         }
         else
         {
