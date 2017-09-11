@@ -10,6 +10,7 @@
 #include "ai_fleet.hpp"
 #include "ai_empire.hpp"
 #include "serialise.hpp"
+#include "ui_util.hpp"
 
 #define FLOAT_BOUND 0.00000001f
 
@@ -489,7 +490,7 @@ namespace ship_type
     };
 }
 
-struct ship : positional, serialisable
+struct ship : positional, serialisable, has_context_menu
 {
     ship_type::types ai_fleet_type = ship_type::COUNT;
     ///for ui purposes
@@ -510,6 +511,8 @@ struct ship : positional, serialisable
     ship();
 
     ship_type::types estimate_ship_type();
+
+    virtual void context_handle_menu() override;
 
     int team = 0;
 
@@ -720,7 +723,7 @@ struct orbital;
 struct battle_manager;
 
 ///can be used as a fleet
-struct ship_manager : serialisable
+struct ship_manager : serialisable, has_context_menu
 {
     //int32_t this_fight_id = -1;
     //int32_t last_fight_id = -1;

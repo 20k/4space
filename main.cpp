@@ -1790,6 +1790,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         #endif
 
                         ImGui::ColourHoverText(str, draw_col);
+
+                        if(ImGui::IsItemClicked_Registered(1))
+                        {
+                            s->context_request_open = true;
+                        }
                     }
                     else
                         ImGui::Text(str.c_str());
@@ -3294,6 +3299,16 @@ int main()
             }
         }
 
+        for(ship_manager* smanage : fleet_manage.fleets)
+        {
+            for(ship* s : smanage->ships)
+            {
+                ///if we modify ship state this will crash
+                ///however in the current model of memory management I think this is no longer
+                ///ever an issue
+                s->context_handle_menu();
+            }
+        }
 
         for(orbital_system* os : system_manage.systems)
         {

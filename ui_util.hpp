@@ -70,6 +70,18 @@ void imgui_hp_bar(float fraction, vec4f col, vec2f dim)
     ImGui::PopStyleColor(1);
 }
 
+struct has_context_menu
+{
+    bool context_request_open = false;
+    bool context_request_close = false;
+
+    bool context_is_open = false;
+
+    void context_tick_menu();
+
+    virtual void context_handle_menu() {};
+};
+
 namespace sf
 {
     struct RenderWindow;

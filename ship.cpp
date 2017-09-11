@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "profile.hpp"
 #include <iterator>
+#include "popup.hpp"
 
 int ship_manager::gid;
 
@@ -1792,6 +1793,33 @@ ship_type::types ship::estimate_ship_type()
 
     ///just in case
     return ship_type::MILITARY;
+}
+
+void ship::context_handle_menu()
+{
+    context_tick_menu();
+
+    if(context_request_open)
+    {
+        context_request_open = false;
+
+        ImGui::OpenPopup("TestPopup");
+    }
+
+    if(!context_is_open)
+        return;
+
+    bool open = ImGui::BeginPopup("TestPopup");
+
+    if(!open)
+    {
+        context_is_open = false;
+        return;
+    }
+
+    ImGui::NeutralText("Test");
+
+    ImGui::EndPopup();
 }
 
 void ship::tick_all_components(float step_s)
