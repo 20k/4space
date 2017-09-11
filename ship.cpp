@@ -4325,6 +4325,7 @@ void ship::do_serialise(serialise& s, bool ser)
     #if 1
     if(serialise_data_helper::send_mode == 1)
     {
+        s.handle_serialise(estimated_type, ser);
         s.handle_serialise(editor_size_storage, ser);
         s.handle_serialise(colonise_target, ser);
         s.handle_serialise(colonising, ser);
