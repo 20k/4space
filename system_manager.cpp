@@ -3419,85 +3419,61 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         ///ok. Instead, this should advertise which orbitals are hovered
         for(auto& i : classed_orbitals)
         {
+            bool OOB = false;
+            bool any_hovered = false;
+
             if(i.second.size() > bound)
             {
-                int num = i.first;
+                OOB = true;
+            }
 
-                vec3f col = colours[num];
+            float width_offset = 0.f;
 
-                bool any_highlighted = false;
+            for(orbital* o : i.second)
+            {
+                sf::Texture* draw_tex = o->data->get_universe_texture();
 
-                for(orbital* o : i.second)
+                if(draw_tex == nullptr)
+                    continue;
+
+                sf::Sprite spr(*draw_tex);
+
+                vec3f col = viewer_empire->get_relations_colour(o->parent_empire);
+
+                if(o->highlight)
                 {
-                    if(o->highlight)
-                    {
-                        any_highlighted = true;
-                        o->highlight = false;
-                    }
+                    o->highlight = false;
 
-                    auto mapped_spos = win.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
-
-                    mapped_spos = mapped_spos + sf::Vector2i(screen_offset.x() + fleet_sprite.getLocalBounds().width/2.f, screen_offset.y());
-
-                    auto mapped_wpos = win.mapPixelToCoords(mapped_spos);
-
-                    o->universe_view_pos = {mapped_wpos.x, mapped_wpos.y};
-                }
-
-                if(any_highlighted)
-                {
                     col = {0, 0.5, 1};
                 }
 
-                bool hovered = universe_fleet_ui_tick(win, fleet_sprite, fleet_draw_pos, screen_offset, col);
+                auto mapped_spos = win.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
+
+                mapped_spos = mapped_spos + sf::Vector2i(screen_offset.x() + width_offset + draw_tex->getSize().x/2.f, screen_offset.y());
+
+                auto mapped_wpos = win.mapPixelToCoords(mapped_spos);
+
+                o->universe_view_pos = {mapped_wpos.x, mapped_wpos.y};
+
+                bool hovered = universe_fleet_ui_tick(win, spr, fleet_draw_pos, screen_offset + (vec2f){width_offset, 0.f}, col);
 
                 if(hovered)
                 {
-                    for(auto& o : i.second)
-                    {
+                    if(!OOB)
                         hovered_orbitals.push_back(o);
-                    }
+
+                    any_hovered = true;
                 }
+
+                width_offset += draw_tex->getSize().x + 2;
+
+                if(OOB)
+                    break;
             }
-            else
+
+            if(OOB && any_hovered)
             {
-                float width_offset = 0.f;
-
-                for(orbital* o : i.second)
-                {
-                    sf::Texture* draw_tex = o->data->get_universe_texture();
-
-                    if(draw_tex == nullptr)
-                        continue;
-
-                    sf::Sprite spr(*draw_tex);
-
-                    vec3f col = viewer_empire->get_relations_colour(o->parent_empire);
-
-                    if(o->highlight)
-                    {
-                        o->highlight = false;
-
-                        col = {0, 0.5, 1};
-                    }
-
-                    auto mapped_spos = win.mapCoordsToPixel({fleet_draw_pos.x(), fleet_draw_pos.y()});
-
-                    mapped_spos = mapped_spos + sf::Vector2i(screen_offset.x() + width_offset + draw_tex->getSize().x/2.f, screen_offset.y());
-
-                    auto mapped_wpos = win.mapPixelToCoords(mapped_spos);
-
-                    o->universe_view_pos = {mapped_wpos.x, mapped_wpos.y};
-
-                    bool hovered = universe_fleet_ui_tick(win, spr, fleet_draw_pos, screen_offset + (vec2f){width_offset, 0.f}, col);
-
-                    if(hovered)
-                    {
-                        hovered_orbitals.push_back(o);
-                    }
-
-                    width_offset += draw_tex->getSize().x + 2;
-                }
+                hovered_orbitals.insert(hovered_orbitals.end(), i.second.begin(), i.second.end());
             }
 
             screen_offset.y() += draw_offset;

@@ -694,6 +694,7 @@ struct ship : positional, serialisable, has_context_menu
     float get_total_components_size();
     bool is_ship_design_valid();
 
+    static sf::Texture* get_world_texture(ship_type::types type);
     sf::Texture* get_world_texture();
 
     static sf::RenderTexture* intermediate;

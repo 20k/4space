@@ -4514,7 +4514,7 @@ bool ship::is_ship_design_valid()
     return get_total_components_size() <= max_space + FLOAT_BOUND;
 }
 
-sf::Texture* ship::get_world_texture()
+sf::Texture* ship::get_world_texture(ship_type::types type)
 {
     static sf::Texture textures[ship_type::COUNT];
 
@@ -4531,7 +4531,12 @@ sf::Texture* ship::get_world_texture()
         }
     }
 
-    return &textures[estimated_type];
+    return &textures[type];
+}
+
+sf::Texture* ship::get_world_texture()
+{
+    return get_world_texture(estimated_type);
 }
 
 void ship::set_size(float new_size)
