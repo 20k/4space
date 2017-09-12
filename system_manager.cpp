@@ -3420,7 +3420,6 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         for(auto& i : classed_orbitals)
         {
             bool OOB = false;
-            bool any_hovered = false;
 
             if(i.second.size() > bound)
             {
@@ -3461,19 +3460,14 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 {
                     if(!OOB)
                         hovered_orbitals.push_back(o);
-
-                    any_hovered = true;
+                    else
+                        hovered_orbitals.insert(hovered_orbitals.end(), i.second.begin(), i.second.end());
                 }
 
                 width_offset += draw_tex->getSize().x + 2;
 
                 if(OOB)
                     break;
-            }
-
-            if(OOB && any_hovered)
-            {
-                hovered_orbitals.insert(hovered_orbitals.end(), i.second.begin(), i.second.end());
             }
 
             screen_offset.y() += draw_offset;
