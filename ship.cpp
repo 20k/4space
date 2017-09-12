@@ -1877,7 +1877,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire)
     bool get_research = original_owning_race != player_empire;
 
     bool can_claim_hostile = (player_empire == o->parent_system->get_base()->parent_empire ||
-                             player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
+                              player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
                               !o->data->any_in_combat();
 
     if((owned && not_busy_and_in_friendly_territory) || (fully_disabled() && can_claim_hostile))
