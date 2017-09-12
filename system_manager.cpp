@@ -3426,9 +3426,15 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 OOB = true;
             }
 
-            OOB = false;
+            bool test_class = false;
 
-            bool test_class = true;
+            if(OOB && bound >= 4)
+            {
+                test_class = true;
+            }
+
+            if(test_class)
+                OOB = false;
 
             int classes_seen[ship_type::COUNT + 1] = {0};
 
