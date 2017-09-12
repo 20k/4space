@@ -1086,7 +1086,7 @@ void orbital::transfer(vec2f pos, orbital_system* in_system, bool at_back, bool 
 
 float orbital::get_transfer_speed()
 {
-    float base_speed = 200.f / 5.f;
+    float base_speed = 100.f / 5.f;
 
     if(type != orbital_info::FLEET)
         return base_speed;
