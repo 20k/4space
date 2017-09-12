@@ -1814,8 +1814,6 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                         bool shift = key.isKeyPressed(sf::Keyboard::LShift);
 
                         if(ImGui::IsItemHovered())
-                            tooltip::add("Left Click to view ship");
-                        if(ImGui::IsItemHovered())
                             tooltip::add("Right Click for ship options");
                         if(sm->can_merge && ImGui::IsItemHovered())
                             tooltip::add("Shift-Click to add to fleet");
