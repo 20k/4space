@@ -498,7 +498,12 @@ namespace ship_type
     };
 }
 
-struct ship : positional, serialisable, has_context_menu
+struct ship_base_context_menu : has_context_menu
+{
+    bool context_are_you_sure_war = false;
+};
+
+struct ship : positional, serialisable, ship_base_context_menu
 {
     ship_type::types ai_fleet_type = ship_type::COUNT;
     ///for ui purposes
@@ -734,7 +739,7 @@ struct orbital;
 struct battle_manager;
 
 ///can be used as a fleet
-struct ship_manager : serialisable, has_context_menu
+struct ship_manager : serialisable, ship_base_context_menu
 {
     //int32_t this_fight_id = -1;
     //int32_t last_fight_id = -1;
