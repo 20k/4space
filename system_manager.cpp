@@ -3429,6 +3429,11 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         ///ok. Instead, this should advertise which orbitals are hovered
         for(auto& i : classed_orbitals)
         {
+            ///sort in the opposite of importance type
+            ///so most important is first
+            std::sort(i.second.begin(), i.second.end(),
+                      [](orbital* o1, orbital* o2){return o1->data->get_most_common_ship_type() > o2->data->get_most_common_ship_type();});
+
             bool old_test_class = test_class;
 
             if(i.second.size() > bound && !OOB)
