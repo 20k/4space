@@ -5183,7 +5183,7 @@ void ship_manager::draw_alerts(sf::RenderWindow& win, vec2f abs_pos)
     text_manager::render(win, alert_symbol, abs_pos + (vec2f){8, -20}, alert_colour);
 }
 
-sf::Texture* ship_manager::get_universe_texture()
+ship_type::types ship_manager::get_most_common_ship_type()
 {
     std::vector<int> counts;
     counts.resize(ship_type::COUNT+1);
@@ -5194,6 +5194,13 @@ sf::Texture* ship_manager::get_universe_texture()
     }
 
     ship_type::types type = (ship_type::types)std::distance(ships.begin(), ships.begin() + *std::max_element(counts.begin(), counts.end()));
+
+    return type;
+}
+
+sf::Texture* ship_manager::get_universe_texture()
+{
+    ship_type::types type = get_most_common_ship_type();
 
     for(ship* s : ships)
     {

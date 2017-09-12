@@ -782,6 +782,7 @@ struct ship_manager : serialisable, has_context_menu
 
     void draw_alerts(sf::RenderWindow& win, vec2f abs_pos);
     ///if we need just one texture for a whole fleet
+    ship_type::types get_most_common_ship_type();
     sf::Texture* get_universe_texture();
 
     void force_warp(orbital_system* fin, orbital_system* cur, orbital* o);
