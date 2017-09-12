@@ -3077,13 +3077,14 @@ void ship::use_warp_drives()
 float ship::get_warp_distance()
 {
     float rad = 0.f;
+    float ship_mass = current_size;
 
     for(component& c : entity_list)
     {
         if(!c.has_tag(component_tag::WARP_DISTANCE))
             continue;
 
-        float val = c.get_tag(component_tag::WARP_DISTANCE);
+        float val = c.get_tag(component_tag::WARP_DISTANCE) / ship_mass;
 
         rad = std::max(rad, val);
     }
