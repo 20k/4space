@@ -3219,17 +3219,20 @@ int main()
             }
         }
 
-        for(ship_manager* smanage : fleet_manage.fleets)
+        for(orbital_system* os : system_manage.systems)
         {
-            for(ship* s : smanage->ships)
+            for(orbital* o : os->orbitals)
             {
-                ///if we modify ship state this will crash
-                ///however in the current model of memory management I think this is no longer
-                ///ever an issue
-                s->context_handle_menu(player_empire);
-            }
+                if(o->type != orbital_info::FLEET)
+                    continue;
 
-            smanage->context_handle_menu(player_empire);
+                for(ship* s : o->data->ships)
+                {
+                    s->context_handle_menu(o, player_empire);
+                }
+
+                o->data->context_handle_menu(o, player_empire);
+            }
         }
 
         for(orbital_system* os : system_manage.systems)

@@ -1796,7 +1796,7 @@ ship_type::types ship::estimate_ship_type()
     return ship_type::MILITARY;
 }
 
-void ship::context_handle_menu(empire* player_empire)
+void ship::context_handle_menu(orbital* o, empire* player_empire)
 {
     context_tick_menu();
 
@@ -1820,6 +1820,8 @@ void ship::context_handle_menu(empire* player_empire)
     }
 
     bool friendly = owned_by->parent_empire == player_empire || player_empire->is_allied(owned_by->parent_empire);
+
+    bool owned = owned_by->parent_empire == player_empire;
 
     ///RESUPPLY
     if(friendly && !fully_disabled())
@@ -1869,6 +1871,11 @@ void ship::context_handle_menu(empire* player_empire)
         }
     }
 
+    /*if(owned)
+    {
+        ImGui::BadText()
+    }*/
+
     bool neutral_or_allied = (!player_empire->is_hostile(owned_by->parent_empire) || player_empire->is_allied(owned_by->parent_empire)) && player_empire != owned_by->parent_empire;
 
     if(neutral_or_allied)
@@ -1903,7 +1910,7 @@ void ship::context_handle_menu(empire* player_empire)
     ImGui::EndPopup();
 }
 
-void ship_manager::context_handle_menu(empire* player_empire)
+void ship_manager::context_handle_menu(orbital* o, empire* player_empire)
 {
     context_tick_menu();
 

@@ -501,6 +501,9 @@ namespace ship_type
 struct ship_base_context_menu : has_context_menu
 {
     bool context_are_you_sure_war = false;
+    bool context_are_you_sure_scrap = false;
+
+    virtual void context_handle_menu(orbital* associated, empire* player_empire) {};
 };
 
 struct ship : positional, serialisable, ship_base_context_menu
@@ -525,7 +528,7 @@ struct ship : positional, serialisable, ship_base_context_menu
 
     ship_type::types estimate_ship_type();
 
-    virtual void context_handle_menu(empire* player_empire) override;
+    virtual void context_handle_menu(orbital* associated, empire* player_empire) override;
 
     int team = 0;
 
@@ -764,7 +767,7 @@ struct ship_manager : serialisable, ship_base_context_menu
     std::vector<std::string> get_info_strs();
     std::vector<std::string> get_info_strs_with_info_warfare(empire* viewing, orbital* my_orbital, bool full_detail);
 
-    virtual void context_handle_menu(empire* player_empire) override;
+    virtual void context_handle_menu(orbital* associated, empire* player_empire) override;
 
     void merge_into_me(ship_manager& other);
 

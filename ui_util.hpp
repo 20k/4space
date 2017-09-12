@@ -80,8 +80,6 @@ struct has_context_menu
     bool context_is_open = false;
 
     void context_tick_menu();
-
-    virtual void context_handle_menu(empire* player_empire) {};
 };
 
 namespace sf
