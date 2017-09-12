@@ -1815,6 +1815,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire)
     if(!open)
     {
         context_are_you_sure_war = false;
+        context_are_you_sure_scrap = false;
         context_is_open = false;
         return;
     }
@@ -1871,10 +1872,61 @@ void ship::context_handle_menu(orbital* o, empire* player_empire)
         }
     }
 
-    /*if(owned)
+    bool not_busy_and_in_friendly_territory = o->in_friendly_territory_and_not_busy();
+
+    bool get_research = original_owning_race != player_empire;
+
+    if(owned && not_busy_and_in_friendly_territory)
     {
-        ImGui::BadText()
-    }*/
+        research research_raw;
+
+        if(get_research)
+        {
+            research_raw = get_research_real_for_empire(owned_by->parent_empire, player_empire);
+        }
+
+        auto res = resources_received_when_scrapped();
+
+        res[resource::RESEARCH] = research_raw.units_to_currency(true);
+
+        resource_manager rm;
+
+        for(auto& i : res)
+        {
+            rm.resources[i.first].amount = i.second;
+        }
+
+        ImGui::BadText("(Scrap Ship)");
+
+        std::string rstr = rm.get_formatted_str(true);
+
+        if(ImGui::IsItemHovered())
+        {
+            tooltip::add(rstr);
+        }
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            context_are_you_sure_scrap = true;
+        }
+
+        if(context_are_you_sure_scrap)
+        {
+            ImGui::BadText("(Are you sure?)");
+
+            if(ImGui::IsItemClicked())
+            {
+                context_are_you_sure_scrap = false;
+
+                for(auto& i : res)
+                {
+                    player_empire->add_resource(i.first, i.second);
+                }
+
+                cleanup = true;
+            }
+        }
+    }
 
     bool neutral_or_allied = (!player_empire->is_hostile(owned_by->parent_empire) || player_empire->is_allied(owned_by->parent_empire)) && player_empire != owned_by->parent_empire;
 
