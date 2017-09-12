@@ -3405,13 +3405,23 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             screen_offset.y() = -(num_offsets - 1) * draw_offset / 2.f;
         }
 
+        bool test_class = false;
+        bool OOB = false;
+
         int bound = 10;
 
         if(zoom_level > 30)
+        {
             bound = 4;
+            test_class = true;
+        }
 
         if(zoom_level > 60)
+        {
             bound = 2;
+            OOB = true;
+            test_class = false;
+        }
 
         if(zoom_level > 100)
             bound = 1;
@@ -3419,22 +3429,12 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         ///ok. Instead, this should advertise which orbitals are hovered
         for(auto& i : classed_orbitals)
         {
-            bool OOB = false;
+            bool old_test_class = test_class;
 
-            if(i.second.size() > bound)
-            {
-                OOB = true;
-            }
-
-            bool test_class = false;
-
-            if(OOB && bound >= 4)
+            if(i.second.size() > bound && !OOB)
             {
                 test_class = true;
             }
-
-            if(test_class)
-                OOB = false;
 
             int classes_seen[ship_type::COUNT + 1] = {0};
 
@@ -3517,6 +3517,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             }
 
             screen_offset.y() += draw_offset;
+
+            test_class = old_test_class;
         }
     }
 
