@@ -5198,7 +5198,7 @@ ship_type::types ship_manager::get_most_common_ship_type()
         counts[s->estimated_type]++;
     }
 
-    ship_type::types type = (ship_type::types)std::distance(ships.begin(), ships.begin() + *std::max_element(counts.begin(), counts.end()));
+    ship_type::types type = (ship_type::types)std::distance(counts.begin(), std::max_element(counts.begin(), counts.end()));
 
     return type;
 }

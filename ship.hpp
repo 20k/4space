@@ -474,7 +474,7 @@ namespace ship_type
 {
     enum types
     {
-        MINING,
+        MINING = 0,
         COLONY,
         SCOUT,
         MILITARY,

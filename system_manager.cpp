@@ -3426,6 +3426,12 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 OOB = true;
             }
 
+            OOB = false;
+
+            bool test_class = true;
+
+            int classes_seen[ship_type::COUNT + 1] = {0};
+
             float width_offset = 0.f;
 
             for(orbital* o : i.second)
@@ -3434,6 +3440,13 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 if(draw_tex == nullptr)
                     continue;
+
+                auto majority_type = o->data->get_most_common_ship_type();
+
+                if(test_class && classes_seen[majority_type])
+                {
+                    continue;
+                }
 
                 sf::Sprite spr(*draw_tex);
 
@@ -3458,11 +3471,24 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 if(hovered)
                 {
-                    if(!OOB)
+                    if(!OOB && !test_class)
                         hovered_orbitals.push_back(o);
-                    else
+                    if(OOB && !test_class)
                         hovered_orbitals.insert(hovered_orbitals.end(), i.second.begin(), i.second.end());
+
+                    if(test_class)
+                    {
+                        for(orbital* orb : i.second)
+                        {
+                            if(orb->data->get_most_common_ship_type() != majority_type)
+                                continue;
+
+                            hovered_orbitals.push_back(orb);
+                        }
+                    }
                 }
+
+                classes_seen[majority_type] = 1;
 
                 width_offset += draw_tex->getSize().x + 2;
 
