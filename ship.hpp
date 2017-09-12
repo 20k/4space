@@ -488,6 +488,14 @@ namespace ship_type
         {SCOUT, "pics/fleet_chevron_scout.png"},
         {MILITARY, "pics/fleet_chevron_military.png"},
     };
+
+    static std::map<types, std::string> type_to_name
+    {
+        {MINING, "Mining"},
+        {COLONY, "Colony"},
+        {SCOUT, "Scout"},
+        {MILITARY, "Military"},
+    };
 }
 
 struct ship : positional, serialisable, has_context_menu

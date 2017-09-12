@@ -3478,18 +3478,32 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 if(hovered)
                 {
                     if(!OOB && !test_class)
+                    {
                         hovered_orbitals.push_back(o);
+                        tooltip::add(o->name);
+                    }
                     if(OOB && !test_class)
+                    {
                         hovered_orbitals.insert(hovered_orbitals.end(), i.second.begin(), i.second.end());
+                        tooltip::add(std::to_string(i.second.size()) + " Fleets");
+                    }
 
                     if(test_class)
                     {
+                        int num = 0;
+
                         for(orbital* orb : i.second)
                         {
                             if(orb->data->get_most_common_ship_type() != majority_type)
                                 continue;
 
                             hovered_orbitals.push_back(orb);
+                            num++;
+                        }
+
+                        if(num > 0)
+                        {
+                            tooltip::add(std::to_string(num) + " " + ship_type::type_to_name[majority_type] + " Fleets");
                         }
                     }
                 }
