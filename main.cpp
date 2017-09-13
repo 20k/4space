@@ -483,6 +483,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     if(s.owned_by->parent_empire == player_empire && !s.owned_by->any_in_combat() && o != nullptr && o->in_friendly_territory_and_not_busy())
     {
+        ///this is slow
         ship c_cpy = s;
 
         if(s.owned_by->parent_empire != nullptr)
@@ -502,16 +503,13 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         auto current_resources = s.resources_cost();
 
-        auto res_remaining = res_cost;
-
         for(auto& i : current_resources)
         {
-            res_remaining[i.first] -= i.second;
+            res_cost[i.first] -= i.second;
         }
 
-
         resource_manager rm;
-        rm.add(res_remaining);
+        rm.add(res_cost);
 
         for(auto& i : rm.resources)
         {
@@ -527,9 +525,9 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             ///setting tech level currently does not have a cost associated with it
             if(ImGui::IsItemClicked_Registered())
             {
-                if(owner->can_fully_dispense(res_remaining))
+                if(owner->can_fully_dispense(res_cost))
                 {
-                    owner->dispense_resources(res_remaining);
+                    owner->dispense_resources(res_cost);
 
                     s.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
                 }
