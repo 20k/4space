@@ -1927,7 +1927,6 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
             ship* s = new_sm->make_new_from(player_empire, *this);
             s->name = name;
 
-            //new_sm->steal(this);
 
             cleanup = true;
 
@@ -1935,15 +1934,8 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
             owned_by->toggle_fleet_ui = false;
 
-            popup_element* pelem = popup.fetch(o);
-
-            if(pelem != nullptr && popup.going)
-            {
-                /*if(owned_by->ships.size() == 1)
-                    popup.schedule_rem(o);*/
-
+            if(popup.going)
                 popup.insert(new_orbital);
-            }
         }
     }
 
