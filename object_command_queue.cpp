@@ -521,8 +521,6 @@ void object_command_queue::add(const queue_type& type, bool at_back, bool does_n
 
 void object_command_queue::tick(orbital* o, float step_s)
 {
-    cancel_internal(o);
-
     if(command_queue.size() == 0)
         return;
 
@@ -537,6 +535,9 @@ void object_command_queue::tick(orbital* o, float step_s)
 
     for(int i=0; i<command_queue.size(); i++)
     {
+        if(command_queue[i].data.should_pop)
+            continue;
+
         auto& to_test = command_queue.front();
 
         if(first_warp && to_test.type == object_command_queue_info::WARP)
