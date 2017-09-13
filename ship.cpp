@@ -2110,9 +2110,10 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         }
     }
 
-    if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
+    if((ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(0)) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
     {
         ImGui::CloseCurrentPopup();
+        ImGui::suppress_clicks = true;
     }
 
     ImGui::EndPopup();
@@ -2410,9 +2411,10 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         }
     }
 
-    if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
+    if((ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(0)) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
     {
         ImGui::CloseCurrentPopup();
+        ImGui::suppress_clicks = true;
     }
 
     ImGui::EndPopup();

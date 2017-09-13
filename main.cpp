@@ -1029,7 +1029,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
 
     ///this is where we click away fleets
-    if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()))
+    if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
     {
         popup.going = false;
 
@@ -2385,13 +2385,14 @@ int main()
     player_empire->name = "Glorious Azerbaijanian Conglomerate";
     player_empire->ship_prefix = "SS";
 
-    player_empire->resources.resources[resource::IRON].amount = 5000.f;
+    /*player_empire->resources.resources[resource::IRON].amount = 5000.f;
     player_empire->resources.resources[resource::COPPER].amount = 5000.f;
     player_empire->resources.resources[resource::TITANIUM].amount = 5000.f;
     player_empire->resources.resources[resource::URANIUM].amount = 5000.f;
-    player_empire->resources.resources[resource::RESEARCH].amount = 8000.f;
     player_empire->resources.resources[resource::HYDROGEN].amount = 8000.f;
-    player_empire->resources.resources[resource::OXYGEN].amount = 8000.f;
+    player_empire->resources.resources[resource::OXYGEN].amount = 8000.f;*/
+
+    //player_empire->resources.resources[resource::RESEARCH].amount = 8000.f;
 
     fleet_manager fleet_manage;
 
