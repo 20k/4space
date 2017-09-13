@@ -524,7 +524,7 @@ struct ship : positional, serialisable, ship_base_context_menu
         return gid++;
     }
 
-    ship duplicate();
+    ship duplicate() const;
 
     ship();
 

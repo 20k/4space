@@ -1735,7 +1735,7 @@ void component::do_serialise(serialise& s, bool ser)
     }
 }
 
-ship ship::duplicate()
+ship ship::duplicate() const
 {
     ship s = *this;
     s.id = ship::get_new_id();
@@ -1924,7 +1924,12 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
             player_empire->take_ownership(new_orbital);
 
-            new_sm->steal(this);
+            ship* s = new_sm->make_new_from(player_empire, *this);
+            s->name = name;
+
+            //new_sm->steal(this);
+
+            cleanup = true;
 
             player_empire->take_ownership(new_sm);
 
@@ -1934,8 +1939,8 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
             if(pelem != nullptr && popup.going)
             {
-                if(owned_by->ships.size() == 1)
-                    popup.schedule_rem(o);
+                /*if(owned_by->ships.size() == 1)
+                    popup.schedule_rem(o);*/
 
                 popup.insert(new_orbital);
             }
@@ -4879,7 +4884,7 @@ void ship::do_serialise(serialise& s, bool ser)
 
 ship* ship_manager::make_new_from(empire* e, const ship& ns)
 {
-    ship* s = new ship(ns);
+    ship* s = new ship(ns.duplicate());
 
     ships.push_back(s);
 
