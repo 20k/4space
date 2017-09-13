@@ -1817,6 +1817,30 @@ std::string get_recrew_str(ship* s, empire* player_empire)
     return rstr;
 }
 
+std::string get_recrew_str(ship_manager* sm, empire* player_empire)
+{
+    resource_manager rm;
+    float recrew_research_currency = 0.f;
+
+    for(ship* s : sm->ships)
+    {
+        auto res = s->resources_needed_to_recrew_total();
+
+        recrew_research_currency += s->get_recrew_potential_research(player_empire).units_to_currency(false);
+
+        for(auto& i : res)
+        {
+            rm.resources[i.first].amount += -i.second;
+        }
+    }
+
+    std::string rstr = rm.get_formatted_str(true);
+
+    rstr += "Potential Re: " + std::to_string((int)recrew_research_currency);
+
+    return rstr;
+}
+
 void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup)
 {
     context_tick_menu();
