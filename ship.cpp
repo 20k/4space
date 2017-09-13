@@ -1934,7 +1934,8 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
             if(pelem != nullptr && popup.going)
             {
-                popup.schedule_rem(o);
+                if(owned_by->ships.size() == 1)
+                    popup.schedule_rem(o);
 
                 popup.insert(new_orbital);
             }
