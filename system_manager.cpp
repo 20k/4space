@@ -3938,7 +3938,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
                 bool do_obfuscate = false;
 
-                if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= ship_info::accessory_information_obfuscation_level && !viewing_empire->is_allied(sm->parent_empire))
+                if(viewing_empire->available_scanning_power_on(o) <= ship_info::accessory_information_obfuscation_level && !viewing_empire->is_allied(sm->parent_empire))
                 {
                     do_obfuscate = true;
                 }
@@ -4118,7 +4118,7 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
                     bool do_obfuscate = false;
 
-                    if(viewing_empire->available_scanning_power_on((ship_manager*)sm, *this) <= ship_info::ship_obfuscation_level && !viewing_empire->is_allied(sm->parent_empire))
+                    if(viewing_empire->available_scanning_power_on(o) <= ship_info::ship_obfuscation_level && !viewing_empire->is_allied(sm->parent_empire))
                     {
                         do_obfuscate = true;
                     }

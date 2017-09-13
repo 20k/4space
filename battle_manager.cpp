@@ -486,7 +486,7 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
 
                     //std::cout << "hit\n";
 
-                    found_ship->hit(p, system_manage);
+                    found_ship->hit(p, o);
 
 
                     ///problematic for network, defer calls
@@ -1136,6 +1136,20 @@ ship* battle_manager::get_ship_under(vec2f pos)
         {
             if(point_within_ship(pos, s))
                 return s;
+        }
+    }
+
+    return nullptr;
+}
+
+orbital* battle_manager::get_orbital_under(vec2f pos)
+{
+    for(orbital* o : ship_map)
+    {
+        for(ship* s : o->data->ships)
+        {
+            if(point_within_ship(pos, s))
+                return o;
         }
     }
 

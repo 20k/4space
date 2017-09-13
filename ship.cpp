@@ -3601,9 +3601,9 @@ void ship::add(const component& c)
     estimated_type = estimate_ship_type();
 }
 
-void ship::hit(projectile* p, system_manager& system_manage)
+void ship::hit(projectile* p, orbital* associated)
 {
-    return hit_raw_damage(p->base.get_tag(component_tag::DAMAGE), p->fired_by, p->ship_fired_by, &system_manage);
+    return hit_raw_damage(p->base.get_tag(component_tag::DAMAGE), p->fired_by, p->ship_fired_by, associated);
 }
 
 void distribute_damage(float hp_damage, int num, ship* s, bool hit_crew = false)
@@ -3628,7 +3628,7 @@ void distribute_damage(float hp_damage, int num, ship* s, bool hit_crew = false)
 }
 
 ///should we spread damage over multiple components?
-void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, system_manager* system_manage)
+void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, orbital* associated)
 {
     float shields = get_stored_resources()[ship_component_element::SHIELD_POWER];
     float armour = get_stored_resources()[ship_component_element::ARMOUR];
@@ -3668,12 +3668,12 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
 
         test_set_disabled();
 
-        if(hit_by == nullptr || ship_hit_by == nullptr || system_manage == nullptr)
+        if(hit_by == nullptr || ship_hit_by == nullptr || associated == nullptr)
             return;
 
         empire* being_hit_empire = owned_by->parent_empire;
 
-        float information = being_hit_empire->available_scanning_power_on(ship_hit_by, *system_manage);
+        float information = being_hit_empire->available_scanning_power_on(associated);
 
         if(information <= 0)
             return;
@@ -3703,11 +3703,11 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, syste
 
     empire* being_hit_empire = owned_by->parent_empire;
 
-    if(hit_by == nullptr || ship_hit_by == nullptr || system_manage == nullptr)
+    if(hit_by == nullptr || ship_hit_by == nullptr || associated == nullptr)
         return;
 
     ///do faction relations here because they might change later
-    float information = being_hit_empire->available_scanning_power_on(ship_hit_by, *system_manage);
+    float information = being_hit_empire->available_scanning_power_on(associated);
 
     if(information <= 0)
         return;

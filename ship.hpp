@@ -592,9 +592,9 @@ struct ship : positional, serialisable, ship_base_context_menu
 
     //std::map<empire*, float> damage_taken;
 
-    void hit(projectile* p, system_manager& system_manage);
+    void hit(projectile* p, orbital* associated);
     ///last 3 parameters are optional, allow for faction relation mechanics degradation
-    void hit_raw_damage(float val, empire* hit_by, ship* s_hit_by, system_manager* system_manage);
+    void hit_raw_damage(float val, empire* hit_by, ship* s_hit_by, orbital* associated);
 
     void check_load(vec2i dim);
     void generate_image(vec2i dim);

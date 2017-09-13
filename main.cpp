@@ -147,7 +147,7 @@ void do_title_colouring_preparation(ship& s, empire* player_empire, float info_a
 }
 
 ///claiming_empire for salvage, can be nullptr
-void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup)
+void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* player_empire, system_manager& system_manage, fleet_manager& fleet_manage, empire_manager& empire_manage, popup_info& popup, orbital* associated)
 {
     sf::Keyboard key;
 
@@ -158,7 +158,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     auto fully_merged = s.get_fully_merged(1.f);
 
-    float known_information = player_empire->available_scanning_power_on(&s, system_manage);
+    float known_information = player_empire->available_scanning_power_on(associated);
 
     //bool knows_prod = known_information >= 0.4f;
     //bool knows_prod_exact = known_information >= 0.9f;
@@ -430,7 +430,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         s.display_popout = !s.display_popout;
 
 
-    float scanning_power = player_empire->available_scanning_power_on(&s, system_manage);
+    float scanning_power = player_empire->available_scanning_power_on(associated);
 
     if(scanning_power < 1)
     {
@@ -612,12 +612,13 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
     auto transformed = win.mapPixelToCoords({x, y});
 
     ship* s = battle->get_ship_under({transformed.x, transformed.y});
+    orbital* o = battle->get_orbital_under({transformed.x, transformed.y});
 
     if(s)
     {
         s->highlight = true;
 
-        float available_information = viewing_empire->available_scanning_power_on(s, system_manage);
+        float available_information = viewing_empire->available_scanning_power_on(o);
 
         ImGui::BeginTooltip();
 
@@ -1209,7 +1210,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
         bool do_obfuscate_misc = false;
 
-        if(orb->type == orbital_info::FLEET && player_empire->available_scanning_power_on((ship_manager*)orb->data, system_manage) <= ship_info::accessory_information_obfuscation_level)
+        if(orb->type == orbital_info::FLEET && player_empire->available_scanning_power_on(orb) <= ship_info::accessory_information_obfuscation_level)
         {
             do_obfuscate_misc = true;
         }
@@ -1294,7 +1295,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 if(o->type == orbital_info::FLEET && !player_empire->is_allied(o->parent_empire))
                 {
-                    if(player_empire->available_scanning_power_on((ship_manager*)o->data, system_manage) <= ship_info::ship_obfuscation_level)
+                    if(player_empire->available_scanning_power_on(o) <= ship_info::ship_obfuscation_level)
                     {
                         do_obfuscate_name = true;
                     }
@@ -2994,13 +2995,32 @@ int main()
 
         //printf("ui\n");
 
-        for(ship_manager* smanage : fleet_manage.fleets)
+        /*for(ship_manager* smanage : fleet_manage.fleets)
         {
             for(ship* s : smanage->ships)
             {
                 if(s->display_ui)
                 {
                     display_ship_info(*s, smanage->parent_empire, player_empire, player_empire, system_manage, fleet_manage, empire_manage, popup);
+                }
+            }
+        }*/
+
+        for(orbital_system* os : system_manage.systems)
+        {
+            for(orbital* o : os->orbitals)
+            {
+                if(o->type != orbital_info::FLEET)
+                    continue;
+
+                ship_manager* sm = o->data;
+
+                for(ship* s : o->data->ships)
+                {
+                    if(s->display_ui)
+                    {
+                        display_ship_info(*s, sm->parent_empire, player_empire, player_empire, system_manage, fleet_manage, empire_manage, popup, o);
+                    }
                 }
             }
         }
@@ -3221,6 +3241,11 @@ int main()
             }*/
 
             serialise_host_type host_id = -1;
+
+            for(empire* e : empire_manage.empires)
+            {
+                e->network_take_ownership(net_state, net_state.my_id);
+            }
 
             for(empire* e : empire_manage.empires)
             {

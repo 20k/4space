@@ -209,6 +209,7 @@ struct battle_manager : serialisable
 
     ///in world coordinates... which atm is screenspace I WILL FORGET THIS
     ship* get_ship_under(vec2f pos);
+    orbital* get_orbital_under(vec2f pos);
 
     void set_view(system_manager& system_manage);
 

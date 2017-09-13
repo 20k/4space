@@ -362,7 +362,7 @@ void ai_fleet::tick_fleet(ship_manager* ship_manage, orbital* o, all_battles_man
 
         ///STEALTH PROBABLY BORKED
         ///Why are we skipping ships that are decolonising?
-        if(my_empire->available_scanning_power_on(other_ships, system_manage) <= 0 && !other_ships->any_in_combat() && !other_ships->any_colonising() && !other_ships->decolonising)
+        if(my_empire->available_scanning_power_on(other) <= 0 && !other_ships->any_in_combat() && !other_ships->any_colonising() && !other_ships->decolonising)
             continue;
 
         targets.push_back({other, other_ships});

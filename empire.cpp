@@ -608,7 +608,7 @@ float empire::available_scanning_power_on(orbital* passed_other)
     return max_scanning_power;
 }
 
-float empire::available_scanning_power_on(ship* s, system_manager& system_manage)
+/*float empire::available_scanning_power_on(ship* s, system_manager& system_manage)
 {
     if(s == nullptr)
         return 0.f;
@@ -647,8 +647,47 @@ float empire::available_scanning_power_on(ship* s, system_manager& system_manage
     return max_scanning_power;
 }
 
+float empire::available_scanning_power_on(ship* s, orbital* o)
+{
+    if(s == nullptr)
+        return 0.f;
+
+    ship_manager* sm = s->owned_by;
+
+    if(sm == nullptr)
+        return 1.f;
+
+    if(sm->parent_empire == this)
+        return 1.f;
+
+    orbital_system* os = o->parent_system;
+
+    ///if os == nullptr, no orbital is associated
+    ///ie bug bug bug
+
+    float max_scanning_power = 0.f;
+
+    for(orbital* o : os->orbitals)
+    {
+        if(o->type != orbital_info::FLEET)
+            continue;
+
+        ship_manager* found_sm = (ship_manager*)o->data;
+
+        if(found_sm->parent_empire != this && !is_allied(found_sm->parent_empire))
+            continue;
+
+        for(ship* ns : found_sm->ships)
+        {
+            max_scanning_power = std::max(max_scanning_power, ns->get_scanning_power_on_ship(s));
+        }
+    }
+
+    return max_scanning_power;
+}*/
+
 ///available scanning power on ship does this already, we're basically duplicating stuff
-float empire::available_scanning_power_on(ship_manager* sm, system_manager& system_manage)
+/*float empire::available_scanning_power_on(ship_manager* sm, system_manager& system_manage)
 {
     if(sm == nullptr)
         return 1.f;
@@ -661,7 +700,7 @@ float empire::available_scanning_power_on(ship_manager* sm, system_manager& syst
     }
 
     return max_v;
-}
+}*/
 
 void empire::become_hostile(empire* e)
 {

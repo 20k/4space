@@ -180,8 +180,9 @@ struct empire : serialisable
     float get_military_strength();
 
     float available_scanning_power_on(orbital* o);
-    float available_scanning_power_on(ship* s, system_manager& system_manage);
-    float available_scanning_power_on(ship_manager* sm, system_manager& system_manage);
+    //float available_scanning_power_on(ship* s, system_manager& system_manage);
+    //float available_scanning_power_on(ship* s, orbital* o);
+    //float available_scanning_power_on(ship_manager* sm, system_manager& system_manage);
 
     ///does allying, not 'try' ally etc
     ///two way street
