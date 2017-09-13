@@ -542,66 +542,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
-    if(s.fully_disabled() && claiming_empire != nullptr && s.can_recrew(claiming_empire) && !s.owned_by->any_in_combat())
-    {
-        ImGui::NeutralText("(Recrew)");
-
-        auto res = s.resources_needed_to_recrew_total();
-
-        ///crew research has 0 bound, scrapped research has minimum bound
-        float recrew_research_currenct = s.get_recrew_potential_research(claiming_empire).units_to_currency(false);
-
-        resource_manager rm;
-
-        for(auto& i : res)
-        {
-            rm.resources[i.first].amount = -i.second;
-        }
-
-        std::string rstr = rm.get_formatted_str(true);
-
-        rstr += "Potential Re: " + std::to_string((int)recrew_research_currenct);
-
-        if(ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip(rstr.c_str());
-        }
-
-        ///if originating empire is not the claiming empire, get some tech
-        if(ImGui::IsItemClicked_Registered())
-        {
-            ///depletes resources
-            ///should probably pull the resource stuff outside of here as there might be other sources of recrewing
-            s.recrew_derelict(owner, claiming_empire);
-
-            ship_manager* parent_fleet = s.owned_by;
-
-            orbital_system* os = system_manage.get_by_element(parent_fleet);
-
-            orbital* o = os->get_by_element(parent_fleet);
-
-            assert(o);
-
-            ship_manager* new_sm = fleet_manage.make_new();
-
-            orbital* new_orbital = os->make_new(orbital_info::FLEET, 5.f);
-            new_orbital->orbital_angle = o->orbital_angle;
-            new_orbital->orbital_length = o->orbital_length;
-            new_orbital->parent = o->parent;
-            new_orbital->data = new_sm;
-
-            claiming_empire->take_ownership(new_orbital);
-
-            new_sm->steal(&s);
-
-            claiming_empire->take_ownership(new_sm);
-
-            parent_fleet->toggle_fleet_ui = false;
-
-            popup.schedule_rem(o);
-        }
-    }
-
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
