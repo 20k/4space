@@ -1796,6 +1796,27 @@ ship_type::types ship::estimate_ship_type()
     return ship_type::MILITARY;
 }
 
+std::string get_recrew_str(ship* s, empire* player_empire)
+{
+    auto res = s->resources_needed_to_recrew_total();
+
+    ///crew research has 0 bound, scrapped research has minimum bound
+    float recrew_research_currency = s->get_recrew_potential_research(player_empire).units_to_currency(false);
+
+    resource_manager rm;
+
+    for(auto& i : res)
+    {
+        rm.resources[i.first].amount = -i.second;
+    }
+
+    std::string rstr = rm.get_formatted_str(true);
+
+    rstr += "Potential Re: " + std::to_string((int)recrew_research_currency);
+
+    return rstr;
+}
+
 void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup)
 {
     context_tick_menu();
@@ -1887,25 +1908,9 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         else
             ImGui::BadText("(Recrew)");
 
-        auto res = resources_needed_to_recrew_total();
-
-        ///crew research has 0 bound, scrapped research has minimum bound
-        float recrew_research_currency = get_recrew_potential_research(player_empire).units_to_currency(false);
-
-        resource_manager rm;
-
-        for(auto& i : res)
-        {
-            rm.resources[i.first].amount = -i.second;
-        }
-
-        std::string rstr = rm.get_formatted_str(true);
-
-        rstr += "Potential Re: " + std::to_string((int)recrew_research_currency);
-
         if(ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip(rstr.c_str());
+            tooltip::add(get_recrew_str(this, player_empire));
         }
 
         ///if originating empire is not the claiming empire, get some tech
