@@ -2068,6 +2068,80 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire)
         }
     }
 
+    bool owned = parent_empire == player_empire;
+
+
+    bool not_busy_and_in_friendly_territory = o->in_friendly_territory_and_not_busy();
+
+
+    bool can_claim_hostile = (player_empire == o->parent_system->get_base()->parent_empire ||
+                              player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
+                              !any_in_combat();
+
+    if((owned && not_busy_and_in_friendly_territory) || (all_derelict() && can_claim_hostile))
+    {
+        resource_manager rm;
+        std::map<resource::types, float> accum_res;
+
+        for(ship* s : ships)
+        {
+            bool get_research = s->original_owning_race != player_empire;
+            research research_raw;
+
+            if(get_research)
+            {
+                research_raw = s->get_research_real_for_empire(parent_empire, player_empire);
+            }
+
+            auto res = s->resources_received_when_scrapped();
+
+            if(get_research)
+            {
+                res[resource::RESEARCH] = research_raw.units_to_currency(true);
+            }
+
+            for(auto& i : res)
+            {
+                rm.resources[i.first].amount += i.second;
+                accum_res[i.first] += i.second;
+            }
+        }
+
+        ImGui::BadText("(Scrap All Ships)");
+
+        std::string rstr = rm.get_formatted_str(true);
+
+        if(ImGui::IsItemHovered())
+        {
+            tooltip::add(rstr);
+        }
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            context_are_you_sure_scrap = true;
+        }
+
+        if(context_are_you_sure_scrap)
+        {
+            ImGui::BadText("(Are you sure?)");
+
+            if(ImGui::IsItemClicked())
+            {
+                context_are_you_sure_scrap = false;
+
+                for(auto& i : accum_res)
+                {
+                    player_empire->add_resource(i.first, i.second);
+                }
+
+                for(ship* s : ships)
+                {
+                    s->cleanup = true;
+                }
+            }
+        }
+    }
+
     if(ImGui::IsMouseClicked(1) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
     {
         ImGui::CloseCurrentPopup();
