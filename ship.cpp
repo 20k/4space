@@ -1824,6 +1824,9 @@ std::string get_recrew_str(ship_manager* sm, empire* player_empire)
 
     for(ship* s : sm->ships)
     {
+        if(!s->fully_disabled())
+            continue;
+
         auto res = s->resources_needed_to_recrew_total();
 
         recrew_research_currency += s->get_recrew_potential_research(player_empire).units_to_currency(false);
@@ -2069,6 +2072,15 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
 
     bool friendly = parent_empire == player_empire || player_empire->is_allied(parent_empire);
 
+    bool owned = parent_empire == player_empire;
+
+    bool not_busy_and_in_friendly_territory = o->in_friendly_territory_and_not_busy();
+
+    bool can_claim_hostile = (player_empire == o->parent_system->get_base()->parent_empire ||
+                              player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
+                              !any_in_combat();
+
+
     ///RESUPPLY
     if(friendly && !any_derelict())
     {
@@ -2117,6 +2129,74 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         }
     }
 
+    if(any_derelict() && can_claim_hostile)
+    {
+        bool can_recrew_all = true;
+
+        for(ship* s : ships)
+        {
+            if(s->fully_disabled() && !s->can_recrew(player_empire))
+            {
+                can_recrew_all = false;
+                break;
+            }
+        }
+
+        auto formatted_str = get_recrew_str(this, player_empire);
+
+        if(can_recrew_all)
+            ImGui::NeutralText("(Recrew)");
+        else
+            ImGui::BadText("(Recrew)");
+
+        if(ImGui::IsItemHovered())
+        {
+            tooltip::add(get_recrew_str(this, player_empire));
+        }
+
+        if(ImGui::IsItemClicked_Registered() && can_recrew_all)
+        {
+            bool can_recrew_any = false;
+
+            for(ship* s : ships)
+            {
+                if(s->can_recrew(player_empire))
+                {
+                    can_recrew_any = true;
+                    break;
+                }
+            }
+
+            if(can_recrew_any)
+            {
+                orbital* new_orbital = o->parent_system->make_fleet(fleet_manage, o->orbital_length, o->orbital_angle, player_empire);
+
+                for(ship* s : ships)
+                {
+                    if(!s->fully_disabled())
+                        continue;
+
+                    ///if originating empire is not the claiming empire, get some tech
+                    if(ImGui::IsItemClicked_Registered() && s->can_recrew(player_empire))
+                    {
+                        ///depletes resources
+                        ///should probably pull the resource stuff outside of here as there might be other sources of recrewing
+                        s->recrew_derelict(s->owned_by->parent_empire, player_empire);
+
+                        ship* ns = new_orbital->data->make_new_from(player_empire, *s);
+                        ns->name = s->name;
+
+                        s->cleanup = true;
+
+                        if(popup.going)
+                            popup.insert(new_orbital);
+                    }
+                }
+
+            }
+        }
+    }
+
     bool neutral_or_allied = (!player_empire->is_hostile(parent_empire) || player_empire->is_allied(parent_empire)) && player_empire != parent_empire;
 
     if(neutral_or_allied)
@@ -2142,16 +2222,6 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
 
         }
     }
-
-    bool owned = parent_empire == player_empire;
-
-
-    bool not_busy_and_in_friendly_territory = o->in_friendly_territory_and_not_busy();
-
-
-    bool can_claim_hostile = (player_empire == o->parent_system->get_base()->parent_empire ||
-                              player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
-                              !any_in_combat();
 
     if((owned && not_busy_and_in_friendly_territory) || (all_derelict() && can_claim_hostile))
     {
