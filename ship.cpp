@@ -1974,6 +1974,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
     if(!fully_disabled() && can_claim_hostile && owned_by->parent_empire == player_empire && can_be_upgraded())
     {
+        ///this is expensive and involves a ship copy
         auto res = get_upgrade_cost(this);
 
         if(owned_by->parent_empire->can_fully_dispense(res))
@@ -2196,6 +2197,58 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         if(ImGui::IsItemClicked_Registered())
         {
             refill_resources(player_empire);
+        }
+    }
+
+    bool any_upgrade = false;
+
+    for(ship* s : ships)
+    {
+        if(s->can_be_upgraded())
+        {
+            any_upgrade = true;
+            break;
+        }
+    }
+
+    if(any_upgrade && parent_empire == player_empire && can_claim_hostile)
+    {
+        bool all_can_be_upgraded = true;
+
+        std::map<resource::types, float> cost;
+
+        for(ship* s : ships)
+        {
+            auto res = get_upgrade_cost(s);
+
+            for(auto& i : res)
+            {
+                cost[i.first] += i.second;
+            }
+        }
+
+        if(parent_empire->can_fully_dispense(cost))
+        {
+            ImGui::NeutralText("(Upgrade Fleet)");
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                parent_empire->dispense_resources(cost);
+
+                for(ship* s : ships)
+                {
+                    s->set_max_tech_level_from_empire_and_ship(parent_empire);
+                }
+            }
+        }
+        else
+        {
+            ImGui::BadText("(Upgrade Fleet)");
+        }
+
+        if(ImGui::IsItemHovered())
+        {
+            tooltip::add(get_upgrade_str(cost));
         }
     }
 
