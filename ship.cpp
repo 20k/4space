@@ -1880,9 +1880,12 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
                               player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
                               !o->data->any_in_combat();
 
-    if(fully_disabled() && can_recrew(player_empire) && can_claim_hostile)
+    if(fully_disabled() && can_claim_hostile)
     {
-        ImGui::NeutralText("(Recrew)");
+        if(can_recrew(player_empire))
+            ImGui::NeutralText("(Recrew)");
+        else
+            ImGui::BadText("(Recrew)");
 
         auto res = resources_needed_to_recrew_total();
 
@@ -1906,7 +1909,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         }
 
         ///if originating empire is not the claiming empire, get some tech
-        if(ImGui::IsItemClicked_Registered())
+        if(ImGui::IsItemClicked_Registered() && can_recrew(player_empire))
         {
             ///depletes resources
             ///should probably pull the resource stuff outside of here as there might be other sources of recrewing
@@ -1927,12 +1930,9 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
             ship* s = new_sm->make_new_from(player_empire, *this);
             s->name = name;
 
-
             cleanup = true;
 
             player_empire->take_ownership(new_sm);
-
-            owned_by->toggle_fleet_ui = false;
 
             if(popup.going)
                 popup.insert(new_orbital);
