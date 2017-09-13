@@ -1920,24 +1920,12 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
             ///should probably pull the resource stuff outside of here as there might be other sources of recrewing
             recrew_derelict(owned_by->parent_empire, player_empire);
 
-            ship_manager* new_sm = fleet_manage.make_new();
+            orbital* new_orbital = o->parent_system->make_fleet(fleet_manage, o->orbital_length, o->orbital_angle, player_empire);
 
-            orbital_system* os = o->parent_system;
-
-            orbital* new_orbital = os->make_new(orbital_info::FLEET, 5.f);
-            new_orbital->orbital_angle = o->orbital_angle;
-            new_orbital->orbital_length = o->orbital_length;
-            new_orbital->parent = o->parent;
-            new_orbital->data = new_sm;
-
-            player_empire->take_ownership(new_orbital);
-
-            ship* s = new_sm->make_new_from(player_empire, *this);
+            ship* s = new_orbital->data->make_new_from(player_empire, *this);
             s->name = name;
 
             cleanup = true;
-
-            player_empire->take_ownership(new_sm);
 
             if(popup.going)
                 popup.insert(new_orbital);
