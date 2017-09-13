@@ -2955,6 +2955,22 @@ int main()
 
         system_manage.tick(diff_s);
 
+        for(orbital_system* os : system_manage.systems)
+        {
+            for(orbital* o : os->orbitals)
+            {
+                if(o->type != orbital_info::FLEET)
+                    continue;
+
+                for(ship* s : o->data->ships)
+                {
+                    s->context_handle_menu(o, player_empire, fleet_manage, popup);
+                }
+
+                o->data->context_handle_menu(o, player_empire, fleet_manage, popup);
+            }
+        }
+
         if(state == 0)
         {
             ///must happen before drawing system
@@ -2986,22 +3002,6 @@ int main()
                 {
                     display_ship_info(*s, smanage->parent_empire, player_empire, player_empire, system_manage, fleet_manage, empire_manage, popup);
                 }
-            }
-        }
-
-        for(orbital_system* os : system_manage.systems)
-        {
-            for(orbital* o : os->orbitals)
-            {
-                if(o->type != orbital_info::FLEET)
-                    continue;
-
-                for(ship* s : o->data->ships)
-                {
-                    s->context_handle_menu(o, player_empire, fleet_manage, popup);
-                }
-
-                o->data->context_handle_menu(o, player_empire, fleet_manage, popup);
             }
         }
 
