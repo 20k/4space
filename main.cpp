@@ -469,9 +469,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             if(!key.isKeyPressed(sf::Keyboard::LShift))
                 popup.schedule_rem_all();
 
-            popup_element elem;
-            elem.element = o;
-
             if(o)
             {
                 popup.insert(o);
@@ -3121,10 +3118,10 @@ int main()
 
                 for(ship* s : o->data->ships)
                 {
-                    s->context_handle_menu(o, player_empire);
+                    s->context_handle_menu(o, player_empire, fleet_manage, popup);
                 }
 
-                o->data->context_handle_menu(o, player_empire);
+                o->data->context_handle_menu(o, player_empire, fleet_manage, popup);
             }
         }
 

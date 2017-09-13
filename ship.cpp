@@ -1796,7 +1796,7 @@ ship_type::types ship::estimate_ship_type()
     return ship_type::MILITARY;
 }
 
-void ship::context_handle_menu(orbital* o, empire* player_empire)
+void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup)
 {
     context_tick_menu();
 
@@ -1880,6 +1880,67 @@ void ship::context_handle_menu(orbital* o, empire* player_empire)
                               player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
                               !o->data->any_in_combat();
 
+    if(fully_disabled() && can_recrew(player_empire) && can_claim_hostile)
+    {
+        ImGui::NeutralText("(Recrew)");
+
+        auto res = resources_needed_to_recrew_total();
+
+        ///crew research has 0 bound, scrapped research has minimum bound
+        float recrew_research_currency = get_recrew_potential_research(player_empire).units_to_currency(false);
+
+        resource_manager rm;
+
+        for(auto& i : res)
+        {
+            rm.resources[i.first].amount = -i.second;
+        }
+
+        std::string rstr = rm.get_formatted_str(true);
+
+        rstr += "Potential Re: " + std::to_string((int)recrew_research_currency);
+
+        if(ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip(rstr.c_str());
+        }
+
+        ///if originating empire is not the claiming empire, get some tech
+        if(ImGui::IsItemClicked_Registered())
+        {
+            ///depletes resources
+            ///should probably pull the resource stuff outside of here as there might be other sources of recrewing
+            recrew_derelict(owned_by->parent_empire, player_empire);
+
+            ship_manager* new_sm = fleet_manage.make_new();
+
+            orbital_system* os = o->parent_system;
+
+            orbital* new_orbital = os->make_new(orbital_info::FLEET, 5.f);
+            new_orbital->orbital_angle = o->orbital_angle;
+            new_orbital->orbital_length = o->orbital_length;
+            new_orbital->parent = o->parent;
+            new_orbital->data = new_sm;
+
+            player_empire->take_ownership(new_orbital);
+
+            new_sm->steal(this);
+
+            player_empire->take_ownership(new_sm);
+
+            owned_by->toggle_fleet_ui = false;
+
+            popup_element* pelem = popup.fetch(o);
+
+            if(pelem != nullptr && popup.going)
+            {
+                popup.schedule_rem(o);
+
+                popup.insert(new_orbital);
+            }
+        }
+    }
+
     if((owned && not_busy_and_in_friendly_territory) || (fully_disabled() && can_claim_hostile))
     {
         research research_raw;
@@ -1957,7 +2018,6 @@ void ship::context_handle_menu(orbital* o, empire* player_empire)
 
                 context_are_you_sure_war = false;
             }
-
         }
     }
 
@@ -1969,7 +2029,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire)
     ImGui::EndPopup();
 }
 
-void ship_manager::context_handle_menu(orbital* o, empire* player_empire)
+void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup)
 {
     context_tick_menu();
 
