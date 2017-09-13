@@ -528,6 +528,8 @@ void check_for_resources(orbital* me)
         return;
 
     float harvest_dist = 40.f;
+    float min_dist = FLT_MAX;
+    orbital* min_orbital = nullptr;
 
     for(orbital* o : me->parent_system->orbitals)
     {
@@ -542,45 +544,54 @@ void check_for_resources(orbital* me)
         if(dist > harvest_dist)
             continue;
 
-        for(ship* s : sm->ships)
+        if(dist < min_dist)
         {
-            component* primary = s->get_component_with_primary(ship_component_elements::ORE_HARVESTER);
+            min_dist = dist;
+            min_orbital = o;
+        }
+    }
 
-            if(primary == nullptr)
+    if(min_orbital == nullptr)
+        return;
+
+    for(ship* s : sm->ships)
+    {
+        component* primary = s->get_component_with_primary(ship_component_elements::ORE_HARVESTER);
+
+        if(primary == nullptr)
+            continue;
+
+        min_orbital->current_num_harvesting++;
+
+        int num_harvest = min_orbital->last_num_harvesting;
+
+        if(num_harvest == 0)
+            return;
+
+        for(int type = 0; type < primary->components.size(); type++)
+        {
+            component_attribute& attr = primary->components[type];
+
+            if(!attr.present)
                 continue;
 
-            o->current_num_harvesting++;
+            auto res_type = ship_component_elements::element_infos[(int)type].resource_type;
 
-            int num_harvest = o->last_num_harvesting;
+            if(res_type == resource::COUNT)
+                continue;
 
-            if(num_harvest == 0)
-                return;
+            float ore_mult = primary->components[ship_component_elements::ORE_HARVESTER].produced_per_s;
 
-            for(int type = 0; type < primary->components.size(); type++)
-            {
-                component_attribute& attr = primary->components[type];
+            if(ore_mult > FLOAT_BOUND)
+                ore_mult = (1 + ore_mult)/2.f;
 
-                if(!attr.present)
-                    continue;
+            attr.produced_per_s = ore_mult * min_orbital->produced_resources_ps.get_resource(res_type).amount / num_harvest;
 
-                auto res_type = ship_component_elements::element_infos[(int)type].resource_type;
-
-                if(res_type == resource::COUNT)
-                    continue;
-
-                float ore_mult = primary->components[ship_component_elements::ORE_HARVESTER].produced_per_s;
-
-                if(ore_mult > FLOAT_BOUND)
-                    ore_mult = (1 + ore_mult)/2.f;
-
-                attr.produced_per_s = ore_mult * o->produced_resources_ps.get_resource(res_type).amount / num_harvest;
-
-                me->is_mining = true;
-                me->mining_target = o;
-            }
-
-            return;
+            me->is_mining = true;
+            me->mining_target = min_orbital;
         }
+
+        return;
     }
 }
 
