@@ -125,7 +125,6 @@ bool empire::owns(orbital* o)
 void empire::generate_resource_from_owned(float step_s)
 {
     float res[resource::COUNT] = {0};
-    res.resize(resource::COUNT);
 
     static float last_step_s = 1.f;
 
@@ -196,7 +195,7 @@ void empire::generate_resource_from_owned(float step_s)
         }
     }
 
-    for(int i=0; i<res.size(); i++)
+    for(int i=0; i<resource::COUNT; i++)
     {
         resources.resources[i].amount += res[i];
     }
