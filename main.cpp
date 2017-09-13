@@ -2846,7 +2846,7 @@ int main()
 
         }*/
 
-        all_battles->tick(diff_s, system_manage, net_state);
+        all_battles->tick(diff_s, system_manage, net_state, player_empire);
 
         handle_camera(window, system_manage);
 

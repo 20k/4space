@@ -197,7 +197,7 @@ struct battle_manager : serialisable
 
     std::vector<orbital*> ship_map;
 
-    void tick(float step_s, system_manager& system_manage, network_state& net_state);
+    void tick(float step_s, system_manager& system_manage, network_state& net_state, empire* player_empire);
 
     void draw(sf::RenderWindow& win, system_manager& system_manage);
 
@@ -259,7 +259,7 @@ struct all_battles_manager : serialisable
     void destroy(battle_manager* bm);
 
     void tick_find_battles(system_manager& system_manage);
-    void tick(float step_s, system_manager& system_manage, network_state& net_state);
+    void tick(float step_s, system_manager& system_manage, network_state& net_state, empire* player_empire);
     void merge_battles_together();
 
     void draw_viewing(sf::RenderWindow& win, system_manager& system_manage);

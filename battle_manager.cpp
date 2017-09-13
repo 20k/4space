@@ -748,10 +748,17 @@ void battle_manager::keep_fleets_together(system_manager& system_manage)
     }
 }
 
-void battle_manager::tick(float step_s, system_manager& system_manage, network_state& net_state)
+void battle_manager::tick(float step_s, system_manager& system_manage, network_state& net_state, empire* player_empire)
 {
+    bool player_involvement = false;
+
     for(int i=0; i<ship_map.size(); i++)
     {
+        if(ship_map[i]->parent_empire == player_empire)
+        {
+            player_involvement = true;
+        }
+
         if(ship_map[i]->data->should_be_removed_from_combat())
         {
             ship_map[i]->leave_battle();
@@ -762,8 +769,12 @@ void battle_manager::tick(float step_s, system_manager& system_manage, network_s
         }
     }
 
-    stars.tick(step_s);
-    sparks.tick(step_s);
+    ///optimisation
+    if(player_involvement)
+    {
+        stars.tick(step_s);
+        sparks.tick(step_s);
+    }
 
     tick_ai(*this, step_s, net_state);
 
@@ -1704,7 +1715,7 @@ void all_battles_manager::merge_battles_together()
     }
 }
 
-void all_battles_manager::tick(float step_s, system_manager& system_manage, network_state& net_state)
+void all_battles_manager::tick(float step_s, system_manager& system_manage, network_state& net_state, empire* player_empire)
 {
     //tick_find_battles(system_manage);
 
@@ -1712,7 +1723,7 @@ void all_battles_manager::tick(float step_s, system_manager& system_manage, netw
 
     for(auto& i : battles)
     {
-        i->tick(step_s, system_manage, net_state);
+        i->tick(step_s, system_manage, net_state, player_empire);
     }
 
     bool any = false;
