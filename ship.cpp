@@ -1844,6 +1844,50 @@ std::string get_recrew_str(ship_manager* sm, empire* player_empire)
     return rstr;
 }
 
+std::map<resource::types, float> get_upgrade_cost(ship* s)
+{
+     ship c_cpy = *s;
+
+    if(s->owned_by->parent_empire != nullptr)
+        c_cpy.set_max_tech_level_from_empire_and_ship(s->owned_by->parent_empire);
+
+    ///this doesn't include armour, so we're kind of getting it for free atm
+    auto repair_resources = c_cpy.resources_needed_to_repair_total();
+
+    //c_cpy.intermediate_texture = nullptr;
+
+    auto res_cost = c_cpy.resources_cost();
+
+    for(auto& i : repair_resources)
+    {
+        res_cost[i.first] += i.second;
+    }
+
+    auto current_resources = s->resources_cost();
+
+    for(auto& i : current_resources)
+    {
+        res_cost[i.first] -= i.second;
+    }
+
+    return res_cost;
+}
+
+std::string get_upgrade_str(const std::map<resource::types, float>& cost)
+{
+    resource_manager rm;
+    rm.add(cost);
+
+    for(auto& i : rm.resources)
+    {
+        i.amount = -i.amount;
+    }
+
+    std::string str = rm.get_formatted_str(true);
+
+    return str;
+}
+
 void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup)
 {
     context_tick_menu();
@@ -1927,6 +1971,32 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
     bool can_claim_hostile = (player_empire == o->parent_system->get_base()->parent_empire ||
                               player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
                               !o->data->any_in_combat();
+
+    if(!fully_disabled() && can_claim_hostile && owned_by->parent_empire == player_empire && can_be_upgraded())
+    {
+        auto res = get_upgrade_cost(this);
+
+        if(owned_by->parent_empire->can_fully_dispense(res))
+        {
+            ImGui::NeutralText("(Upgrade)");
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                owned_by->parent_empire->dispense_resources(res);
+
+                set_max_tech_level_from_empire_and_ship(owned_by->parent_empire);
+            }
+        }
+        else
+        {
+            ImGui::BadText("(Upgrade)");
+        }
+
+        if(ImGui::IsItemHovered())
+        {
+            tooltip::add(get_upgrade_str(res));
+        }
+    }
 
     if(fully_disabled() && can_claim_hostile)
     {
@@ -4063,6 +4133,24 @@ void ship::test_set_disabled()
     }
 
     force_fully_disabled(full_disabled);
+}
+
+bool ship::can_be_upgraded()
+{
+    for(component& c : entity_list)
+    {
+        int appropriate_tech = ship_component_elements::component_element_to_research_type[c.primary_attribute];
+        float new_tech_level = owned_by->parent_empire->research_tech_level.categories[appropriate_tech].amount;
+
+        float tl = c.get_tech_level_of_primary();
+
+        if(tl < new_tech_level)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*void ship::set_tech_level_of_component(int component_offset, float tech_level)

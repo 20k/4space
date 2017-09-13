@@ -645,6 +645,7 @@ struct ship : positional, serialisable, ship_base_context_menu
 
     bool is_fully_disabled = false;
 
+    bool can_be_upgraded();
     void set_tech_level_of_component(int component_offset, float tech_level);
     void set_max_tech_level_from_empire_and_ship(empire* e); ///takes max(ship, empire) tech
     void set_tech_level_from_empire(empire* e);

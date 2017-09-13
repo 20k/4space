@@ -481,65 +481,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
         }
     }
 
-    if(s.owned_by->parent_empire == player_empire && !s.owned_by->any_in_combat() && o != nullptr && o->in_friendly_territory_and_not_busy())
-    {
-        ///this is slow
-        ship c_cpy = s;
-
-        if(s.owned_by->parent_empire != nullptr)
-            c_cpy.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
-
-        ///this doesn't include armour, so we're kind of getting it for free atm
-        auto repair_resources = c_cpy.resources_needed_to_repair_total();
-
-        //c_cpy.intermediate_texture = nullptr;
-
-        auto res_cost = c_cpy.resources_cost();
-
-        for(auto& i : repair_resources)
-        {
-            res_cost[i.first] += i.second;
-        }
-
-        auto current_resources = s.resources_cost();
-
-        for(auto& i : current_resources)
-        {
-            res_cost[i.first] -= i.second;
-        }
-
-        resource_manager rm;
-        rm.add(res_cost);
-
-        for(auto& i : rm.resources)
-        {
-            i.amount = -i.amount;
-        }
-
-        std::string str = rm.get_formatted_str(true);
-
-        if(str != "")
-        {
-            ImGui::NeutralText("(Upgrade to latest Tech)");
-
-            ///setting tech level currently does not have a cost associated with it
-            if(ImGui::IsItemClicked_Registered())
-            {
-                if(owner->can_fully_dispense(res_cost))
-                {
-                    owner->dispense_resources(res_cost);
-
-                    s.set_max_tech_level_from_empire_and_ship(s.owned_by->parent_empire);
-                }
-            }
-
-            if(ImGui::IsItemHovered())
-            {
-                ImGui::SetTooltip(str.c_str());
-            }
-        }
-    }
-
     ///if derelict SALAGE BBZ or recapture YEAAAAAH
     ///recapturing will take some resources to prop up the crew and some necessary systems
     ///or just... fully repair? Maybe make a salvage literally just a resupply + empire change?
