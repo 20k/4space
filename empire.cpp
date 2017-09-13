@@ -124,7 +124,7 @@ bool empire::owns(orbital* o)
 
 void empire::generate_resource_from_owned(float step_s)
 {
-    std::vector<float> res;
+    float res[resource::COUNT] = {0};
     res.resize(resource::COUNT);
 
     static float last_step_s = 1.f;
@@ -188,7 +188,7 @@ void empire::generate_resource_from_owned(float step_s)
         if(!o->is_resource_object)
             continue;
 
-        resource_manager manager = o->produced_resources_ps;
+        const resource_manager& manager = o->produced_resources_ps;
 
         for(int i=0; i<manager.resources.size(); i++)
         {
