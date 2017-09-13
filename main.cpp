@@ -585,15 +585,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
             assert(o);
 
-            ///?
-            /*if(parent_fleet->ships.size() == 1)
-            {
-                owner->release_ownership(parent_fleet);
-                owner->release_ownership(o);
-            }*/
-
-            //claiming_empire->take_ownership(o);
-
             ship_manager* new_sm = fleet_manage.make_new();
 
             orbital* new_orbital = os->make_new(orbital_info::FLEET, 5.f);
@@ -607,8 +598,6 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
             new_sm->steal(&s);
 
             claiming_empire->take_ownership(new_sm);
-
-            //o->data = new_sm;
 
             parent_fleet->toggle_fleet_ui = false;
 
