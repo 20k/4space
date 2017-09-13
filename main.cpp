@@ -3223,6 +3223,7 @@ int main()
             serialise_data_helper::send_mode = 1;
 
             serialise_data_helper::host_to_id_to_pointer.clear();
+            serialise_data_helper::type_to_datas.clear();
 
             ser.handle_serialise(state, false);
             ser.handle_serialise(empire_manage, false);
@@ -3244,7 +3245,7 @@ int main()
 
             for(empire* e : empire_manage.empires)
             {
-                e->network_take_ownership(net_state, net_state.my_id);
+                e->network_take_ownership(net_state, net_state.my_id, false);
             }
 
             for(empire* e : empire_manage.empires)
@@ -3260,7 +3261,11 @@ int main()
                 }
             }
 
+            std::cout << "HI THERE " << player_empire->name << std::endl;
+
             player_empire->network_take_ownership(net_state, net_state.my_id);
+
+            serialise_data_helper::type_to_datas.clear();
 
             //system_manage.ensure_found_orbitals_handled();
 

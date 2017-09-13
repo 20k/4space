@@ -273,7 +273,7 @@ struct empire : serialisable
 
     void do_serialise(serialise& s, bool ser) override;
 
-    void network_take_ownership(network_state& net_state, serialise_host_type& host);
+    void network_take_ownership(network_state& net_state, serialise_host_type& host, bool modify_ai_status = true);
     void try_network_take_ownership(network_state& net_state);
     void tick_network_take_ownership(network_state& net_state);
 };

@@ -1721,17 +1721,20 @@ void empire::do_serialise(serialise& s, bool ser)
 }
 
 ///the problem is, we can't claim this for someone else as we don't know its serialisation id
-void empire::network_take_ownership(network_state& net_state, serialise_host_type& host)
+void empire::network_take_ownership(network_state& net_state, serialise_host_type& host, bool modify_ai_status)
 {
-    if(host == net_state.my_id)
+    if(modify_ai_status)
     {
-        has_ai = false;
-        is_player = true;
-    }
-    else
-    {
-        has_ai = true;
-        is_player = false;
+        if(host == net_state.my_id)
+        {
+            has_ai = false;
+            is_player = true;
+        }
+        else
+        {
+            has_ai = true;
+            is_player = false;
+        }
     }
 
     net_state.claim_for(this, host);
