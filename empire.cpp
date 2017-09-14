@@ -1115,6 +1115,8 @@ void empire::propagage_relationship_modification_from_damaging_ship(empire* dama
         negative_relations(damaged, relationship_change);
     }
 
+    float enemy_of_enemy_conversion = 0.1f;
+
     for(auto& rel : damaged->relations_map)
     {
         empire* e = rel.first;
@@ -1122,7 +1124,7 @@ void empire::propagage_relationship_modification_from_damaging_ship(empire* dama
 
         if(e->is_hostile(damaged) && e != this)
         {
-            e->positive_relations(this, relationship_change/2.f);
+            e->positive_relations(this, relationship_change * enemy_of_enemy_conversion);
         }
     }
 }
