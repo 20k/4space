@@ -34,7 +34,7 @@ struct spark
 
     bool cleanup = false;
 
-    sf::Texture tex;
+    //sf::Texture tex;
 
     float alpha = 1.f;
 
@@ -49,6 +49,10 @@ struct spark
 
 struct spark_manager
 {
+    sf::Texture tex;
+
+    spark_manager();
+
     std::vector<spark> sparks;
 
     void tick(float step_s);
@@ -68,6 +72,7 @@ void premultiply(sf::Image& image);
 ///need to ensure loaded after serialisation
 struct projectile : positional, serialisable
 {
+    bool clientside_hit = false;
     bool cleanup = false;
 
     projectile_options options;
@@ -182,7 +187,7 @@ struct star_map
 struct battle_manager : serialisable
 {
     ///this is compensating for an error that projectile cleanup state is not networked
-    std::map<serialise_host_type, std::map<serialise_data_type, bool>> clientside_hit;
+    //std::map<serialise_host_type, std::map<serialise_data_type, bool>> clientside_hit;
 
     spark_manager sparks;
 
