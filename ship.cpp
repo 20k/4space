@@ -4690,6 +4690,13 @@ void ship::recrew_derelict(empire* owner, empire* claiming)
 
         team = claiming->team_id;
     }
+    else
+    {
+        is_alien = false;
+        crew_effectiveness = 1.f;
+        team = claiming->team_id;
+        research_left_from_crewing = research();
+    }
 
     auto res_needed = resources_needed_to_recrew_total();
 
