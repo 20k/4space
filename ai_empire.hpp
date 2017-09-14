@@ -65,7 +65,6 @@ struct invasion_hash
 
 struct ai_empire
 {
-    std::map<ship_manager*, ship_general_state> general_purpose_state;
     std::unordered_set<orbital_system*> speculatively_owned;
     //std::map<orbital_system*, invasion_info> invasion_targets;
     std::map<empire*, invasion_info> invasion_targets;

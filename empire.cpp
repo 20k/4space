@@ -91,8 +91,6 @@ void empire::take_ownership(ship_manager* o)
     }
 
     owned_fleets.push_back(o);
-
-    ai_empire_controller.general_purpose_state[o] = ai_empire_info::IDLE;
 }
 
 void empire::release_ownership(ship_manager* o)
@@ -107,8 +105,6 @@ void empire::release_ownership(ship_manager* o)
             return;
         }
     }
-
-    ai_empire_controller.general_purpose_state.erase(o);
 }
 
 bool empire::owns(orbital* o)
