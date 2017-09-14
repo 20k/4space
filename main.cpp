@@ -458,7 +458,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     }
     ///have a recovery cost display
 
-    orbital* o = system_manage.get_by_element_orbital(s.owned_by);
+    //orbital* o = system_manage.get_by_element_orbital(s.owned_by);
+    orbital* o = associated;
 
     if(s.owned_by != nullptr && s.owned_by->parent_empire != nullptr && popup.fetch(o) == nullptr)
     {
