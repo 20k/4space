@@ -579,12 +579,13 @@ orbital* try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& d
 ///new proposal for this function
 ///we keep iterating systems until every scout is able to explore
 
+#if 1
 void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::vector<orbital_system_descriptor>& descriptors, system_manager& system_manage)
 {
     for(orbital* o : free_ships[ship_type::SCOUT])
     {
         float min_dist = FLT_MAX;
-        orbital_system* nearest = nullptr;
+        orbital_system_descriptor* nearest_desc = nullptr;
         int up_to = 5;
         int num_to = 0;
         int max_try = 5;
@@ -602,49 +603,68 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
             if(dist < min_dist)
             {
                 min_dist = dist;
-                nearest = desc.os;
+                nearest_desc = &desc;
             }
 
-            if(num_to >= up_to)
-            {
-                orbital_system* test = nullptr;
-
-                if(num_to == up_to)
-                {
-                    test = nearest;
-                }
-                else
-                {
-                    test = desc.os;
-                }
-
-                ///not super happy with pathfinding cap
-                auto path = system_manage.pathfind(o, test, 10);
-
-                if(path.size() > 0)
-                {
-                    desc.num_ships_predicted[ship_type::SCOUT]++;
-
-                    o->command_queue.try_warp(path, true);
-
-                    break;
-                }
-            }
-
-            if(num_to >= up_to + max_try)
+            if(num_to == up_to)
                 break;
 
             num_to++;
         }
+
+
+        if(nearest_desc != nullptr)
+        {
+            ///not super happy with pathfinding cap
+            auto path = system_manage.pathfind(o, nearest_desc->os, 100);
+
+            if(path.size() > 0)
+            {
+                nearest_desc->num_ships_predicted[ship_type::SCOUT]++;
+
+                o->command_queue.try_warp(path, true);
+
+                break;
+            }
+        }
+
+        num_to = 0;
+
+        for(auto& desc : descriptors)
+        {
+            if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
+                continue;
+
+            if(desc.os->get_base()->viewed_by[o->parent_empire])
+                continue;
+
+            auto path = system_manage.pathfind(o, desc.os, 100);
+
+            if(path.size() > 0)
+            {
+                desc.num_ships_predicted[ship_type::SCOUT]++;
+
+                o->command_queue.try_warp(path, true);
+
+                break;
+            }
+
+            num_to++;
+
+            if(num_to >= up_to + max_try)
+                break;
+        }
+
     }
 }
+#endif
 
 #if 0
 void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::vector<orbital_system_descriptor>& descriptors, system_manager& system_manage)
 {
     std::vector<orbital_system*> to_explore;
 
-    int pathfind_cap = 5;
+    int pathfind_cap = 50;
 
     ///systematic exploration behaviour
     for(auto& desc : descriptors)
