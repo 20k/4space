@@ -771,6 +771,14 @@ void orbital::end_render_asteroid_window()
 
 void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 {
+    if(type == orbital_info::ASTEROID && !is_resource_object)
+    {
+        if(render_type == 0)
+            simple_renderable.main_rendering(win, rotation, absolute_pos, 1.f, col);
+
+        return;
+    }
+
     /*std::vector<sf::Vertex> lines;
 
     for(int i=0; i<vert_dist.size(); i++)
