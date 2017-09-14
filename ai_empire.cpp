@@ -581,14 +581,14 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
     std::vector<orbital_system*> to_explore;
 
     ///systematic exploration behaviour
-    for(orbital* o : free_ships[ship_type::SCOUT])
+    for(auto& desc : descriptors)
     {
-        for(auto& desc : descriptors)
+        if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
+            continue;
+
+        for(orbital* o : free_ships[ship_type::SCOUT])
         {
             if(desc.os->get_base()->viewed_by[o->parent_empire])
-                continue;
-
-            if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
                 continue;
 
             auto path = system_manage.pathfind(o, desc.os);

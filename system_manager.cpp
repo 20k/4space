@@ -2515,18 +2515,16 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
     g_score[start] = 0.f;
     f_score[start] = heuristic(start, fin);
 
-    while(open_set.size() > 0)
-    {
-        std::vector<std::pair<orbital_system*, float>> sorted;
+    std::vector<std::pair<orbital_system*, float>> sorted;
 
-        for(auto& i : open_set)
+    sorted = {std::pair<orbital_system*, float>(start, f_score[start])};
+
+    while(sorted.size() > 0)
+    {
+        /*for(auto& i : open_set)
         {
             sorted.push_back({i, f_score[i]});
-        }
-
-        std::sort(sorted.begin(), sorted.begin(),
-                  [](const std::pair<orbital_system*, float>& p1, const std::pair<orbital_system*, float>& p2){return p1.second < p2.second;});
-
+        }*/
 
         orbital_system* current_sys = sorted[0].first;
 
@@ -2535,9 +2533,12 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
             return reconstruct_path(came_from, current_sys);
         }
 
-        auto it = std::find(open_set.begin(), open_set.end(), current_sys);
+        //auto it = std::find(open_set.begin(), open_set.end(), current_sys);
+        auto it2 = std::find_if(sorted.begin(), sorted.end(), [&](auto& v){return v.first == current_sys;});
 
-        open_set.erase(it);
+        //open_set.erase(it);
+
+        sorted.erase(it2);
 
         closed_set.push_back(current_sys);
 
@@ -2554,9 +2555,9 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
             if(std::find(closed_set.begin(), closed_set.end(), next_sys) != closed_set.end())
                 continue;
 
-            if(std::find(open_set.begin(), open_set.end(), next_sys) == open_set.end())
+            if(std::find_if(sorted.begin(), sorted.end(), [&](auto& v){return v.first == current_sys;}) == sorted.end())
             {
-                open_set.push_back(next_sys);
+                sorted.push_back({next_sys, FLT_MAX});
             }
 
             float found_gscore = g_score[current_sys] + heuristic(next_sys, current_sys);
@@ -2576,7 +2577,18 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
             came_from[next_sys] = current_sys;
 
             g_score[next_sys] = found_gscore;
-            f_score[next_sys] = found_gscore + heuristic(next_sys, fin);
+
+            for(auto& i : sorted)
+            {
+                if(i.first == next_sys)
+                {
+                    i.second = found_gscore + heuristic(next_sys, fin);
+                    break;
+                }
+            }
+
+            std::sort(sorted.begin(), sorted.begin(),
+                  [](const std::pair<orbital_system*, float>& p1, const std::pair<orbital_system*, float>& p2){return p1.second < p2.second;});
         }
     }
 
