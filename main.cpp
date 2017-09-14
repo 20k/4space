@@ -2858,14 +2858,14 @@ int main()
 
         handle_camera(window, system_manage);
 
-        auto tt22 = MAKE_AUTO_TIMER2(true);
+        //auto tt22 = MAKE_AUTO_TIMER2(true);
 
         if(ONCE_MACRO(sf::Keyboard::M) && focused && !ship_customise.text_input_going)
         {
             system_manage.enter_universe_view();
         }
 
-        auto tt23 = MAKE_AUTO_TIMER2(true);
+        //auto tt23 = MAKE_AUTO_TIMER2(true);
 
         ///this hack is very temporary, after this make it so that the backup system is the
         ///system in which the battle takes place that we're viewing
@@ -2881,8 +2881,6 @@ int main()
                 all_battles->request_leave_battle_view = true;
             }
         }
-
-        auto tt3 = MAKE_AUTO_TIMER2(true);
 
         //if(ONCE_MACRO(sf::Keyboard::F1))
 
@@ -2940,8 +2938,6 @@ int main()
 
         bool lclick = ONCE_MACRO(sf::Mouse::Left) && no_suppress_mouse;
         bool rclick = ONCE_MACRO(sf::Mouse::Right) && no_suppress_mouse;
-
-        auto tt4 = MAKE_AUTO_TIMER2(true);
 
         /*if(lclick)
         {
@@ -3020,8 +3016,6 @@ int main()
                 }
             }
         }*/
-
-        auto tt10 = MAKE_AUTO_TIMER2(true);
 
         for(orbital_system* os : system_manage.systems)
         {
@@ -3176,8 +3170,6 @@ int main()
 
             serialise_data_helper::type_to_datas.clear();
         };
-
-        auto tt5 = MAKE_AUTO_TIMER2(true);
 
         if(ImGui::Button("Save"))
         {
@@ -3486,8 +3478,6 @@ int main()
             }
         }
 
-        auto tt6 = MAKE_AUTO_TIMER2(true);
-
         ///do immediately after networking
         ///not critical but useful
         system_manage.shuffle_networked_orbitals();
@@ -3622,8 +3612,6 @@ int main()
         net_state.tick_join_game(diff_s);
         net_state.tick();
 
-        auto tt8 = MAKE_AUTO_TIMER2(true);
-
         handle_unprocessed();
 
         fleet_manage.shuffle_networked_ships();
@@ -3632,9 +3620,6 @@ int main()
         popup.remove_scheduled();
         system_manage.destroy_cleanup(empire_manage);
         fleet_manage.destroy_cleanup(empire_manage);
-
-
-        auto tt7 = MAKE_AUTO_TIMER2(true);
 
         if(key.isKeyPressed(sf::Keyboard::N))
         {
@@ -3676,8 +3661,6 @@ int main()
         empire_manage.draw_diplomacy_ui(player_empire, system_manage);
         empire_manage.draw_resource_donation_ui(player_empire);
 
-
-        auto tt9 = MAKE_AUTO_TIMER2(true);
 
         player_empire->draw_ui();
         ///this is slow
