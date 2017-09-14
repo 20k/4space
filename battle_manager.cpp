@@ -89,19 +89,6 @@ void spark::load()
     if(loaded)
         return;
 
-    tonemap_options tone_options;
-
-    //tone_options.power_weights = {4, 4, 0.5};
-
-    tone_options.power_weights = {0.6f, 0.6f, 3.f};
-
-    sf::Image img;
-
-    tonemap({12, 12}, tone_options, img);
-
-    tex.loadFromImage(img);
-    tex.setSmooth(true);
-
     options.overall_scale = 1/10.f;
     options.scale = {1.5f, 5.f};
     options.blur = false;
@@ -123,6 +110,22 @@ float spark::get_alpha()
     }
 
     return (1.f - (get_time_frac() + 0.1f) / (1 + 0.1f));
+}
+
+spark_manager::spark_manager()
+{
+    tonemap_options tone_options;
+
+    //tone_options.power_weights = {4, 4, 0.5};
+
+    tone_options.power_weights = {0.6f, 0.6f, 3.f};
+
+    sf::Image img;
+
+    tonemap({12, 12}, tone_options, img);
+
+    tex.loadFromImage(img);
+    tex.setSmooth(true);
 }
 
 void spark_manager::init_effect(vec2f pos, vec2f dir)
@@ -206,7 +209,7 @@ void spark_manager::draw(sf::RenderWindow& win)
 
     for(spark& s : sparks)
     {
-        sf::Sprite spr(s.tex);
+        sf::Sprite spr(tex);
 
         if(s.center)
             spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
@@ -434,12 +437,6 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
         {
             for(ship* found_ship : o->data->ships)
             {
-                if(p->requires_attention)
-                {
-                    //p->cleanup = true;
-                    //p->make_dirty();
-                }
-
                 ///projectile cleanup state not networked
                 ///relying on local hit detection is an error ALERT
                 ///not an issue currently but will graphically cause errors later
@@ -451,12 +448,12 @@ void projectile_manager::tick(battle_manager& manage, float step_s, system_manag
                     ///this is not the cause of projectiles disappearing on the host
                     //std::cout << "yay" << std::endl;
 
-                    if(!p->owned_by->clientside_hit[p->host_id][p->serialise_id])
+                    if(!p->clientside_hit)
                     {
                         p->owned_by->sparks.init_effect(p->local_pos, p->velocity);
                     }
 
-                     p->owned_by->clientside_hit[p->host_id][p->serialise_id] = true;
+                     p->clientside_hit = true;
 
                      if(net_state.owns(p))
                      {
@@ -581,7 +578,7 @@ void projectile_manager::draw(sf::RenderWindow& win)
 
     for(projectile* p : projectiles)
     {
-        if(p->owned_by->clientside_hit[p->host_id][p->serialise_id])
+        if(p->clientside_hit)
             continue;
 
         sf::Sprite spr(p->tex);
