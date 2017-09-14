@@ -2502,7 +2502,7 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
     if(fin == nullptr)
         return ret;
 
-    float max_distance = max_warp_distance;
+    float max_distance = max_warp_distance * max_warp_distance;
 
     std::vector<orbital_system*> closed_set;
     std::vector<orbital_system*> open_set{start};
@@ -2548,7 +2548,7 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
 
             vec2f dist = next_sys->universe_pos - current_sys->universe_pos;
 
-            if(dist.length() >= max_distance)
+            if(dist.squared_length() >= max_distance)
                 continue;
 
             if(std::find(closed_set.begin(), closed_set.end(), next_sys) != closed_set.end())
