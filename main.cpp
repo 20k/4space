@@ -2471,11 +2471,12 @@ int main()
     test_ship.tick_all_components(1.f);*/
 
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    settings.antialiasingLevel = 4;
 
     sf::RenderWindow window;
 
     window.create(sf::VideoMode(1500, 900),"Wowee", sf::Style::Default, settings);
+    window.setVerticalSyncEnabled(false);
 
     ImGui::SFML::Init(window);
 
