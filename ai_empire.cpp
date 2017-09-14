@@ -578,6 +578,68 @@ orbital* try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& d
 
 ///new proposal for this function
 ///we keep iterating systems until every scout is able to explore
+
+void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::vector<orbital_system_descriptor>& descriptors, system_manager& system_manage)
+{
+    for(orbital* o : free_ships[ship_type::SCOUT])
+    {
+        float min_dist = FLT_MAX;
+        orbital_system* nearest = nullptr;
+        int up_to = 5;
+        int num_to = 0;
+        int max_try = 5;
+
+        for(auto& desc : descriptors)
+        {
+            if(desc.num_ships_predicted[ship_type::SCOUT] != 0)
+                continue;
+
+            if(desc.os->get_base()->viewed_by[o->parent_empire])
+                continue;
+
+            float dist = (o->parent_system->universe_pos - desc.os->universe_pos).squared_length();
+
+            if(dist < min_dist)
+            {
+                min_dist = dist;
+                nearest = desc.os;
+            }
+
+            if(num_to >= up_to)
+            {
+                orbital_system* test = nullptr;
+
+                if(num_to == up_to)
+                {
+                    test = nearest;
+                }
+                else
+                {
+                    test = desc.os;
+                }
+
+                ///not super happy with pathfinding cap
+                auto path = system_manage.pathfind(o, test, 10);
+
+                if(path.size() > 0)
+                {
+                    desc.num_ships_predicted[ship_type::SCOUT]++;
+
+                    o->command_queue.try_warp(path, true);
+
+                    break;
+                }
+            }
+
+            if(num_to >= up_to + max_try)
+                break;
+
+            num_to++;
+        }
+    }
+}
+
+#if 0
 void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::vector<orbital_system_descriptor>& descriptors, system_manager& system_manage)
 {
     std::vector<orbital_system*> to_explore;
@@ -682,6 +744,7 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
         }
     }*/
 }
+#endif
 
 void check_colonisation(std::vector<orbital_system_descriptor>& descriptors, int global_ship_deficit[], empire* e, system_manager& system_manage, fleet_manager& fleet_manage)
 {
