@@ -130,21 +130,21 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
     if(real_coord.x < 0 || real_coord.x > win.getSize().x || real_coord.y < 0 || real_coord.y >= win.getSize().y)
         return;
 
-    float rad_to_check = 0;
-
-    for(auto& rad : vert_dist)
-    {
-        rad_to_check += rad;
-    }
-
-    rad_to_check /= vert_dist.size();
-
-    auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
-
-    pixel_rad.x -= win.getSize().x/2;
-
     if((draw_outline && !o->rendered_asteroid_window) || o->force_draw_expanded_window)
     {
+        float rad_to_check = 0;
+
+        for(auto& rad : vert_dist)
+        {
+            rad_to_check += rad;
+        }
+
+        rad_to_check /= vert_dist.size();
+
+        auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
+
+        pixel_rad.x -= win.getSize().x/2;
+
         if(!show_detail)
             ImGui::SkipFrosting(tag);
 
