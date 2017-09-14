@@ -95,6 +95,9 @@ struct empire : serialisable
     bool given_colour = false;
     vec3f temporary_hsv;
 
+    double resource_time_accum = 0.f;
+    resource_manager partial_resources;
+
     ///a two dimensional vector that we can use to determine our similarity to other empires
     ///used for determining tech and ship operating capability
     ///we need some way for getting less tech once we learn a lot from the culture

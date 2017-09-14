@@ -128,7 +128,7 @@ void empire::generate_resource_from_owned(float step_s)
 
     static float last_step_s = 1.f;
 
-    resource_manager diff_res;
+    //resource_manager diff_res;
 
     for(int i=0; i<backup_income.resources.size(); i++)
     {
@@ -139,15 +139,28 @@ void empire::generate_resource_from_owned(float step_s)
             cur_res = 0;
         }
 
-        diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount);
+        //diff_res.resources[i].amount = (resources.resources[i].amount - backup_income.resources[i].amount);
+        partial_resources.resources[i].amount += (resources.resources[i].amount - backup_income.resources[i].amount);
     }
 
-    backup_income_list.push_back(diff_res);
-    backup_dt_s.push_back(step_s);
+    resource_time_accum += step_s;
+
+    if(resource_time_accum > 0.2f)
+    {
+        backup_income_list.push_back(partial_resources);
+        backup_dt_s.push_back(resource_time_accum);
+
+        partial_resources = resource_manager();
+
+        resource_time_accum = 0.f;
+    }
+
+    //backup_income_list.push_back(diff_res);
+    //backup_dt_s.push_back(step_s);
 
     last_step_s = step_s;
 
-    while(backup_income_list.size() > 200)
+    while(backup_income_list.size() > 20)
     {
         backup_income_list.pop_front();
         backup_dt_s.pop_front();
@@ -1556,6 +1569,8 @@ void empire::do_serialise(serialise& s, bool ser)
     if(serialise_data_helper::send_mode == 1)
     {
         //s.handle_serialise(relations_diff, ser);
+        //s.handle_serialise(resource_time_accum, ser);
+        //s.handle_serialise(partial_resources, ser);
         s.handle_serialise(frame_counter, ser);
         s.handle_serialise(accumulated_dt_s, ser);
         s.handle_serialise(desired_empire_size, ser);
