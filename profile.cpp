@@ -12,6 +12,7 @@ int auto_timer::last_line;
 std::map<timer_info, timer_data> auto_timer::info;
 
 auto_timer::auto_timer(const std::string& pfunc, int pline) : func(pfunc), line(pline){}
+auto_timer::auto_timer(const std::string& pfunc, int pline, bool auto_start) : func(pfunc), line(pline){if(auto_start) start();}
 
 auto_timer::~auto_timer()
 {
@@ -21,7 +22,9 @@ auto_timer::~auto_timer()
 
 void auto_timer::start()
 {
-    start_s = std::chrono::high_resolution_clock::now();
+    //start_s = std::chrono::high_resolution_clock::now();
+
+    clk.restart();
 
     last_func = func;
     last_line = line;
@@ -29,11 +32,13 @@ void auto_timer::start()
 
 void auto_timer::finish()
 {
-    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    //std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 
-    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - start_s);
+    //std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - start_s);
 
-    double time = time_span.count();
+    //double time = time_span.count();
+
+    double time = clk.getElapsedTime().asMicroseconds() / 1000. / 1000.;
 
     auto_timer::info[{func, line}].time_s += time;
     //auto_timer::info[{func, line}].num ++;

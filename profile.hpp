@@ -4,6 +4,7 @@
 #include <chrono>
 #include <map>
 #include <string>
+#include <SFML/System/Clock.hpp>
 
 struct timer_info
 {
@@ -28,15 +29,35 @@ bool operator<(const timer_info& t1, const timer_info& t2)
     return t1.line < t2.line;
 }
 
-//#define ENABLE_PROFILING
+
+struct auto_timer_null
+{
+    void start(){}
+    void finish(){}
+
+    static void incremenet_last_num(){}
+    static void increment_last_num(){}
+    static void increment_all(){}
+    static void reduce(){}
+
+    static void reset(){}
+    static void dump(){}
+    static void dump_imgui(){}
+};
+
+#define ENABLE_PROFILING
 
 #ifdef ENABLE_PROFILING
 
-#define MAKE_AUTO_TIMER() auto_timer(__PRETTY_FUNCTION__, __LINE__)
+//#define MAKE_AUTO_TIMER2() auto_timer(__PRETTY_FUNCTION__, __LINE__)
+#define MAKE_AUTO_TIMER2(x) auto_timer(__PRETTY_FUNCTION__, __LINE__, x)
+#define MAKE_AUTO_TIMER() auto_timer_null()
 
 struct auto_timer
 {
-    std::chrono::high_resolution_clock::time_point start_s;
+    //std::chrono::high_resolution_clock::time_point start_s;
+
+    sf::Clock clk;
 
     std::string func;
     int line;
@@ -45,6 +66,7 @@ struct auto_timer
     static int last_line;
 
     auto_timer(const std::string& func, int line);
+    auto_timer(const std::string& func, int line, bool auto_start);
     ~auto_timer();
 
     bool finished = false;
@@ -66,20 +88,7 @@ struct auto_timer
 
 #define MAKE_AUTO_TIMER() auto_timer()
 
-struct auto_timer
-{
-    void start(){}
-    void finish(){}
-
-    static void incremenet_last_num(){}
-    static void increment_last_num(){}
-    static void increment_all(){}
-    static void reduce(){}
-
-    static void reset(){}
-    static void dump(){}
-    static void dump_imgui(){}
-};
+using auto_timer = auto_timer_null;
 #endif
 
 #endif // PROFILE_HPP_INCLUDED

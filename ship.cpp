@@ -6268,7 +6268,7 @@ void fleet_manager::destroy_cleanup(empire_manager& empire_manage)
 
 void fleet_manager::tick_all(float step_s)
 {
-    int bound = 6;
+    int bound = 60;
 
     for(ship_manager* sm : fleets)
     {
@@ -6279,11 +6279,14 @@ void fleet_manager::tick_all(float step_s)
 
     for(ship_manager* sm : fleets)
     {
+        if(sm->all_derelict())
+            continue;
+
         tcount %= bound;
 
         bool in_combat = sm->any_in_combat();
 
-        if(tcount != internal_counter && !in_combat)
+        if(tcount != internal_counter)// && !in_combat)
         {
             tcount++;
             continue;

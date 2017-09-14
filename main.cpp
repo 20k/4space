@@ -2730,6 +2730,9 @@ int main()
             playing_music.tg.make_cell_random();
         }*/
 
+        auto tt1 = MAKE_AUTO_TIMER2(true);
+
+
         mouse_last = mpos;
         mpos = {mouse.getPosition(window).x, mouse.getPosition(window).y};
 
@@ -2847,14 +2850,22 @@ int main()
 
         }*/
 
+        auto tt2 = MAKE_AUTO_TIMER2(true);
+
         all_battles->tick(diff_s, system_manage, net_state, player_empire);
 
+        auto tt21 = MAKE_AUTO_TIMER2(true);
+
         handle_camera(window, system_manage);
+
+        auto tt22 = MAKE_AUTO_TIMER2(true);
 
         if(ONCE_MACRO(sf::Keyboard::M) && focused && !ship_customise.text_input_going)
         {
             system_manage.enter_universe_view();
         }
+
+        auto tt23 = MAKE_AUTO_TIMER2(true);
 
         ///this hack is very temporary, after this make it so that the backup system is the
         ///system in which the battle takes place that we're viewing
@@ -2870,6 +2881,8 @@ int main()
                 all_battles->request_leave_battle_view = true;
             }
         }
+
+        auto tt3 = MAKE_AUTO_TIMER2(true);
 
         //if(ONCE_MACRO(sf::Keyboard::F1))
 
@@ -2927,6 +2940,8 @@ int main()
 
         bool lclick = ONCE_MACRO(sf::Mouse::Left) && no_suppress_mouse;
         bool rclick = ONCE_MACRO(sf::Mouse::Right) && no_suppress_mouse;
+
+        auto tt4 = MAKE_AUTO_TIMER2(true);
 
         /*if(lclick)
         {
@@ -3005,6 +3020,8 @@ int main()
                 }
             }
         }*/
+
+        auto tt10 = MAKE_AUTO_TIMER2(true);
 
         for(orbital_system* os : system_manage.systems)
         {
@@ -3159,6 +3176,8 @@ int main()
 
             serialise_data_helper::type_to_datas.clear();
         };
+
+        auto tt5 = MAKE_AUTO_TIMER2(true);
 
         if(ImGui::Button("Save"))
         {
@@ -3467,6 +3486,8 @@ int main()
             }
         }
 
+        auto tt6 = MAKE_AUTO_TIMER2(true);
+
         ///do immediately after networking
         ///not critical but useful
         system_manage.shuffle_networked_orbitals();
@@ -3601,6 +3622,8 @@ int main()
         net_state.tick_join_game(diff_s);
         net_state.tick();
 
+        auto tt8 = MAKE_AUTO_TIMER2(true);
+
         handle_unprocessed();
 
         fleet_manage.shuffle_networked_ships();
@@ -3610,6 +3633,8 @@ int main()
         system_manage.destroy_cleanup(empire_manage);
         fleet_manage.destroy_cleanup(empire_manage);
 
+
+        auto tt7 = MAKE_AUTO_TIMER2(true);
 
         if(key.isKeyPressed(sf::Keyboard::N))
         {
@@ -3652,6 +3677,8 @@ int main()
         empire_manage.draw_resource_donation_ui(player_empire);
 
 
+        auto tt9 = MAKE_AUTO_TIMER2(true);
+
         player_empire->draw_ui();
         ///this is slow
         //sf::Clock tclk;
@@ -3676,8 +3703,11 @@ int main()
         context_menu::stop();*/
 
         auto_timer::increment_all();
-        auto_timer::dump_imgui();
+
+        if(tt1.clk.getElapsedTime().asMicroseconds() / 1000. > 10)
+            auto_timer::dump();
         auto_timer::reduce();
+        auto_timer::reset();
 
         ship_customise.tick(scrollwheel_delta, lclick, mpos - mouse_last);
 

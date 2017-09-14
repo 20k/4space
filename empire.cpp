@@ -526,7 +526,7 @@ void empire::tick(float step_s)
 
 void empire::tick_ai(all_battles_manager& all_battles, system_manager& system_manage)
 {
-    //if(!has_ai)
+    //if(!has_ai)f
     //    return;
 
     for(orbital* o : owned)
@@ -550,6 +550,8 @@ void empire::tick_high_level_ai(float dt_s, fleet_manager& fm, system_manager& s
 {
     if(!has_ai)
         return;
+
+    return;
 
     ai_empire_controller.tick(accumulated_dt_s, fm, sm, this);
 }
