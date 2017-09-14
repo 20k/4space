@@ -2686,7 +2686,7 @@ void system_manager::repulse_fleets()
 {
     for(orbital_system* sys : systems)
     {
-        for(orbital* o : sys->orbitals)
+        /*for(orbital* o : sys->orbitals)
         {
             ///this is pretty funny though
             if(o->type != orbital_info::FLEET)
@@ -2711,6 +2711,35 @@ void system_manager::repulse_fleets()
                 float dist = (a2 - a1).length();
 
                 if(dist < 10.f)
+                    repulse(o, k);
+            }
+        }*/
+
+        for(int ii = 0; ii < sys->orbitals.size(); ii++)
+        {
+            orbital* o = sys->orbitals[ii];
+
+            if(o->type != orbital_info::FLEET)
+                continue;
+
+            if(!o->owned_by_host)
+                continue;
+
+            for(int jj = ii+1; jj < sys->orbitals.size(); jj++)
+            {
+                orbital* k = sys->orbitals[jj];
+
+                if(k->type != orbital_info::FLEET)
+                    continue;
+
+                vec2f a1 = o->absolute_pos;
+                vec2f a2 = k->absolute_pos;
+
+                constexpr float min_dist = 10.f;
+
+                float dist = (a2 - a1).squared_length();
+
+                if(dist < min_dist * min_dist)
                     repulse(o, k);
             }
         }
