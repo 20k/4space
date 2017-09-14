@@ -390,12 +390,13 @@ struct system_manager : serialisable
     orbital_system* make_new();
 
     ///perf issue?
+    ///DELETE THESE
     orbital_system* get_parent(orbital* o);
     orbital_system* get_by_element(void* ptr);
     orbital* get_by_element_orbital(void* ptr);
 
-    std::vector<orbital_system*> pathfind(float max_warp_distance, orbital_system* start, orbital_system* fin);
-    std::vector<orbital_system*> pathfind(orbital* o, orbital_system* fin);
+    std::vector<orbital_system*> pathfind(float max_warp_distance, orbital_system* start, orbital_system* fin, int cap = -1);
+    std::vector<orbital_system*> pathfind(orbital* o, orbital_system* fin, int cap = -1);
     void add_draw_pathfinding(const std::vector<orbital_system*>& path);
 
     std::vector<orbital_system*> get_nearest_n(orbital_system* os, int n);

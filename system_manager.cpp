@@ -2495,7 +2495,7 @@ std::vector<orbital_system*> reconstruct_path(std::map<orbital_system*, orbital_
     return total_path;
 }
 
-std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, orbital_system* start, orbital_system* fin)
+std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, orbital_system* start, orbital_system* fin, int cap)
 {
     std::vector<orbital_system*> ret;
 
@@ -2518,6 +2518,8 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
     std::vector<std::pair<orbital_system*, float>> sorted;
 
     sorted = {std::pair<orbital_system*, float>(start, f_score[start])};
+
+    int num_explored = 0;
 
     while(sorted.size() > 0)
     {
@@ -2589,20 +2591,25 @@ std::vector<orbital_system*> system_manager::pathfind(float max_warp_distance, o
 
             std::sort(sorted.begin(), sorted.begin(),
                   [](const std::pair<orbital_system*, float>& p1, const std::pair<orbital_system*, float>& p2){return p1.second < p2.second;});
+
+            num_explored++;
+
+            if(num_explored > cap && cap != -1)
+                return ret;
         }
     }
 
     return ret;
 }
 
-std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system* fin)
+std::vector<orbital_system*> system_manager::pathfind(orbital* o, orbital_system* fin, int cap)
 {
     if(o->type != orbital_info::FLEET)
         return std::vector<orbital_system*>();
 
     ship_manager* sm = (ship_manager*)o->data;
 
-    return pathfind(sm->get_min_warp_distance(), o->parent_system, fin);
+    return pathfind(sm->get_min_warp_distance(), o->parent_system, fin, cap);
 }
 
 void system_manager::add_draw_pathfinding(const std::vector<orbital_system*>& path)

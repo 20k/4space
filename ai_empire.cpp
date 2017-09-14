@@ -576,9 +576,13 @@ orbital* try_construct(fleet_manager& fleet_manage, orbital_system_descriptor& d
     return try_construct_any(fleet_manage, {desc}, type, e, warp_capable);
 }
 
+///new proposal for this function
+///we keep iterating systems until every scout is able to explore
 void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::vector<orbital_system_descriptor>& descriptors, system_manager& system_manage)
 {
     std::vector<orbital_system*> to_explore;
+
+    int pathfind_cap = 5;
 
     ///systematic exploration behaviour
     for(auto& desc : descriptors)
@@ -591,7 +595,7 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
             if(desc.os->get_base()->viewed_by[o->parent_empire])
                 continue;
 
-            auto path = system_manage.pathfind(o, desc.os);
+            auto path = system_manage.pathfind(o, desc.os, pathfind_cap);
 
             if(path.size() > 0)
             {
@@ -620,7 +624,7 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
         {
             float dist = ((*it)->universe_pos - o->parent_system->universe_pos).length();
 
-            auto path = system_manage.pathfind(o, *it);
+            auto path = system_manage.pathfind(o, *it, pathfind_cap);
 
             if(path.size() == 0)
                 continue;
@@ -643,7 +647,7 @@ void scout_explore(const std::vector<std::vector<orbital*>>& free_ships, std::ve
         if(found == nullptr)
             continue;
 
-        auto path = system_manage.pathfind(o, found);
+        auto path = system_manage.pathfind(o, found, pathfind_cap);
 
         if(path.size() > 0)
         {
