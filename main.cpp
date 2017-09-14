@@ -2471,7 +2471,7 @@ int main()
     test_ship.tick_all_components(1.f);*/
 
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 4;
+    settings.antialiasingLevel = 8;
 
     sf::RenderWindow window;
 
