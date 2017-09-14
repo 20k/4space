@@ -516,6 +516,8 @@ struct ship : positional, serialisable, ship_base_context_menu
 
     std::string name;
 
+    std::vector<component_attribute> cached_fully_merged;
+
     uint32_t id = gid++;
     static uint32_t gid;
 

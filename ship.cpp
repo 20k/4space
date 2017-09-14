@@ -1750,6 +1750,7 @@ ship::ship()
     type_to_component_offsets.resize(ship_component_elements::NONE + 1);
 
     dim = {100, 40};
+    cached_fully_merged = get_fully_merged(1.f);
 }
 
 ship_type::types ship::estimate_ship_type()
@@ -2930,6 +2931,9 @@ void ship::tick_all_components(float step_s)
     }*/
 
     timer.finish();
+
+    ///hooray! Cheat and blatantly get this for free :)
+    cached_fully_merged = std::move(fully_merge);
 
     ///so amount left over is total_to_apply - available_capacities
 
@@ -4828,12 +4832,12 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
     return end_val;*/
 
     ///so. This is the cause of why available scanning power on is slow
-    auto res = get_produced(1.f);
-    auto res2 = s->get_produced(1.f);
+    const auto& res = cached_fully_merged;
+    const auto& res2 = s->cached_fully_merged;
 
-    float their_power_excess = res2[ship_component_elements::ENERGY] - res2[ship_component_elements::STEALTH];
+    float their_power_excess = res2[ship_component_elements::ENERGY].produced_per_s - res2[ship_component_elements::STEALTH].produced_per_s;
 
-    float diff = res[ship_component_elements::SCANNING_POWER] + their_power_excess;
+    float diff = res[ship_component_elements::SCANNING_POWER].produced_per_s + their_power_excess;
 
     float total_scanning_power = (diff / 100.f) + empire_culture_distance + disabled_bonus + culture_distance_mod;
 
