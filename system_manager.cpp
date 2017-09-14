@@ -3887,6 +3887,9 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
         pop.type = orbital_info::NONE;
         pop.is_player = found_empire == viewing_empire;
 
+        if(!viewing_empire->has_direct_vision(os))
+           continue;
+
         empire_to_systems[pop].push_back(os);
 
         //empire_to_systems[os->get_base()->parent_empire].push_back(os);
