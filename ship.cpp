@@ -3013,6 +3013,32 @@ bool ship::in_combat()
     return currently_in_combat;
 }
 
+std::vector<float> ship::get_produced(float step_s)
+{
+    std::vector<float> ret;
+
+    ret.resize((int)ship_component_elements::NONE);
+
+    for(const auto& i : entity_list)
+    {
+        for(int type = 0; type < i.components.size(); type++)
+        {
+            const component_attribute& attr = i.components[type];
+
+            if(!attr.present)
+                continue;
+
+            float& which = ret[type];
+
+            const component_attribute& other = attr;
+
+            which += other.produced_per_s * step_s * other.cur_efficiency;
+        }
+    }
+
+    return ret;
+}
+
 std::vector<component_attribute> ship::get_fully_merged(float step_s)
 {
     std::vector<component_attribute> ret;
@@ -4801,12 +4827,13 @@ float ship::get_scanning_power_on_ship(ship* s, int difficulty_modifier)
 
     return end_val;*/
 
-    auto res = get_fully_merged(1.f);
-    auto res2 = s->get_fully_merged(1.f);
+    ///so. This is the cause of why available scanning power on is slow
+    auto res = get_produced(1.f);
+    auto res2 = s->get_produced(1.f);
 
-    float their_power_excess = res2[ship_component_elements::ENERGY].produced_per_s - res2[ship_component_elements::STEALTH].produced_per_s;
+    float their_power_excess = res2[ship_component_elements::ENERGY] - res2[ship_component_elements::STEALTH];
 
-    float diff = res[ship_component_elements::SCANNING_POWER].produced_per_s + their_power_excess;
+    float diff = res[ship_component_elements::SCANNING_POWER] + their_power_excess;
 
     float total_scanning_power = (diff / 100.f) + empire_culture_distance + disabled_bonus + culture_distance_mod;
 
