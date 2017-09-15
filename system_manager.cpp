@@ -3446,7 +3446,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         bool test_class = false;
         bool OOB = false;
 
-        int bound = 10;
+        int bound = 8;
 
         if(zoom_level > 30)
         {
