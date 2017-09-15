@@ -3797,6 +3797,9 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
         #endif
     }
 
+    if(amount == 0)
+        return;
+
     set_zoom(zoom, true);
 }
 
@@ -3807,10 +3810,9 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
     float min_zoom = 1.f / 1000.f;
     //float max_zoom = 5.f;
 
-    zoom_handle.set_zoom(zoom);
+    zoom = std::max(zoom, min_zoom);
 
-    if(zoom_handle.get_zoom() < min_zoom)
-        zoom_handle.set_zoom(min_zoom);
+    zoom_handle.set_zoom(zoom);
 
     bool is_in_system_view = in_system_view();
 
@@ -3838,6 +3840,7 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
         //camera = currently_viewed->universe_pos * universe_scale;
         //camera = camera + currently_viewed->universe_pos * universe_scale;
     }
+
 
     top_bar::active[top_bar_info::UNIVERSE] = !is_in_system_view;
 }

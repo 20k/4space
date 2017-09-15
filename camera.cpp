@@ -75,7 +75,7 @@ void zoom_handler::tick(float dt_s)
 
         destination_zoom_level = greatest_zoom_diff_target;
 
-        std::cout << "hi\n";
+        //std::cout << "hi\n";
     }
 
     //std::cout << greatest_zoom_diff << "\n";
@@ -111,14 +111,17 @@ float zoom_handler::get_zoom()
 
 void zoom_handler::set_zoom(float zoom)
 {
-    if(fabs(zoom_level - zoom) > fabs(zoom_level - get_zoom()) + 0.1f &&
+    /*if(fabs(zoom_level - zoom) > fabs(zoom_level - get_zoom()) + 0.1f &&
        fabs(destination_zoom_level - zoom) > fabs(destination_zoom_level - greatest_zoom_diff_target) + 0.1f)
     {
         greatest_zoom_diff_target = zoom;
         zooming = true;
 
         std::cout << "set " << zoom << std::endl;
-    }
+    }*/
+
+    greatest_zoom_diff_target = zoom;
+    zooming = true;
 
     /*if(fabs(zoom - destination_zoom_level) < 0.1f)
     {
