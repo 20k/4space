@@ -17,10 +17,10 @@ namespace resource
         TITANIUM_ORE,
         URANIUM_ORE,*/
 
-        OXYGEN,
-        COPPER,
+        //OXYGEN,
         HYDROGEN,
         IRON,
+        COPPER,
         TITANIUM,
         URANIUM,
         RESEARCH,
@@ -36,10 +36,10 @@ namespace resource
         "Titanium Dioxide", ///has oxygen
         "Uraninite", ///has oxygen*/
 
-        "Oxygen",
-        "Copper",
+        //"Oxygen",
         "Hydrogen",
         "Iron",
+        "Copper",
         "Titanium",
         "Uranium",
         "Research",
@@ -55,10 +55,10 @@ namespace resource
         "TiO2",
         "UO2",*/
 
-        "O2",
-        "Cu",
+        //"O2",
         "H2",
         "Fe",
+        "Cu",
         "Ti",
         "U",
         "Re",
@@ -68,7 +68,7 @@ namespace resource
     //types get_random_unprocessed();
     types get_random_processed();
 
-    static types unprocessed_end = OXYGEN;
+    //static types unprocessed_end = OXYGEN;
 
     bool is_processed(types type);
 

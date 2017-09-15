@@ -2112,7 +2112,7 @@ empire* empire_manager::birth_empire_without_system_ownership(fleet_manager& fle
     e->resources.resources[resource::URANIUM].amount = 5000.f;
     e->resources.resources[resource::RESEARCH].amount = 8000.f;
     e->resources.resources[resource::HYDROGEN].amount = 8000.f;
-    e->resources.resources[resource::OXYGEN].amount = 8000.f;
+    //e->resources.resources[resource::OXYGEN].amount = 8000.f;
 
     for(int i=0; i<fleets; i++)
     {

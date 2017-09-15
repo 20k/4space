@@ -86,7 +86,6 @@ std::map<resource::types, float> get_tech_type_resource_ratio(ship_component_ele
 
     if(type & ALL_COMMON)
     {
-        ret[resource::OXYGEN] = 1;
         ret[resource::COPPER] = 1;
         ret[resource::HYDROGEN] = 1;
         ret[resource::IRON] = 1;
@@ -139,7 +138,7 @@ void ship_component_elements::generate_element_infos()
     ei[OXYGEN].research_type = research_info::MATERIALS;
     ei[OXYGEN].allowed_skip_in_repair = true;
     ei[OXYGEN].negative_is_bad = true;
-    ei[OXYGEN].resource_type = resource::OXYGEN;
+    //ei[OXYGEN].resource_type = resource::OXYGEN;
     ei[OXYGEN].combat_view_if_not_full = true;
 
 

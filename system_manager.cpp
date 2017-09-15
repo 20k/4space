@@ -1177,10 +1177,10 @@ void orbital::make_random_resource_planet(float total_ps)
     ore_mults[resource::TITANIUM_ORE] = 0.1;
     ore_mults[resource::URANIUM_ORE] = 0.1;*/
 
-    ore_mults[resource::OXYGEN] = 2.f;
-    ore_mults[resource::COPPER] = 0.05f;
+    //ore_mults[resource::OXYGEN] = 2.f;
     ore_mults[resource::HYDROGEN] = 0.7f;
     ore_mults[resource::IRON] = 0.1f;
+    ore_mults[resource::COPPER] = 0.05f;
     ore_mults[resource::TITANIUM] = 0.025;
     ore_mults[resource::URANIUM] = 0.01f;
     ore_mults[resource::RESEARCH] = 1.f;
