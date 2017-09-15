@@ -1250,7 +1250,7 @@ bool battle_manager::can_end_battle_peacefully(empire* leaving_empire)
             if(s->owned_by->parent_empire == leaving_empire)
                 continue;
 
-            if(s->owned_by->parent_empire != nullptr && !s->owned_by->parent_empire->is_hostile(leaving_empire))
+            if(!leaving_empire->is_hostile(s->owned_by->parent_empire))
                 continue;
 
             if(!s->fully_disabled())
