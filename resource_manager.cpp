@@ -15,12 +15,12 @@
 
 resource::types resource::get_random_processed()
 {
-    return (resource::types)randf_s(resource::unprocessed_end, resource::COUNT);
+    return (resource::types)randf_s(0, resource::COUNT);
 }
 
 bool resource::is_processed(resource::types type)
 {
-    return type >= resource::unprocessed_end;
+    return type >= 0;
 }
 
 resource_manager::resource_manager()
@@ -160,12 +160,6 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
         vals.push_back(val);
     }
 
-    for(int i=0; i<resource::unprocessed_end; i++)
-    {
-        names.erase(names.begin());
-        vals.erase(vals.begin());
-    }
-
     std::string ret;
 
     for(int i=0; i<names.size(); i++)
@@ -244,15 +238,6 @@ std::string resource_manager::get_processed_str(bool can_skip)
 
         names.push_back(name);
         vals.push_back(val);
-    }
-
-    //names.resize(resource::unprocessed_end);
-    //vals.resize(resource::unprocessed_end);
-
-    for(int i=0; i<resource::unprocessed_end; i++)
-    {
-        names.erase(names.begin());
-        vals.erase(vals.begin());
     }
 
     std::string ret;

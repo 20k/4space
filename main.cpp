@@ -2415,8 +2415,8 @@ int main()
     hostile_empire->resources.resources[resource::TITANIUM].amount = 500.f;
     hostile_empire->resources.resources[resource::URANIUM].amount = 500.f;
     hostile_empire->resources.resources[resource::RESEARCH].amount = 800.f;
-    hostile_empire->resources.resources[resource::HYDROGEN].amount = 800.f;
-    hostile_empire->resources.resources[resource::OXYGEN].amount = 800.f;
+    //hostile_empire->resources.resources[resource::HYDROGEN].amount = 800.f;
+    //hostile_empire->resources.resources[resource::OXYGEN].amount = 800.f;
 
     //player_empire->ally(hostile_empire);
     //player_empire->become_hostile(hostile_empire);
@@ -2601,8 +2601,8 @@ int main()
     e2->resources.resources[resource::TITANIUM].amount = 5000.f;
     e2->resources.resources[resource::URANIUM].amount = 5000.f;
     e2->resources.resources[resource::RESEARCH].amount = 8000.f;
-    e2->resources.resources[resource::HYDROGEN].amount = 8000.f;
-    e2->resources.resources[resource::OXYGEN].amount = 8000.f;
+    //e2->resources.resources[resource::HYDROGEN].amount = 8000.f;
+    //e2->resources.resources[resource::OXYGEN].amount = 8000.f;
 
     //hostile_empire->unally(e2);
 
