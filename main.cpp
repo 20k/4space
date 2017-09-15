@@ -2348,7 +2348,7 @@ void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 {
     sf::View view = window.getDefaultView();
 
-    view.setSize(window.getSize().x * system_manage.zoom_level, window.getSize().y * system_manage.zoom_level);
+    view.setSize(window.getSize().x * system_manage.zoom_handle.get_zoom(), window.getSize().y * system_manage.zoom_handle.get_zoom());
     //view.zoom(system_manage.zoom_level);
 
     if(system_manage.in_system_view())
@@ -3635,7 +3635,7 @@ int main()
 
         if(key.isKeyPressed(sf::Keyboard::B))
         {
-            std::cout << system_manage.zoom_level << std::endl;
+            std::cout << system_manage.zoom_handle.get_zoom() << std::endl;
         }
 
         //printf("premanage\n");

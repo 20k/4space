@@ -3518,20 +3518,22 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
         int bound = 8;
 
-        if(zoom_level > 30)
+        float current_zoom = zoom_handle.get_zoom();
+
+        if(current_zoom > 30)
         {
             bound = 4;
             test_class = true;
         }
 
-        if(zoom_level > 60)
+        if(current_zoom > 60)
         {
             bound = 2;
             OOB = true;
             test_class = false;
         }
 
-        if(zoom_level > 100)
+        if(current_zoom > 100)
             bound = 1;
 
         ///ok. Instead, this should advertise which orbitals are hovered
@@ -3768,7 +3770,7 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
     auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
     auto vfgame_pos = xy_to_vec(game_pos);
 
-    float zoom = zoom_level;
+    float zoom = zoom_handle.get_zoom();
 
     float root_2 = sqrt(2.f);
 
@@ -3803,10 +3805,10 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
     float min_zoom = 1.f / 1000.f;
     //float max_zoom = 5.f;
 
-    zoom_level = zoom;
+    zoom_handle.set_zoom(zoom);
 
-    if(zoom_level < min_zoom)
-        zoom_level = min_zoom;
+    if(zoom_handle.get_zoom() < min_zoom)
+        zoom_handle.set_zoom(min_zoom);
 
     bool is_in_system_view = in_system_view();
 
@@ -3842,8 +3844,8 @@ void system_manager::pan_camera(vec2f dir)
 {
     //camera = camera - dir * zoom_level;
 
-    system_cam.pos += -dir * zoom_level;
-    universe_cam.pos += -dir * zoom_level;
+    system_cam.pos += -dir * zoom_handle.get_zoom();
+    universe_cam.pos += -dir * zoom_handle.get_zoom();
 }
 
 void system_manager::check_system_transition()
@@ -3865,7 +3867,7 @@ void system_manager::check_system_transition()
 
 bool system_manager::in_system_view()
 {
-    return zoom_level < 8;
+    return zoom_handle.get_zoom() < 8;
 }
 
 void system_manager::enter_universe_view()
@@ -4404,7 +4406,7 @@ void system_manager::do_serialise(serialise& s, bool ser)
     {
         s.handle_serialise(universe_cam.pos, ser);
         s.handle_serialise(system_cam.pos, ser);
-        s.handle_serialise(zoom_level, ser);
+        s.handle_serialise(zoom_handle.zoom_level, ser);
         ///deliberately out of order. Not important tremendously but it means that
         ///all the orbital systems will be grouped in the binary file
         s.handle_serialise(systems, ser);

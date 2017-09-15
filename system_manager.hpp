@@ -444,7 +444,8 @@ struct system_manager : serialisable
     /*float zoom_level = 1.f;
     vec2f camera;*/
 
-    float zoom_level = 1.f;
+    //float zoom_level = 1.f;
+    zoom_handler zoom_handle;
 
     camera system_cam;
     camera universe_cam;
