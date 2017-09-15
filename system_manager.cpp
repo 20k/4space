@@ -2861,6 +2861,11 @@ void system_manager::set_viewed_system(orbital_system* s, bool reset_zoom)
 {
     currently_viewed = s;
 
+    if(reset_zoom)
+    {
+        universe_cam.pos = s->universe_pos * universe_scale;
+    }
+
     if(s != nullptr && s->get_base())
     {
         if(reset_zoom)
@@ -3705,6 +3710,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
             if(lclick)
             {
                 set_viewed_system(s);
+                universe_cam.pos = s->universe_pos * universe_scale;
 
                 lclick = false;
             }
