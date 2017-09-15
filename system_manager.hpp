@@ -434,6 +434,8 @@ struct system_manager : serialisable
     void set_zoom(float zoom, bool auto_enter_system = false);
     void pan_camera(vec2f dir);
 
+    void check_system_transition();
+
     bool in_system_view();
     void enter_universe_view();
     orbital_system* get_nearest_to_camera();

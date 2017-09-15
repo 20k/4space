@@ -3639,6 +3639,8 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 {
     hovered_system = currently_viewed;
 
+    check_system_transition();
+
     ///ok, i've done this in a stupid way which means that I can't set the pad on the top bar
     ///:(
     /*if(top_bar::active[top_bar_info::UNIVERSE])
@@ -3792,6 +3794,23 @@ void system_manager::pan_camera(vec2f dir)
 
     system_cam.pos += -dir * zoom_level;
     universe_cam.pos += -dir * zoom_level;
+}
+
+void system_manager::check_system_transition()
+{
+    orbital_system* cur = currently_viewed;
+    orbital_system* close = get_nearest_to_camera();
+
+    if(cur != close)
+    {
+        vec2f ccam_pos = system_cam.pos;
+
+        vec2f relative_universe = universe_cam.pos - close->universe_pos * universe_scale;
+
+        system_cam.pos = relative_universe;
+
+        currently_viewed = close;
+    }
 }
 
 bool system_manager::in_system_view()
