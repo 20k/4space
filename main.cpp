@@ -2815,7 +2815,10 @@ int main()
             window.close();
         }
 
+        vec2f mouse_dir = mpos - mouse_last;
+
         vec2f cdir = {0,0};
+        vec2f mdir = {0,0};
 
         if(key.isKeyPressed(sf::Keyboard::W))
             cdir.y() += 1;
@@ -2828,17 +2831,21 @@ int main()
 
         if(key.isKeyPressed(sf::Keyboard::D))
             cdir.x() -= 1;
-
         if(key.isKeyPressed(sf::Keyboard::LShift))
             cdir = cdir * 5.f;
 
         if(ship_customise.text_input_going)
             cdir = 0.f;
 
+        if(mouse.isButtonPressed(sf::Mouse::Middle))
+        {
+            mdir += mouse_dir;
+        }
+
         if(!focused)
             cdir = 0.f;
 
-        system_manage.pan_camera(cdir * diff_s * 300);
+        system_manage.pan_camera(cdir * diff_s * 300 + mdir);
 
         if(no_suppress_mouse)
             system_manage.change_zoom(-scrollwheel_delta, mpos, window);
