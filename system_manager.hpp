@@ -320,7 +320,7 @@ struct orbital_system : serialisable
 
     void vision_test_all();
 
-    void tick(float step_s, orbital_system* viewed_system);
+    void tick(float step_s, system_manager& system_manage);
 
     void destroy(orbital*);
     ///non destructively reparent

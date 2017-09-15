@@ -1729,7 +1729,7 @@ orbital* orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, floa
     }
 }*/
 
-void orbital_system::tick(float step_s, orbital_system* viewed)
+void orbital_system::tick(float step_s, system_manager& system_manage)
 {
     std::set<empire*> next_empires;
 
@@ -1752,10 +1752,13 @@ void orbital_system::tick(float step_s, orbital_system* viewed)
 
     accumulated_nonviewed_time += step_s;
 
-    if(this != viewed)
+    /*if(this != viewed)
     {
         return;
-    }
+    }*/
+
+    if(!system_manage.is_visible(this))
+        return;
 
     for(auto& i : asteroids)
     {
@@ -2452,8 +2455,8 @@ bool system_manager::is_visible(orbital_system* s)
     if(!in_system_view())
         return false;
 
-    return viewing(s);
-    //return viewing(s) || (s->universe_pos * universe_scale - universe_cam.pos).length() < universe_scale * 100;
+    //return viewing(s);
+    return viewing(s) || (s->universe_pos * universe_scale - universe_cam.pos).length() < universe_scale * 10;
 }
 
 orbital_system* system_manager::get_parent(orbital* o)
@@ -2674,7 +2677,7 @@ void system_manager::tick(float step_s)
 {
     for(auto& i : systems)
     {
-        i->tick(step_s, currently_viewed);
+        i->tick(step_s, *this);
     }
 
     repulse_fleets();
@@ -2849,8 +2852,21 @@ void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
     if(!in_system_view())
         return;
 
-    for(auto& i : systems)
+    for(orbital_system* i : systems)
     {
+        if(!is_visible(i))
+            continue;
+
+        view_handler view_handle(win);
+
+        if(i != currently_viewed)
+        {
+            camera sys = system_cam;
+            sys.pos = universe_cam.pos - i->universe_pos * universe_scale;
+
+            view_handle.set_camera(sys);
+        }
+
         i->draw_alerts(win, viewing_empire, *this);
     }
 }
@@ -2865,12 +2881,22 @@ void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_em
 
     currently_viewed->draw(win, viewer_empire);*/
 
-    for(orbital_system* sys : systems)
+    for(orbital_system* system : systems)
     {
-        if(is_visible(sys))
+        if(!is_visible(system))
+            continue;
+
+        view_handler view_handle(win);
+
+        if(system != currently_viewed)
         {
-            sys->draw(win, viewer_empire);
+            camera sys = system_cam;
+            sys.pos = universe_cam.pos - system->universe_pos * universe_scale;
+
+            view_handle.set_camera(sys);
         }
+
+        system->draw(win, viewer_empire);
     }
 }
 
@@ -3297,7 +3323,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     {
         orbital_system* os = systems[i];
 
-        if(viewing(os))
+        if(is_visible(os))
             continue;
 
         vec2f pos = os->universe_pos * universe_scale;
