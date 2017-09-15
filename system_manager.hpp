@@ -392,6 +392,7 @@ struct system_manager : serialisable
     orbital_system* make_new();
 
     bool viewing(orbital_system* sys);
+    bool is_visible(orbital_system* sys);
 
     ///perf issue?
     ///DELETE THESE

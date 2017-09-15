@@ -1229,7 +1229,7 @@ void orbital::release_ownership()
 
 void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
 {
-    if(parent_system != system_manage.currently_viewed)
+    if(!system_manage.is_visible(parent_system))
         return;
 
     //if(!viewing_empire->has_vision(system_manage.currently_viewed))
@@ -2447,6 +2447,15 @@ bool system_manager::viewing(orbital_system* sys)
     return sys == currently_viewed && in_system_view();
 }
 
+bool system_manager::is_visible(orbital_system* s)
+{
+    if(!in_system_view())
+        return false;
+
+    return viewing(s);
+    //return viewing(s) || (s->universe_pos * universe_scale - universe_cam.pos).length() < universe_scale * 100;
+}
+
 orbital_system* system_manager::get_parent(orbital* o)
 {
     for(auto& i : systems)
@@ -2848,13 +2857,21 @@ void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 
 void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_empire)
 {
-    if(currently_viewed == nullptr)
+    /*if(currently_viewed == nullptr)
         return;
 
     if(!in_system_view())
         return;
 
-    currently_viewed->draw(win, viewer_empire);
+    currently_viewed->draw(win, viewer_empire);*/
+
+    for(orbital_system* sys : systems)
+    {
+        if(is_visible(sys))
+        {
+            sys->draw(win, viewer_empire);
+        }
+    }
 }
 
 void system_manager::set_viewed_system(orbital_system* s, bool reset_zoom)
