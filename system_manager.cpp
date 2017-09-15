@@ -2675,6 +2675,8 @@ std::vector<orbital_system*> system_manager::get_nearest_n(orbital_system* os, i
 
 void system_manager::tick(float step_s)
 {
+    zoom_handle.tick(step_s);
+
     for(auto& i : systems)
     {
         i->tick(step_s, *this);

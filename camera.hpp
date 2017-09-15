@@ -41,6 +41,19 @@ struct view_handler
 struct zoom_handler
 {
     float zoom_level = 1.f;
+    float destination_zoom_level = 1.f;
+
+    float greatest_zoom_diff_target = 1.f;
+    float greatest_zoom_diff_zoom = 1.f;
+
+    double zoom_time = 1.f;
+
+    double current_time = 0.;
+    double destination_time = 0.;
+
+    bool zooming = false;
+
+    void tick(float dt_s);
 
     float get_zoom();
     void set_zoom(float zoom);
