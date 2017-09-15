@@ -19,7 +19,7 @@
 int orbital::gid;
 int orbital_system::gid;
 
-float system_manager::universe_scale = 100.f;
+float system_manager::universe_scale = 200.f;
 
 double position_history_element::max_history_s = 20;
 
