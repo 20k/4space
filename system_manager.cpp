@@ -3700,7 +3700,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
         top_bar::active[top_bar_info::UNIVERSE] = false;
     }*/
 
-    if(top_bar::active[top_bar_info::UNIVERSE])
+    /*if(top_bar::active[top_bar_info::UNIVERSE])
     {
         if(in_system_view())
         {
@@ -3713,7 +3713,7 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
         {
             set_viewed_system(get_nearest_to_camera(), true);
         }
-    }
+    }*/
 
     if(in_system_view())
         return;
