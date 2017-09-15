@@ -87,11 +87,7 @@ void zoom_handler::tick(float dt_s)
         zoom_accum = 0;
 
         destination_zoom_level = std::max(destination_zoom_level, min_zoom);
-
-        std::cout << destination_zoom_level << std::endl;
     }
-
-    //std::cout << greatest_zoom_diff << "\n";
 
     greatest_zoom_diff_target = destination_zoom_level;
     greatest_zoom_diff_zoom = get_zoom();
