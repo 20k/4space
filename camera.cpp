@@ -62,6 +62,8 @@ void zoom_handler::tick(float dt_s)
         zoom_level = destination_zoom_level;
     }
 
+    float min_zoom = 1.f / 1024.f;
+
     if(zooming)
     {
         double diff = (destination_time - current_time);
@@ -71,11 +73,34 @@ void zoom_handler::tick(float dt_s)
         if(diff > 0)
         {
             destination_time += diff;
+            current_zoom_time = zoom_time + diff;
         }
 
         destination_zoom_level = greatest_zoom_diff_target;
 
         //std::cout << "hi\n";
+    }
+
+    if(is_zoom_accum)
+    {
+        zoom_level = get_zoom();
+
+        double diff = (destination_time - current_time);
+
+        destination_time = current_time + zoom_time;
+
+        if(diff > 0)
+        {
+            //destination_time += diff;
+            //current_zoom_time = zoom_time + diff;
+        }
+
+        destination_zoom_level += zoom_accum;
+        zoom_accum = 0;
+
+        destination_zoom_level = std::max(destination_zoom_level, min_zoom);
+
+        std::cout << destination_zoom_level << std::endl;
     }
 
     //std::cout << greatest_zoom_diff << "\n";
@@ -84,6 +109,7 @@ void zoom_handler::tick(float dt_s)
     greatest_zoom_diff_zoom = get_zoom();
 
     zooming = false;
+    is_zoom_accum = false;
 }
 
 float zoom_handler::get_zoom()
@@ -93,7 +119,7 @@ float zoom_handler::get_zoom()
         return zoom_level;
     }
 
-    float frac = (destination_time - current_time) / zoom_time;
+    float frac = (destination_time - current_time) / current_zoom_time;
 
     //std::cout << 1.f - frac << " ";
 
@@ -107,6 +133,11 @@ float zoom_handler::get_zoom()
     //return val;
 
     //return zoom_level;
+}
+
+float zoom_handler::get_destination_zoom()
+{
+    return destination_zoom_level;
 }
 
 void zoom_handler::set_zoom(float zoom)
@@ -132,4 +163,10 @@ void zoom_handler::set_zoom(float zoom)
         destination_time = current_time + zoom_time;
         destination_zoom_level = (destination_zoom_level + zoom) / 2.f;
     }*/
+}
+
+void zoom_handler::offset_zoom(float amount)
+{
+    zoom_accum += amount;
+    is_zoom_accum = true;
 }

@@ -45,18 +45,24 @@ struct zoom_handler
 
     float greatest_zoom_diff_target = 1.f;
     float greatest_zoom_diff_zoom = 1.f;
+    float zoom_accum = 0.f;
 
     double zoom_time = 1.f;
+    double current_zoom_time = 1.f;
 
     double current_time = 0.;
     double destination_time = 0.;
 
     bool zooming = false;
 
+    bool is_zoom_accum = false;
+
     void tick(float dt_s);
 
     float get_zoom();
+    float get_destination_zoom();
     void set_zoom(float zoom);
+    void offset_zoom(float amount);
 };
 
 #endif // CAMERA_HPP_INCLUDED

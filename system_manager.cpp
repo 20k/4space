@@ -3772,9 +3772,11 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
     auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
     auto vfgame_pos = xy_to_vec(game_pos);
 
-    float zoom = zoom_handle.get_zoom();
+    float zoom = zoom_handle.get_destination_zoom();
 
     float root_2 = sqrt(2.f);
+
+    float old_zoom = zoom;
 
     if(amount > 0)
     {
@@ -3800,7 +3802,8 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
     if(amount == 0)
         return;
 
-    set_zoom(zoom, true);
+    //set_zoom(zoom, true);
+    zoom_handle.offset_zoom(zoom - old_zoom);
 }
 
 void system_manager::set_zoom(float zoom, bool auto_enter_system)
