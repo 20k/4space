@@ -2991,9 +2991,9 @@ int main()
         if(state == 0)
         {
             ///this is slow
-            system_manage.draw_viewed_system(window, player_empire);
             ///dis kinda slow too
             system_manage.draw_universe_map(window, player_empire, popup);
+            system_manage.draw_viewed_system(window, player_empire);
             system_manage.process_universe_map(window, lclick, player_empire);
             system_manage.draw_warp_radiuses(window, player_empire);
         }
@@ -3622,6 +3622,11 @@ int main()
         if(key.isKeyPressed(sf::Keyboard::N))
         {
             printf("%f\n", diff_s * 1000.f);
+        }
+
+        if(key.isKeyPressed(sf::Keyboard::B))
+        {
+            std::cout << system_manage.zoom_level << std::endl;
         }
 
         //printf("premanage\n");

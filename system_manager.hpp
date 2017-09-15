@@ -381,6 +381,7 @@ struct system_manager : serialisable
 
     std::vector<orbital_system*> systems;
 
+
     ///for when we go into battle view, bit of a hack
     orbital_system* backup_system = nullptr;
 
@@ -388,6 +389,8 @@ struct system_manager : serialisable
     orbital_system* hovered_system = nullptr;
 
     orbital_system* make_new();
+
+    bool viewing(orbital_system* sys);
 
     ///perf issue?
     ///DELETE THESE

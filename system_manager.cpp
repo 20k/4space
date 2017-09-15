@@ -2440,6 +2440,11 @@ orbital_system* system_manager::make_new()
     return sys;
 }
 
+bool system_manager::viewing(orbital_system* sys)
+{
+    return sys == currently_viewed && in_system_view();
+}
+
 orbital_system* system_manager::get_parent(orbital* o)
 {
     for(auto& i : systems)
@@ -3038,8 +3043,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     hovered_orbitals.clear();
     advertised_universe_orbitals.clear();
 
-    if(in_system_view())
-        return;
+    //if(in_system_view())
+    //    return;
 
     /*for(orbital_system* os : systems)
     {
@@ -3080,6 +3085,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     for(orbital_system* os : systems)
     {
+        if(in_system_view())
+            continue;
+
         vec2f pos = os->universe_pos * universe_scale;
 
         auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
@@ -3111,6 +3119,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     for(orbital_system* os : systems)
     {
+        if(in_system_view())
+            continue;
+
         vec2f pos = os->universe_pos * universe_scale;
 
         auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
@@ -3164,6 +3175,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
     for(orbital_system* o1 : systems)
     {
+        if(in_system_view())
+            continue;
+
         for(orbital_system* o2 : systems)
         {
             if(o1 == o2)
@@ -3255,6 +3269,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     {
         orbital_system* os = systems[i];
 
+        if(viewing(os))
+            continue;
 
         vec2f pos = os->universe_pos * universe_scale;
 
