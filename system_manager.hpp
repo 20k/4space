@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include "context_menu.hpp"
 #include "serialise.hpp"
+#include "camera.hpp"
 
 namespace orbital_info
 {
@@ -437,8 +438,14 @@ struct system_manager : serialisable
     void enter_universe_view();
     orbital_system* get_nearest_to_camera();
 
+    /*float zoom_level = 1.f;
+    vec2f camera;*/
+
     float zoom_level = 1.f;
-    vec2f camera;
+
+    camera system_cam;
+    camera universe_cam;
+
     static float universe_scale;
     static inline float sun_universe_rad = 200;
     float border_universe_rad = sun_universe_rad * 6.5;

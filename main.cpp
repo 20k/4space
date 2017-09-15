@@ -2350,7 +2350,16 @@ void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
 
     view.setSize(window.getSize().x * system_manage.zoom_level, window.getSize().y * system_manage.zoom_level);
     //view.zoom(system_manage.zoom_level);
-    view.setCenter({system_manage.camera.x(), system_manage.camera.y()});
+
+    if(system_manage.in_system_view())
+    {
+        view.setCenter({system_manage.system_cam.pos.x(), system_manage.system_cam.pos.y()});
+    }
+    else
+    {
+        view.setCenter({system_manage.universe_cam.pos.x(), system_manage.universe_cam.pos.y()});
+    }
+    //view.setCenter({system_manage.camera.x(), system_manage.camera.y()});
 
     window.setView(view);
 }

@@ -965,7 +965,9 @@ float orbital::get_pixel_radius(sf::RenderWindow& win)
 
 void orbital::center_camera(system_manager& system_manage)
 {
-    system_manage.camera = absolute_pos;
+    //system_manage.camera = absolute_pos;
+
+    system_manage.system_cam.pos = absolute_pos;
 }
 
 bool orbital::point_within(vec2f pos)
@@ -3043,6 +3045,10 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     hovered_orbitals.clear();
     advertised_universe_orbitals.clear();
 
+    view_handler view_handle(win);
+
+    view_handle.set_camera(universe_cam);
+
     //if(in_system_view())
     //    return;
 
@@ -3752,16 +3758,22 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
     if(is_in_system_view && !was_in_system_view)
     {
         if(auto_enter_system)
-            set_viewed_system(get_nearest_to_camera(), false);
+            currently_viewed = get_nearest_to_camera();
+            //set_viewed_system(get_nearest_to_camera(), false);
 
-        camera = camera - currently_viewed->universe_pos * universe_scale;
+        //camera = camera - currently_viewed->universe_pos * universe_scale;
 
-        if(auto_enter_system)
-            currently_viewed->get_base()->center_camera(*this);
+        system_cam.pos = universe_cam.pos - currently_viewed->universe_pos * universe_scale;
+        //universe_cam.pos = currently_viewed->universe_pos * universe_scale;
+
+        //if(auto_enter_system)
+        //    currently_viewed->get_base()->center_camera(*this);
     }
     if(was_in_system_view && !is_in_system_view)
     {
-        camera = currently_viewed->universe_pos * universe_scale;
+        //universe_cam.pos = universe_cam.pos - system_cam.pos;
+
+        //camera = currently_viewed->universe_pos * universe_scale;
         //camera = camera + currently_viewed->universe_pos * universe_scale;
     }
 
@@ -3770,7 +3782,10 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
 
 void system_manager::pan_camera(vec2f dir)
 {
-    camera = camera - dir * zoom_level;
+    //camera = camera - dir * zoom_level;
+
+    system_cam.pos += -dir * zoom_level;
+    universe_cam.pos += -dir * zoom_level;
 }
 
 bool system_manager::in_system_view()
@@ -3793,7 +3808,7 @@ orbital_system* system_manager::get_nearest_to_camera()
 
     for(orbital_system* s : systems)
     {
-        float found_dist = (camera - s->universe_pos * universe_scale).length();
+        float found_dist = (universe_cam.pos - s->universe_pos * universe_scale).length();
 
         if(found_dist < dist)
         {
@@ -4312,7 +4327,8 @@ void system_manager::do_serialise(serialise& s, bool ser)
 {
     if(serialise_data_helper::send_mode == 1)
     {
-        s.handle_serialise(camera, ser);
+        s.handle_serialise(universe_cam.pos, ser);
+        s.handle_serialise(system_cam.pos, ser);
         s.handle_serialise(zoom_level, ser);
         ///deliberately out of order. Not important tremendously but it means that
         ///all the orbital systems will be grouped in the binary file

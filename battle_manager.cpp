@@ -1176,7 +1176,8 @@ void battle_manager::set_view(system_manager& system_manage)
 
     win.setView(v1);*/
 
-    system_manage.camera = avg;
+    //system_manage.camera = avg;
+    system_manage.system_cam.pos = avg;
 }
 
 bool battle_manager::can_disengage(empire* disengaging_empire)
