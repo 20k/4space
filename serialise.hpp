@@ -82,7 +82,6 @@ struct serialise_data_helper
     ///0 = partial update, 1 = full
     static int32_t send_mode;
 
-    ///this table may contain duplicates, don't iterate through me
     static inline std::map<serialise_host_type, std::map<serialise_data_type, serialisable*>> host_to_id_to_pointer;
 
     static std::map<size_t, unhandled_types> type_to_datas;
