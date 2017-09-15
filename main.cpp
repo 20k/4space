@@ -2732,11 +2732,6 @@ int main()
         {
             playing_music.tg.make_cell_random();
         }*/
-
-        mouse_last = mpos;
-        mpos = {mouse.getPosition(window).x, mouse.getPosition(window).y};
-
-
         sf::Event event;
 
         bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
@@ -2777,6 +2772,9 @@ int main()
                 window.setView(view);*/
             }
         }
+
+        mouse_last = mpos;
+        mpos = {mouse.getPosition(window).x, mouse.getPosition(window).y};
 
         if(scrollwheel_delta < 0)
             scrollwheel_delta = -1;
