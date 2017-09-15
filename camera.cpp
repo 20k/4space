@@ -70,15 +70,9 @@ void zoom_handler::tick(float dt_s)
 
         destination_time = current_time + zoom_time;
 
-        if(diff > 0)
-        {
-            destination_time += diff;
-            current_zoom_time = zoom_time + diff;
-        }
-
         destination_zoom_level = greatest_zoom_diff_target;
 
-        //std::cout << "hi\n";
+        destination_zoom_level = std::max(destination_zoom_level, min_zoom);
     }
 
     if(is_zoom_accum)
@@ -88,12 +82,6 @@ void zoom_handler::tick(float dt_s)
         double diff = (destination_time - current_time);
 
         destination_time = current_time + zoom_time;
-
-        if(diff > 0)
-        {
-            //destination_time += diff;
-            //current_zoom_time = zoom_time + diff;
-        }
 
         destination_zoom_level += zoom_accum;
         zoom_accum = 0;
@@ -121,18 +109,7 @@ float zoom_handler::get_zoom()
 
     float frac = (destination_time - current_time) / current_zoom_time;
 
-    //std::cout << 1.f - frac << " ";
-
-    //float val =  mix(zoom_level, destination_zoom_level, 1.f - frac);
-
-    //std::cout << zoom_level << " " << destination_zoom_level << " end";
-
-
     return zoom_level * frac + destination_zoom_level * (1.f - frac);
-
-    //return val;
-
-    //return zoom_level;
 }
 
 float zoom_handler::get_destination_zoom()
@@ -142,27 +119,8 @@ float zoom_handler::get_destination_zoom()
 
 void zoom_handler::set_zoom(float zoom)
 {
-    /*if(fabs(zoom_level - zoom) > fabs(zoom_level - get_zoom()) + 0.1f &&
-       fabs(destination_zoom_level - zoom) > fabs(destination_zoom_level - greatest_zoom_diff_target) + 0.1f)
-    {
-        greatest_zoom_diff_target = zoom;
-        zooming = true;
-
-        std::cout << "set " << zoom << std::endl;
-    }*/
-
     greatest_zoom_diff_target = zoom;
     zooming = true;
-
-    /*if(fabs(zoom - destination_zoom_level) < 0.1f)
-    {
-        //zooming = false;
-    }
-    else
-    {
-        destination_time = current_time + zoom_time;
-        destination_zoom_level = (destination_zoom_level + zoom) / 2.f;
-    }*/
 }
 
 void zoom_handler::offset_zoom(float amount)
