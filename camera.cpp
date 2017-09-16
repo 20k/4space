@@ -135,7 +135,7 @@ void zoom_handler::tick(float dt_s)
         //zoom_level = std::max(zoom_level, min_zoom);
 
         camera_offset = {0,0};
-        last_camera_offset = {0,0};
+        //last_camera_offset = {0,0};
     }
 
     std::cout << get_zoom() << std::endl;
