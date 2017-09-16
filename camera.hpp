@@ -60,6 +60,7 @@ struct zoom_handler
 
     void tick(float dt_s);
 
+    float get_linear_zoom();
     float get_zoom();
     float get_destination_zoom();
     void set_zoom(float zoom);

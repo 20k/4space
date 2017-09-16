@@ -77,7 +77,7 @@ void zoom_handler::tick(float dt_s)
     {
         if(signum(zoom_accum) == signum(destination_zoom_level - zoom_level))
         {
-            zoom_level = get_zoom();
+            zoom_level = get_linear_zoom();
 
             destination_zoom_level += zoom_accum;
 
@@ -86,7 +86,7 @@ void zoom_handler::tick(float dt_s)
         }
         else
         {
-            zoom_level = get_zoom();
+            zoom_level = get_linear_zoom();
 
             destination_zoom_level = zoom_level + zoom_accum;
 
@@ -120,6 +120,26 @@ void zoom_handler::tick(float dt_s)
 
         camera_offset = {0,0};
     }
+
+    std::cout << get_zoom() << std::endl;
+}
+
+float zoom_handler::get_linear_zoom()
+{
+    if(current_time >= destination_time)
+    {
+        return zoom_level;
+    }
+
+    float frac = (destination_time - current_time) / zoom_time;
+
+    frac = clamp(frac, 0.f, 1.f);
+
+    frac = ease_function(frac);
+
+    float res = zoom_level * frac + destination_zoom_level * (1.f - frac);
+
+    return res;
 }
 
 float zoom_handler::get_zoom()
