@@ -926,16 +926,25 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage, all_ba
 
         vec2f star_pos = star.pos.xy();
 
-        vec2f projected_star_pos = ((star_pos.xy() - center) * 1.f / (star.pos.z() * 10.f + all_battles.zoom_handle.get_zoom())) + xy_to_vec(win.getSize())/2.f;
+        vec2f projected_star_pos = ((star_pos.xy() - center) * 1.f / (star.pos.z() * 20.f + all_battles.zoom_handle.get_zoom())) + xy_to_vec(win.getSize())/2.f;
 
         //auto spos = win.mapCoordsToPixel({star_pos.x() - disp.x(), star_pos.y() - disp.y()});
 
         if(projected_star_pos.x() < 0 || projected_star_pos.x() >= win.getSize().x || projected_star_pos.y() < 0 || projected_star_pos.y() >= win.getSize().y)
             continue;
 
+        float star_size_frac = system_manager::temperature_fraction_to_size_fraction(star.temp);
+
+        float scale = mix(star_size_frac/8.f, star_size_frac, 1.f - star.pos.z());
+
+        float est_scale = scale * 16 / all_battles.zoom_handle.get_zoom();
+
+        if(est_scale < 0.2f)
+            continue;
+
         //std::cout << projected_star_pos << std::endl;
 
-        simple_renderable.main_rendering(win, 0.f, projected_star_pos.xy(), 1.f, {1,1,1});
+        simple_renderable.main_rendering(win, 0.f, projected_star_pos.xy(), scale, {1,1,1});
     }
 }
 
