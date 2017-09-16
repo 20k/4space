@@ -2673,13 +2673,18 @@ std::vector<orbital_system*> system_manager::get_nearest_n(orbital_system* os, i
     return ret;
 }
 
-void system_manager::tick(float step_s)
+void system_manager::tick_camera(float step_s)
 {
+    float old_zoom = zoom_handle.get_zoom();
+
     zoom_handle.tick(step_s);
 
-    system_cam.pos += zoom_handle.get_camera_offset(step_s);
-    universe_cam.pos += zoom_handle.get_camera_offset(step_s);
+    system_cam.pos += -zoom_handle.get_camera_offset(step_s);
+    universe_cam.pos += -zoom_handle.get_camera_offset(step_s);
+}
 
+void system_manager::tick(float step_s)
+{
     for(auto& i : systems)
     {
         i->tick(step_s, *this);

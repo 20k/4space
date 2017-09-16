@@ -2866,12 +2866,15 @@ int main()
 
         all_battles->tick(diff_s, system_manage, net_state, player_empire);
 
-        handle_camera(window, system_manage);
 
         if(ONCE_MACRO(sf::Keyboard::M) && focused && !ship_customise.text_input_going)
         {
             system_manage.enter_universe_view();
         }
+
+        system_manage.tick_camera(diff_s);
+
+        handle_camera(window, system_manage);
 
         ///this hack is very temporary, after this make it so that the backup system is the
         ///system in which the battle takes place that we're viewing

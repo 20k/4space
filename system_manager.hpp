@@ -408,6 +408,7 @@ struct system_manager : serialisable
 
     std::vector<orbital*> next_frame_warp_radiuses;
 
+    void tick_camera(float step_s);
     void tick(float step_s);
 
     void destroy(orbital_system* s);
