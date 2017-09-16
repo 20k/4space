@@ -38,6 +38,8 @@ struct view_handler
     ~view_handler();
 };
 
+extern float min_zoom;
+
 struct zoom_handler
 {
     vec2f last_camera_offset = {0,0};

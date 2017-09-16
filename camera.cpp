@@ -56,40 +56,14 @@ view_handler::~view_handler()
 float ease_function(float frac)
 {
     return frac;
+
+    return frac * frac * frac;
 }
+
+float min_zoom = 1/256.f;
 
 void zoom_handler::tick(float dt_s)
 {
-    /*if(current_time >= destination_time)
-    {
-        zoom_level = destination_zoom_level;
-    }*/
-
-    float min_zoom = 1.f / 1024.f;
-
-    advertised_offset = {0,0};
-
-    #ifdef OLD_ZOOM
-    if(zooming)
-    {
-        /*double diff = (destination_time - current_time);
-
-        destination_time = current_time + zoom_time;
-
-        destination_zoom_level = greatest_zoom_diff_target;
-
-        destination_zoom_level = std::max(destination_zoom_level, min_zoom);*/
-
-        zoom_level = greatest_zoom_diff_target;
-
-        zoom_level = std::max(zoom_level, min_zoom);
-        destination_zoom_level = zoom_level;
-
-        destination_time = current_time - 1;
-    }
-    #endif
-
-    ///need to handle reversing mouse
     if(is_zoom_accum)
     {
         if(signum(zoom_accum) == signum(destination_zoom_level - zoom_level))
@@ -113,7 +87,7 @@ void zoom_handler::tick(float dt_s)
 
         destination_time = current_time + zoom_time;
         zoom_accum = 0;
-        destination_zoom_level = std::max(destination_zoom_level, min_zoom);
+        //destination_zoom_level = std::max(destination_zoom_level, min_zoom);
     }
 
     greatest_zoom_diff_target = destination_zoom_level;
@@ -135,13 +109,9 @@ void zoom_handler::tick(float dt_s)
     {
         zoom_level = destination_zoom_level;
 
-        //advertised_offset += dt_s * camera_offset / zoom_time;
+        zoom_level = std::max(zoom_level, min_zoom);
 
         camera_offset = {0,0};
-    }
-    else
-    {
-        //advertised_offset += dt_s * camera_offset / zoom_time;
     }
 }
 
@@ -158,7 +128,11 @@ float zoom_handler::get_zoom()
 
     frac = ease_function(frac);
 
-    return zoom_level * frac + destination_zoom_level * (1.f - frac);
+    float res = zoom_level * frac + destination_zoom_level * (1.f - frac);
+
+    res = std::max(res, min_zoom);
+
+    return res;
 }
 
 float zoom_handler::get_destination_zoom()
@@ -168,11 +142,6 @@ float zoom_handler::get_destination_zoom()
 
 void zoom_handler::set_zoom(float zoom)
 {
-    /*greatest_zoom_diff_target = zoom;
-    zooming = true;*/
-
-    float min_zoom = 1.f / 1024.f;
-
     zoom_level = zoom;
 
     zoom_level = std::max(zoom_level, min_zoom);
