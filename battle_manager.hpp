@@ -8,6 +8,8 @@
 #include "system_manager.hpp"
 #include "procedural_text_generator.hpp"
 
+#include "camera.hpp"
+
 struct empire;
 struct ship;
 

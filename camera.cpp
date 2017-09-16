@@ -184,6 +184,9 @@ void zoom_handler::set_zoom(float zoom)
 
 void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos)
 {
+    if(amount == 0)
+        return;
+
     float old_proj_zoom = get_zoom();
     float new_proj_zoom = proj(destination_zoom_level + zoom_accum + amount);
 
