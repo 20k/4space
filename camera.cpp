@@ -78,6 +78,12 @@ float unproj(float zoom)
 
 float min_zoom = 1/256.f;
 
+zoom_handler::zoom_handler()
+{
+    zoom_level = proj(1);
+    destination_zoom_level = proj(1);
+}
+
 void zoom_handler::tick(float dt_s)
 {
     if(is_zoom_accum)
@@ -168,7 +174,7 @@ float zoom_handler::get_destination_zoom()
 
 void zoom_handler::set_zoom(float zoom)
 {
-    zoom_level = zoom;
+    zoom_level = unproj(zoom);
 
     zoom_level = std::max(zoom_level, min_zoom);
     destination_zoom_level = zoom_level;

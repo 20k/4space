@@ -42,12 +42,14 @@ extern float min_zoom;
 
 struct zoom_handler
 {
+    zoom_handler();
+
     vec2f last_camera_offset = {0,0};
     vec2f camera_offset = {0,0};
     vec2f potential_camera_offset = {0,0};
     vec2f advertised_offset = {0,0};
-    float zoom_level = 1.f;
-    float destination_zoom_level = 1.f;
+    float zoom_level;
+    float destination_zoom_level;
 
     float zoom_accum = 0.f;
 
