@@ -66,7 +66,14 @@ float ease_function(float frac)
 
 float proj(float zoom)
 {
-    return pow(sqrt(2), zoom);
+    float val = pow(sqrt(2), zoom);
+
+    return std::max(val, min_zoom);
+}
+
+float unproj(float zoom)
+{
+    return log(zoom) / log(sqrt(2));
 }
 
 float min_zoom = 1/256.f;
@@ -94,7 +101,7 @@ void zoom_handler::tick(float dt_s)
             last_camera_offset = {0,0};
         }*/
 
-        zoom_level = get_linear_zoom();
+        zoom_level = unproj(get_zoom());
 
         destination_zoom_level += zoom_accum;
 
