@@ -135,6 +135,7 @@ void zoom_handler::tick(float dt_s)
         //zoom_level = std::max(zoom_level, min_zoom);
 
         camera_offset = {0,0};
+        last_camera_offset = {0,0};
     }
 
     std::cout << get_zoom() << std::endl;
@@ -237,14 +238,18 @@ vec2f zoom_handler::get_camera_pos()
 
     //float frac = get_zoom() / proj(destination_zoom_level)
 
-    /*float diff = (destination_zoom_level - zoom_level);
+    float diff = (proj(destination_zoom_level) - proj(zoom_level));
 
     if(fabs(diff) < 0.001f)
         return {0,0};
 
-    float frac = (get_linear_zoom() - zoom_level) / diff;*/
+    frac = (get_zoom() - proj(zoom_level)) / diff;
 
-    vec2f current_camera_abs = mix((vec2f){0.f, 0.f}, camera_offset, frac);
+    frac = fabs(frac);
+
+    //std::cout << frac << std::endl;
+
+    vec2f current_camera_abs = mix((vec2f){0.f, 0.f}, camera_offset, 1.f - frac);
 
     return current_camera_abs;
 }
