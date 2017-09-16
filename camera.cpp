@@ -110,7 +110,7 @@ float zoom_handler::get_zoom()
         return zoom_level;
     }
 
-    float frac = (destination_time - current_time) / current_zoom_time;
+    float frac = (destination_time - current_time) / zoom_time;
 
     return zoom_level * frac + destination_zoom_level * (1.f - frac);
 }

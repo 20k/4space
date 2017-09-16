@@ -47,8 +47,7 @@ struct zoom_handler
     float greatest_zoom_diff_zoom = 1.f;
     float zoom_accum = 0.f;
 
-    double zoom_time = 1.f;
-    double current_zoom_time = 1.f;
+    double zoom_time = 0.15f;
 
     double current_time = 0.;
     double destination_time = 0.;

@@ -3788,7 +3788,7 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
 
         zoom /= pow(root_2, fabs(amount) + 1);
 
-        #define ZOOM_TOWARDS
+        //#define ZOOM_TOWARDS
         #ifdef ZOOM_TOWARDS
         float scale_frac = (zoom - old_scale);
 
