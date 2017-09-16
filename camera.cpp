@@ -53,6 +53,11 @@ view_handler::~view_handler()
     saved.setView(backup);
 }
 
+float ease_function(float frac)
+{
+    return frac;
+}
+
 void zoom_handler::tick(float dt_s)
 {
     /*if(current_time >= destination_time)
@@ -121,6 +126,7 @@ void zoom_handler::tick(float dt_s)
 
     float frac = (destination_time - current_time) / zoom_time;
     frac = clamp(frac, 0.f, 1.f);
+    frac = ease_function(frac);
     last_camera_offset = mix((vec2f){0.f, 0.f}, camera_offset, frac);
 
     current_time += dt_s;
@@ -149,6 +155,8 @@ float zoom_handler::get_zoom()
     float frac = (destination_time - current_time) / zoom_time;
 
     frac = clamp(frac, 0.f, 1.f);
+
+    frac = ease_function(frac);
 
     return zoom_level * frac + destination_zoom_level * (1.f - frac);
 }
@@ -181,7 +189,7 @@ void zoom_handler::offset_zoom(float amount, vec2f pcamera_offset)
     potential_camera_offset += pcamera_offset;
 }
 
-vec2f zoom_handler::get_camera_offset(float dt_s)
+vec2f zoom_handler::get_camera_offset()
 {
     //if(current_time >= destination_time)
     //    return {0,0};
@@ -189,6 +197,8 @@ vec2f zoom_handler::get_camera_offset(float dt_s)
     float frac = (destination_time - current_time) / zoom_time;
 
     frac = clamp(frac, 0.f, 1.f);
+
+    frac = ease_function(frac);
 
     vec2f current_camera_abs = mix((vec2f){0.f, 0.f}, camera_offset, frac);
 

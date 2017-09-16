@@ -2679,8 +2679,8 @@ void system_manager::tick_camera(float step_s)
 
     zoom_handle.tick(step_s);
 
-    system_cam.pos += -zoom_handle.get_camera_offset(step_s);
-    universe_cam.pos += -zoom_handle.get_camera_offset(step_s);
+    system_cam.pos += -zoom_handle.get_camera_offset();
+    universe_cam.pos += -zoom_handle.get_camera_offset();
 }
 
 void system_manager::tick(float step_s)

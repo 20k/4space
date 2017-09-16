@@ -51,7 +51,7 @@ struct zoom_handler
     float greatest_zoom_diff_zoom = 1.f;
     float zoom_accum = 0.f;
 
-    double zoom_time = 0.15f;
+    double zoom_time = 0.55f;
 
     double current_time = 0.;
     double destination_time = 0.;
@@ -67,7 +67,7 @@ struct zoom_handler
     void set_zoom(float zoom);
     void offset_zoom(float amount, vec2f pcamera_offset = {0,0});
 
-    vec2f get_camera_offset(float dt_s);
+    vec2f get_camera_offset();
 };
 
 #endif // CAMERA_HPP_INCLUDED
