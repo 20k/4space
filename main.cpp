@@ -2936,6 +2936,9 @@ int main()
                 if(all_battles->get_currently_viewing() != nullptr)
                     all_battles->get_currently_viewing()->set_view(system_manage);
 
+                ///for the moment, reset zoom
+                all_battles->zoom_handle.set_zoom(1.f);
+
                 system_manage.set_viewed_system(nullptr);
             }
 
