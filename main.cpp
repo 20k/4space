@@ -2862,9 +2862,18 @@ int main()
 
         system_manage.pan_camera(cdir * diff_s * 300 + mdir);
 
-        if(no_suppress_mouse)
-            system_manage.change_zoom(-scrollwheel_delta, mpos, window);
-
+        if(state == 0)
+        {
+            if(no_suppress_mouse)
+                system_manage.change_zoom(-scrollwheel_delta, mpos, window);
+        }
+        else if(state == 1)
+        {
+            if(no_suppress_mouse)
+            {
+                all_battles->zoom_handle.offset_zoom(-scrollwheel_delta, window, mpos);
+            }
+        }
         ///BATTLE MANAGER IS NO LONGER TICKING SHIP COMPONENTS, IT IS ASSUMED TO BE DONE GLOBALLY WHICH WE WONT WANT
         ///WHEN BATTLES ARE SEPARATED FROM GLOBAL TIME
         /*if(key.isKeyPressed(sf::Keyboard::Num1))
@@ -2881,6 +2890,10 @@ int main()
         }
 
         system_manage.tick_camera(diff_s);
+        all_battles->zoom_handle.tick(diff_s);
+
+        system_manage.system_cam.pos += -all_battles->zoom_handle.get_camera_offset();
+        system_manage.universe_cam.pos += -all_battles->zoom_handle.get_camera_offset();
 
         handle_camera(window, system_manage, *all_battles, state == 1);
 
