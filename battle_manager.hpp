@@ -261,7 +261,7 @@ struct all_battles_manager : serialisable
     ///but should be overwritten with current fleets in battle at the beginning of the next tick
     ///ie we iterate, then
     view_data current_view;
-    zoom_handler battle_zoom;
+    zoom_handler zoom_handle;
 
     battle_manager* make_new();
 

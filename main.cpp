@@ -2344,11 +2344,19 @@ void do_ownership_ui(empire_manager& empire_manage, network_state& net_state)
     ImGui::End();
 }
 
-void handle_camera(sf::RenderWindow& window, system_manager& system_manage)
+void handle_camera(sf::RenderWindow& window, system_manager& system_manage, all_battles_manager& all_battles, bool in_battle)
 {
     sf::View view = window.getDefaultView();
 
-    view.setSize(window.getSize().x * system_manage.zoom_handle.get_zoom(), window.getSize().y * system_manage.zoom_handle.get_zoom());
+    if(!in_battle)
+    {
+        view.setSize(window.getSize().x * system_manage.zoom_handle.get_zoom(), window.getSize().y * system_manage.zoom_handle.get_zoom());
+    }
+    else
+    {
+        view.setSize(window.getSize().x * all_battles.zoom_handle.get_zoom(), window.getSize().y * all_battles.zoom_handle.get_zoom());
+    }
+
     //view.zoom(system_manage.zoom_level);
 
     if(system_manage.in_system_view())
@@ -2874,7 +2882,7 @@ int main()
 
         system_manage.tick_camera(diff_s);
 
-        handle_camera(window, system_manage);
+        handle_camera(window, system_manage, *all_battles, state == 1);
 
         ///this hack is very temporary, after this make it so that the backup system is the
         ///system in which the battle takes place that we're viewing
@@ -2960,7 +2968,7 @@ int main()
 
         //debug_menu({test_ship});
 
-        handle_camera(window, system_manage);
+        //handle_camera(window, system_manage);
 
         debug_all_battles(*all_battles, window, lclick, system_manage, player_empire, state == 1);
 
