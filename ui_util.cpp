@@ -16,12 +16,12 @@ void has_context_menu::context_tick_menu()
         //ImGui::OpenPopupEx("Menu", true);
     }
 
-    if(context_request_close)
+    /*if(context_request_close)
     {
         context_is_open = false;
 
         //ImGui::CloseCurrentPopup();
-    }
+    }*/
 
     //request_context_close = false;
     //request_context_open = false;

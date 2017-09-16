@@ -1,8 +1,9 @@
 #include <iostream>
 #include "ship.hpp"
 #include <SFML/Graphics.hpp>
-#include "../../render_projects/imgui/imgui.h"
-#include "../../render_projects/imgui/imgui-SFML.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui-SFML.h>
+#include <imgui/imgui_internal.h>
 #include <iomanip>
 #include "battle_manager.hpp"
 #include <set>
@@ -213,6 +214,15 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     do_title_colouring_preparation(s, player_empire, known_information);
 
     ImGui::BeginOverride((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    ImGuiWindow* win = ImGui::GetCurrentWindow();
+
+    ImRect rect = win->TitleBarRect();
+
+    if(ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(win->TitleBarRect().Min, win->TitleBarRect().Max, false) && ImGui::IsMouseClicked(1))
+    {
+        s.context_request_open = true;
+    }
 
     std::vector<std::string> headers;
     std::vector<std::string> prod_list;
@@ -3033,6 +3043,9 @@ int main()
 
         system_manage.tick(diff_s);
 
+        int num_open = 0;
+        int num_request_open = 0;
+
         for(orbital_system* os : system_manage.systems)
         {
             for(orbital* o : os->orbitals)
@@ -3042,7 +3055,49 @@ int main()
 
                 for(ship* s : o->data->ships)
                 {
+                    if(s->context_is_open)
+                    {
+                        num_open++;
+                    }
+
+                    if(s->context_request_open)
+                    {
+                        num_request_open++;
+                    }
+                }
+
+                if(o->data->context_is_open)
+                {
+                    num_open++;
+                }
+
+                if(o->data->context_request_open)
+                {
+                    num_request_open++;
+                }
+            }
+        }
+
+        for(orbital_system* os : system_manage.systems)
+        {
+            for(orbital* o : os->orbitals)
+            {
+                if(o->type != orbital_info::FLEET)
+                    continue;
+
+                for(ship* s : o->data->ships)
+                {
+                    if(num_request_open > 0 && num_open > 0 && s->context_is_open)
+                    {
+                        s->context_request_close = true;
+                    }
+
                     s->context_handle_menu(o, player_empire, fleet_manage, popup);
+                }
+
+                if(num_request_open > 0 && num_open > 0 && o->data->context_is_open)
+                {
+                    o->data->context_request_close = true;
                 }
 
                 o->data->context_handle_menu(o, player_empire, fleet_manage, popup);

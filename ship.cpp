@@ -1909,6 +1909,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         context_are_you_sure_war = false;
         context_are_you_sure_scrap = false;
         context_is_open = false;
+        context_request_close = false;
         return;
     }
 
@@ -2110,10 +2111,11 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         }
     }
 
-    if((ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(0)) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
+    if((ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(0)) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks || context_request_close)
     {
         ImGui::CloseCurrentPopup();
         ImGui::suppress_clicks = true;
+        context_request_close = false;
     }
 
     ImGui::EndPopup();
@@ -2139,6 +2141,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
     {
         context_are_you_sure_war = false;
         context_is_open = false;
+        context_request_close = false;
         return;
     }
 
@@ -2411,10 +2414,11 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         }
     }
 
-    if((ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(0)) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks)
+    if((ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(0)) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks || context_request_close)
     {
         ImGui::CloseCurrentPopup();
         ImGui::suppress_clicks = true;
+        context_request_close = false;
     }
 
     ImGui::EndPopup();
