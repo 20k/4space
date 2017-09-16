@@ -40,6 +40,8 @@ struct view_handler
 
 struct zoom_handler
 {
+    vec2f camera_offset = {0,0};
+    vec2f potential_camera_offset = {0,0};
     float zoom_level = 1.f;
     float destination_zoom_level = 1.f;
 
@@ -61,7 +63,9 @@ struct zoom_handler
     float get_zoom();
     float get_destination_zoom();
     void set_zoom(float zoom);
-    void offset_zoom(float amount);
+    void offset_zoom(float amount, vec2f pcamera_offset = {0,0});
+
+    vec2f get_camera_offset(float dt_s);
 };
 
 #endif // CAMERA_HPP_INCLUDED

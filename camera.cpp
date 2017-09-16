@@ -83,12 +83,16 @@ void zoom_handler::tick(float dt_s)
             zoom_level = get_zoom();
 
             destination_zoom_level += zoom_accum;
+
+            camera_offset = potential_camera_offset;
         }
         else
         {
             zoom_level = get_zoom();
 
             destination_zoom_level = zoom_level + zoom_accum;
+
+            camera_offset = potential_camera_offset;
         }
 
         destination_time = current_time + zoom_time;
@@ -101,6 +105,8 @@ void zoom_handler::tick(float dt_s)
 
     zooming = false;
     is_zoom_accum = false;
+
+    potential_camera_offset = {0,0};
 }
 
 float zoom_handler::get_zoom()
@@ -126,8 +132,18 @@ void zoom_handler::set_zoom(float zoom)
     zooming = true;
 }
 
-void zoom_handler::offset_zoom(float amount)
+void zoom_handler::offset_zoom(float amount, vec2f pcamera_offset)
 {
     zoom_accum += amount;
     is_zoom_accum = true;
+
+    potential_camera_offset += pcamera_offset;
+}
+
+vec2f zoom_handler::get_camera_offset(float dt_s)
+{
+    if(current_time >= destination_time)
+        return {0,0};
+
+    return camera_offset * dt_s / zoom_time;
 }
