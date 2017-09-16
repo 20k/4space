@@ -2963,9 +2963,20 @@ int main()
             {
                 all_battles->zoom_handle.offset_zoom(-scrollwheel_delta, window, mpos);
 
+                ///need to set system camera to be location of battle
                 if(all_battles->zoom_handle.get_zoom() > 10)
                 {
                     all_battles->request_leave_battle_view = true;
+                    all_battles->request_stay_in_battle_system = true;
+                    all_battles->request_stay_system = nullptr;
+
+                    if(all_battles->get_currently_viewing() != nullptr)
+                    {
+                        battle_manager* bm = all_battles->get_currently_viewing();
+
+                        system_manage.universe_cam.pos = bm->get_avg_centre_global() + bm->get_system_in()->universe_pos * system_manage.universe_scale;
+                        system_manage.system_cam.pos = bm->get_avg_centre_global();
+                    }
                 }
             }
         }
@@ -2973,8 +2984,7 @@ int main()
         system_manage.tick_camera(diff_s);
         all_battles->zoom_handle.tick(diff_s);
 
-        system_manage.system_cam.pos += -all_battles->zoom_handle.get_camera_offset();
-        system_manage.universe_cam.pos += -all_battles->zoom_handle.get_camera_offset();
+        all_battles->battle_cam.pos += -all_battles->zoom_handle.get_camera_offset();
 
         handle_camera(window, system_manage, *all_battles, state == 1);
 
