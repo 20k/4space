@@ -200,8 +200,13 @@ void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_
 
     camera_offset += -scale_frac * rel;*/
 
-    float old_proj_zoom = proj(get_linear_zoom());
+    float old_proj_zoom = get_zoom();
     float new_proj_zoom = proj(destination_zoom_level + zoom_accum + amount);
+
+    if(signum(amount) != signum(destination_zoom_level - zoom_level))
+    {
+        new_proj_zoom = proj(unproj(get_zoom()) + amount);
+    }
 
     vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
 
@@ -222,11 +227,11 @@ vec2f zoom_handler::get_camera_pos()
     //if(current_time >= destination_time)
     //    return {0,0};
 
-    float frac = (destination_time - current_time) / zoom_time;
+    /*float frac = (destination_time - current_time) / zoom_time;
 
     frac = clamp(frac, 0.f, 1.f);
 
-    frac = ease_function(frac);
+    frac = ease_function(frac);*/
 
     //frac = pow(frac, sqrtf(2));
 
@@ -237,7 +242,7 @@ vec2f zoom_handler::get_camera_pos()
     if(fabs(diff) < 0.001f)
         return {0,0};
 
-    frac = (get_zoom() - proj(zoom_level)) / diff;
+    float frac = (get_zoom() - proj(zoom_level)) / diff;
 
     frac = fabs(frac);
 
