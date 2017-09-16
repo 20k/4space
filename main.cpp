@@ -2359,13 +2359,20 @@ void handle_camera(sf::RenderWindow& window, system_manager& system_manage, all_
 
     //view.zoom(system_manage.zoom_level);
 
-    if(system_manage.in_system_view())
+    if(!in_battle)
     {
-        view.setCenter({system_manage.system_cam.pos.x(), system_manage.system_cam.pos.y()});
+        if(system_manage.in_system_view())
+        {
+            view.setCenter({system_manage.system_cam.pos.x(), system_manage.system_cam.pos.y()});
+        }
+        else
+        {
+            view.setCenter({system_manage.universe_cam.pos.x(), system_manage.universe_cam.pos.y()});
+        }
     }
     else
     {
-        view.setCenter({system_manage.universe_cam.pos.x(), system_manage.universe_cam.pos.y()});
+        view.setCenter({all_battles.battle_cam.pos.x(), all_battles.battle_cam.pos.y()});
     }
     //view.setCenter({system_manage.camera.x(), system_manage.camera.y()});
 
@@ -2935,8 +2942,12 @@ int main()
             all_battles->request_stay_in_battle_system = false;
         }
 
+        vec2f pan_dir = cdir * diff_s * 300 + mdir;
+
         if(state == 0)
-            system_manage.pan_camera(cdir * diff_s * 300 + mdir);
+            system_manage.pan_camera(pan_dir);
+        if(state == 1)
+            all_battles->battle_cam.pos += -pan_dir * all_battles->zoom_handle.get_zoom();
 
         if(state == 0)
         {
@@ -2948,6 +2959,11 @@ int main()
             if(no_suppress_mouse)
             {
                 all_battles->zoom_handle.offset_zoom(-scrollwheel_delta, window, mpos);
+
+                if(all_battles->zoom_handle.get_zoom() > 10)
+                {
+                    all_battles->request_leave_battle_view = true;
+                }
             }
         }
 
@@ -3653,7 +3669,7 @@ int main()
 
         if(key.isKeyPressed(sf::Keyboard::B))
         {
-            std::cout << system_manage.zoom_handle.get_zoom() << std::endl;
+            std::cout << system_manage.zoom_handle.get_zoom() << " " << all_battles->zoom_handle.get_zoom() << std::endl;
         }
 
         //printf("premanage\n");

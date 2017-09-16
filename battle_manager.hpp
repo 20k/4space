@@ -262,6 +262,7 @@ struct all_battles_manager : serialisable
     ///ie we iterate, then
     view_data current_view;
     zoom_handler zoom_handle;
+    camera battle_cam;
 
     battle_manager* make_new();
 
