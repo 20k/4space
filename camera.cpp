@@ -75,18 +75,33 @@ void zoom_handler::tick(float dt_s)
         destination_zoom_level = std::max(destination_zoom_level, min_zoom);
     }
 
+    ///need to handle reversing mouse
     if(is_zoom_accum)
     {
-        zoom_level = get_zoom();
+        if(signum(zoom_accum) == signum(destination_zoom_level - zoom_level))
+        {
+            zoom_level = get_zoom();
 
-        double diff = (destination_time - current_time);
+            double diff = (destination_time - current_time);
 
-        destination_time = current_time + zoom_time;
+            destination_time = current_time + zoom_time;
 
-        destination_zoom_level += zoom_accum;
-        zoom_accum = 0;
+            destination_zoom_level += zoom_accum;
+            zoom_accum = 0;
 
-        destination_zoom_level = std::max(destination_zoom_level, min_zoom);
+            destination_zoom_level = std::max(destination_zoom_level, min_zoom);
+        }
+        else
+        {
+            zoom_level = get_zoom();
+
+            destination_time = current_time + zoom_time;
+
+            destination_zoom_level = zoom_level + zoom_accum;
+            zoom_accum = 0;
+
+            destination_zoom_level = std::max(destination_zoom_level, min_zoom);
+        }
     }
 
     greatest_zoom_diff_target = destination_zoom_level;
