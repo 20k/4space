@@ -3043,8 +3043,7 @@ int main()
 
         system_manage.tick(diff_s);
 
-        int num_open = 0;
-        int num_request_open = 0;
+        bool any_open = false;
 
         for(orbital_system* os : system_manage.systems)
         {
@@ -3057,24 +3056,19 @@ int main()
                 {
                     if(s->context_is_open)
                     {
-                        num_open++;
-                    }
-
-                    if(s->context_request_open)
-                    {
-                        num_request_open++;
+                        any_open = true;
+                        break;
                     }
                 }
 
                 if(o->data->context_is_open)
                 {
-                    num_open++;
+                    any_open = true;
+                    break;
                 }
 
-                if(o->data->context_request_open)
-                {
-                    num_request_open++;
-                }
+                if(any_open)
+                    break;
             }
         }
 
@@ -3087,17 +3081,17 @@ int main()
 
                 for(ship* s : o->data->ships)
                 {
-                    if(num_request_open > 0 && num_open > 0 && s->context_is_open)
+                    if(any_open)
                     {
-                        s->context_request_close = true;
+                        s->context_request_open = false;
                     }
 
                     s->context_handle_menu(o, player_empire, fleet_manage, popup);
                 }
 
-                if(num_request_open > 0 && num_open > 0 && o->data->context_is_open)
+                if(any_open)
                 {
-                    o->data->context_request_close = true;
+                    o->data->context_request_open = false;
                 }
 
                 o->data->context_handle_menu(o, player_empire, fleet_manage, popup);
