@@ -5150,7 +5150,8 @@ ship* ship_manager::make_new_from(empire* e, const ship& ns)
     procedural_text_generator generator;
 
     s->team = e->team_id;
-    s->name = e->ship_prefix + " " + generator.generate_ship_name();
+    //s->name = e->ship_prefix + " " + generator.generate_ship_name();
+    s->name = ns.name;
 
     s->owned_by = this;
 

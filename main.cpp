@@ -2476,14 +2476,14 @@ int main()
 
     ship* scout_ship = fleet3->make_new_from(player_empire, make_mining_ship());
 
-    test_ship->name = "SS Icarus";
+    /*test_ship->name = "SS Icarus";
     test_ship2->name = "SS Buttz";
     test_ship3->name = "SS Duplicate";
     test_ship4->name = "SS Secondary";
 
     derelict_ship->name = "SS Dereliction";
 
-    scout_ship->name = "SS Scout";
+    scout_ship->name = "SS Scout";*/
     //scout_ship2->name = "SS Scout2";
 
     #endif
