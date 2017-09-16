@@ -87,18 +87,12 @@ void zoom_handler::tick(float dt_s)
             zoom_level = unproj(get_zoom());
 
             destination_zoom_level += zoom_accum;
-
-            camera_offset = potential_camera_offset;
-            last_camera_offset = {0,0};
         }
         else
         {
             zoom_level = unproj(get_zoom());
 
             destination_zoom_level = zoom_level + zoom_accum;
-
-            camera_offset = potential_camera_offset;
-            last_camera_offset = {0,0};
         }
 
         //zoom_level = unproj(get_zoom());
@@ -138,7 +132,7 @@ void zoom_handler::tick(float dt_s)
         //last_camera_offset = {0,0};
     }
 
-    std::cout << get_zoom() << std::endl;
+    //std::cout << get_zoom() << std::endl;
 }
 
 float zoom_handler::get_linear_zoom()
