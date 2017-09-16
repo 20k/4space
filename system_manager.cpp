@@ -1496,7 +1496,8 @@ void orbital::do_serialise(serialise& s, bool ser)
         }
     }
 
-    absolute_pos = saved_history.pos;
+    if(serialise_data_helper::send_mode != 1)
+        absolute_pos = saved_history.pos;
     //internal_time_s = saved_history.time_s;
 
     //std::cout << serialise_data_helper::send_mode << std::endl;
