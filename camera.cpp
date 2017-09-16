@@ -57,11 +57,11 @@ float ease_function(float frac)
 {
     //return (pow(10, frac) - 1) / 9;
 
-    return frac;
+    //return frac;
 
     //return pow(2.f, frac) - 1;
 
-    //return frac * frac * frac;
+    return frac * frac * frac * frac;
 }
 
 float proj(float zoom)
