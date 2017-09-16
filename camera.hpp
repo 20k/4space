@@ -51,7 +51,7 @@ struct zoom_handler
 
     float zoom_accum = 0.f;
 
-    double zoom_time = 0.55f;
+    double zoom_time = 0.15f;
 
     double current_time = 0.;
     double destination_time = 0.;
