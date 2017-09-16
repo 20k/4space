@@ -2963,6 +2963,8 @@ int main()
             {
                 all_battles->zoom_handle.offset_zoom(-scrollwheel_delta, window, mpos);
 
+                //system_manage.change_zoom(-scrollwheel_delta, mpos, window);
+
                 ///need to set system camera to be location of battle
                 if(all_battles->zoom_handle.get_zoom() > 10)
                 {
@@ -2971,6 +2973,13 @@ int main()
                     all_battles->request_stay_system = nullptr;
 
                     system_manage.set_zoom(pow(sqrtf(2), -4));
+
+                    if(all_battles->zoom_handle.current_time < all_battles->zoom_handle.destination_time)
+                    {
+                        system_manage.change_zoom(all_battles->zoom_handle.destination_zoom_level - all_battles->zoom_handle.zoom_level, mpos, window);
+                        system_manage.zoom_handle.current_time = all_battles->zoom_handle.current_time;
+                        system_manage.zoom_handle.destination_time = all_battles->zoom_handle.destination_time;
+                    }
 
                     if(all_battles->get_currently_viewing() != nullptr)
                     {
