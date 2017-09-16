@@ -95,28 +95,17 @@ void zoom_handler::tick(float dt_s)
             destination_zoom_level = zoom_level + zoom_accum;
         }
 
-        //zoom_level = unproj(get_zoom());
-
-        //destination_zoom_level += zoom_accum;
-
         camera_offset = potential_camera_offset;
         last_camera_offset = {0,0};
 
         destination_time = current_time + zoom_time;
 
         zoom_accum = 0;
-        //destination_zoom_level = std::max(destination_zoom_level, min_zoom);
     }
-
 
     is_zoom_accum = false;
 
     potential_camera_offset = {0,0};
-
-    /*float frac = (destination_time - current_time) / zoom_time;
-    frac = clamp(frac, 0.f, 1.f);
-    frac = ease_function(frac);
-    last_camera_offset = mix((vec2f){0.f, 0.f}, camera_offset, frac);*/
 
     last_camera_offset = get_camera_pos();
 
@@ -126,13 +115,8 @@ void zoom_handler::tick(float dt_s)
     {
         zoom_level = destination_zoom_level;
 
-        //zoom_level = std::max(zoom_level, min_zoom);
-
         camera_offset = {0,0};
-        //last_camera_offset = {0,0};
     }
-
-    //std::cout << get_zoom() << std::endl;
 }
 
 float zoom_handler::get_linear_zoom()
@@ -194,12 +178,6 @@ void zoom_handler::set_zoom(float zoom)
 
 void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos)
 {
-    /*float scale_frac = (zoom - current_zoom);
-
-    vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
-
-    camera_offset += -scale_frac * rel;*/
-
     float old_proj_zoom = get_zoom();
     float new_proj_zoom = proj(destination_zoom_level + zoom_accum + amount);
 
@@ -224,19 +202,6 @@ void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_
 
 vec2f zoom_handler::get_camera_pos()
 {
-    //if(current_time >= destination_time)
-    //    return {0,0};
-
-    /*float frac = (destination_time - current_time) / zoom_time;
-
-    frac = clamp(frac, 0.f, 1.f);
-
-    frac = ease_function(frac);*/
-
-    //frac = pow(frac, sqrtf(2));
-
-    //float frac = get_zoom() / proj(destination_zoom_level)
-
     float diff = (proj(destination_zoom_level) - proj(zoom_level));
 
     if(fabs(diff) < 0.001f)
@@ -245,8 +210,6 @@ vec2f zoom_handler::get_camera_pos()
     float frac = (get_zoom() - proj(zoom_level)) / diff;
 
     frac = fabs(frac);
-
-    //std::cout << frac << std::endl;
 
     vec2f current_camera_abs = mix((vec2f){0.f, 0.f}, camera_offset, 1.f - frac);
 
@@ -257,9 +220,5 @@ vec2f zoom_handler::get_camera_pos()
 ///so it can never be desync'ds
 vec2f zoom_handler::get_camera_offset()
 {
-
-
     return get_camera_pos() - last_camera_offset;
-
-    //return advertised_offset;
 }
