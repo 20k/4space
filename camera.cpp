@@ -66,7 +66,7 @@ float ease_function(float frac)
 
 float proj(float zoom)
 {
-    return pow(2.f, zoom);
+    return pow(sqrt(2), zoom);
 }
 
 float min_zoom = 1/256.f;
@@ -75,7 +75,7 @@ void zoom_handler::tick(float dt_s)
 {
     if(is_zoom_accum)
     {
-        if(signum(zoom_accum) == signum(destination_zoom_level - zoom_level))
+        /*if(signum(zoom_accum) == signum(destination_zoom_level - zoom_level))
         {
             zoom_level = get_linear_zoom();
 
@@ -92,7 +92,14 @@ void zoom_handler::tick(float dt_s)
 
             camera_offset = potential_camera_offset;
             last_camera_offset = {0,0};
-        }
+        }*/
+
+        zoom_level = get_linear_zoom();
+
+        destination_zoom_level += zoom_accum;
+
+        camera_offset = potential_camera_offset;
+        last_camera_offset = {0,0};
 
         destination_time = current_time + zoom_time;
 
@@ -155,9 +162,9 @@ float zoom_handler::get_zoom()
 
     frac = ease_function(frac);
 
-    float res = zoom_level * frac + destination_zoom_level * (1.f - frac);
+    float res = proj(zoom_level) * frac + proj(destination_zoom_level) * (1.f - frac);
 
-    res = proj(res);
+    //res = proj(res);
 
     res = std::max(res, min_zoom);
 
@@ -188,7 +195,7 @@ void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_
     camera_offset += -scale_frac * rel;*/
 
     float old_proj_zoom = proj(get_linear_zoom());
-    float new_proj_zoom = proj(destination_zoom_level + amount);
+    float new_proj_zoom = proj(destination_zoom_level + zoom_accum + amount);
 
     vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
 
@@ -199,7 +206,7 @@ void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_
     zoom_accum += amount;
     is_zoom_accum = true;
 
-    potential_camera_offset += pcamera_offset;
+    //potential_camera_offset += pcamera_offset;
 }
 
 vec2f zoom_handler::get_camera_offset()
