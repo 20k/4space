@@ -49,16 +49,12 @@ struct zoom_handler
     float zoom_level = 1.f;
     float destination_zoom_level = 1.f;
 
-    float greatest_zoom_diff_target = 1.f;
-    float greatest_zoom_diff_zoom = 1.f;
     float zoom_accum = 0.f;
 
     double zoom_time = 0.55f;
 
     double current_time = 0.;
     double destination_time = 0.;
-
-    bool zooming = false;
 
     bool is_zoom_accum = false;
 

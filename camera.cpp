@@ -55,9 +55,18 @@ view_handler::~view_handler()
 
 float ease_function(float frac)
 {
-    return frac;
+    //return (pow(10, frac) - 1) / 9;
 
-    return frac * frac * frac;
+    //return frac;
+
+    return pow(2.f, frac) - 1;
+
+    //return frac * frac * frac;
+}
+
+float proj(float zoom)
+{
+    return pow(2.f, zoom);
 }
 
 float min_zoom = 1/256.f;
@@ -86,14 +95,12 @@ void zoom_handler::tick(float dt_s)
         }
 
         destination_time = current_time + zoom_time;
+
         zoom_accum = 0;
         //destination_zoom_level = std::max(destination_zoom_level, min_zoom);
     }
 
-    greatest_zoom_diff_target = destination_zoom_level;
-    greatest_zoom_diff_zoom = get_zoom();
 
-    zooming = false;
     is_zoom_accum = false;
 
     potential_camera_offset = {0,0};
@@ -109,7 +116,7 @@ void zoom_handler::tick(float dt_s)
     {
         zoom_level = destination_zoom_level;
 
-        zoom_level = std::max(zoom_level, min_zoom);
+        //zoom_level = std::max(zoom_level, min_zoom);
 
         camera_offset = {0,0};
     }
@@ -119,7 +126,7 @@ float zoom_handler::get_zoom()
 {
     if(current_time >= destination_time)
     {
-        return zoom_level;
+        return proj(zoom_level);
     }
 
     float frac = (destination_time - current_time) / zoom_time;
@@ -129,6 +136,8 @@ float zoom_handler::get_zoom()
     frac = ease_function(frac);
 
     float res = zoom_level * frac + destination_zoom_level * (1.f - frac);
+
+    res = proj(res);
 
     res = std::max(res, min_zoom);
 

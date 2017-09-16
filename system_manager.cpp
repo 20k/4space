@@ -3821,7 +3821,8 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
         return;
 
     //set_zoom(zoom, true);
-    zoom_handle.offset_zoom(zoom - old_zoom, camera_offset);
+    zoom_handle.offset_zoom(amount, camera_offset);
+    //zoom_handle.offset_zoom(zoom - old_zoom, camera_offset);
 }
 
 void system_manager::set_zoom(float zoom, bool auto_enter_system)
@@ -3832,7 +3833,7 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
 
     zoom = std::max(zoom, min_zoom);
 
-    zoom_handle.set_zoom(zoom);
+    //zoom_handle.set_zoom(zoom);
 
     bool is_in_system_view = in_system_view();
 
@@ -3877,6 +3878,9 @@ void system_manager::check_system_transition()
 {
     orbital_system* cur = currently_viewed;
     orbital_system* close = get_nearest_to_camera();
+
+    if(close == nullptr)
+        return;
 
     if(cur != close)
     {
