@@ -3809,9 +3809,6 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
 
         vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
 
-        //system_cam.pos += -scale_frac * rel;
-        //universe_cam.pos += -scale_frac * rel;
-
         camera_offset += -scale_frac * rel;
     }
 
