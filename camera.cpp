@@ -48,6 +48,15 @@ void view_handler::set_camera(camera& cam)
     saved.setView(view);
 }
 
+void view_handler::set_zoom(float zoom)
+{
+    sf::View view = saved.getView();
+
+    view.setSize(saved.getSize().x * zoom, saved.getSize().y * zoom);
+
+    saved.setView(view);
+}
+
 view_handler::~view_handler()
 {
     saved.setView(backup);

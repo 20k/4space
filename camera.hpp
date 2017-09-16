@@ -15,7 +15,7 @@ struct camera
     int id = gid++;
 
     vec2f pos;
-    float zoom_level = 1.f;
+    //float zoom_level = 1.f;
 
     static std::vector<camera> camera_stack;
 
@@ -34,6 +34,7 @@ struct view_handler
     view_handler(sf::RenderWindow& win);
 
     void set_camera(camera& cam);
+    void set_zoom(float zoom);
 
     ~view_handler();
 };
