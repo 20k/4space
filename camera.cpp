@@ -119,10 +119,12 @@ void zoom_handler::tick(float dt_s)
 
     potential_camera_offset = {0,0};
 
-    float frac = (destination_time - current_time) / zoom_time;
+    /*float frac = (destination_time - current_time) / zoom_time;
     frac = clamp(frac, 0.f, 1.f);
     frac = ease_function(frac);
-    last_camera_offset = mix((vec2f){0.f, 0.f}, camera_offset, frac);
+    last_camera_offset = mix((vec2f){0.f, 0.f}, camera_offset, frac);*/
+
+    last_camera_offset = get_camera_pos();
 
     current_time += dt_s;
 
@@ -156,6 +158,8 @@ float zoom_handler::get_linear_zoom()
     return res;
 }
 
+///the problem is, we need to interpolate in linear space
+///but then that breaks the camera panning mechanics as they inherently assume projected space
 float zoom_handler::get_zoom()
 {
     if(current_time >= destination_time)
@@ -169,9 +173,9 @@ float zoom_handler::get_zoom()
 
     frac = ease_function(frac);
 
-    float res = proj(zoom_level) * frac + proj(destination_zoom_level) * (1.f - frac);
+    float res = (zoom_level) * frac + (destination_zoom_level) * (1.f - frac);
 
-    //res = proj(res);
+    res = proj(res);
 
     res = std::max(res, min_zoom);
 
@@ -218,7 +222,7 @@ void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_
         potential_camera_offset += pcamera_offset;
 }
 
-vec2f zoom_handler::get_camera_offset()
+vec2f zoom_handler::get_camera_pos()
 {
     //if(current_time >= destination_time)
     //    return {0,0};
@@ -229,9 +233,29 @@ vec2f zoom_handler::get_camera_offset()
 
     frac = ease_function(frac);
 
+    //frac = pow(frac, sqrtf(2));
+
+    //float frac = get_zoom() / proj(destination_zoom_level)
+
+    /*float diff = (destination_zoom_level - zoom_level);
+
+    if(fabs(diff) < 0.001f)
+        return {0,0};
+
+    float frac = (get_linear_zoom() - zoom_level) / diff;*/
+
     vec2f current_camera_abs = mix((vec2f){0.f, 0.f}, camera_offset, frac);
 
-    return current_camera_abs - last_camera_offset;
+    return current_camera_abs;
+}
+
+///need to somehow tie camera offset directly to zoom levels
+///so it can never be desync'ds
+vec2f zoom_handler::get_camera_offset()
+{
+
+
+    return get_camera_pos() - last_camera_offset;
 
     //return advertised_offset;
 }

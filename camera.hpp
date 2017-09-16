@@ -67,6 +67,7 @@ struct zoom_handler
     void offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos, vec2f pcamera_offset = {0,0});
 
     vec2f get_camera_offset();
+    vec2f get_camera_pos();
 };
 
 #endif // CAMERA_HPP_INCLUDED
