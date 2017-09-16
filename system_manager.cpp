@@ -3708,20 +3708,20 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
         top_bar::active[top_bar_info::UNIVERSE] = false;
     }*/
 
-    /*if(top_bar::active[top_bar_info::UNIVERSE])
+    if(top_bar::clicked[top_bar_info::UNIVERSE] && top_bar::active[top_bar_info::UNIVERSE])
     {
         if(in_system_view())
         {
             enter_universe_view();
         }
     }
-    else
+    else if(top_bar::clicked[top_bar_info::UNIVERSE] && !top_bar::active[top_bar_info::UNIVERSE])
     {
         if(!in_system_view())
         {
             set_viewed_system(get_nearest_to_camera(), true);
         }
-    }*/
+    }
 
     if(in_system_view())
         return;
@@ -3777,63 +3777,19 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
 
 void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow& win)
 {
-    auto game_pos = win.mapPixelToCoords({mouse_pos.x(), mouse_pos.y()});
-    auto vfgame_pos = xy_to_vec(game_pos);
-
-    float current_zoom = zoom_handle.get_zoom();
-
-    float zoom = zoom_handle.get_destination_zoom();
-
-    float root_2 = sqrt(2.f);
-
-    float old_zoom = zoom;
-
-    vec2f camera_offset = {0,0};
-
-    if(amount > 0)
-    {
-        zoom *= pow(root_2, amount + 1);
-    }
-    else if(amount < 0)
-    {
-        float old_scale = zoom;
-
-        zoom /= pow(root_2, fabs(amount) + 1);
-
-        //#define ZOOM_TOWARDS
-        #ifdef ZOOM_TOWARDS
-        float scale_frac = (zoom - old_scale);
-
-        vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
-
-        system_cam.pos += -scale_frac * rel;
-        universe_cam.pos += -scale_frac * rel;
-        #endif
-
-        float scale_frac = (zoom - current_zoom);
-
-        vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
-
-        camera_offset += -scale_frac * rel;
-    }
-
     if(amount == 0)
         return;
 
-    //set_zoom(zoom, true);
-    zoom_handle.offset_zoom(amount, win, mouse_pos, camera_offset);
-    //zoom_handle.offset_zoom(zoom - old_zoom, camera_offset);
+    zoom_handle.offset_zoom(amount, win, mouse_pos);
 }
 
 void system_manager::set_zoom(float zoom, bool auto_enter_system)
 {
     bool was_in_system_view = in_system_view();
 
-    //float max_zoom = 5.f;
-
     zoom = std::max(zoom, min_zoom);
 
-    //zoom_handle.set_zoom(zoom);
+    zoom_handle.set_zoom(zoom);
 
     bool is_in_system_view = in_system_view();
 

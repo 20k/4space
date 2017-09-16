@@ -5,6 +5,7 @@
 
 std::vector<std::string> top_bar::headers = top_bar_info::names;
 std::map<top_bar_info::types, bool> top_bar::active;
+std::map<top_bar_info::types, bool> top_bar::clicked;
 
 bool top_bar::get_active(top_bar_info::types type)
 {
@@ -51,9 +52,12 @@ void top_bar::display(vec2i window_dim)
         vec3f highlight_col = {0.8, 0.8, 0.8};
         ImGui::OutlineHoverText(i, highlight_col, {1,1,1}, true, {8,2}, 1, is_active, highlight_col/4, is_active);
 
+        clicked[(top_bar_info::types)num] = false;
+
         if(ImGui::IsItemClicked_Registered())
         {
             active[(top_bar_info::types)num] = !active[(top_bar_info::types)num];
+            clicked[(top_bar_info::types)num] = true;
         }
 
         if(num != headers.size()-1)

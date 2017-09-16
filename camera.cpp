@@ -192,7 +192,7 @@ void zoom_handler::set_zoom(float zoom)
     destination_time = current_time - 1;
 }
 
-void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos, vec2f pcamera_offset)
+void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos)
 {
     /*float scale_frac = (zoom - current_zoom);
 
@@ -212,14 +212,14 @@ void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_
 
     float scale_frac = (new_proj_zoom - old_proj_zoom);
 
-    pcamera_offset = -scale_frac * rel;
+    vec2f next_camera_offset = -scale_frac * rel;
 
     zoom_accum += amount;
     is_zoom_accum = true;
 
     ///restrict to zoom in
     if(amount < 0)
-        potential_camera_offset += pcamera_offset;
+        potential_camera_offset += next_camera_offset;
 }
 
 vec2f zoom_handler::get_camera_pos()

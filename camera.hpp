@@ -64,7 +64,7 @@ struct zoom_handler
     float get_zoom();
     float get_destination_zoom();
     void set_zoom(float zoom);
-    void offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos, vec2f pcamera_offset = {0,0});
+    void offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos);
 
     vec2f get_camera_offset();
     vec2f get_camera_pos();
