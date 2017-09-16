@@ -174,6 +174,8 @@ struct star_map_star
     float drift_speed = 1.f;
 };
 
+struct all_battles_manager;
+
 struct star_map
 {
     std::vector<star_map_star> stars;
@@ -182,7 +184,7 @@ struct star_map
 
     star_map(int num);
     void tick(float step_s);
-    void draw(sf::RenderWindow& win, system_manager& system_manage);
+    void draw(sf::RenderWindow& win, system_manager& system_manage, all_battles_manager& all_battles);
 };
 
 ///no need to serialise this now
@@ -206,7 +208,7 @@ struct battle_manager : serialisable
 
     void tick(float step_s, system_manager& system_manage, network_state& net_state, empire* player_empire);
 
-    void draw(sf::RenderWindow& win, system_manager& system_manage);
+    void draw(sf::RenderWindow& win, system_manager& system_manage, all_battles_manager& all_battles);
 
     vec2f get_avg_centre_global();
     //void add_ship(ship* s);

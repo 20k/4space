@@ -854,7 +854,7 @@ star_map::star_map(int num)
 
         star.pos.xy() = {cos(angle) * rad, sin(angle) * rad};*/
 
-        star.pos.z() = randf_s(0.4f, 0.99998f);
+        star.pos.z() = randf_s(0.01f, 0.99998f);
 
         //star.simple_renderable.init(3, 2.f, 2.f);
 
@@ -881,14 +881,19 @@ void star_map::tick(float step_s)
     }
 }
 
-void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
+void star_map::draw(sf::RenderWindow& win, system_manager& system_manage, all_battles_manager& all_battles)
 {
+    sf::View view = win.getView();
+    auto center = xy_to_vec(view.getCenter());
+
+    view_handler handle(win);
+
+    win.setView(win.getDefaultView());
+
     for(star_map_star& star : stars)
     {
-        sf::View view = win.getView();
-        auto center = view.getCenter();
 
-        float ivz = 1.f - star.pos.z();
+        /*float ivz = 1.f - star.pos.z();
 
         ivz = mix(ivz, 1.f, 0.1f);
         vec2f star_pos = star.pos.xy() / ivz;
@@ -917,13 +922,26 @@ void star_map::draw(sf::RenderWindow& win, system_manager& system_manage)
 
         simple_renderable.main_rendering(win, 0.f, star_pos.xy() - disp,
                                               scale * 16,
-                                              col);
+                                              col);*/
+
+        vec2f star_pos = star.pos.xy();
+
+        vec2f projected_star_pos = ((star_pos.xy() - center) * 1.f / (star.pos.z() * 10.f + all_battles.zoom_handle.get_zoom())) + xy_to_vec(win.getSize())/2.f;
+
+        //auto spos = win.mapCoordsToPixel({star_pos.x() - disp.x(), star_pos.y() - disp.y()});
+
+        if(projected_star_pos.x() < 0 || projected_star_pos.x() >= win.getSize().x || projected_star_pos.y() < 0 || projected_star_pos.y() >= win.getSize().y)
+            continue;
+
+        //std::cout << projected_star_pos << std::endl;
+
+        simple_renderable.main_rendering(win, 0.f, projected_star_pos.xy(), 1.f, {1,1,1});
     }
 }
 
-void battle_manager::draw(sf::RenderWindow& win, system_manager& system_manage)
+void battle_manager::draw(sf::RenderWindow& win, system_manager& system_manage, all_battles_manager& all_battles)
 {
-    stars.draw(win, system_manage);
+    stars.draw(win, system_manage, all_battles);
     projectile_manage.draw(win);
 
     std::vector<ship*> linear_vec;
@@ -1765,7 +1783,7 @@ void all_battles_manager::draw_viewing(sf::RenderWindow& win, system_manager& sy
     {
         if(viewing(*bm))
         {
-            bm->draw(win, system_manage);
+            bm->draw(win, system_manage, *this);
         }
     }
 }
