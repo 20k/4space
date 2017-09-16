@@ -4375,6 +4375,7 @@ void system_manager::do_serialise(serialise& s, bool ser)
         s.handle_serialise(universe_cam.pos, ser);
         s.handle_serialise(system_cam.pos, ser);
         s.handle_serialise(zoom_handle.zoom_level, ser);
+        s.handle_serialise(zoom_handle.destination_zoom_level, ser);
         ///deliberately out of order. Not important tremendously but it means that
         ///all the orbital systems will be grouped in the binary file
         s.handle_serialise(systems, ser);
