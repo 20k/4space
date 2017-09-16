@@ -3786,7 +3786,7 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
 {
     bool was_in_system_view = in_system_view();
 
-    zoom = std::max(zoom, min_zoom);
+    //zoom = std::max(zoom, min_zoom);
 
     zoom_handle.set_zoom(zoom);
 

@@ -185,7 +185,7 @@ void zoom_handler::set_zoom(float zoom)
 {
     zoom_level = unproj(zoom);
 
-    zoom_level = std::max(zoom_level, min_zoom);
+    //zoom_level = std::max(zoom_level, min_zoom);
     destination_zoom_level = zoom_level;
 
     destination_time = current_time - 1;

@@ -2970,6 +2970,8 @@ int main()
                     all_battles->request_stay_in_battle_system = true;
                     all_battles->request_stay_system = nullptr;
 
+                    system_manage.set_zoom(pow(sqrtf(2), -4));
+
                     if(all_battles->get_currently_viewing() != nullptr)
                     {
                         battle_manager* bm = all_battles->get_currently_viewing();
