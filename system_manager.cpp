@@ -2914,7 +2914,7 @@ void system_manager::set_viewed_system(orbital_system* s, bool reset_zoom)
 {
     currently_viewed = s;
 
-    if(reset_zoom)
+    if(reset_zoom && s != nullptr)
     {
         universe_cam.pos = s->universe_pos * universe_scale;
     }
