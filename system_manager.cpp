@@ -3800,24 +3800,9 @@ void system_manager::set_zoom(float zoom, bool auto_enter_system)
     {
         if(auto_enter_system)
             currently_viewed = get_nearest_to_camera();
-            //set_viewed_system(get_nearest_to_camera(), false);
-
-        //camera = camera - currently_viewed->universe_pos * universe_scale;
 
         system_cam.pos = universe_cam.pos - currently_viewed->universe_pos * universe_scale;
-        //universe_cam.pos = currently_viewed->universe_pos * universe_scale;
-
-        //if(auto_enter_system)
-        //    currently_viewed->get_base()->center_camera(*this);
     }
-    if(was_in_system_view && !is_in_system_view)
-    {
-        //universe_cam.pos = universe_cam.pos - system_cam.pos;
-
-        //camera = currently_viewed->universe_pos * universe_scale;
-        //camera = camera + currently_viewed->universe_pos * universe_scale;
-    }
-
 
     top_bar::active[top_bar_info::UNIVERSE] = !is_in_system_view;
 }
