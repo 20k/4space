@@ -79,6 +79,8 @@
 		<Unit filename="ai_fleet.hpp" />
 		<Unit filename="battle_manager.cpp" />
 		<Unit filename="battle_manager.hpp" />
+		<Unit filename="camera.cpp" />
+		<Unit filename="camera.hpp" />
 		<Unit filename="context_menu.cpp" />
 		<Unit filename="context_menu.hpp" />
 		<Unit filename="drag_and_drop.cpp" />
