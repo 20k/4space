@@ -3821,7 +3821,7 @@ void system_manager::change_zoom(float amount, vec2f mouse_pos, sf::RenderWindow
         return;
 
     //set_zoom(zoom, true);
-    zoom_handle.offset_zoom(amount, camera_offset);
+    zoom_handle.offset_zoom(amount, win, mouse_pos, camera_offset);
     //zoom_handle.offset_zoom(zoom - old_zoom, camera_offset);
 }
 

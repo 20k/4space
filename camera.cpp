@@ -57,9 +57,9 @@ float ease_function(float frac)
 {
     //return (pow(10, frac) - 1) / 9;
 
-    //return frac;
+    return frac;
 
-    return pow(2.f, frac) - 1;
+    //return pow(2.f, frac) - 1;
 
     //return frac * frac * frac;
 }
@@ -179,8 +179,23 @@ void zoom_handler::set_zoom(float zoom)
     destination_time = current_time - 1;
 }
 
-void zoom_handler::offset_zoom(float amount, vec2f pcamera_offset)
+void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_pos, vec2f pcamera_offset)
 {
+    /*float scale_frac = (zoom - current_zoom);
+
+    vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
+
+    camera_offset += -scale_frac * rel;*/
+
+    float old_proj_zoom = proj(get_linear_zoom());
+    float new_proj_zoom = proj(destination_zoom_level + amount);
+
+    vec2f rel = mouse_pos - (vec2f){win.getSize().x, win.getSize().y}/2.f;
+
+    float scale_frac = (new_proj_zoom - old_proj_zoom);
+
+    pcamera_offset = -scale_frac * rel;
+
     zoom_accum += amount;
     is_zoom_accum = true;
 
