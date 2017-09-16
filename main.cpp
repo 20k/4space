@@ -2977,6 +2977,8 @@ int main()
                     if(all_battles->zoom_handle.current_time < all_battles->zoom_handle.destination_time)
                     {
                         system_manage.change_zoom(all_battles->zoom_handle.destination_zoom_level - all_battles->zoom_handle.zoom_level, mpos, window);
+                        system_manage.zoom_handle.destination_zoom_level = round(system_manage.zoom_handle.destination_zoom_level);
+
                         system_manage.zoom_handle.current_time = all_battles->zoom_handle.current_time;
                         system_manage.zoom_handle.destination_time = all_battles->zoom_handle.destination_time;
                     }
