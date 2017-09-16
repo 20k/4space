@@ -82,9 +82,9 @@ void zoom_handler::tick(float dt_s)
 {
     if(is_zoom_accum)
     {
-        /*if(signum(zoom_accum) == signum(destination_zoom_level - zoom_level))
+        if(signum(zoom_accum) == signum(destination_zoom_level - zoom_level))
         {
-            zoom_level = get_linear_zoom();
+            zoom_level = unproj(get_zoom());
 
             destination_zoom_level += zoom_accum;
 
@@ -93,17 +93,17 @@ void zoom_handler::tick(float dt_s)
         }
         else
         {
-            zoom_level = get_linear_zoom();
+            zoom_level = unproj(get_zoom());
 
             destination_zoom_level = zoom_level + zoom_accum;
 
             camera_offset = potential_camera_offset;
             last_camera_offset = {0,0};
-        }*/
+        }
 
-        zoom_level = unproj(get_zoom());
+        //zoom_level = unproj(get_zoom());
 
-        destination_zoom_level += zoom_accum;
+        //destination_zoom_level += zoom_accum;
 
         camera_offset = potential_camera_offset;
         last_camera_offset = {0,0};
@@ -213,7 +213,9 @@ void zoom_handler::offset_zoom(float amount, sf::RenderWindow& win, vec2f mouse_
     zoom_accum += amount;
     is_zoom_accum = true;
 
-    //potential_camera_offset += pcamera_offset;
+    ///restrict to zoom in
+    if(amount < 0)
+        potential_camera_offset += pcamera_offset;
 }
 
 vec2f zoom_handler::get_camera_offset()
