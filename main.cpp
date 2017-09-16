@@ -2966,7 +2966,7 @@ int main()
                 //system_manage.change_zoom(-scrollwheel_delta, mpos, window);
 
                 ///need to set system camera to be location of battle
-                if(all_battles->zoom_handle.get_zoom() > 10)
+                if(all_battles->zoom_handle.get_zoom() > 20)
                 {
                     all_battles->request_leave_battle_view = true;
                     all_battles->request_stay_in_battle_system = true;
