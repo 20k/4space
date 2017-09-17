@@ -904,7 +904,14 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
                 spos.x += offset.x();
                 spos.y += offset.y();
 
-                sprite_renderable::draw(*s->get_world_texture(), win, rotation, {spos.x, spos.y}, current_sprite_col, highlight);
+                vec3f cur_col = current_sprite_col;
+
+                if(s->is_fully_disabled)
+                {
+                    cur_col = cur_col / 2.f;
+                }
+
+                sprite_renderable::draw(*s->get_world_texture(), win, rotation, {spos.x, spos.y}, cur_col, highlight);
             }
         }
         else
@@ -1276,9 +1283,9 @@ void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_
     if(parent_empire != viewing_empire)
         return;
 
-    ship_manager* sm = (ship_manager*)data;
+    /*ship_manager* sm = (ship_manager*)data;
 
-    sm->draw_alerts(win, absolute_pos);
+    sm->draw_alerts(win, absolute_pos);*/
 }
 
 bool orbital::is_colonised()
