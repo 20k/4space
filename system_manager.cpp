@@ -893,7 +893,18 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
                 yoffset += s->get_world_texture()->getSize().y;
 
-                sprite_renderable::draw(*s->get_world_texture(), win, rotation, last_viewed_position + offset, current_sprite_col, highlight);
+                vec2f combined = last_viewed_position;//+ offset;
+
+                auto spos = win.mapCoordsToPixel({combined.x(), combined.y()});
+
+                view_handler view_handle(win);
+
+                win.setView(win.getDefaultView());
+
+                spos.x += offset.x();
+                spos.y += offset.y();
+
+                sprite_renderable::draw(*s->get_world_texture(), win, rotation, {spos.x, spos.y}, current_sprite_col, highlight);
             }
         }
         else
@@ -920,7 +931,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
         ImGui::SkipFrosting(nname);
 
-        ImGui::SetNextWindowPos(ImVec2(round(real_coord.x + get_pixel_radius(win)), round(real_coord.y)));
+        ImGui::SetNextWindowPos(ImVec2(round(real_coord.x + get_radius()), round(real_coord.y)));
 
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.1));
 
@@ -938,7 +949,7 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
     highlight = false;
 }
 
-float orbital::get_pixel_radius(sf::RenderWindow& win)
+float orbital::get_radius()
 {
     float rad_to_check = 0;
 
@@ -956,6 +967,13 @@ float orbital::get_pixel_radius(sf::RenderWindow& win)
         rad_to_check = sprite.tex.getSize().x/2.f;
     }
 
+    return rad_to_check;
+}
+
+float orbital::get_pixel_radius(sf::RenderWindow& win)
+{
+    float rad_to_check = get_radius();
+
     auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
 
     pixel_rad.x -= win.getSize().x/2;
@@ -970,7 +988,8 @@ void orbital::center_camera(system_manager& system_manage)
     system_manage.system_cam.pos = absolute_pos;
 }
 
-bool orbital::point_within(vec2f pos)
+///this function needs to be in screenspace so that we can have constant sized fleet icons
+bool orbital::point_within(vec2f pos, sf::RenderWindow& win)
 {
     float extra_dist = 0;
 
@@ -985,10 +1004,18 @@ bool orbital::point_within(vec2f pos)
         }
     }
 
+    auto sp1 = xy_to_vec(win.mapCoordsToPixel({pos.x(), pos.y()}));
+
+
     extra_dist /= 2.f;
 
     vec2f dim = rad * 1.5f;
     vec2f apos = last_viewed_position;
+
+    auto sp2 = xy_to_vec(win.mapCoordsToPixel({apos.x(), apos.y()}));
+
+    pos = sp1;
+    apos = sp2;
 
     if(extra_dist > 0)
         dim.y() += extra_dist;

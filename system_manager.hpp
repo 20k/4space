@@ -200,10 +200,11 @@ struct orbital : serialisable
     void end_render_asteroid_window();
 
     float get_pixel_radius(sf::RenderWindow& win);
+    float get_radius();
 
     void center_camera(system_manager& system_manage);
 
-    bool point_within(vec2f pos);
+    bool point_within(vec2f pos, sf::RenderWindow& win);
 
     std::vector<std::string> get_info_str(empire* viewer_empire, bool use_info_warfare, bool full_detail);
     std::string get_empire_str(bool newline = true);

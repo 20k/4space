@@ -1071,7 +1071,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         {
             orb->was_hovered = false;
 
-            if(orb->point_within({transformed.x, transformed.y}))
+            if(orb->point_within({transformed.x, transformed.y}, win))
             {
                 vec2f dist = (vec2f){transformed.x, transformed.y} - orb->absolute_pos;
 
