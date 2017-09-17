@@ -3616,6 +3616,14 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 vec3f col = viewer_empire->get_relations_colour(o->parent_empire);
 
+                if(!test_class && !OOB)
+                {
+                    if(o->data->all_derelict())
+                    {
+                        col = col / 2.f;
+                    }
+                }
+
                 if(o->highlight)
                 {
                     o->highlight = false;
