@@ -1836,7 +1836,7 @@ std::string get_component_display_string(component& c)
 
 ///vertical list of attributes, going horizontally with separators between components
 ///we'll also want a systems level version of this, ie overall not specific
-std::vector<std::string> get_components_display_string(ship& s)
+/*std::vector<std::string> get_components_display_string(ship& s)
 {
     std::vector<component> components = s.entity_list;
 
@@ -1850,7 +1850,7 @@ std::vector<std::string> get_components_display_string(ship& s)
     }
 
     return display_str;
-}
+}*/
 
 
 ship ship::duplicate() const

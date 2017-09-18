@@ -514,7 +514,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
     ImGui::PopStyleColor(6);
 }
 
-void display_ship_info_old(ship& s, float step_s)
+/*void display_ship_info_old(ship& s, float step_s)
 {
     auto display_strs = get_components_display_string(s);
 
@@ -545,7 +545,7 @@ void display_ship_info_old(ship& s, float step_s)
     }
 
     ImGui::End();
-}
+}*/
 
 
 /*void debug_menu(const std::vector<ship*>& ships)

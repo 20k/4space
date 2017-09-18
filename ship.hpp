@@ -513,7 +513,7 @@ struct ship;
 
 std::string get_component_attribute_display_string(const component& c, int type);
 std::string get_component_display_string(component& c);
-std::vector<std::string> get_components_display_string(ship& s);
+//std::vector<std::string> get_components_display_string(ship& s);
 
 struct ship : positional, serialisable, ship_base_context_menu
 {
