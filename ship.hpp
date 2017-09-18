@@ -504,6 +504,7 @@ struct ship_base_context_menu : has_context_menu
 {
     bool context_are_you_sure_war = false;
     bool context_are_you_sure_scrap = false;
+    bool context_renaming = false;
 
     virtual void context_handle_menu(orbital* associated, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup) {};
 };

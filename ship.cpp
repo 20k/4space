@@ -1888,6 +1888,26 @@ std::string get_upgrade_str(const std::map<resource::types, float>& cost)
     return str;
 }
 
+///ok so. If we click anywhere outside the box we want to cancel
+bool handle_rename(std::string& to_handle, bool going)
+{
+    if(!going)
+        return false;
+
+    to_handle.resize(100);
+
+    bool term = ImGui::InputText("###renamer_context", &to_handle[0], 99, ImGuiInputTextFlags_EnterReturnsTrue);
+
+    to_handle.resize(strlen(to_handle.c_str()));
+
+    if(ImGui::IsMouseClicked(0) && !ImGui::IsItemClicked_Registered())
+    {
+        term = true;
+    }
+
+    return term;
+}
+
 void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup)
 {
     context_tick_menu();
@@ -1910,6 +1930,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         context_are_you_sure_scrap = false;
         context_is_open = false;
         context_request_close = false;
+        context_renaming = false;
         return;
     }
 
@@ -2111,6 +2132,29 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         }
     }
 
+    ///ordering of functions here is extremely strict
+    ///designed to never let two items be drawn on the same frame
+    ///also has to take into account that the item is clicked to open the input box
+    if(owned)
+    {
+        bool cancel = handle_rename(name, context_renaming);
+
+        if(!context_renaming)
+        {
+            ImGui::NeutralText("(Rename)");
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                context_renaming = true;
+            }
+        }
+
+        if(cancel)
+        {
+            context_renaming = false;
+        }
+    }
+
     if((ImGui::IsMouseClicked(1) || ImGui::IsMouseClicked(0)) && !ImGui::IsWindowHovered() && !ImGui::suppress_clicks || context_request_close)
     {
         ImGui::CloseCurrentPopup();
@@ -2142,6 +2186,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         context_are_you_sure_war = false;
         context_is_open = false;
         context_request_close = false;
+        context_renaming = false;
         return;
     }
 
