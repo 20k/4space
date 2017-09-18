@@ -477,7 +477,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         if(ImGui::IsItemClicked_Registered())
         {
-            if(!key.isKeyPressed(sf::Keyboard::LShift))
+            if(!key_down(sf::Keyboard::LShift))
                 popup.schedule_rem_all();
 
             if(o)
@@ -888,7 +888,7 @@ struct box_selection
 
         sf::Keyboard key;
 
-        bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
+        bool lctrl = key_down(sf::Keyboard::LControl);
 
         std::vector<orbital*> potential_orbitals;
 
@@ -973,7 +973,7 @@ struct box_selection
             return;
         }
 
-        if(!key.isKeyPressed(sf::Keyboard::LShift) && !going)
+        if(!key_down(sf::Keyboard::LShift) && !going)
         {
             for(orbital* o : cur->orbitals)
             {
@@ -1038,7 +1038,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     sf::Keyboard key;
 
-    bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
+    bool lshift = key_down(sf::Keyboard::LShift);
 
     ///this is where we click away fleets
     if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
@@ -1192,8 +1192,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     sf::Mouse mouse;
     sf::Keyboard key;
 
-    bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
-    bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
+    bool lshift = key_down(sf::Keyboard::LShift);
+    bool lctrl = key_down(sf::Keyboard::LControl);
 
     int x = mouse.getPosition(win).x;
     int y = mouse.getPosition(win).y;
@@ -1592,7 +1592,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                     if(o->type == orbital_info::FLEET)
                     {
-                        bool shift = key.isKeyPressed(sf::Keyboard::LShift);
+                        bool shift = key_down(sf::Keyboard::LShift);
 
                         if(ImGui::IsItemHovered())
                             tooltip::add("Right Click for ship options");
@@ -1952,7 +1952,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 orbital_system* current = o->parent_system;
 
-                if(warp_destinations.size() > 0 && key.isKeyPressed(sf::Keyboard::LShift))
+                if(warp_destinations.size() > 0 && key_down(sf::Keyboard::LShift))
                 {
                     current = warp_destinations.back();
                 }
@@ -1999,7 +1999,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 {
                     bool skip = false;
 
-                    if(!key.isKeyPressed(sf::Keyboard::LShift) && !system_manage.in_system_view())
+                    if(!key_down(sf::Keyboard::LShift) && !system_manage.in_system_view())
                     {
                         o->command_queue.cancel();
 
@@ -2815,7 +2815,7 @@ int main()
         if(scrollwheel_delta > 0)
             scrollwheel_delta = 1;
 
-        if(focused && key.isKeyPressed(sf::Keyboard::LAlt) && ONCE_MACRO(sf::Keyboard::Return))
+        if(focused && key_down(sf::Keyboard::LAlt) && ONCE_MACRO(sf::Keyboard::Return))
         {
             if(!fullscreen)
             {
@@ -2842,7 +2842,7 @@ int main()
             ClipCursor(&r);
         }
 
-        if(focused && key.isKeyPressed(sf::Keyboard::F10))
+        if(focused && key_down(sf::Keyboard::F10))
         {
             window.close();
         }
@@ -2852,18 +2852,18 @@ int main()
         vec2f cdir = {0,0};
         vec2f mdir = {0,0};
 
-        if(key.isKeyPressed(sf::Keyboard::W))
+        if(key_down(sf::Keyboard::W))
             cdir.y() += 1;
 
-        if(key.isKeyPressed(sf::Keyboard::S))
+        if(key_down(sf::Keyboard::S))
             cdir.y() -= 1;
 
-        if(key.isKeyPressed(sf::Keyboard::A))
+        if(key_down(sf::Keyboard::A))
             cdir.x() += 1;
 
-        if(key.isKeyPressed(sf::Keyboard::D))
+        if(key_down(sf::Keyboard::D))
             cdir.x() -= 1;
-        if(key.isKeyPressed(sf::Keyboard::LShift))
+        if(key_down(sf::Keyboard::LShift))
             cdir = cdir * 5.f;
 
         if(ship_customise.text_input_going)
@@ -3042,6 +3042,10 @@ int main()
         }
 
         system_manage.tick(diff_s);
+
+        ///this is... well, quite a bit of a hack
+        ///only context can suppress keyboard at the moment
+        ImGui::suppress_keyboard = false;
 
         bool any_open = false;
 
@@ -3629,7 +3633,7 @@ int main()
             net_state.forward_data(no_test, ser);
         }
 
-        if(key.isKeyPressed(sf::Keyboard::H))
+        if(key_down(sf::Keyboard::H))
             std::cout << "pid " << net_state.packet_id << std::endl;
 
         //if(ImGui::Button("Try mini packet") && net_state.my_id != -1)
@@ -3737,12 +3741,12 @@ int main()
         fleet_manage.destroy_cleanup(empire_manage);
 
 
-        if(key.isKeyPressed(sf::Keyboard::N))
+        if(key_down(sf::Keyboard::N))
         {
             printf("%f\n", diff_s * 1000.f);
         }
 
-        if(key.isKeyPressed(sf::Keyboard::B))
+        if(key_down(sf::Keyboard::B))
         {
             std::cout << system_manage.zoom_handle.get_zoom() << " " << all_battles->zoom_handle.get_zoom() << std::endl;
         }

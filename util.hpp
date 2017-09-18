@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <math.h>
 #include <SFML/Graphics.hpp>
+#include "ui_util.hpp"
 
 template <typename T>
 inline
@@ -88,6 +89,9 @@ bool once()
 
     sf::Keyboard key;
 
+    if(ImGui::suppress_keyboard)
+        return false;
+
     if(key.isKeyPressed(k) && !last)
     {
         last = true;
@@ -126,6 +130,14 @@ bool once()
 }
 
 #define ONCE_MACRO(x) once<x, __LINE__, __COUNTER__>()
+
+inline
+bool key_down(sf::Keyboard::Key k)
+{
+    sf::Keyboard key;
+
+    return key.isKeyPressed(k) && !ImGui::suppress_keyboard;
+}
 
 inline
 std::string obfuscate(const std::string& str, bool should_obfuscate)

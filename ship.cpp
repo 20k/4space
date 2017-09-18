@@ -1898,6 +1898,11 @@ bool handle_rename(std::string& to_handle, bool going)
 
     bool term = ImGui::InputText("###renamer_context", &to_handle[0], 99, ImGuiInputTextFlags_EnterReturnsTrue);
 
+    if(ImGui::IsItemActive())
+    {
+        ImGui::suppress_keyboard = true;
+    }
+
     to_handle.resize(strlen(to_handle.c_str()));
 
     if(ImGui::IsMouseClicked(0) && !ImGui::IsItemClicked_Registered())
@@ -1908,6 +1913,8 @@ bool handle_rename(std::string& to_handle, bool going)
     return term;
 }
 
+///may need to migrate context handling above input handling
+///so that keyboard input can be suppressed
 void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup)
 {
     context_tick_menu();
@@ -2456,6 +2463,26 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
                     s->cleanup = true;
                 }
             }
+        }
+    }
+
+    if(owned)
+    {
+        bool cancel = handle_rename(o->name, context_renaming);
+
+        if(!context_renaming)
+        {
+            ImGui::NeutralText("(Rename)");
+
+            if(ImGui::IsItemClicked_Registered())
+            {
+                context_renaming = true;
+            }
+        }
+
+        if(cancel)
+        {
+            context_renaming = false;
         }
     }
 

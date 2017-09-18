@@ -2,6 +2,7 @@
 #include <imgui/imgui_internal.h>
 #include <SFML/Graphics.hpp>
 
+bool ImGui::suppress_keyboard = false;
 bool ImGui::suppress_clicks = false;
 int ImGui::suppress_frames = 2;
 

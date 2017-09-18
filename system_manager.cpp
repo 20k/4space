@@ -851,10 +851,10 @@ void orbital::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     sf::Keyboard key;
 
-    //if(is_resource_object && key.isKeyPressed(sf::Keyboard::LAlt))
+    //if(is_resource_object && key_down(sf::Keyboard::LAlt))
     //    draw_name_window = false;
 
-    bool show_detail = key.isKeyPressed(sf::Keyboard::LAlt);
+    bool show_detail = key_down(sf::Keyboard::LAlt);
 
     if(type == orbital_info::STAR)
     {
@@ -3470,7 +3470,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         }
 
 
-        /*if(key.isKeyPressed(sf::Keyboard::LAlt))
+        /*if(key_down(sf::Keyboard::LAlt))
         {
             std::string use_name = os->get_base()->name + "##" + std::to_string(i);
 
@@ -4003,8 +4003,8 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
     sf::Keyboard key;
 
-    bool lshift = key.isKeyPressed(sf::Keyboard::LShift);
-    bool lctrl = key.isKeyPressed(sf::Keyboard::LControl);
+    bool lshift = key_down(sf::Keyboard::LShift);
+    bool lctrl = key_down(sf::Keyboard::LControl);
 
     ImGui::BeginOverride("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 

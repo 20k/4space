@@ -89,6 +89,7 @@ namespace sf
 
 namespace ImGui
 {
+    extern bool suppress_keyboard;
     extern bool suppress_clicks;
     extern int suppress_frames;
 
