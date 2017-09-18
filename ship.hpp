@@ -509,6 +509,11 @@ struct ship_base_context_menu : has_context_menu
     virtual void context_handle_menu(orbital* associated, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup) {};
 };
 
+struct ship;
+
+std::string get_component_display_string(component& c);
+std::vector<std::string> get_components_display_string(ship& s);
+
 struct ship : positional, serialisable, ship_base_context_menu
 {
     ship_type::types ai_fleet_type = ship_type::COUNT;
