@@ -402,40 +402,7 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
             if(!attr.present)
                 continue;
 
-            std::string header = ship_component_elements::display_strings[type];
-
-            ///ok, we can take the nets
-
-            float net_usage = attr.produced_per_s - attr.drained_per_s;
-            float net_per_use = attr.produced_per_use - attr.drained_per_use;
-
-            float time_between_uses = attr.time_between_uses_s;
-            float time_until_next_use = std::max(0.f, attr.time_between_uses_s - (attr.current_time_s - attr.time_last_used_s));
-
-            float max_amount = attr.max_amount;
-            float cur_amount = attr.cur_amount;
-
-            std::string use_string = "" + to_string_with_precision(net_usage, 3) + "(/s)";
-            std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "(/use)";
-
-            std::string fire_time_remaining = to_string_with_precision(time_between_uses, 3) + ("(s /use)");
-            //std::string fire_time_remaining = "Time Left (s): " + to_string_with_enforced_variable_dp(time_until_next_use) + "/" + to_string_with_precision(time_between_uses, 3);
-
-            std::string storage_str = "(" + to_string_with_variable_prec(max_amount) + ")";
-
-            std::string component_str = header;
-
-            if(net_usage != 0)
-                component_str += " " + use_string;
-
-            if(net_per_use != 0)
-                component_str += " " + per_use_string;
-
-            if(time_between_uses > 0)
-                component_str += " " + fire_time_remaining;
-
-            if(max_amount > 0)
-                component_str += " " + storage_str;
+            std::string component_str = get_component_attribute_display_string(c, type);
 
             ImGui::Text(component_str.c_str());
 

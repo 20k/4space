@@ -1734,6 +1734,48 @@ void component::do_serialise(serialise& s, bool ser)
     }
 }
 
+std::string get_component_attribute_display_string(const component& c, int type)
+{
+    std::string component_str;
+
+    const component_attribute& attr = c.components[type];
+
+    if(!attr.present)
+        return component_str;
+
+    std::string header = ship_component_elements::display_strings[type];
+
+    float net_usage = attr.produced_per_s - attr.drained_per_s;
+    float net_per_use = attr.produced_per_use - attr.drained_per_use;
+
+    float time_between_uses = attr.time_between_uses_s;
+    float time_until_next_use = std::max(0.f, attr.time_between_uses_s - (attr.current_time_s - attr.time_last_used_s));
+
+    float max_amount = attr.max_amount;
+    float cur_amount = attr.cur_amount;
+
+    std::string use_string = "" + to_string_with_precision(net_usage, 3) + "(/s)";
+    std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "(/use)";
+    std::string fire_time_remaining = "Time Left (s): " + to_string_with_enforced_variable_dp(time_until_next_use) + "/" + to_string_with_precision(time_between_uses, 3);
+
+    std::string storage_str = "(" + to_string_with_enforced_variable_dp(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
+
+    component_str += header;
+
+    if(net_usage != 0)
+        component_str += " " + use_string;
+
+    if(net_per_use != 0)
+        component_str += " " + per_use_string;
+
+    if(time_between_uses > 0)
+        component_str += " " + fire_time_remaining;
+
+    if(max_amount > 0)
+        component_str += " " + storage_str;
+
+    return component_str;
+}
 
 ///so display this (ish) on mouseover for a component
 std::string get_component_display_string(component& c)
@@ -1754,9 +1796,6 @@ std::string get_component_display_string(component& c)
 
     float efficiency = 1.f;
 
-    /*if(c.components.begin() != c.components.end())
-        efficiency = c.components.begin()->cur_efficiency * 100.f;*/
-
     for(auto& i : c.components)
     {
         if(i.present)
@@ -1775,72 +1814,14 @@ std::string get_component_display_string(component& c)
     component_str += eff;
 
     //for(auto& i : c.components)
-    for(int kk = 0; kk < c.components.size(); kk++)
+    for(int type = 0; type < c.components.size(); type++)
     {
-        auto type = kk;
-        const component_attribute& attr = c.components[kk];
+        const component_attribute& attr = c.components[type];
 
         if(!attr.present)
             continue;
 
-        std::string header = ship_component_elements::display_strings[type];
-
-        ///ok, we can take the nets
-
-        float net_usage = attr.produced_per_s - attr.drained_per_s;
-        float net_per_use = attr.produced_per_use - attr.drained_per_use;
-
-        float time_between_uses = attr.time_between_uses_s;
-        float time_until_next_use = std::max(0.f, attr.time_between_uses_s - (attr.current_time_s - attr.time_last_used_s));
-
-        float max_amount = attr.max_amount;
-        float cur_amount = attr.cur_amount;
-
-        //float tech_level = attr.tech_level;
-
-        std::string use_string = "" + to_string_with_precision(net_usage, 3) + "(/s)";
-        std::string per_use_string = "" + to_string_with_precision(net_per_use, 3) + "(/use)";
-
-        //std::string time_str = "Time Between Uses (s): " + to_string_with_precision(time_between_uses, 3);
-        //std::string left_str = "Time Till Next Use (s): " + to_string_with_precision(time_until_next_use, 3);
-
-        std::string fire_time_remaining = "Time Left (s): " + to_string_with_enforced_variable_dp(time_until_next_use) + "/" + to_string_with_precision(time_between_uses, 3);
-
-        //std::string mamount_str = "Max Storage: " + to_string_with_precision(max_amount, 3);
-        //std::string camount_str = "Current Storage: " + to_string_with_precision(cur_amount, 3);
-
-        std::string storage_str = "(" + to_string_with_enforced_variable_dp(cur_amount) + "/" + to_string_with_variable_prec(max_amount) + ")";
-
-        //std::string tech_str = "(Tech " + std::to_string((int)tech_level) + ")";
-
-        //std::string efficiency_str = "Efficiency %%: " + to_string_with_precision(attr.cur_efficiency*100.f, 3);
-
-        component_str += header;
-
-        if(net_usage != 0)
-            component_str += " " + use_string;
-
-        if(net_per_use != 0)
-            component_str += " " + per_use_string;
-
-        if(time_between_uses > 0)
-            component_str += " " + fire_time_remaining;
-
-        /*if(max_amount > 0)
-            component_str += "\n" + mamount_str;*/
-
-        ///not a typo
-        /*if(max_amount > 0)
-            component_str += "\n" + camount_str;*/
-
-        if(max_amount > 0)
-            component_str += " " + storage_str;
-
-        //component_str += " " + tech_str;
-
-        //if(attr.cur_efficiency < 0.99999f)
-        //    component_str += "\n" + efficiency_str;
-
+        component_str += get_component_attribute_display_string(c, type);
 
         if(num != c.components.size() - 1)
         {
