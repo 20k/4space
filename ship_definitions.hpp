@@ -52,6 +52,7 @@ inline component make_default_crew()
     crew.set_tag(component_tag::OXYGEN_STARVATION, 0.0f);
 
     crew.set_tech_type(ship_component_elements::COMMON | ship_component_elements::LOW);
+    crew.ui_category = component_category_info::CONTROL;
 
     return crew;
 }
@@ -79,6 +80,7 @@ inline component make_default_life_support()
     life_support.repair_this_when_recrewing = true;
 
     life_support.set_tech_type(ship_component_elements::RARE | ship_component_elements::MEDIUM);
+    life_support.ui_category = component_category_info::CONTROL;
 
     return life_support;
 }
@@ -101,6 +103,7 @@ inline component make_default_ammo_store()
     ammo_store.primary_attribute = ship_component_elements::AMMO;
 
     ammo_store.set_tech_type(ship_component_elements::COMMON | ship_component_elements::LOW);
+    ammo_store.ui_category = component_category_info::WEAPON;
 
     return ammo_store;
 }
@@ -127,6 +130,7 @@ inline component make_default_shields()
     shields.primary_attribute = ship_component_elements::SHIELD_POWER;
 
     shields.set_tech_type(ship_component_elements::HARD_RARE | ship_component_elements::HIGH);
+    shields.ui_category = component_category_info::DEFENCE;
 
     return shields;
 }
@@ -161,6 +165,7 @@ inline component make_default_power_core()
     core.repair_this_when_recrewing = true;
 
     core.set_tech_type(ship_component_elements::COMMON | ship_component_elements::SUPER_HIGH);
+    core.ui_category = component_category_info::CORE;
 
     return core;
 }
@@ -185,6 +190,7 @@ inline component make_default_solar_panel()
     core.cost_mult = 0.5f;
 
     core.set_tech_type(ship_component_elements::RARE | ship_component_elements::HIGH);
+    core.ui_category = component_category_info::CORE;
 
     return core;
 }
@@ -223,6 +229,7 @@ inline component make_default_engines()
     thruster.primary_attribute = ship_component_elements::ENGINE_POWER;
 
     thruster.set_tech_type(ship_component_elements::COMMON | ship_component_elements::MEDIUM);
+    thruster.ui_category = component_category_info::ENGINE;
 
     return thruster;
 }
@@ -246,6 +253,7 @@ inline component make_default_heatsink()
     heatsink.primary_attribute = ship_component_elements::COOLING_POTENTIAL;
 
     heatsink.set_tech_type(ship_component_elements::COMMON | ship_component_elements::MEDIUM);
+    heatsink.ui_category = component_category_info::SUPPORT;
 
     return heatsink;
 }
@@ -296,6 +304,7 @@ inline component make_default_warp_drive()
     warp_drive.test_if_can_use_in_ship_customisation = true;
 
     warp_drive.set_tech_type(ship_component_elements::COMMON | ship_component_elements::SUPER_HIGH);
+    warp_drive.ui_category = component_category_info::CORE;
 
     return warp_drive;
 }
@@ -332,6 +341,7 @@ inline component make_default_stealth(float effectiveness = 1.f)
     stealth_drive.cost_mult = get_cost_mod(effectiveness);
 
     stealth_drive.set_tech_type(ship_component_elements::HARD_RARE | ship_component_elements::LOW_VOLUME | ship_component_elements::HIGH);
+    stealth_drive.ui_category = component_category_info::SUPPORT;
 
     return stealth_drive;
 }
@@ -372,6 +382,7 @@ inline component make_default_coloniser()
     coloniser.test_if_can_use_in_ship_customisation = true;
 
     coloniser.set_tech_type(ship_component_elements::ALL_COMMON | ship_component_elements::HIGH);
+    coloniser.ui_category = component_category_info::EMPIRE;
 
     return coloniser;
 }
@@ -406,7 +417,7 @@ inline component make_default_scanner()
     scanner.primary_attribute = ship_component_element::SCANNING_POWER;
 
     scanner.set_tech_type(ship_component_elements::COMMON | ship_component_elements::LOW);
-
+    scanner.ui_category = component_category_info::SUPPORT;
 
     return scanner;
 }
@@ -452,7 +463,7 @@ inline component make_default_railgun()
     gun.test_if_can_use_in_ship_customisation = true;
 
     gun.set_tech_type(ship_component_elements::HARD_RARE | ship_component_elements::HIGH);
-
+    gun.ui_category = component_category_info::WEAPON;
 
     return gun;
 }
@@ -495,7 +506,7 @@ inline component make_default_torpedo()
     torp.test_if_can_use_in_ship_customisation = true;
 
     torp.set_tech_type(ship_component_elements::RARE | ship_component_elements::MEDIUM);
-
+    torp.ui_category = component_category_info::WEAPON;
 
     return torp;
 }
@@ -519,7 +530,7 @@ inline component make_default_fuel_tank()
     tank.repair_this_when_recrewing = true;
 
     tank.set_tech_type(ship_component_elements::COMMON | ship_component_elements::LOW);
-
+    tank.ui_category = component_category_info::ENGINE;
 
     return tank;
 }
@@ -546,7 +557,7 @@ inline component make_default_repair_systems()
     repair.extra_resources_ratio[resource::COPPER] = 0.2;
 
     repair.set_tech_type(ship_component_elements::HARD_RARE | ship_component_elements::LOW_VOLUME | ship_component_elements::HIGH);
-
+    repair.ui_category = component_category_info::SUPPORT;
 
     return repair;
 }
@@ -578,7 +589,7 @@ inline component make_default_ram_scoop()
     ram.repair_this_when_recrewing = true;
 
     ram.set_tech_type(ship_component_elements::LOW_VOLUME | ship_component_elements::HIGH);
-
+    ram.ui_category = component_category_info::ENGINE;
 
     return ram;
 }
@@ -606,7 +617,7 @@ inline component make_default_research_factory()
     research.cost_mult = 5.f;
 
     research.set_tech_type(ship_component_elements::HARD_RARE | ship_component_elements::LOW_VOLUME | ship_component_elements::SUPER_HIGH);
-
+    research.ui_category = component_category_info::EMPIRE;
 
     return research;
 }
@@ -641,6 +652,7 @@ inline component make_default_resource_storage()
     research.cost_mult = 5.f;
 
     research.set_tech_type(ship_component_elements::COMMON | ship_component_elements::LOW);
+    research.ui_category = component_category_info::EMPIRE;
 
     return research;
 }
@@ -661,6 +673,8 @@ inline component make_default_shipyard()
     shipyard.cost_mult = 5.f;
 
     shipyard.set_tech_type(ship_component_elements::RARE | ship_component_elements::MEDIUM);
+    shipyard.ui_category = component_category_info::EMPIRE;
+
 
     return shipyard;
 }
@@ -694,6 +708,7 @@ inline component make_default_mining_system()
     mining.cost_mult = 5.f;
 
     mining.set_tech_type(ship_component_elements::COMMON | ship_component_elements::LOW);
+    mining.ui_category = component_category_info::EMPIRE;
 
     return mining;
 }
@@ -726,6 +741,8 @@ inline component make_default_resource_puller()
     mining.cost_mult = 5.f;
 
     mining.set_tech_type(ship_component_elements::RARE | ship_component_elements::MEDIUM);
+    mining.ui_category = component_category_info::EMPIRE;
+
 
     return mining;
 }

@@ -325,12 +325,30 @@ struct component_tag_type
     float second = 0.f;
 };
 
+namespace component_category_info
+{
+    enum types
+    {
+        CONTROL,
+        CORE,
+        ENGINE,
+        WEAPON,
+        DEFENCE,
+        SUPPORT,
+        EMPIRE,
+        NONE
+    };
+}
+
+using component_category_t = component_category_info::types;
+
 ///ie what can things do
 ///this is a ship entity for the moment.. but could likely describe a character as well
 ///float get_current_functionality
 ///maybe component attributes should not have a tech level, but components overall
 struct component : serialisable
 {
+    component_category_t ui_category = component_category_info::NONE;
     ship_component_elements::tech_type tech_type = ship_component_elements::NONE_TECH;
     float current_size = 1;
     float ship_size = 1;
