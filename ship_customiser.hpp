@@ -9,7 +9,7 @@
 
 extern std::map<int, bool> component_open;
 
-namespace ship_cusomise_info
+namespace ship_customise_info
 {
     enum types
     {
@@ -22,6 +22,8 @@ namespace ship_cusomise_info
         EMPIRE
     };
 }
+
+using ship_customise_t = ship_customise_info::types;
 
 struct ship_customiser
 {
