@@ -9,6 +9,20 @@
 
 extern std::map<int, bool> component_open;
 
+namespace ship_cusomise_info
+{
+    enum types
+    {
+        CONTROL,
+        CORE,
+        ENGINE,
+        WEAPON,
+        DEFENCE,
+        SUPPORT,
+        EMPIRE
+    };
+}
+
 struct ship_customiser
 {
     bool text_input_going = false;
