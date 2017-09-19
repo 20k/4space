@@ -409,61 +409,93 @@ void do_ship_component_display(ship& current)
 
     ImGui::BeginGroup();
 
-    for(int i=0; i<full_component_list.size(); i++)
+    std::stable_sort(full_component_list.begin(), full_component_list.end(),
+                     [](auto& c1, auto& c2){return c1.ui_category < c2.ui_category;});
+
+    int max_len = 0;
+
+    for(auto& c : full_component_list)
     {
-        component& c = full_component_list[i];
+        max_len = std::max(max_len, (int)c.name.length());
+    }
 
-        std::string pad = "+";
+    int min_title_length = 4;
 
-        if(component_open[i])
-        {
-            pad = "-";
-        }
+    if(max_len < min_title_length)
+    {
+        max_len = min_title_length;
+    }
 
-        ImGui::Text((pad + c.name).c_str());
+    std::string length_pad(max_len - min_title_length, ' ');
 
-        if(ImGui::IsItemClicked_DragCompatible())
-        {
-            component_open[i] = !component_open[i];
-        }
+    for(int category = 0; category < component_category_info::NONE; category++)
+    {
+        bool good = ImGui::TreeNodeEx((component_category_info::names[category] + length_pad).c_str(), ImGuiTreeNodeFlags_CollapsingHeader);
 
-        if(ImGui::IsItemClicked_UnRegistered())
-        {
-            global_drag_and_drop.begin_dragging(&c, drag_and_drop_info::COMPONENT, c.name);
-        }
-
-        if(ImGui::IsItemClicked_Registered(1))
-        {
-            current.add(c);
-        }
-
-        if(!component_open[i])
+        if(!good)
             continue;
 
-        ImGui::Indent();
-
-        float tech_level = c.get_tech_level_of_primary();
-
-        for(int type = 0; type < c.components.size(); type++)
+        for(int i=0; i<full_component_list.size(); i++)
         {
-            const component_attribute& attr = c.components[type];
+            component& c = full_component_list[i];
 
-            if(!attr.present)
+            if((int)c.ui_category != category)
                 continue;
 
-            std::string component_str = get_component_attribute_display_string(c, type);
+            std::string pad = "+";
 
-            ImGui::Text(component_str.c_str());
-
-            /*if(num != c.components.size() - 1)
+            if(component_open[i])
             {
-                component_str += "\n";
+                pad = "-";
             }
 
-            num++;*/
+            ImGui::Text((pad + c.name).c_str());
+
+            if(ImGui::IsItemClicked_DragCompatible())
+            {
+                component_open[i] = !component_open[i];
+            }
+
+            if(ImGui::IsItemClicked_UnRegistered())
+            {
+                global_drag_and_drop.begin_dragging(&c, drag_and_drop_info::COMPONENT, c.name);
+            }
+
+            if(ImGui::IsItemClicked_Registered(1))
+            {
+                current.add(c);
+            }
+
+            if(!component_open[i])
+                continue;
+
+            ImGui::Indent();
+
+            float tech_level = c.get_tech_level_of_primary();
+
+            for(int type = 0; type < c.components.size(); type++)
+            {
+                const component_attribute& attr = c.components[type];
+
+                if(!attr.present)
+                    continue;
+
+                std::string component_str = get_component_attribute_display_string(c, type);
+
+                ImGui::Text(component_str.c_str());
+
+                /*if(num != c.components.size() - 1)
+                {
+                    component_str += "\n";
+                }
+
+                num++;*/
+            }
+
+            ImGui::Unindent();
         }
 
-        ImGui::Unindent();
+        ImGui::TreePop();
     }
 
     ImGui::EndGroup();

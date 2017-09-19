@@ -338,6 +338,19 @@ namespace component_category_info
         EMPIRE,
         NONE
     };
+
+    static inline
+    std::vector<std::string> names
+    {
+        "Control",
+        "Core",
+        "Engines",
+        "Weapons",
+        "Defence",
+        "Support",
+        "Empire",
+        "Err",
+    };
 }
 
 using component_category_t = component_category_info::types;
