@@ -116,9 +116,13 @@ void display_ship(ship& current)
 
         ship_component_element& id = found_elements[i];
 
-        if(produced[id] - consumed[id] <= 0 && ship_component_elements::element_infos[(int)id].negative_is_bad)
+        if(produced[id] - consumed[id] <= 0)// && ship_component_elements::element_infos[(int)id].negative_is_bad)
         {
             col = popup_colour_info::bad_ui_colour;
+        }
+        else
+        {
+            col = popup_colour_info::good_ui_colour;
         }
 
         ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), net_formatted.c_str());
@@ -134,11 +138,46 @@ void display_ship(ship& current)
     }
 }
 
+struct size_manager
+{
+    ImVec2 last_size = ImVec2(0,0);
+
+    void set_size(ImVec2 s)
+    {
+        last_size = s;
+    }
+
+    ImVec2 get_last_size()
+    {
+        auto wsize = ImGui::GetWindowSize();
+
+        ImVec2 ret = last_size;
+
+        ret.x += 30;
+        ret.y += 30;
+
+        if(ret.y >= wsize.y - 40)
+        {
+            ret.y = 0;
+        }
+
+        return ret;
+    }
+};
+
+#define CHILD_WINDOW_FLAGS 0
+
 std::tuple<ImVec2, ImVec2> display_ship_stats_window(ship& current)
 {
+    static size_manager display_ship_size;
+
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
 
-    ImGui::BeginOverride((current.name + "###SHIPSTATSCUSTOMISE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    //ImGui::BeginOverride((current.name + "###SHIPSTATSCUSTOMISE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::BeginChild("###ship_state_customise", display_ship_size.get_last_size(), true, CHILD_WINDOW_FLAGS);
+
+    ImGui::BeginGroup();
 
     display_ship(current);
 
@@ -162,19 +201,28 @@ std::tuple<ImVec2, ImVec2> display_ship_stats_window(ship& current)
     auto win_pos = ImGui::GetWindowPos();
     auto win_size = ImGui::GetWindowSize();
 
-    ImGui::End();
+    ImGui::EndGroup();
+
+    display_ship_size.set_size(ImGui::GetItemRectSize());
+
+    ImGui::EndChild();
 
     return {win_pos, win_size};
 }
 
 void do_side_foldout_window(ImVec2 win_pos, ImVec2 win_size, ship& current, float scrollwheel)
 {
-    ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
+    static size_manager foldout_size;
+
+    //ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
 
-    ImGui::BeginOverride((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
-    //ImGui::BeginOverride((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+    //ImGui::BeginOverride((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
+
+    ImGui::BeginChild("###side_foldout", foldout_size.get_last_size(), true, CHILD_WINDOW_FLAGS);
+
+    ImGui::BeginGroup();
 
     std::vector<std::string> names;
     std::vector<std::string> sizes;
@@ -343,14 +391,24 @@ void do_side_foldout_window(ImVec2 win_pos, ImVec2 win_size, ship& current, floa
         current.add(c);
     }
 
-    ImGui::End();
+    ImGui::EndGroup();
+
+    foldout_size.set_size(ImGui::GetItemRectSize());
+
+    ImGui::EndChild();
 }
 
 void do_ship_component_display(ship& current)
 {
+    static size_manager display_component_size;
+
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_2");
 
-    ImGui::BeginOverride("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    //ImGui::BeginOverride("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::BeginChild("###ship_components", display_component_size.get_last_size(), true, CHILD_WINDOW_FLAGS);
+
+    ImGui::BeginGroup();
 
     for(int i=0; i<full_component_list.size(); i++)
     {
@@ -409,7 +467,11 @@ void do_ship_component_display(ship& current)
         ImGui::Unindent();
     }
 
-    ImGui::End();
+    ImGui::EndGroup();
+
+    display_component_size.set_size(ImGui::GetItemRectSize());
+
+    ImGui::EndChild();
 }
 
 void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
@@ -434,11 +496,19 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     if(last_selected == -1)
         return;
 
+    ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS);
+
     auto [win_pos, win_size] = display_ship_stats_window(current);
+
+    ImGui::SameLine();
 
     do_side_foldout_window(win_pos, win_size, current, scrollwheel);
 
+    ImGui::SameLine();
+
     do_ship_component_display(current);
+
+    ImGui::End();
 
     current.editor_size_storage = clamp(current.editor_size_storage, 0.1f, 1000.f);
 
