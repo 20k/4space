@@ -116,7 +116,7 @@ void display_ship(ship& current)
 
         ship_component_element& id = found_elements[i];
 
-        if(produced[id] - consumed[id] <= 0)// && ship_component_elements::element_infos[(int)id].negative_is_bad)
+        if(produced[id] - consumed[id] < 0)// && ship_component_elements::element_infos[(int)id].negative_is_bad)
         {
             col = popup_colour_info::bad_ui_colour;
         }

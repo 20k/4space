@@ -341,7 +341,7 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         vec3f col = {1,1,1};
 
-        if(produced[id] - consumed[id] <= 0)// && ship_component_elements::element_infos[(int)id].negative_is_bad)
+        if(produced[id] - consumed[id] < 0)// && ship_component_elements::element_infos[(int)id].negative_is_bad)
         {
             col = popup_colour_info::bad_ui_colour;
         }
