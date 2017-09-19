@@ -341,9 +341,13 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
         vec3f col = {1,1,1};
 
-        if(produced[id] - consumed[id] <= 0 && ship_component_elements::element_infos[(int)id].negative_is_bad)
+        if(produced[id] - consumed[id] <= 0)// && ship_component_elements::element_infos[(int)id].negative_is_bad)
         {
             col = popup_colour_info::bad_ui_colour;
+        }
+        else
+        {
+            col = popup_colour_info::good_ui_colour;
         }
 
         ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), net_formatted.c_str());
