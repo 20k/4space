@@ -167,7 +167,7 @@ struct size_manager
 
 #define CHILD_WINDOW_FLAGS 0
 
-std::tuple<ImVec2, ImVec2> display_ship_stats_window(ship& current)
+void display_ship_stats_window(ship& current)
 {
     static size_manager display_ship_size;
 
@@ -175,7 +175,7 @@ std::tuple<ImVec2, ImVec2> display_ship_stats_window(ship& current)
 
     //ImGui::BeginOverride((current.name + "###SHIPSTATSCUSTOMISE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::BeginChild("###ship_state_customise", display_ship_size.get_last_size(), true, CHILD_WINDOW_FLAGS);
+    ImGui::BeginChild("###ship_state_customise", display_ship_size.get_last_size(), false, CHILD_WINDOW_FLAGS);
 
     ImGui::BeginGroup();
 
@@ -207,10 +207,9 @@ std::tuple<ImVec2, ImVec2> display_ship_stats_window(ship& current)
 
     ImGui::EndChild();
 
-    return {win_pos, win_size};
 }
 
-void do_side_foldout_window(ImVec2 win_pos, ImVec2 win_size, ship& current, float scrollwheel)
+void do_side_foldout_window(ship& current, float scrollwheel)
 {
     static size_manager foldout_size;
 
@@ -498,15 +497,15 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS);
 
-    auto [win_pos, win_size] = display_ship_stats_window(current);
-
-    ImGui::SameLine();
-
-    do_side_foldout_window(win_pos, win_size, current, scrollwheel);
-
-    ImGui::SameLine();
-
     do_ship_component_display(current);
+
+    ImGui::SameLine();
+
+    do_side_foldout_window(current, scrollwheel);
+
+    ImGui::SameLine();
+
+    display_ship_stats_window(current);
 
     ImGui::End();
 
