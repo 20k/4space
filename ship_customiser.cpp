@@ -134,29 +134,8 @@ void display_ship(ship& current)
     }
 }
 
-void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
+std::tuple<ImVec2, ImVec2> display_ship_stats_window(ship& current)
 {
-    text_input_going = false;
-
-    if(lclick)
-    {
-        renaming_id = -1;
-    }
-
-    if(current.name == "")
-        current.name = "New Ship";
-
-    current.refill_all_components();
-
-    if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
-        return;
-
-    do_save_window();
-
-    if(last_selected == -1)
-        return;
-
-
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_1");
 
     ImGui::BeginOverride((current.name + "###SHIPSTATSCUSTOMISE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
@@ -185,6 +164,11 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     ImGui::End();
 
+    return {win_pos, win_size};
+}
+
+void do_side_foldout_window(ImVec2 win_pos, ImVec2 win_size, ship& current, float scrollwheel)
+{
     ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
 
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
@@ -360,7 +344,10 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     }
 
     ImGui::End();
+}
 
+void do_ship_component_display(ship& current)
+{
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_2");
 
     ImGui::BeginOverride("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
@@ -423,6 +410,35 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     }
 
     ImGui::End();
+}
+
+void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
+{
+    text_input_going = false;
+
+    if(lclick)
+    {
+        renaming_id = -1;
+    }
+
+    if(current.name == "")
+        current.name = "New Ship";
+
+    current.refill_all_components();
+
+    if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
+        return;
+
+    do_save_window();
+
+    if(last_selected == -1)
+        return;
+
+    auto [win_pos, win_size] = display_ship_stats_window(current);
+
+    do_side_foldout_window(win_pos, win_size, current, scrollwheel);
+
+    do_ship_component_display(current);
 
     current.editor_size_storage = clamp(current.editor_size_storage, 0.1f, 1000.f);
 
