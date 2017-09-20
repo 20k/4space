@@ -156,7 +156,7 @@ struct size_manager
         ret.x += 30;
         ret.y += 30;
 
-        if(ret.y >= wsize.y - 40)
+        if(ret.y >= wsize.y - 70)
         {
             ret.y = 0;
         }
@@ -190,13 +190,13 @@ void display_ship_stats_window(ship& current)
 
     ImGui::NewLine();
 
-    ImGui::Text("Size");
+    /*ImGui::Text("Size");
 
     ImGui::SameLine();
 
     ImGui::PushItemWidth(150.f);
     ImGui::DragFloat("###SIZE_FLOATER_SHIP_CUSTOMISE", &current.editor_size_storage, 0.1f, 0.1f, 100.f, "%.1f");
-    ImGui::PopItemWidth();
+    ImGui::PopItemWidth();*/
 
     auto win_pos = ImGui::GetWindowPos();
     auto win_size = ImGui::GetWindowSize();
@@ -430,7 +430,8 @@ void do_ship_component_display(ship& current)
 
     for(int category = 0; category < component_category_info::NONE; category++)
     {
-        bool good = ImGui::TreeNodeEx((component_category_info::names[category] + length_pad).c_str(), ImGuiTreeNodeFlags_CollapsingHeader);
+        bool good = ImGui::TreeNodeEx((component_category_info::names[category] + length_pad).c_str(), 0);
+        //bool good = ImGui::TreeNodeEx((component_category_info::names[category] + length_pad).c_str(), ImGuiTreeNodeFlags_CollapsingHeader);
 
         if(!good)
             continue;
@@ -531,6 +532,18 @@ void handle_top_bar(ship& current)
     {
         ImGui::suppress_keyboard = true;
     }
+
+    ///SCALE
+
+    ImGui::AlignFirstTextHeightToWidgets();
+
+    ImGui::Text("Scale:");
+
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(150.f);
+    ImGui::DragFloat("###SIZE_FLOATER_SHIP_CUSTOMISE", &current.editor_size_storage, 0.1f, 0.1f, 100.f, "%.1f");
+    ImGui::PopItemWidth();
 
     ImGui::EndChild();
 }
