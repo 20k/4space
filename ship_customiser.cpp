@@ -2,6 +2,7 @@
 
 #include "top_bar.hpp"
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include <set>
 #include "util.hpp"
 #include "ui_util.hpp"
@@ -547,10 +548,7 @@ void handle_top_bar(ship& current)
 
     std::string dummy(40, ' ');
 
-    //ImVec2 win_size = ImGui::GetWindowSize();
-
-    //ImGui::BeginChild("TopBar", ImVec2(win_size.x, 50));
-
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4,2));
     ImGui::AlignFirstTextHeightToWidgets();
 
     ImGui::Text("Name: ");
@@ -561,6 +559,7 @@ void handle_top_bar(ship& current)
     ImGui::PushItemWidth(ImGui::CalcTextSize(dummy.c_str()).x);
     ImGui::InputText("", &current.name[0], max_name_length);
     ImGui::PopItemWidth();
+
     current.name.resize(strlen(current.name.c_str()));
 
     if(ImGui::IsItemActive())
@@ -570,7 +569,7 @@ void handle_top_bar(ship& current)
 
     ///SCALE
 
-    //ImGui::AlignFirstTextHeightToWidgets();
+    ImGui::AlignFirstTextHeightToWidgets();
 
     ImGui::Text("Scale:");
 
@@ -580,7 +579,7 @@ void handle_top_bar(ship& current)
     ImGui::DragFloat("###SIZE_FLOATER_SHIP_CUSTOMISE", &current.editor_size_storage, 0.1f, 0.1f, 100.f, "%.1f");
     ImGui::PopItemWidth();
 
-    //ImGui::EndChild();
+    ImGui::PopStyleVar(1);
 }
 
 void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
