@@ -588,11 +588,11 @@ void handle_top_bar(ship& current)
     ImGui::PopStyleVar(1);
 }
 
+#define HIGHLIGHT_COL (vec3f){ImGui::GetStyleCol(ImGuiCol_TitleBgActive).x, ImGui::GetStyleCol(ImGuiCol_TitleBgActive).y, ImGui::GetStyleCol(ImGuiCol_TitleBgActive).z}
+
 void do_selection_bar(ship_customiser& ship_customise)
 {
-    vec3f highlight_col = popup_colour_info::neutral_ui_colour * 0.6f;
-
-    ImGui::ToggleTextButton("(Design List)", highlight_col, {1,1,1}, ship_customise.edit_state == 0);
+    ImGui::SolidToggleTextButton("(Design List)", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 0);
 
     if(ImGui::IsItemClicked_Registered())
     {
@@ -601,7 +601,7 @@ void do_selection_bar(ship_customiser& ship_customise)
 
     ImGui::SameLine();
 
-    ImGui::ToggleTextButton("(Edit Design)", highlight_col, {1,1,1}, ship_customise.edit_state == 1);
+    ImGui::SolidToggleTextButton("(Edit Design)", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 1);
 
     if(ImGui::IsItemClicked_Registered())
     {
@@ -721,7 +721,7 @@ void ship_customiser::do_save_window()
             col = popup_colour_info::bad_ui_colour;
         }
 
-        ImGui::ToggleTextButton(name, col * 0.6, col, s.id == last_selected);
+        ImGui::ToggleTextButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
 
         if(ImGui::IsItemClicked() && last_selected != s.id)
         {
