@@ -505,6 +505,36 @@ void do_ship_component_display(ship& current)
     ImGui::EndChild();
 }
 
+void handle_top_bar(ship& current)
+{
+    int max_name_length = 40;
+
+    std::string dummy(40, ' ');
+
+    ImVec2 win_size = ImGui::GetWindowSize();
+
+    ImGui::BeginChild("TopBar", ImVec2(win_size.x, 50));
+
+    ImGui::AlignFirstTextHeightToWidgets();
+
+    ImGui::Text("Name: ");
+
+    ImGui::SameLine();
+
+    current.name.resize(max_name_length + 1);
+    ImGui::PushItemWidth(ImGui::CalcTextSize(dummy.c_str()).x);
+    ImGui::InputText("", &current.name[0], max_name_length);
+    ImGui::PopItemWidth();
+    current.name.resize(strlen(current.name.c_str()));
+
+    if(ImGui::IsItemActive())
+    {
+        ImGui::suppress_keyboard = true;
+    }
+
+    ImGui::EndChild();
+}
+
 void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 {
     text_input_going = false;
@@ -528,6 +558,8 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
         return;
 
     ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS);
+
+    handle_top_bar(current);
 
     do_ship_component_display(current);
 
