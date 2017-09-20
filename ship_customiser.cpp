@@ -18,6 +18,12 @@ ship_customiser::ship_customiser()
     //last_selected = current.id;
 
     saved = default_ships_list;
+
+    if(saved.size() > 0)
+    {
+        last_selected = saved.front().id;
+        current = saved.front();
+    }
 }
 
 void display_ship(ship& current)
@@ -557,7 +563,7 @@ void handle_top_bar(ship& current)
 
     current.name.resize(max_name_length + 1);
     ImGui::PushItemWidth(ImGui::CalcTextSize(dummy.c_str()).x);
-    ImGui::InputText("", &current.name[0], max_name_length);
+    ImGui::InputText("##test", &current.name[0], max_name_length);
     ImGui::PopItemWidth();
 
     current.name.resize(strlen(current.name.c_str()));
@@ -582,6 +588,27 @@ void handle_top_bar(ship& current)
     ImGui::PopStyleVar(1);
 }
 
+void do_selection_bar(ship_customiser& ship_customise)
+{
+    vec3f highlight_col = popup_colour_info::neutral_ui_colour * 0.6f;
+
+    ImGui::ToggleTextButton("(Design List)", highlight_col, {1,1,1}, ship_customise.edit_state == 0);
+
+    if(ImGui::IsItemClicked_Registered())
+    {
+        ship_customise.edit_state = 0;
+    }
+
+    ImGui::SameLine();
+
+    ImGui::ToggleTextButton("(Edit Design)", highlight_col, {1,1,1}, ship_customise.edit_state == 1);
+
+    if(ImGui::IsItemClicked_Registered())
+    {
+        ship_customise.edit_state = 1;
+    }
+}
+
 void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 {
     text_input_going = false;
@@ -594,10 +621,15 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
 
-    do_save_window();
+    //do_save_window();
 
-    if(last_selected == -1)
-        return;
+    //if(last_selected == -1)
+    //    return;
+
+    if(last_selected == -1 && saved.size() != 0)
+    {
+        last_selected = saved.front().id;
+    }
 
     ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -605,7 +637,14 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     handle_top_bar(current);
 
-    do_ship_component_display(current);
+    ImGui::NewLine();
+
+    do_selection_bar(*this);
+
+    if(edit_state == 1)
+        do_ship_component_display(current);
+    if(edit_state == 0)
+        do_save_window();
 
     ImGui::SameLine();
 
@@ -645,13 +684,26 @@ void ship_customiser::save()
 
     if(!found)
     {
+        last_selected = current.id;
         saved.push_back(current);
     }
 }
 
 void ship_customiser::do_save_window()
 {
-    ImGui::BeginOverride("Ship Design Manager", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    //ImGui::BeginOverride("Ship Design Manager", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+
+    static size_manager size_manage;
+
+    ImGui::BeginChild("###Ship Designs", size_manage.get_last_size(), false, CHILD_WINDOW_FLAGS);
+
+    ImGui::BeginMenuBar();
+    ImGui::Text("Ship Designs");
+    ImGui::EndMenuBar();
+
+    ImGui::BeginGroup();
+
+    child_pad();
 
     for(int i=0; i<saved.size(); i++)
     {
@@ -659,10 +711,14 @@ void ship_customiser::do_save_window()
 
         std::string name = s.name;
 
-        if(s.is_ship_design_valid())
-            ImGui::NeutralText(name);
-        else
-            ImGui::BadText(name);
+        vec3f col = popup_colour_info::neutral_ui_colour;
+
+        if(!s.is_ship_design_valid())
+        {
+            col = popup_colour_info::bad_ui_colour;
+        }
+
+        ImGui::ToggleTextButton(name, col * 0.6, col, s.id == last_selected);
 
         if(ImGui::IsItemClicked() && last_selected != s.id)
         {
@@ -751,5 +807,11 @@ void ship_customiser::do_save_window()
         last_selected = current.id;
     }
 
-    ImGui::End();
+    child_unpad();
+
+    ImGui::EndGroup();
+
+    size_manage.set_size(ImGui::GetItemRectSize());
+
+    ImGui::EndChild();
 }

@@ -22,6 +22,8 @@ struct ship_customiser
 
     void tick(float scrollwheel, bool lclick, vec2f mouse_change);
 
+    int edit_state = 0;
+
 private:
     //ImVec2 last_stats_dim = ImVec2(0, 0);
     void save();

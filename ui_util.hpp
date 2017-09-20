@@ -241,6 +241,12 @@ namespace ImGui
     }
 
     inline
+    void ToggleTextButton(const std::string& txt, vec3f highlight_col, vec3f col, bool is_active)
+    {
+        OutlineHoverText(txt, highlight_col, col, true, {8.f, 2.f}, 1, is_active, highlight_col/4.f, is_active);
+    }
+
+    inline
     void OutlineHoverTextAuto(const std::string& txt, vec3f text_col, bool hover = true, vec2f dim_extra = {0,0}, int thickness = 1, bool force_hover = false)
     {
         return OutlineHoverText(txt, text_col/2.f, text_col, hover, dim_extra, thickness, force_hover);

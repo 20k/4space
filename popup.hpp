@@ -28,6 +28,7 @@ namespace popup_colour_info
 {
     static vec3f good_ui_colour{0.5, 0.5, 1};
     static vec3f bad_ui_colour{1, 0.5, 0.5};
+    static vec3f neutral_ui_colour{1, 1, 1}; ///somewhat of a formality
 }
 
 #define SCOPED_INDENT(name) auto name = ImGui::ScopedIndent()
