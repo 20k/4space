@@ -2984,6 +2984,7 @@ int main()
 
                 //system_manage.change_zoom(-scrollwheel_delta, mpos, window);
 
+                #ifdef ZOOM_OUT_OF_BATTLE
                 ///need to set system camera to be location of battle
                 if(all_battles->zoom_handle.get_zoom() > 20)
                 {
@@ -3010,6 +3011,7 @@ int main()
                         system_manage.system_cam.pos = bm->get_avg_centre_global();
                     }
                 }
+                #endif
             }
         }
 
