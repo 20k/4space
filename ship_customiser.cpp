@@ -476,6 +476,8 @@ void do_ship_component_display(ship& current)
         if(!good)
             continue;
 
+        //ImGui::SmallButton((component_category_info::names[category] + length_pad).c_str());
+
         for(int i=0; i<full_component_list.size(); i++)
         {
             component& c = full_component_list[i];
@@ -721,7 +723,15 @@ void ship_customiser::do_save_window()
             col = popup_colour_info::bad_ui_colour;
         }
 
-        ImGui::ToggleTextButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
+        //ImGui::ToggleTextButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
+
+        //ImGui::SolidToggleTextButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
+
+        ImGui::PushItemWidth(100);
+
+        ImGui::SolidSmallButton(name, HIGHLIGHT_COL, col);
+
+        ImGui::PopItemWidth();
 
         if(ImGui::IsItemClicked() && last_selected != s.id)
         {

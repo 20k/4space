@@ -119,3 +119,39 @@ void ImGui::SkipFrosting(const std::string& name)
 {
     to_skip_frosting.push_back(name);
 }
+
+void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f col)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, 0.f));
+
+    highlight_col = clamp(highlight_col, 0.f, 1.f);
+
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(highlight_col.x(), highlight_col.y(), highlight_col.z(), 1));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(highlight_col.x(), highlight_col.y(), highlight_col.z(), 1));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(col.x(), col.y(), col.z(), 0));
+
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(col.x(), col.y(), col.z(), 1));
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0.5f));
+
+    auto cpos = ImGui::GetCursorPos();
+
+    ImGui::BeginGroup();
+
+    ImGui::ButtonEx(("###" + txt + "MYBUTT").c_str(), ImVec2(ImGui::GetWindowSize().x - 12,0), ImGuiButtonFlags_AlignTextBaseLine);
+
+    cpos.x += ImGui::GetStyle().FramePadding.x;
+
+    cpos.x = round(cpos.x);
+
+    ImGui::SetCursorPos(cpos);
+
+    ImGui::Text(txt.c_str());
+
+    ImGui::EndGroup();
+
+    ImGui::PopStyleColor(4);
+
+    ImGui::PopStyleVar(3);
+}
