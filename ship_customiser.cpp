@@ -669,11 +669,29 @@ void ship_customiser::do_save_window()
 
         if(ImGui::IsItemClicked())
         {
-            ///this is wrong a s it duplicates ids
-            saved.push_back(current.duplicate());
+            auto dupe = current.duplicate();
 
-            //current = ship();
-            last_selected = current.id;
+            dupe.name = dupe.name + " (1)";
+
+            ///this is wrong a s it duplicates ids
+            if(saved.size() == 0)
+            {
+                saved.push_back(dupe);
+            }
+            else
+            {
+                for(auto it = saved.begin(); it != saved.end(); it++)
+                {
+                    if(it->id == last_selected)
+                    {
+                        saved.insert(it + 1, dupe);
+                        break;
+                    }
+                }
+            }
+
+            current = dupe;
+            last_selected = dupe.id;
         }
 
         ImGui::NeutralText("(Save)");
