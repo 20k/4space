@@ -2888,6 +2888,11 @@ int main()
             system_manage.enter_universe_view();
         }
 
+        ///this is... well, quite a bit of a hack
+        ///only context can suppress keyboard at the moment
+        ImGui::suppress_keyboard = false;
+
+
         ///this hack is very temporary, after this make it so that the backup system is the
         ///system in which the battle takes place that we're viewing
         ///Ok so. If any system sets currently viewed to not be nullptr, but we're in the combat state
@@ -3046,10 +3051,6 @@ int main()
         }
 
         system_manage.tick(diff_s);
-
-        ///this is... well, quite a bit of a hack
-        ///only context can suppress keyboard at the moment
-        ImGui::suppress_keyboard = false;
 
         bool any_open = false;
 
