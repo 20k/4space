@@ -153,19 +153,31 @@ struct size_manager
 
         ImVec2 ret = last_size;
 
-        ret.x += 30;
+        ret.x += ImGui::CalcTextSize(" ").x;
         ret.y += 30;
 
         if(ret.y >= wsize.y - 70)
         {
-            ret.y = 0;
+            //ret.y = 0;
         }
 
         return ret;
     }
 };
 
-#define CHILD_WINDOW_FLAGS 0
+void child_pad()
+{
+    ImGui::Dummy(ImVec2(1, ImGui::CalcTextSize(" ").y / 2.f));
+
+    ImGui::Indent(ImGui::CalcTextSize(" ").x);
+}
+
+void child_unpad()
+{
+    ImGui::Unindent(ImGui::CalcTextSize(" ").x);
+}
+
+#define CHILD_WINDOW_FLAGS ImGuiWindowFlags_MenuBar
 
 void display_ship_stats_window(ship& current)
 {
@@ -177,7 +189,13 @@ void display_ship_stats_window(ship& current)
 
     ImGui::BeginChild("###ship_state_customise", display_ship_size.get_last_size(), false, CHILD_WINDOW_FLAGS);
 
+    ImGui::BeginMenuBar();
+    ImGui::Text("Ship State");
+    ImGui::EndMenuBar();
+
     ImGui::BeginGroup();
+
+    child_pad();
 
     display_ship(current);
 
@@ -201,12 +219,13 @@ void display_ship_stats_window(ship& current)
     auto win_pos = ImGui::GetWindowPos();
     auto win_size = ImGui::GetWindowSize();
 
+    child_unpad();
+
     ImGui::EndGroup();
 
     display_ship_size.set_size(ImGui::GetItemRectSize());
 
     ImGui::EndChild();
-
 }
 
 void do_side_foldout_window(ship& current, float scrollwheel)
@@ -219,9 +238,15 @@ void do_side_foldout_window(ship& current, float scrollwheel)
 
     //ImGui::BeginOverride((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
-    ImGui::BeginChild("###side_foldout", foldout_size.get_last_size(), true, CHILD_WINDOW_FLAGS);
+    ImGui::BeginChild("###side_foldout", foldout_size.get_last_size(), false, CHILD_WINDOW_FLAGS);
+
+    ImGui::BeginMenuBar();
+    ImGui::Text("Ship Components");
+    ImGui::EndMenuBar();
 
     ImGui::BeginGroup();
+
+    child_pad();
 
     std::vector<std::string> names;
     std::vector<std::string> sizes;
@@ -390,6 +415,8 @@ void do_side_foldout_window(ship& current, float scrollwheel)
         current.add(c);
     }
 
+    child_unpad();
+
     ImGui::EndGroup();
 
     foldout_size.set_size(ImGui::GetItemRectSize());
@@ -405,9 +432,15 @@ void do_ship_component_display(ship& current)
 
     //ImGui::BeginOverride("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::BeginChild("###ship_components", display_component_size.get_last_size(), true, CHILD_WINDOW_FLAGS);
+    ImGui::BeginChild("###ship_components", display_component_size.get_last_size(), false, CHILD_WINDOW_FLAGS);
+
+    ImGui::BeginMenuBar();
+    ImGui::Text("Available Components");
+    ImGui::EndMenuBar();
 
     ImGui::BeginGroup();
+
+    child_pad();
 
     std::stable_sort(full_component_list.begin(), full_component_list.end(),
                      [](auto& c1, auto& c2){return c1.ui_category < c2.ui_category;});
@@ -499,6 +532,8 @@ void do_ship_component_display(ship& current)
         ImGui::TreePop();
     }
 
+    child_unpad();
+
     ImGui::EndGroup();
 
     display_component_size.set_size(ImGui::GetItemRectSize());
@@ -512,9 +547,9 @@ void handle_top_bar(ship& current)
 
     std::string dummy(40, ' ');
 
-    ImVec2 win_size = ImGui::GetWindowSize();
+    //ImVec2 win_size = ImGui::GetWindowSize();
 
-    ImGui::BeginChild("TopBar", ImVec2(win_size.x, 50));
+    //ImGui::BeginChild("TopBar", ImVec2(win_size.x, 50));
 
     ImGui::AlignFirstTextHeightToWidgets();
 
@@ -535,7 +570,7 @@ void handle_top_bar(ship& current)
 
     ///SCALE
 
-    ImGui::AlignFirstTextHeightToWidgets();
+    //ImGui::AlignFirstTextHeightToWidgets();
 
     ImGui::Text("Scale:");
 
@@ -545,7 +580,7 @@ void handle_top_bar(ship& current)
     ImGui::DragFloat("###SIZE_FLOATER_SHIP_CUSTOMISE", &current.editor_size_storage, 0.1f, 0.1f, 100.f, "%.1f");
     ImGui::PopItemWidth();
 
-    ImGui::EndChild();
+    //ImGui::EndChild();
 }
 
 void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
@@ -565,7 +600,9 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     if(last_selected == -1)
         return;
 
-    ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS);
+    ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::BeginGroup();
 
     handle_top_bar(current);
 
@@ -578,6 +615,8 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     ImGui::SameLine();
 
     display_ship_stats_window(current);
+
+    ImGui::EndGroup();
 
     ImGui::End();
 
