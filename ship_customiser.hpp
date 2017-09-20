@@ -26,8 +26,6 @@ private:
     //ImVec2 last_stats_dim = ImVec2(0, 0);
     void save();
     void do_save_window();
-    int64_t renaming_id = -1;
-    std::string ship_name_buffer;
 };
 
 #endif // SHIP_CUSTOMISER_HPP_INCLUDED

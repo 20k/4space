@@ -552,11 +552,6 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 {
     text_input_going = false;
 
-    if(lclick)
-    {
-        renaming_id = -1;
-    }
-
     if(current.name == "")
         current.name = "New Ship";
 
@@ -626,47 +621,15 @@ void ship_customiser::do_save_window()
 
         std::string name = s.name;
 
-        if(renaming_id != s.id)
-        {
-            if(s.is_ship_design_valid())
-                ImGui::NeutralText(name);
-            else
-                ImGui::BadText(name);
-
-            if(ImGui::IsItemClicked() && last_selected != s.id)
-            {
-                current = s;
-                last_selected = current.id;
-            }
-
-            if(ImGui::IsItemClicked() && ImGui::IsMouseDoubleClicked(0))
-            {
-                ship_name_buffer = s.name;
-                renaming_id = last_selected;
-            }
-        }
+        if(s.is_ship_design_valid())
+            ImGui::NeutralText(name);
         else
+            ImGui::BadText(name);
+
+        if(ImGui::IsItemClicked() && last_selected != s.id)
         {
-            ship_name_buffer.resize(100);
-
-            text_input_going = true;
-
-            if(ImGui::InputText("###Input_savewindow", &ship_name_buffer[0], ship_name_buffer.size() - 1, ImGuiInputTextFlags_EnterReturnsTrue))
-            {
-                renaming_id = -1;
-            }
-
-            ///we don't want nulls
-            int c_style_length = strlen(ship_name_buffer.c_str());
-
-            s.name = ship_name_buffer;
-
-            s.name.resize(c_style_length);
-
-            if(current.id == s.id)
-            {
-                current.name = s.name;
-            }
+            current = s;
+            last_selected = current.id;
         }
     }
 
