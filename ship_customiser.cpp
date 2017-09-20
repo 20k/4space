@@ -609,6 +609,9 @@ void do_selection_bar(ship_customiser& ship_customise)
     }
 }
 
+///Ok. If I'm going to stick with 1d ship layout, need to colour code the components by category
+///otherwise it is simply too difficult to see wtfs going on
+///draw up colour list, not hard to do
 void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 {
     text_input_going = false;
@@ -729,6 +732,8 @@ void ship_customiser::do_save_window()
 
     if(last_selected != -1)
     {
+        ImGui::NewLine();
+
         ImGui::NeutralText("(Delete current design)");
 
         if(ImGui::IsItemClicked())
