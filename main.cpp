@@ -881,9 +881,6 @@ struct box_selection
 
     void tick(system_manager& system_manage, orbital_system* cur, sf::RenderWindow& win, popup_info& popup, empire* viewer_empire)
     {
-        if(cur == nullptr)
-            return;
-
         sf::Mouse mouse;
 
         vec2f mpos = {mouse.getPosition(win).x, mouse.getPosition(win).y};
@@ -896,7 +893,7 @@ struct box_selection
 
         std::vector<orbital*> potential_orbitals;
 
-        if(going)
+        if(going && cur != nullptr)
         {
             std::vector<orbital*>* orbitals = &cur->orbitals;
 
@@ -977,7 +974,7 @@ struct box_selection
             return;
         }
 
-        if(!key_down(sf::Keyboard::LShift) && !going)
+        if(!key_down(sf::Keyboard::LShift) && !going && cur != nullptr)
         {
             for(orbital* o : cur->orbitals)
             {
