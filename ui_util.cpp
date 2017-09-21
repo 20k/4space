@@ -120,7 +120,7 @@ void ImGui::SkipFrosting(const std::string& name)
     to_skip_frosting.push_back(name);
 }
 
-void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f col)
+void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f col, bool force_hover)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, 0.f));
@@ -129,7 +129,7 @@ void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f 
 
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(highlight_col.x(), highlight_col.y(), highlight_col.z(), 1));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(highlight_col.x(), highlight_col.y(), highlight_col.z(), 1));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(col.x(), col.y(), col.z(), 0));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(highlight_col.x(), highlight_col.y(), highlight_col.z(), force_hover ? 1 : 0));
 
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(col.x(), col.y(), col.z(), 1));
 

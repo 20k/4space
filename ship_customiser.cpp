@@ -700,6 +700,11 @@ void ship_customiser::do_save_window()
 
     static size_manager size_manage;
 
+
+    //ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1,1,1,1));
+
+    //ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1,1,1,0));
+
     ImGui::BeginChild("###Ship Designs", size_manage.get_last_size(), false, CHILD_WINDOW_FLAGS);
 
     ImGui::BeginMenuBar();
@@ -729,7 +734,7 @@ void ship_customiser::do_save_window()
 
         ImGui::PushItemWidth(100);
 
-        ImGui::SolidSmallButton(name, HIGHLIGHT_COL, col);
+        ImGui::SolidSmallButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
 
         ImGui::PopItemWidth();
 
@@ -829,4 +834,6 @@ void ship_customiser::do_save_window()
     size_manage.set_size(ImGui::GetItemRectSize());
 
     ImGui::EndChild();
+
+    //ImGui::PopStyleColor(1);
 }
