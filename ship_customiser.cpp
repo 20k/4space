@@ -431,7 +431,54 @@ void do_side_foldout_window(ship& current, float scrollwheel)
     ImGui::EndChild();
 }
 
-void do_ship_component_display(ship& current)
+int get_max_spacing_len(ship& current)
+{
+    int max_len = 0;
+
+    for(auto& c : full_component_list)
+    {
+        max_len = std::max(max_len, (int)c.name.length());
+    }
+
+    max_len = std::max(max_len, (int)current.name.length());
+
+    int min_title_length = 4;
+
+    if(max_len < min_title_length)
+    {
+        max_len = min_title_length;
+    }
+
+    max_len += 8;
+
+    return max_len;
+}
+
+void do_consistent_pad(ship_customiser& ship_customise)
+{
+    int max_len = 0;
+
+    for(ship& s : ship_customise.saved)
+    {
+        max_len = std::max(max_len, get_max_spacing_len(s));
+    }
+
+    max_len = std::max(max_len, get_max_spacing_len(ship_customise.current));
+
+    std::string length_test(max_len, ' ');
+
+    auto cursor = ImGui::GetCursorPos();
+
+    ImGui::Indent(4);
+
+    ImGui::Text(length_test.c_str());
+
+    ImGui::Unindent(4);
+
+    ImGui::SetCursorPos(cursor);
+}
+
+void do_ship_component_display(ship& current, ship_customiser& ship_customise)
 {
     static size_manager display_component_size;
 
@@ -452,25 +499,13 @@ void do_ship_component_display(ship& current)
     std::stable_sort(full_component_list.begin(), full_component_list.end(),
                      [](auto& c1, auto& c2){return c1.ui_category < c2.ui_category;});
 
-    int max_len = 0;
-
-    for(auto& c : full_component_list)
-    {
-        max_len = std::max(max_len, (int)c.name.length());
-    }
-
-    int min_title_length = 4;
-
-    if(max_len < min_title_length)
-    {
-        max_len = min_title_length;
-    }
-
-    std::string length_pad(max_len - min_title_length, ' ');
+    do_consistent_pad(ship_customise);
 
     for(int category = 0; category < component_category_info::NONE; category++)
     {
-        bool good = ImGui::TreeNodeEx((component_category_info::names[category] + length_pad).c_str(), 0);
+        std::string my_name = component_category_info::names[category];
+
+        bool good = ImGui::TreeNodeEx(my_name.c_str(), 0);
         //bool good = ImGui::TreeNodeEx((component_category_info::names[category] + length_pad).c_str(), ImGuiTreeNodeFlags_CollapsingHeader);
 
         if(!good)
@@ -594,7 +629,9 @@ void handle_top_bar(ship& current)
 
 void do_selection_bar(ship_customiser& ship_customise)
 {
-    ImGui::SolidToggleTextButton("(Design List)", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 0);
+    //ImGui::SolidToggleTextButton("Design List", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 0);
+
+    ImGui::SolidSmallButton("Design List", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 0, {100, 0});
 
     if(ImGui::IsItemClicked_Registered())
     {
@@ -603,7 +640,7 @@ void do_selection_bar(ship_customiser& ship_customise)
 
     ImGui::SameLine();
 
-    ImGui::SolidToggleTextButton("(Edit Design)", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 1);
+    ImGui::SolidSmallButton("Edit Design", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 1, {100, 0});
 
     if(ImGui::IsItemClicked_Registered())
     {
@@ -640,14 +677,14 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     ImGui::BeginGroup();
 
+    do_selection_bar(*this);
+    ImGui::NewLine();
     handle_top_bar(current);
-
     ImGui::NewLine();
 
-    do_selection_bar(*this);
 
     if(edit_state == 1)
-        do_ship_component_display(current);
+        do_ship_component_display(current, *this);
     if(edit_state == 0)
         do_save_window();
 
@@ -715,6 +752,8 @@ void ship_customiser::do_save_window()
 
     child_pad();
 
+    do_consistent_pad(*this);
+
     for(int i=0; i<saved.size(); i++)
     {
         ship& s = saved[i];
@@ -732,11 +771,21 @@ void ship_customiser::do_save_window()
 
         //ImGui::SolidToggleTextButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
 
-        ImGui::PushItemWidth(100);
+        //ImGui::PushItemWidth(100);
 
         ImGui::SolidSmallButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
 
-        ImGui::PopItemWidth();
+        //ImGui::PopItemWidth();
+
+
+        ///problem is that button resizes
+        /*if(name.length() < max_len)
+        {
+            ImGui::SameLine();
+
+
+            ImGui::Text(length_pad.c_str());
+        }*/
 
         if(ImGui::IsItemClicked() && last_selected != s.id)
         {
@@ -749,7 +798,7 @@ void ship_customiser::do_save_window()
     {
         ImGui::NewLine();
 
-        ImGui::NeutralText("(Delete current design)");
+        ImGui::NeutralText("(Delete current)");
 
         if(ImGui::IsItemClicked())
         {

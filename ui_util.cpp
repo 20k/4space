@@ -120,7 +120,7 @@ void ImGui::SkipFrosting(const std::string& name)
     to_skip_frosting.push_back(name);
 }
 
-void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f col, bool force_hover)
+void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f col, bool force_hover, vec2f dim)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, 0.f));
@@ -139,7 +139,12 @@ void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f 
 
     ImGui::BeginGroup();
 
-    ImGui::ButtonEx(("###" + txt + "MYBUTT").c_str(), ImVec2(ImGui::GetWindowSize().x - 12,0), ImGuiButtonFlags_AlignTextBaseLine);
+    if(dim.x() == 0)
+    {
+        dim.x() = ImGui::GetWindowSize().x - 12;
+    }
+
+    ImGui::ButtonEx(("###" + txt + "MYBUTT").c_str(), ImVec2(dim.x(), dim.y()), ImGuiButtonFlags_AlignTextBaseLine);
 
     cpos.x += ImGui::GetStyle().FramePadding.x;
 
