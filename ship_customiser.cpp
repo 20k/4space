@@ -809,12 +809,12 @@ void ship_customiser::do_save_window()
             last_selected = dupe.id;
         }
 
-        ImGui::NeutralText("(Save)");
+        /*ImGui::NeutralText("(Save)");
 
         if(ImGui::IsItemClicked())
         {
             save();
-        }
+        }*/
     }
 
     ImGui::NeutralText("(New Design)");
