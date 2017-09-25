@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <array>
 #include <vec/vec.hpp>
 #include <SFML/Graphics.hpp>
 #include "resource_manager.hpp"
@@ -351,6 +352,10 @@ namespace component_category_info
         "Empire",
         "Err",
     };
+
+    ///Time to move into the modern era and use arrays!
+    inline
+    std::array<bool, types::NONE> is_active;
 }
 
 using component_category_t = component_category_info::types;
