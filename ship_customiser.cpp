@@ -163,11 +163,6 @@ struct size_manager
         ret.x += ImGui::CalcTextSize(" ").x;
         ret.y += 30;
 
-        if(ret.y >= wsize.y - 70)
-        {
-            //ret.y = 0;
-        }
-
         return ret;
     }
 };
@@ -215,14 +210,6 @@ void display_ship_stats_window(ship& current)
 
     ImGui::NewLine();
 
-    /*ImGui::Text("Size");
-
-    ImGui::SameLine();
-
-    ImGui::PushItemWidth(150.f);
-    ImGui::DragFloat("###SIZE_FLOATER_SHIP_CUSTOMISE", &current.editor_size_storage, 0.1f, 0.1f, 100.f, "%.1f");
-    ImGui::PopItemWidth();*/
-
     auto win_pos = ImGui::GetWindowPos();
     auto win_size = ImGui::GetWindowSize();
 
@@ -239,11 +226,7 @@ void do_side_foldout_window(ship& current, float scrollwheel)
 {
     static size_manager foldout_size;
 
-    //ImGui::SetNextWindowPos(ImVec2(win_pos.x + win_size.x, win_pos.y + get_title_bar_height()));
-
     global_drag_and_drop.begin_drag_section("SIDE_FOLDOUT");
-
-    //ImGui::BeginOverride((current.name + "###SHIPPITYSHIPSHAPE").c_str(), &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_JUST_TEXT_WINDOW_INPUTS);
 
     ImGui::BeginChild("###side_foldout", foldout_size.get_last_size(), false, CHILD_WINDOW_FLAGS);
 
@@ -469,12 +452,6 @@ float do_consistent_pad(ship_customiser& ship_customise)
 
     std::string length_test(max_len, ' ');
 
-    /*auto cursor = ImGui::GetCursorPos();
-
-    ImGui::Text(length_test.c_str());
-
-    ImGui::SetCursorPos(cursor);*/
-
     return ImGui::CalcTextSize(length_test.c_str()).x;
 }
 
@@ -486,11 +463,7 @@ void do_ship_component_display(ship& current, ship_customiser& ship_customise)
 
     global_drag_and_drop.begin_drag_section("SHIP_CUSTOMISE_2");
 
-    //ImGui::BeginOverride("Ship Components", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
-
     float dim = do_consistent_pad(ship_customise);
-
-    //ImGui::SetNextWindowSize(ImVec2(dim, 0));
 
     ImGui::BeginChild("###ship_components", ImVec2(dim, display_component_size.get_last_size().y), false, CHILD_WINDOW_FLAGS);
 
@@ -505,14 +478,9 @@ void do_ship_component_display(ship& current, ship_customiser& ship_customise)
     std::stable_sort(full_component_list.begin(), full_component_list.end(),
                      [](auto& c1, auto& c2){return c1.ui_category < c2.ui_category;});
 
-    //do_consistent_pad(ship_customise);
-
     for(int category = 0; category < component_category_info::NONE; category++)
     {
         std::string my_name = component_category_info::names[category];
-
-        //bool good = ImGui::TreeNodeEx((my_name + "##NODETREE" + std::to_string(category)).c_str(), 0);
-        //bool good = ImGui::TreeNodeEx((component_category_info::names[category] + length_pad).c_str(), ImGuiTreeNodeFlags_CollapsingHeader);
 
         ImGui::SolidSmallButton(my_name, HIGHLIGHT_COL, {1,1,1}, false, {0,0});
 
@@ -525,8 +493,6 @@ void do_ship_component_display(ship& current, ship_customiser& ship_customise)
             continue;
 
         ImGui::Indent();
-
-        //ImGui::SmallButton((component_category_info::names[category] + length_pad).c_str());
 
         for(int i=0; i<full_component_list.size(); i++)
         {
@@ -589,8 +555,6 @@ void do_ship_component_display(ship& current, ship_customiser& ship_customise)
         }
 
         ImGui::Unindent();
-
-        //ImGui::TreePop();
     }
 
     child_unpad();
@@ -644,8 +608,6 @@ void handle_top_bar(ship& current)
 
 void do_selection_bar(ship_customiser& ship_customise)
 {
-    //ImGui::SolidToggleTextButton("Design List", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 0);
-
     ImGui::SolidSmallButton("Design List", HIGHLIGHT_COL, {1,1,1}, ship_customise.edit_state == 0, {100, 0});
 
     if(ImGui::IsItemClicked_Registered())
@@ -677,11 +639,6 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
-
-    //do_save_window();
-
-    //if(last_selected == -1)
-    //    return;
 
     if(last_selected == -1 && saved.size() != 0)
     {
@@ -748,14 +705,7 @@ void ship_customiser::save()
 
 void ship_customiser::do_save_window()
 {
-    //ImGui::BeginOverride("Ship Design Manager", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
-
     static size_manager size_manage;
-
-
-    //ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1,1,1,1));
-
-    //ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4(1,1,1,0));
 
     float dim = do_consistent_pad(*this);
 
@@ -768,8 +718,6 @@ void ship_customiser::do_save_window()
     ImGui::BeginGroup();
 
     child_pad();
-
-    //do_consistent_pad(*this);
 
     for(int i=0; i<saved.size(); i++)
     {
@@ -784,25 +732,7 @@ void ship_customiser::do_save_window()
             col = popup_colour_info::bad_ui_colour;
         }
 
-        //ImGui::ToggleTextButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
-
-        //ImGui::SolidToggleTextButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
-
-        //ImGui::PushItemWidth(100);
-
         ImGui::SolidSmallButton(name, HIGHLIGHT_COL, col, s.id == last_selected);
-
-        //ImGui::PopItemWidth();
-
-
-        ///problem is that button resizes
-        /*if(name.length() < max_len)
-        {
-            ImGui::SameLine();
-
-
-            ImGui::Text(length_pad.c_str());
-        }*/
 
         if(ImGui::IsItemClicked() && last_selected != s.id)
         {
@@ -819,8 +749,6 @@ void ship_customiser::do_save_window()
 
         if(ImGui::IsItemClicked())
         {
-            //current = ship();
-
             int i = 0;
 
             for(i=0; i<saved.size(); i++)
@@ -900,6 +828,4 @@ void ship_customiser::do_save_window()
     size_manage.set_size(ImGui::GetItemRectSize());
 
     ImGui::EndChild();
-
-    //ImGui::PopStyleColor(1);
 }
