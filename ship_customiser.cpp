@@ -163,6 +163,13 @@ struct size_manager
         ret.x += ImGui::CalcTextSize(" ").x;
         ret.y += 30;
 
+        int max_window_size = 300;
+
+        if(ret.y >= max_window_size)
+        {
+            ret.y = max_window_size;
+        }
+
         return ret;
     }
 };
