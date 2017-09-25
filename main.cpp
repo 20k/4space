@@ -893,36 +893,43 @@ struct box_selection
 
         std::vector<orbital*> potential_orbitals;
 
-        if(going && cur != nullptr)
+        if(going)
         {
-            std::vector<orbital*>* orbitals = &cur->orbitals;
+            std::vector<orbital*>* orbitals = nullptr;
+
+            if(cur != nullptr)
+                orbitals = &cur->orbitals;
 
             if(!system_manage.in_system_view())
                 orbitals = &system_manage.advertised_universe_orbitals;
 
-            for(orbital* o : *orbitals)
+            if(orbitals != nullptr)
             {
-                if(o->type != orbital_info::FLEET)
-                    continue;
-
-                if(!o->viewed_by[viewer_empire])
-                    continue;
-
-                vec2f pos = o->last_viewed_position;
-
-                if(!system_manage.in_system_view())
-                    pos = o->universe_view_pos;
-
-                vec2f tl = min(mpos, start_pos);
-                vec2f br = max(mpos, start_pos);
-
-                auto spos = win.mapCoordsToPixel({pos.x(), pos.y()});
-
-                if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
+                for(orbital* o : *orbitals)
                 {
-                    potential_orbitals.push_back(o);
+                    if(o->type != orbital_info::FLEET)
+                        continue;
+
+                    if(!o->viewed_by[viewer_empire])
+                        continue;
+
+                    vec2f pos = o->last_viewed_position;
+
+                    if(!system_manage.in_system_view())
+                        pos = o->universe_view_pos;
+
+                    vec2f tl = min(mpos, start_pos);
+                    vec2f br = max(mpos, start_pos);
+
+                    auto spos = win.mapCoordsToPixel({pos.x(), pos.y()});
+
+                    if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
+                    {
+                        potential_orbitals.push_back(o);
+                    }
                 }
             }
+
 
             if(!lclick)
                 going = false;
