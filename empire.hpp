@@ -256,7 +256,7 @@ struct empire : serialisable
 
     std::vector<orbital_system*> get_unowned_system_with_my_fleets_in();
     float pirate_invasion_timer_s = 0.f; ///if this empire is pirates, time since we invaded
-    float max_pirate_invasion_elapsed_time_s = 5 * 60.f;
+    float max_pirate_invasion_elapsed_time_s = 15 * 60.f;
 
     void tick_invasion_timer(float step_s, system_manager& system_manage, fleet_manager& fleet_manage);
 
