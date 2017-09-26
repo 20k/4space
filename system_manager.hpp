@@ -255,6 +255,7 @@ struct orbital : serialisable
     orbital* mining_target = nullptr;
 
     ///busy as in in combat or otherwise indisposed
+    bool hostiles_in_system();
     bool in_friendly_territory_and_not_busy();
     bool in_friendly_territory();
 

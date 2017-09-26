@@ -1298,6 +1298,39 @@ bool orbital::can_colonise()
     return type == orbital_info::PLANET && parent_empire == nullptr;
 }
 
+bool orbital::hostiles_in_system()
+{
+    if(parent_empire == nullptr)
+        return false;
+
+    if(parent_system == nullptr)
+        return false;
+
+    for(orbital* o : parent_system->orbitals)
+    {
+        if(o->parent_empire == nullptr)
+            continue;
+
+        if(o->parent_empire == parent_empire)
+            continue;
+
+        if(o->parent_empire->is_hostile(parent_empire))
+        {
+            if(o->type == orbital_info::FLEET)
+            {
+                ship_manager* sm = o->data;
+
+                if(sm->all_derelict())
+                    continue;
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool orbital::in_friendly_territory_and_not_busy()
 {
     if(parent_empire == nullptr)

@@ -2077,8 +2077,10 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
     bool owned = owned_by->parent_empire == player_empire;
 
+    bool no_hostiles_in_system = !o->hostiles_in_system();
+
     ///RESUPPLY
-    if(friendly && !fully_disabled())
+    if(friendly && !fully_disabled() && no_hostiles_in_system)
     {
         ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, owned_by->auto_resupply);
 
@@ -2105,7 +2107,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
     }
 
     ///REPAIR
-    if(friendly && damaged() && !fully_disabled())
+    if(friendly && damaged() && !fully_disabled() && no_hostiles_in_system)
     {
         ImGui::GoodText("(Repair)");
 
@@ -2115,7 +2117,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         }
     }
 
-    if(friendly && !fully_disabled())
+    if(friendly && !fully_disabled() && no_hostiles_in_system)
     {
         ImGui::GoodText("(Refill Cargo)");
 
@@ -2133,7 +2135,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
                               player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
                               !o->data->any_in_combat();
 
-    if(!fully_disabled() && can_claim_hostile && owned_by->parent_empire == player_empire && can_be_upgraded())
+    if(!fully_disabled() && can_claim_hostile && owned_by->parent_empire == player_empire && can_be_upgraded() && no_hostiles_in_system)
     {
         ///this is expensive and involves a ship copy
         auto res = get_upgrade_cost(this);
@@ -2160,7 +2162,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         }
     }
 
-    if(fully_disabled() && can_claim_hostile)
+    if(fully_disabled() && can_claim_hostile && no_hostiles_in_system)
     {
         if(can_recrew(player_empire))
             ImGui::NeutralText("(Recrew)");
@@ -2191,7 +2193,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
         }
     }
 
-    if((owned && not_busy_and_in_friendly_territory) || (fully_disabled() && can_claim_hostile))
+    if(((owned && not_busy_and_in_friendly_territory) || (fully_disabled() && can_claim_hostile)) && no_hostiles_in_system)
     {
         research research_raw;
 
@@ -2339,9 +2341,10 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
                               player_empire->is_allied(o->parent_system->get_base()->parent_empire)) &&
                               !any_in_combat();
 
+    bool no_hostiles_in_system = !o->hostiles_in_system();
 
     ///RESUPPLY
-    if(friendly && !any_derelict())
+    if(friendly && !any_derelict() && no_hostiles_in_system)
     {
         ImGui::OutlineHoverTextAuto("(Resupply)", popup_colour_info::good_ui_colour, true, {0,0}, 1, auto_resupply);
 
@@ -2368,7 +2371,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
     }
 
     ///REPAIR
-    if(friendly && any_damaged() && !any_derelict())
+    if(friendly && any_damaged() && !any_derelict() && no_hostiles_in_system)
     {
         ImGui::GoodText("(Repair)");
 
@@ -2378,7 +2381,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         }
     }
 
-    if(friendly && !any_derelict())
+    if(friendly && !any_derelict() && no_hostiles_in_system)
     {
         ImGui::GoodText("(Refill Cargo)");
 
@@ -2399,7 +2402,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         }
     }
 
-    if(any_upgrade && parent_empire == player_empire && can_claim_hostile)
+    if(any_upgrade && parent_empire == player_empire && can_claim_hostile && no_hostiles_in_system)
     {
         bool all_can_be_upgraded = true;
 
@@ -2440,7 +2443,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         }
     }
 
-    if(any_derelict() && can_claim_hostile)
+    if(any_derelict() && can_claim_hostile && no_hostiles_in_system)
     {
         bool can_recrew_all = true;
 
@@ -2534,7 +2537,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
         }
     }
 
-    if((owned && not_busy_and_in_friendly_territory) || (all_derelict() && can_claim_hostile))
+    if((owned && not_busy_and_in_friendly_territory) || (all_derelict() && can_claim_hostile) && no_hostiles_in_system)
     {
         resource_manager rm;
         std::map<resource::types, float> accum_res;
