@@ -658,6 +658,13 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     if(!top_bar::active[top_bar_info::SHIP_CUSTOMISER])
         return;
 
+    current.sort_components();
+
+    for(auto& i : saved)
+    {
+        i.sort_components();
+    }
+
     if(last_selected == -1 && saved.size() != 0)
     {
         last_selected = saved.front().id;

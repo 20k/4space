@@ -573,6 +573,8 @@ struct ship : positional, serialisable, ship_base_context_menu
 
     ship();
 
+    void sort_components();
+
     ship_type::types estimate_ship_type();
 
     virtual void context_handle_menu(orbital* associated, empire* player_empire, fleet_manager& fleet_manage, popup_info& popup) override;

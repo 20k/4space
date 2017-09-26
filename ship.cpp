@@ -1871,6 +1871,19 @@ ship::ship()
     cached_fully_merged = get_fully_merged(1.f);
 }
 
+void ship::sort_components()
+{
+    std::sort(entity_list.begin(), entity_list.end(), [](component& c1, component& c2)
+              {
+                    if(c1.ui_category != c2.ui_category)
+                    {
+                        return c1.ui_category < c2.ui_category;
+                    }
+
+                    return c1.primary_attribute < c2.primary_attribute;
+              });
+}
+
 ship_type::types ship::estimate_ship_type()
 {
     float total_scanner_size = 0.f;
