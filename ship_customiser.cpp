@@ -489,6 +489,17 @@ void do_ship_component_display(ship& current, ship_customiser& ship_customise)
     {
         std::string my_name = component_category_info::names[category];
 
+        bool is_active = component_category_info::is_active[category];
+
+        if(is_active)
+        {
+            my_name = "-" + my_name;
+        }
+        else
+        {
+            my_name = "+" + my_name;
+        }
+
         ImGui::SolidSmallButton(my_name, HIGHLIGHT_COL, {1,1,1}, false, {0,0});
 
         if(ImGui::IsItemClicked_Registered())
