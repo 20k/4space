@@ -3937,7 +3937,7 @@ void ship::hit_raw_damage(float damage, empire* hit_by, ship* ship_hit_by, orbit
 
     float leftover = res[ship_component_element::HP];
 
-    distribute_damage(-leftover/2.f, 1, this);
+    distribute_damage(-leftover, 1, this);
 
     test_set_disabled();
 
