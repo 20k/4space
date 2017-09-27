@@ -2869,10 +2869,12 @@ int main()
             ClipCursor(&r);
         }
 
+        #ifdef DEV_ONLY
         if(focused && key_down(sf::Keyboard::F10))
         {
             window.close();
         }
+        #endif // DEV_ONLY
 
         vec2f mouse_dir = mpos - mouse_last;
 
