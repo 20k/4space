@@ -5430,7 +5430,7 @@ std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* v
 
         if(s->fully_disabled())
         {
-            name_str += " (Derelict)";
+            name_str += " | Derelict";
         }
 
         std::string detail_str;
@@ -5443,7 +5443,7 @@ std::vector<std::string> ship_manager::get_info_strs_with_info_warfare(empire* v
             //float percent = hp_frac * 100.f;
             //std::string hp_name = "(" + to_string_with_enforced_variable_dp(percent) + "%%)";
 
-            std::string hp_name = "(" + to_string_with_enforced_variable_dp(fully_merged[ship_component_element::HP].cur_amount) + "/" + to_string_with_variable_prec(fully_merged[ship_component_element::HP].max_amount) + ")";
+            std::string hp_name = "| " + to_string_with_enforced_variable_dp(fully_merged[ship_component_element::HP].cur_amount) + "/" + to_string_with_variable_prec(fully_merged[ship_component_element::HP].max_amount);
 
             if(obfuscate_hp)
             {
