@@ -733,9 +733,26 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
 
         for(orbital* o : bm->ship_map)
         {
+            bool do_obfuscate_name = false;
+
+            if(player_empire->available_scanning_power_on(o) <= ship_info::ship_obfuscation_level)
+            {
+                do_obfuscate_name = true;
+            }
+
+            bool do_obfuscate_hp = false;
+
+            if(player_empire->available_scanning_power_on(o) <= ship_info::misc_resources_obfuscation_level)
+            {
+                do_obfuscate_hp = true;
+            }
+
             for(ship* kk : o->data->ships)
             {
                 std::string name = format(kk->name, names);
+
+                name = obfuscate(name, do_obfuscate_name);
+
                 std::string team = player_empire->get_single_digit_relations_str(kk->owned_by->parent_empire);
 
                 auto fully_merged = kk->get_fully_merged(1.f);
@@ -744,6 +761,8 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 float damage_max = fully_merged[ship_component_elements::HP].max_amount;
 
                 std::string damage_str = to_string_with_enforced_variable_dp(damage) + "/" + to_string_with_enforced_variable_dp(damage_max);
+
+                damage_str = obfuscate(damage_str, do_obfuscate_hp);
 
                 ImGui::TextColored(team, player_empire->get_relations_colour(kk->owned_by->parent_empire, true));
 
