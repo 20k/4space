@@ -1089,7 +1089,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     std::vector<orbital*> valid_selection_targets;
 
-    if(system_manage.currently_viewed != nullptr && system_manage.in_system_view())
+    if(system_manage.currently_viewed != nullptr)
     {
         float min_dist = FLT_MAX;
         orbital* min_orb = nullptr;
@@ -1110,7 +1110,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             }
         }
 
-        if(min_orb != nullptr)
+        if(min_orb != nullptr && system_manage.in_system_view())
         {
             valid_selection_targets.push_back(min_orb);
 

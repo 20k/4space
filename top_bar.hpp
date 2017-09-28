@@ -6,7 +6,7 @@
 #include <vector>
 #include <vec/vec.hpp>
 
-#define IMGUI_WINDOW_FLAGS ImGuiWindowFlags_NoFocusOnAppearing
+#define IMGUI_WINDOW_FLAGS ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoCollapse
 
 namespace top_bar_info
 {
