@@ -1372,31 +1372,38 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
 
                 //ImGui::Text(name.c_str());
 
-                if(grouped_orbitals.second.size() > 1 || orbitals_grouped_by_empire.size() > 1)
+                if(o->type == orbital_info::FLEET)
                 {
-                    ImGui::NeutralText(name);
-
-                    if(ImGui::IsItemHovered())
+                    if(grouped_orbitals.second.size() > 1 || orbitals_grouped_by_empire.size() > 1)
                     {
-                        tooltip::add("Click to select this fleet");
+                        ImGui::NeutralText(name);
+
+                        if(ImGui::IsItemHovered())
+                        {
+                            tooltip::add("Click to select this fleet");
+                        }
+
+                        if(ImGui::IsItemClicked_Registered() && !lctrl)
+                        {
+                            popup.schedule_rem_all_but(o);
+                        }
+
+                        if(ImGui::IsItemClicked_Registered() && lctrl)
+                        {
+                            popup.schedule_rem(o);
+                        }
                     }
-
-                    if(ImGui::IsItemClicked_Registered() && !lctrl)
+                    else
                     {
-                        popup.schedule_rem_all_but(o);
-                    }
-
-                    if(ImGui::IsItemClicked_Registered() && lctrl)
-                    {
-                        popup.schedule_rem(o);
+                        ImGui::NeutralText(name);
                     }
                 }
                 else
                 {
-                    ImGui::NeutralText(name);
+                    ImGui::Text(name.c_str());
                 }
 
-                if(ImGui::IsItemHovered())
+                if(ImGui::IsItemHovered() && o->type == orbital_info::FLEET)
                 {
                     tooltip::add("Right Click for fleet options");
                 }
