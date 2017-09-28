@@ -1111,6 +1111,17 @@ std::string orbital::get_name_with_info_warfare(empire* viewing_empire)
     return name;
 }
 
+std::string orbital::get_full_name()
+{
+    if(type == orbital_info::FLEET)
+        return name;
+
+    if(type == orbital_info::ASTEROID)
+        return name;
+
+    return name + " (" + orbital_info::names[type] + ")";
+}
+
 void orbital::transfer(float pnew_rad, float pnew_angle, orbital_system* in_system)
 {
     /*old_rad = orbital_length;

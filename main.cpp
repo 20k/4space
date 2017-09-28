@@ -1189,12 +1189,12 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
         if(orb->type == orbital_info::STAR)
         {
-            ImGui::SetTooltip((orb->name + "\n" + orb->get_empire_str() + orb->description).c_str());
+            ImGui::SetTooltip((orb->get_full_name() + "\n" + orb->get_empire_str() + orb->description).c_str());
         }
 
         if(orb->is_resource_object)
         {
-            std::string res_first = orb->name;
+            std::string res_first = orb->get_full_name();
 
             res_first += "\n" + orb->get_empire_str();
 
@@ -1400,7 +1400,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                 }
                 else
                 {
-                    ImGui::Text(name.c_str());
+                    ImGui::Text(o->get_full_name().c_str());
                 }
 
                 if(ImGui::IsItemHovered() && o->type == orbital_info::FLEET)
