@@ -227,7 +227,7 @@ std::string procedural_text_generator::generate_fleet_name(orbital* o)
 
     int fname = o->parent_empire->fleet_name_counter++;
 
-    return std::string("Fleet ") + std::to_string(fname);
+    return std::string("Fleet ") + std::to_string(fname + 1);
 }
 
 std::string procedural_text_generator::generate_empire_name()
