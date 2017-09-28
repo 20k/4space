@@ -28,13 +28,13 @@ namespace orbital_info
 
     static std::vector<std::string> names =
     {
-        "STAR",
-        "PLANET",
-        "MOON",
-        "ASTEROID",
-        "FLEET",
-        "FLEET",
-        "NONE",
+        "Star",
+        "Planet",
+        "Moon",
+        "Asteroid",
+        "Fleet",
+        "Fleet",
+        "Err",
     };
 
     static std::vector<int> render_type =
