@@ -3640,6 +3640,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
             int classes_seen[ship_type::COUNT + 1] = {0};
 
+            vec2f class_to_universe_view_pos[ship_type::COUNT + 1] = {0};
+
             float width_offset = 0.f;
 
             for(orbital* o : i.second)
@@ -3653,6 +3655,8 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 if(test_class && classes_seen[majority_type])
                 {
+                    o->universe_view_pos = class_to_universe_view_pos[majority_type];
+
                     continue;
                 }
 
@@ -3719,6 +3723,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
                 }
 
                 classes_seen[majority_type] = 1;
+                class_to_universe_view_pos[majority_type] = o->universe_view_pos;
 
                 width_offset += draw_tex->getSize().x + 2;
 
