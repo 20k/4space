@@ -1021,8 +1021,11 @@ bool orbital::point_within(vec2f pos, sf::RenderWindow& win)
 
     auto sp2 = xy_to_vec(win.mapCoordsToPixel({apos.x(), apos.y()}));
 
-    pos = sp1;
-    apos = sp2;
+    if(type == orbital_info::FLEET)
+    {
+        pos = sp1;
+        apos = sp2;
+    }
 
     if(extra_dist > 0)
         dim.y() += extra_dist;
