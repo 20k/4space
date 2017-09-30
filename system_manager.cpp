@@ -3276,6 +3276,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         if(in_system_view())
             continue;
 
+        if(is_visible(win, os))
+            continue;
+
         vec2f pos = os->universe_pos * universe_scale;
 
         auto projected = mapCoordsToPixel_float(pos.x(), pos.y(), win.getView(), win);
@@ -3308,6 +3311,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     for(orbital_system* os : systems)
     {
         if(in_system_view())
+            continue;
+
+        if(is_visible(win, os))
             continue;
 
         vec2f pos = os->universe_pos * universe_scale;
@@ -3364,6 +3370,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     for(orbital_system* o1 : systems)
     {
         if(in_system_view())
+            continue;
+
+        if(is_visible(win, o1))
             continue;
 
         for(orbital_system* o2 : systems)
@@ -3456,6 +3465,9 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     for(int i=0; i<systems.size(); i++)
     {
         orbital_system* os = systems[i];
+
+        if(in_system_view())
+            continue;
 
         if(is_visible(win, os))
             continue;
