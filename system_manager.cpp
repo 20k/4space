@@ -1636,12 +1636,12 @@ void orbital_system::calculate_radius()
 
     for(orbital* o : orbitals)
     {
-        const float test_length = (o->absolute_pos - base->absolute_pos).length();
+        max_radius = std::max(max_radius, o->orbital_length);
+    }
 
-        if(test_length > max_radius)
-        {
-            max_radius = test_length;
-        }
+    for(orbital* o : asteroids)
+    {
+        max_radius = std::max(max_radius, o->orbital_length);
     }
 
     approx_radius = max_radius;
@@ -2562,10 +2562,27 @@ bool system_manager::is_visible(sf::RenderWindow& win, orbital_system* s)
     if(!in_system_view())
         return false;
 
-    vec2f sun_pos = s->universe_pos * universe_scale;
+    if(viewing(s))
+        return true;
 
-    //return viewing(s);
-    return viewing(s) || (s->universe_pos * universe_scale - universe_cam.pos).length() < universe_scale * 40;
+    vec2f sun_pos = s->universe_pos * universe_scale - universe_cam.pos;
+
+    float sys_radius = s->approx_radius;
+
+    vec2f screen_rad = map_coords_to_pixel(sun_pos + (vec2f){sys_radius, 0.f}, win);
+    vec2f screen_pos = map_coords_to_pixel(sun_pos, win);
+
+    float screen_width = (screen_rad - screen_pos).x();
+
+    if(screen_pos.x() + screen_width < 0 || screen_pos.y() + screen_width < 0 ||
+       screen_pos.x() - screen_width >= win.getSize().x || screen_pos.y() - screen_width >= win.getSize().y)
+    {
+        return false;
+    }
+
+    return true;
+
+    //return viewing(s) || (s->universe_pos * universe_scale - universe_cam.pos).length() < universe_scale * 40;
 }
 
 orbital_system* system_manager::get_parent(orbital* o)
