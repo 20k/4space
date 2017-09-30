@@ -1277,7 +1277,7 @@ void orbital::release_ownership()
 
 void orbital::draw_alerts(sf::RenderWindow& win, empire* viewing_empire, system_manager& system_manage)
 {
-    if(!system_manage.is_visible(parent_system))
+    if(!system_manage.is_visible(win, parent_system))
         return;
 
     //if(!viewing_empire->has_vision(system_manage.currently_viewed))
@@ -1628,6 +1628,25 @@ float get_orbital_update_rate(orbital_info::type type)
     }
 }*/
 
+void orbital_system::calculate_radius()
+{
+    float max_radius = 0.f;
+
+    orbital* base = get_base();
+
+    for(orbital* o : orbitals)
+    {
+        const float test_length = (o->absolute_pos - base->absolute_pos).length();
+
+        if(test_length > max_radius)
+        {
+            max_radius = test_length;
+        }
+    }
+
+    approx_radius = max_radius;
+}
+
 orbital* orbital_system::get_base()
 {
     for(auto& i : orbitals)
@@ -1811,7 +1830,7 @@ orbital* orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, floa
     }
 }*/
 
-void orbital_system::tick(float step_s, system_manager& system_manage)
+void orbital_system::tick(sf::RenderWindow& win, float step_s, system_manager& system_manage)
 {
     std::set<empire*> next_empires;
 
@@ -1839,7 +1858,7 @@ void orbital_system::tick(float step_s, system_manager& system_manage)
         return;
     }*/
 
-    if(!system_manage.is_visible(this))
+    if(!system_manage.is_visible(win, this))
         return;
 
     for(auto& i : asteroids)
@@ -2255,6 +2274,11 @@ void orbital_system::generate_random_system(int planets, int num_asteroids, int 
 
     generate_asteroids_old(num_asteroids, num_belts, num_resource_asteroids);
     //generate_planet_resources(2.f);
+
+    calculate_radius();
+
+    ///just in case
+    make_dirty();
 }
 
 void orbital_system::generate_full_random_system(bool force_planet)
@@ -2415,6 +2439,7 @@ void orbital_system::do_serialise(serialise& s, bool ser)
 {
     if(serialise_data_helper::send_mode == 1)
     {
+        s.handle_serialise(approx_radius, ser);
         s.handle_serialise(toggle_fleet_ui, ser);
         s.handle_serialise(accumulated_nonviewed_time, ser);
         s.handle_serialise(highlight, ser);
@@ -2532,13 +2557,15 @@ bool system_manager::viewing(orbital_system* sys)
     return sys == currently_viewed && in_system_view();
 }
 
-bool system_manager::is_visible(orbital_system* s)
+bool system_manager::is_visible(sf::RenderWindow& win, orbital_system* s)
 {
     if(!in_system_view())
         return false;
 
+    vec2f sun_pos = s->universe_pos * universe_scale;
+
     //return viewing(s);
-    return viewing(s) || (s->universe_pos * universe_scale - universe_cam.pos).length() < universe_scale * 10;
+    return viewing(s) || (s->universe_pos * universe_scale - universe_cam.pos).length() < universe_scale * 40;
 }
 
 orbital_system* system_manager::get_parent(orbital* o)
@@ -2763,11 +2790,11 @@ void system_manager::tick_camera(float step_s)
     universe_cam.pos += -zoom_handle.get_camera_offset();
 }
 
-void system_manager::tick(float step_s)
+void system_manager::tick(sf::RenderWindow& win, float step_s)
 {
     for(auto& i : systems)
     {
-        i->tick(step_s, *this);
+        i->tick(win, step_s, *this);
     }
 
     repulse_fleets();
@@ -2944,7 +2971,7 @@ void system_manager::draw_alerts(sf::RenderWindow& win, empire* viewing_empire)
 
     for(orbital_system* i : systems)
     {
-        if(!is_visible(i))
+        if(!is_visible(win, i))
             continue;
 
         view_handler view_handle(win);
@@ -2973,7 +3000,7 @@ void system_manager::draw_viewed_system(sf::RenderWindow& win, empire* viewer_em
 
     for(orbital_system* system : systems)
     {
-        if(!is_visible(system))
+        if(!is_visible(win, system))
             continue;
 
         view_handler view_handle(win);
@@ -3413,7 +3440,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
     {
         orbital_system* os = systems[i];
 
-        if(is_visible(os))
+        if(is_visible(win, os))
             continue;
 
         vec2f pos = os->universe_pos * universe_scale;

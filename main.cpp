@@ -3090,7 +3090,7 @@ int main()
             //battle->draw(window);
         }
 
-        system_manage.tick(diff_s);
+        system_manage.tick(window, diff_s);
 
         bool any_open = false;
 

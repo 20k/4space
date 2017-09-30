@@ -300,6 +300,9 @@ struct orbital_system : serialisable
 {
     ///can never be true, is only here because of a bit of a screwup with the networking
     bool cleanup = false;
+    float approx_radius = 0.f;
+
+    void calculate_radius();
 
     vec2f universe_pos = {0,0};
 
@@ -323,7 +326,7 @@ struct orbital_system : serialisable
 
     void vision_test_all();
 
-    void tick(float step_s, system_manager& system_manage);
+    void tick(sf::RenderWindow& win, float step_s, system_manager& system_manage);
 
     void destroy(orbital*);
     ///non destructively reparent
@@ -395,7 +398,7 @@ struct system_manager : serialisable
     orbital_system* make_new();
 
     bool viewing(orbital_system* sys);
-    bool is_visible(orbital_system* sys);
+    bool is_visible(sf::RenderWindow& win, orbital_system* sys);
 
     ///perf issue?
     ///DELETE THESE
@@ -412,7 +415,7 @@ struct system_manager : serialisable
     std::vector<orbital*> next_frame_warp_radiuses;
 
     void tick_camera(float step_s);
-    void tick(float step_s);
+    void tick(sf::RenderWindow& win, float step_s);
 
     void destroy(orbital_system* s);
 
