@@ -129,6 +129,7 @@ struct resource_manager : serialisable
     void draw_ui(sf::RenderWindow& win, resource_manager& produced_ps);
 
     void render_formatted_str(bool can_skip);
+    void render_tooltip(bool can_skip);
 
     //std::string get_unprocessed_str();
     std::string get_processed_str(bool can_skip);

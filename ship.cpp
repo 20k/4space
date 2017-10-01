@@ -2215,11 +2215,9 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
         ImGui::BadText("(Scrap Ship)");
 
-        std::string rstr = rm.get_formatted_str(true);
-
         if(ImGui::IsItemHovered())
         {
-            tooltip::add(rstr);
+            rm.render_tooltip(true);
         }
 
         if(ImGui::IsItemClicked_Registered())

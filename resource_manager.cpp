@@ -197,6 +197,15 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
     ImGui::End();
 }
 
+void resource_manager::render_tooltip(bool can_skip)
+{
+    ImGui::BeginTooltip();
+
+    render_formatted_str(can_skip);
+
+    ImGui::EndTooltip();
+}
+
 /*std::string resource_manager::get_unprocessed_str()
 {
     std::vector<std::string> names;
@@ -251,7 +260,7 @@ void resource_manager::render_formatted_str(bool can_skip)
         std::string name_str = format(names[i], names);
         std::string val_str = format(vals[i], vals);
 
-        vec3f col = resource::colours[i];
+        vec3f col = resource::to_col(i);
 
         ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), name_str.c_str());
 
