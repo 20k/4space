@@ -69,7 +69,7 @@ namespace resource
     {
         {0xff / 255.f, 0x6f / 255.f, 0}, ///h2, orange
         {0xc2 / 255.f, 0x19 / 255.f, 0x1c / 255.f}, ///iron, red
-        {0x4 / 255.f, 0x4 / 255.f, 0xc4 / 255.f}, ///copper, blue
+        {0.4f, 0.4f, 1.f}, ///copper, blue
         {0xbd / 255.f, 0x96 / 255.f, 0xa6 / 255.f}, ///titanium, silver
         {0x2d / 255.f, 0xc9 / 255.f, 0x06 / 255.f}, ///uranium, green
         {1.f, 1.f, 1.f}, ///research, white
@@ -91,6 +91,16 @@ namespace resource
     bool is_processed(types type);
 
     static float global_resource_multiplier = 0.2f;
+
+    inline vec3f to_col(types type)
+    {
+        return mix({1.f, 1.f, 1.f}, colours[type], 0.75f);
+    }
+
+    inline vec3f to_col(int type)
+    {
+        return to_col((types)type);
+    }
 }
 
 struct resource_element

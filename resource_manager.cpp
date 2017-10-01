@@ -160,8 +160,6 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
         vals.push_back(val);
     }
 
-    std::string ret;
-
     for(int i=0; i<names.size(); i++)
     {
         float val = produced_ps.resources[i].amount;
@@ -183,10 +181,18 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
             p_str = "+" + p_str;
         }
 
-        ret = ret + format(names[i], names) + ": " + format(vals[i], vals) + " | " + p_str + "\n";
-    }
+        vec3f col = resource::to_col(i);
 
-    ImGui::Text(ret.c_str());
+        std::string name_str = format(names[i], names);
+
+        //ret = ret + format(names[i], names) + ": " + format(vals[i], vals) + " | " + p_str + "\n";
+
+        ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), name_str.c_str());
+
+        ImGui::SameLine(0);
+
+        ImGui::Text((": " + format(vals[i], vals) + " | " + p_str));
+    }
 
     ImGui::End();
 }
