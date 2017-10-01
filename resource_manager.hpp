@@ -65,6 +65,24 @@ namespace resource
         "WTF",
     };
 
+    static std::vector<vec3f> colours
+    {
+        {0xff / 255.f, 0x6f / 255.f, 0}, ///h2, orange
+        {0xc2 / 255.f, 0x19 / 255.f, 0x1c / 255.f}, ///iron, red
+        {0x4 / 255.f, 0x4 / 255.f, 0xc4 / 255.f}, ///copper, blue
+        {0xbd / 255.f, 0x96 / 255.f, 0xa6 / 255.f}, ///titanium, silver
+        {0x2d / 255.f, 0xc9 / 255.f, 0x06 / 255.f}, ///uranium, green
+        {1.f, 1.f, 1.f}, ///research, white
+        {1.f, 0.f, 1.f}, ///err
+    };
+
+    ///h2 -> ff6f00
+    ///fe -> c2191c
+    ///cu -> 0404c4
+    ///ti -> bd96a6
+    ///U -> 2dc906
+    ///RE -> white
+
     //types get_random_unprocessed();
     types get_random_processed();
 
@@ -100,10 +118,13 @@ struct resource_manager : serialisable
 
     void draw_ui(sf::RenderWindow& win, resource_manager& produced_ps);
 
-    std::string get_unprocessed_str();
+    void render_formatted_str(bool can_skip);
+
+    //std::string get_unprocessed_str();
     std::string get_processed_str(bool can_skip);
 
     std::string get_formatted_str(bool can_skip = true);
+
 
     bool has_any_processed();
 

@@ -2211,10 +2211,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
         resource_manager rm;
 
-        for(auto& i : res)
-        {
-            rm.resources[i.first].amount = i.second;
-        }
+        rm.add(res);
 
         ImGui::BadText("(Scrap Ship)");
 
