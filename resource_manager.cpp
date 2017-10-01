@@ -241,8 +241,9 @@ void resource_manager::render_formatted_str(bool can_skip)
 {
     std::vector<std::string> names;
     std::vector<std::string> vals;
+    std::vector<resource_element> elems;
 
-    for(resource_element& elem : resources)
+    for(const resource_element& elem : resources)
     {
         std::string name = resource::short_names[elem.type];
 
@@ -253,6 +254,7 @@ void resource_manager::render_formatted_str(bool can_skip)
 
         names.push_back(name);
         vals.push_back(val);
+        elems.push_back(elem);
     }
 
     for(int i=0; i<names.size(); i++)
@@ -260,7 +262,7 @@ void resource_manager::render_formatted_str(bool can_skip)
         std::string name_str = format(names[i], names);
         std::string val_str = format(vals[i], vals);
 
-        vec3f col = resource::to_col(i);
+        vec3f col = resource::to_col(elems[i].type);
 
         ImGui::TextColored(ImVec4(col.x(), col.y(), col.z(), 1), name_str.c_str());
 

@@ -2304,8 +2304,6 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
         resource_manager rm;
         rm.add(cost);
 
-        std::string str_resources = rm.get_formatted_str(true);
-
         std::string str = test_ship.name;
 
         std::string make_ship_full_name = ("(Make " + str + " Ship)");
@@ -2317,7 +2315,7 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
         bool clicked = ImGui::IsItemClicked_Registered();
 
-        ImGui::Text(str_resources.c_str());
+        rm.render_formatted_str(true);
         ImGui::NewLine();
 
         if(clicked)
