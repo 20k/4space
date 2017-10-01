@@ -1928,7 +1928,7 @@ ship_type::types ship::estimate_ship_type()
     return ship_type::MILITARY;
 }
 
-std::string get_recrew_str(ship* s, empire* player_empire)
+void do_recrew_str(ship* s, empire* player_empire)
 {
     auto res = s->resources_needed_to_recrew_total();
 
@@ -1942,14 +1942,12 @@ std::string get_recrew_str(ship* s, empire* player_empire)
         rm.resources[i.first].amount = -i.second;
     }
 
-    std::string rstr = rm.get_formatted_str(true);
+    rm.render_tooltip(true);
 
-    rstr += "Potential Re: " + std::to_string((int)recrew_research_currency);
-
-    return rstr;
+    ImGui::Text(("Potential Re: " + std::to_string((int)recrew_research_currency)).c_str());
 }
 
-std::string get_recrew_str(ship_manager* sm, empire* player_empire)
+void do_recrew_str(ship_manager* sm, empire* player_empire)
 {
     resource_manager rm;
     float recrew_research_currency = 0.f;
@@ -1969,11 +1967,9 @@ std::string get_recrew_str(ship_manager* sm, empire* player_empire)
         }
     }
 
-    std::string rstr = rm.get_formatted_str(true);
+    rm.render_tooltip(true);
 
-    rstr += "Potential Re: " + std::to_string((int)recrew_research_currency);
-
-    return rstr;
+    ImGui::Text(("Potential Re: " + std::to_string((int)recrew_research_currency)).c_str());;
 }
 
 std::map<resource::types, float> get_upgrade_cost(ship* s)
@@ -2005,7 +2001,7 @@ std::map<resource::types, float> get_upgrade_cost(ship* s)
     return res_cost;
 }
 
-std::string get_upgrade_str(const std::map<resource::types, float>& cost)
+/*std::string get_upgrade_str(const std::map<resource::types, float>& cost)
 {
     resource_manager rm;
     rm.add(cost);
@@ -2018,6 +2014,19 @@ std::string get_upgrade_str(const std::map<resource::types, float>& cost)
     std::string str = rm.get_formatted_str(true);
 
     return str;
+}*/
+
+void do_upgrade_str(const std::map<resource::types, float>& cost)
+{
+    resource_manager rm;
+    rm.add(cost);
+
+    for(auto& i : rm.resources)
+    {
+        i.amount = -i.amount;
+    }
+
+    rm.render_tooltip(true);
 }
 
 ///ok so. If we click anywhere outside the box we want to cancel
@@ -2158,7 +2167,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
         if(ImGui::IsItemHovered())
         {
-            tooltip::add(get_upgrade_str(res));
+            do_upgrade_str(res);
         }
     }
 
@@ -2171,7 +2180,7 @@ void ship::context_handle_menu(orbital* o, empire* player_empire, fleet_manager&
 
         if(ImGui::IsItemHovered())
         {
-            tooltip::add(get_recrew_str(this, player_empire));
+            do_recrew_str(this, player_empire);
         }
 
         ///if originating empire is not the claiming empire, get some tech
@@ -2434,7 +2443,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
 
         if(ImGui::IsItemHovered())
         {
-            tooltip::add(get_upgrade_str(cost));
+            do_upgrade_str(cost);
         }
     }
 
@@ -2451,8 +2460,6 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
             }
         }
 
-        auto formatted_str = get_recrew_str(this, player_empire);
-
         if(can_recrew_all)
             ImGui::NeutralText("(Recrew)");
         else
@@ -2460,7 +2467,7 @@ void ship_manager::context_handle_menu(orbital* o, empire* player_empire, fleet_
 
         if(ImGui::IsItemHovered())
         {
-            tooltip::add(get_recrew_str(this, player_empire));
+            do_recrew_str(this, player_empire);
         }
 
         if(ImGui::IsItemClicked_Registered() && can_recrew_all)
