@@ -94,7 +94,7 @@ namespace resource
 
     inline vec3f to_col(types type)
     {
-        return mix({1.f, 1.f, 1.f}, colours[type], 0.75f);
+        return mix({1.f, 1.f, 1.f}, colours[type], 0.65f);
     }
 
     inline vec3f to_col(int type)
