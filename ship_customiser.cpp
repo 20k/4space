@@ -345,7 +345,7 @@ void do_side_foldout_window(ship& current, float scrollwheel)
             resource_manager rm;
             rm.add(res);
 
-            tooltip::add(rm.get_formatted_str(true));
+            rm.render_tooltip(true);
         }
 
         if(ImGui::IsItemHovered() && component_cant_be_used)
@@ -398,7 +398,7 @@ void do_side_foldout_window(ship& current, float scrollwheel)
     resource_manager rm;
     rm.add(res);
 
-    ImGui::Text(rm.get_formatted_str(true).c_str());
+    rm.render_formatted_str(true);
 
     if(to_erase != -1)
     {
