@@ -206,7 +206,7 @@ struct orbital : serialisable
 
     bool point_within(vec2f pos, sf::RenderWindow& win);
 
-    std::vector<std::string> get_info_str(empire* viewer_empire, bool use_info_warfare, bool full_detail);
+    std::vector<std::string> get_info_str(empire* viewer_empire, bool use_info_warfare, bool full_detail, bool include_resources);
     std::string get_empire_str(bool newline = true);
 
     std::string get_name_with_info_warfare(empire* viewing_empire);
@@ -361,6 +361,7 @@ struct orbital_system : serialisable
 
     bool is_owned();
 
+    void do_resource_str(bool include_vision, empire* viewer_empire, bool only_owned);
     std::string get_resource_str(bool include_vision, empire* viewer_empire, bool only_owned);
     resource_manager get_potential_resources();
 

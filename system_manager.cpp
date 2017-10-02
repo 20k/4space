@@ -165,9 +165,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
         if((show_detail && o && o->is_resource_object) || o->force_draw_expanded_window)
         {
-            auto info = o->produced_resources_ps.get_formatted_str();
-
-            ImGui::Text(info.c_str());
+            o->produced_resources_ps.render_formatted_str(true);
         }
 
         o->expanded_window_clicked = false;
@@ -756,9 +754,7 @@ void orbital::begin_render_asteroid_window()
     {
         ImGui::Text(name.c_str());
 
-        auto info = produced_resources_ps.get_formatted_str();
-
-        ImGui::Text(info.c_str());
+        produced_resources_ps.render_formatted_str(true);
     }
 
     rendered_asteroid_window = true;
@@ -1038,7 +1034,7 @@ bool orbital::point_within(vec2f pos, sf::RenderWindow& win)
     return false;
 }
 
-std::vector<std::string> orbital::get_info_str(empire* viewer_empire, bool use_info_warfare, bool full_detail)
+std::vector<std::string> orbital::get_info_str(empire* viewer_empire, bool use_info_warfare, bool full_detail, bool include_resources)
 {
     if(type != orbital_info::FLEET || data == nullptr)
     {
@@ -1055,7 +1051,7 @@ std::vector<std::string> orbital::get_info_str(empire* viewer_empire, bool use_i
 
         std::string rstr = "";
 
-        if(is_resource_object && viewed_by[viewer_empire])
+        if(is_resource_object && viewed_by[viewer_empire] && include_resources)
         {
             rstr = "\n\n" + produced_resources_ps.get_formatted_str();
         }
@@ -2391,6 +2387,32 @@ bool orbital_system::is_owned()
     assert(get_base() != nullptr);
 
     return get_base()->parent_empire != nullptr;
+}
+
+void orbital_system::do_resource_str(bool include_vision, empire* viewer_empire, bool only_owned)
+{
+    resource_manager resources;
+
+    for(orbital* o : orbitals)
+    {
+        if(!o->is_resource_object)
+            continue;
+
+        if(!o->viewed_by[viewer_empire] && include_vision)
+            continue;
+
+        if(only_owned && o->parent_empire != viewer_empire)
+            continue;
+
+        for(int res = 0; res < o->produced_resources_ps.resources.size(); res++)
+        {
+            resources.resources[res].amount += o->produced_resources_ps.resources[res].amount;
+        }
+    }
+
+    resources.render_formatted_str(true);
+
+    //return resources.get_processed_str(true);
 }
 
 std::string orbital_system::get_resource_str(bool include_vision, empire* viewer_empire, bool only_owned)
@@ -3895,10 +3917,13 @@ void system_manager::process_universe_map(sf::RenderWindow& win, bool lclick, em
                     str += "\n" + s->get_base()->get_empire_str(false);
                 }
 
-                str += "\n" + s->get_resource_str(true, viewer_empire, false);
+                ImGui::BeginTooltip();
 
-                //ImGui::SetTooltip(str.c_str());
-                tooltip::add(str.c_str());
+                ImGui::Text(str.c_str());
+
+                s->do_resource_str(true, viewer_empire, false);
+
+                ImGui::EndTooltip();
             }
 
             if(lclick)

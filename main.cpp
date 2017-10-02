@@ -1204,10 +1204,14 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
             res_first += "\n" + orb->get_empire_str();
 
-            if(orb->viewed_by[player_empire])
-                res_first += orb->produced_resources_ps.get_formatted_str();
+            ImGui::BeginTooltip();
 
-            ImGui::SetTooltip(res_first.c_str());
+            ImGui::Text(res_first.c_str());
+
+            if(orb->viewed_by[player_empire])
+                orb->produced_resources_ps.render_formatted_str(true);
+
+            ImGui::EndTooltip();
         }
     }
 }
@@ -1566,7 +1570,7 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                     popup.rem_all_but(o);
                 }*/
 
-                std::vector<std::string> data = o->get_info_str(player_empire, true, true);
+                std::vector<std::string> data = o->get_info_str(player_empire, true, true, false);
 
                 if(o->description != "" && o->viewed_by[player_empire])
                     data.push_back(o->description);
@@ -1654,6 +1658,11 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
                             global_drag_and_drop.begin_dragging(cur_ship, drag_and_drop_info::SHIP, cur_ship->name);
                         }
                     }
+                }
+
+                if(o->is_resource_object)
+                {
+                    o->produced_resources_ps.render_formatted_str(true);
                 }
 
                 if(o->type == orbital_info::FLEET)
