@@ -129,6 +129,8 @@ struct orbital : serialisable
     std::set<orbital*> in_combat_with;
     //std::set<orbital*> last_in_combat_with;
 
+    sf::Clock time_since_last_clicked;
+
     bool cleanup = false;
 
     std::deque<position_history_element> multiplayer_position_history;

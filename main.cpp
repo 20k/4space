@@ -1066,6 +1066,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     sf::Keyboard key;
 
     bool lshift = key_down(sf::Keyboard::LShift);
+    bool lctrl = key_down(sf::Keyboard::LControl);
 
     ///this is where we click away fleets
     if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
@@ -1143,6 +1144,10 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         }
     }
 
+    float double_click_time_s = 0.3f;
+
+    orbital* double_clicked = nullptr;
+
     for(orbital* orb : valid_selection_targets)
     {
         ///not necessarily valid
@@ -1161,9 +1166,17 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             context_menu::set_item(orb);
         }*/
 
+        bool double_click = orb->time_since_last_clicked.getElapsedTime().asMicroseconds() / 1000. / 1000. < double_click_time_s;
+
+        if(lclick && double_click)
+        {
+            double_clicked = orb;
+        }
+
         if(lclick)
         {
             orb->clicked = true;
+            orb->time_since_last_clicked.restart();
         }
 
         if(lclick && popup.fetch(orb))
@@ -1212,6 +1225,44 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 orb->produced_resources_ps.render_formatted_str(true);
 
             ImGui::EndTooltip();
+        }
+    }
+
+    if(double_clicked != nullptr)
+    {
+        for(orbital* orb : double_clicked->parent_system->orbitals)
+        {
+            if(orb == double_clicked)
+                continue;
+
+            if(orb->type == orbital_info::FLEET && double_clicked->type == orbital_info::FLEET)
+            {
+                ship_type::types type = double_clicked->data->get_most_common_ship_type();
+
+                if(!orb->data->majority_of_type(type))
+                    continue;
+
+                bool should_allow_all_select = lctrl;
+
+                if(!should_allow_all_select && orb->data->parent_empire != double_clicked->data->parent_empire)
+                {
+                    continue;
+                }
+
+                if(popup.fetch(orb) == nullptr)
+                {
+                    popup.going = true;
+
+                    ///do buttons here
+                    popup_element elem;
+                    elem.element = orb;
+
+                    popup.elements.push_back(elem);
+
+                    if(orb->type == orbital_info::FLEET)
+                        orb->data->toggle_fleet_ui = true;
+                }
+            }
         }
     }
 }
