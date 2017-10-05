@@ -1068,14 +1068,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     bool lshift = key_down(sf::Keyboard::LShift);
     bool lctrl = key_down(sf::Keyboard::LControl);
 
-    ///this is where we click away fleets
-    if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
-    {
-        popup.going = false;
-
-        popup.clear();
-    }
-
     for(ship_manager* sm : fleet_manage.fleets)
     {
         if(sm->to_close_ui)
@@ -1179,7 +1171,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
             orb->time_since_last_clicked.restart();
         }
 
-        if(lclick && popup.fetch(orb))
+        if(lclick && popup.fetch(orb) && double_clicked == nullptr)
         {
             if(orb->type == orbital_info::FLEET)
             {
@@ -1230,17 +1222,24 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
     if(double_clicked != nullptr)
     {
+        ImGui::suppress_clicks = true;
+
         for(orbital* orb : double_clicked->parent_system->orbitals)
         {
             if(orb == double_clicked)
                 continue;
 
+            bool allow_any_mix = lshift;
+
             if(orb->type == orbital_info::FLEET && double_clicked->type == orbital_info::FLEET)
             {
                 ship_type::types type = double_clicked->data->get_most_common_ship_type();
 
-                if(!orb->data->majority_of_type(type))
-                    continue;
+                if(!allow_any_mix)
+                {
+                    if(!orb->data->majority_of_type(type))
+                        continue;
+                }
 
                 bool should_allow_all_select = lctrl;
 
@@ -1264,6 +1263,14 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 }
             }
         }
+    }
+
+    ///this is where we click away fleets
+    if(double_clicked == nullptr && lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
+    {
+        popup.going = false;
+
+        popup.clear();
     }
 }
 
