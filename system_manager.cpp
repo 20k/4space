@@ -1026,6 +1026,15 @@ bool orbital::point_within(vec2f pos, sf::RenderWindow& win)
     if(extra_dist > 0)
         dim.y() += extra_dist;
 
+    float overall_fudge = 1.2f;
+
+    dim = dim * overall_fudge;
+
+    if(type != orbital_info::FLEET)
+    {
+        dim = dim * 1.5f;
+    }
+
     if(pos.x() < apos.x() + dim.x() && pos.x() >= apos.x() - dim.x() && pos.y() < apos.y() + dim.y() && pos.y() >= apos.y() - dim.y())
     {
         return true;
