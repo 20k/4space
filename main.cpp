@@ -909,8 +909,11 @@ struct box_selection
         sf::Keyboard key;
 
         bool lctrl = key_down(sf::Keyboard::LControl);
+        bool lalt = key_down(sf::Keyboard::LAlt);
 
         std::vector<orbital*> potential_orbitals;
+
+        bool any_is_fleet = false;
 
         if(going)
         {
@@ -926,7 +929,7 @@ struct box_selection
             {
                 for(orbital* o : *orbitals)
                 {
-                    if(o->type != orbital_info::FLEET)
+                    if(o->type == orbital_info::FLEET && lalt)
                         continue;
 
                     if(!o->viewed_by[viewer_empire])
@@ -945,6 +948,9 @@ struct box_selection
                     if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
                     {
                         potential_orbitals.push_back(o);
+
+                        if(o->type == orbital_info::FLEET)
+                            any_is_fleet = true;
                     }
                 }
             }
@@ -952,6 +958,18 @@ struct box_selection
 
             if(!lclick)
                 going = false;
+        }
+
+        for(auto it = potential_orbitals.begin(); it != potential_orbitals.end();)
+        {
+            if(any_is_fleet && (*it)->type != orbital_info::FLEET)
+            {
+                it = potential_orbitals.erase(it);
+            }
+            else
+            {
+                it++;
+            }
         }
 
         bool can_select_not_my_orbitals = true;
@@ -970,15 +988,18 @@ struct box_selection
 
         for(orbital* o : potential_orbitals)
         {
-            ship_manager* sm = (ship_manager*)o->data;
-
             if(!can_select_not_my_orbitals && o->parent_empire != viewer_empire)
                 continue;
 
+            if(!lclick && o->type == orbital_info::FLEET)
+            {
+                ship_manager* sm = (ship_manager*)o->data;
+
+                sm->toggle_fleet_ui = true;
+            }
+
             if(!lclick)
             {
-                sm->toggle_fleet_ui = true;
-
                 popup.insert(o);
 
                 popup.going = true;
