@@ -1068,6 +1068,14 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     bool lshift = key_down(sf::Keyboard::LShift);
     bool lctrl = key_down(sf::Keyboard::LControl);
 
+    ///this is where we click away fleets
+    if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
+    {
+        popup.going = false;
+
+        popup.clear();
+    }
+
     for(ship_manager* sm : fleet_manage.fleets)
     {
         if(sm->to_close_ui)
@@ -1263,14 +1271,6 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                 }
             }
         }
-    }
-
-    ///this is where we click away fleets
-    if(double_clicked == nullptr && lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
-    {
-        popup.going = false;
-
-        popup.clear();
     }
 }
 
