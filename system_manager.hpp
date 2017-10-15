@@ -385,6 +385,9 @@ struct system_manager : serialisable
     sf::Texture fleet_tex;
     sf::Sprite fleet_sprite;
 
+    sf::Texture star_tex;
+    sf::Sprite star_sprite;
+
     system_manager();
 
     std::vector<std::vector<orbital_system*>> to_draw_pathfinding;

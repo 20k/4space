@@ -2570,6 +2570,9 @@ system_manager::system_manager()
 {
     fleet_tex.loadFromFile(orbital_info::load_strs[orbital_info::FLEET]);
     fleet_sprite.setTexture(fleet_tex);
+
+    star_tex.loadFromFile("pics/star_icon.png");
+    star_sprite.setTexture(star_tex);
 }
 
 orbital_system* system_manager::make_new()
@@ -3129,7 +3132,7 @@ std::pair<vec2f, vec2f> get_intersection(vec2f p1, vec2f p2, float rad)
 }
 
 ///do clicking next, bump up to higher level?
-bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec2f pos, vec2f screen_offset, vec3f col)
+bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, sf::Sprite& star_icon, vec2f pos, vec2f screen_offset, vec3f col, bool is_combined)
 {
     bool no_suppress_mouse = !ImGui::IsAnyItemHovered() && !ImGui::IsMouseHoveringAnyWindow();
 
@@ -3168,6 +3171,14 @@ bool universe_fleet_ui_tick(sf::RenderWindow& win, sf::Sprite& fleet_sprite, vec
     auto backup_view = win.getView();
     win.setView(win.getDefaultView());
     win.draw(fleet_sprite);
+
+    if(is_combined)
+    {
+        star_icon.setPosition(real_pos.x() + dim.x() - star_icon.getGlobalBounds().width, real_pos.y()-1);
+
+        win.draw(star_icon);
+    }
+
     win.setView(backup_view);
 
     return is_hovered;
@@ -3701,6 +3712,7 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
         if(current_zoom > 100)
             bound = 1;
 
+
         ///ok. Instead, this should advertise which orbitals are hovered
         for(auto& i : classed_orbitals)
         {
@@ -3717,6 +3729,14 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             }
 
             int classes_seen[ship_type::COUNT + 1] = {0};
+            int total_of_class[ship_type::COUNT + 1] = {0};
+
+            for(orbital* o : i.second)
+            {
+                auto majority_type = o->data->get_most_common_ship_type();
+
+                total_of_class[majority_type]++;
+            }
 
             vec2f class_to_universe_view_pos[ship_type::COUNT + 1] = {0};
 
@@ -3765,7 +3785,15 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
 
                 o->universe_view_pos = {mapped_wpos.x, mapped_wpos.y};
 
-                bool hovered = universe_fleet_ui_tick(win, spr, fleet_draw_pos, screen_offset + (vec2f){width_offset, 0.f}, col);
+                bool should_draw_star_icon = OOB || test_class;
+
+                if(test_class && total_of_class[majority_type] == 1)
+                    should_draw_star_icon = false;
+
+                if(OOB && i.second.size() == 1)
+                    should_draw_star_icon = false;
+
+                bool hovered = universe_fleet_ui_tick(win, spr, star_sprite, fleet_draw_pos, screen_offset + (vec2f){width_offset, 0.f}, col, should_draw_star_icon);
 
                 if(hovered)
                 {
