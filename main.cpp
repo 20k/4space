@@ -699,6 +699,11 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
     ImGui::End();*/
 }
 
+void init_battle_window()
+{
+    ImGui::BeginOverride("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+}
+
 void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire, bool in_battle_view)
 {
     if(in_battle_view)
@@ -707,13 +712,15 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     if(!top_bar::get_active(top_bar_info::BATTLES))
         return;
 
-    ImGui::BeginOverride("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
-
     //for(int i=0; i<all_battles.battles.size(); i++)
     //for(battle_manager* bm : all_battles.battles)
 
     auto it = all_battles.battles.begin();
     int i = 0;
+
+    bool have_any_battles = false;
+
+    bool has_battle_window = false;
 
     for(; it != all_battles.battles.end(); it++, i++)
     {
@@ -733,6 +740,14 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
                 names.push_back(kk->name);
             }
         }
+
+        if(!has_battle_window)
+        {
+            init_battle_window();
+            has_battle_window = true;
+        }
+
+        have_any_battles = true;
 
         for(orbital* o : bm->ship_map)
         {
@@ -875,14 +890,24 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
         }
     }
 
-    ImGui::NeutralText("(Leave Battle View)");
-
-    if(ImGui::IsItemClicked_Registered())
+    if(in_battle_view)
     {
-        all_battles.request_leave_battle_view = true;
+        if(!has_battle_window)
+        {
+            init_battle_window();
+            has_battle_window = true;
+        }
+
+        ImGui::NeutralText("(Leave Battle View)");
+
+        if(ImGui::IsItemClicked_Registered())
+        {
+            all_battles.request_leave_battle_view = true;
+        }
     }
 
-    ImGui::End();
+    if(has_battle_window)
+        ImGui::End();
 }
 
 ///mostly working except we cant rebox select if we have something selected
