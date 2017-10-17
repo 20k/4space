@@ -701,6 +701,9 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
 
 void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire, bool in_battle_view)
 {
+    if(in_battle_view)
+        debug_battle(all_battles.get_currently_viewing(), win, lclick, system_manage, player_empire);
+
     if(!top_bar::get_active(top_bar_info::BATTLES))
         return;
 
@@ -880,9 +883,6 @@ void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, 
     }
 
     ImGui::End();
-
-    if(in_battle_view)
-        debug_battle(all_battles.get_currently_viewing(), win, lclick, system_manage, player_empire);
 }
 
 ///mostly working except we cant rebox select if we have something selected
