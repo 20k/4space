@@ -704,6 +704,8 @@ void init_battle_window()
     ImGui::BeginOverride("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 }
 
+///maybe battle view should be very flexible, like entering/leaving a system is, where it feels
+///seamless completely entering and leaving
 void debug_all_battles(all_battles_manager& all_battles, sf::RenderWindow& win, bool lclick, system_manager& system_manage, empire* player_empire, bool in_battle_view)
 {
     if(in_battle_view)
