@@ -123,6 +123,13 @@ namespace ImGui
     }
 
     inline
+    void reset_suppress_clicks()
+    {
+        suppress_clicks = true;
+        suppress_frames = 2;
+    }
+
+    inline
     void tick_suppress_frames()
     {
         if(suppress_clicks)

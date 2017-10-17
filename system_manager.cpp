@@ -123,6 +123,30 @@ vec2f map_pixel_to_coords(vec2f pos, const sf::RenderTarget& target)
     return {ret.x, ret.y};
 }
 
+void handle_label_ui_interaction(orbital* o, bool show_detail, const std::string& tag)
+{
+    ImVec2 win_size = ImGui::GetWindowSize();
+    ImVec2 win_pos = ImGui::GetWindowPos();
+
+    ImVec2 br = ImVec2(win_pos.x + win_size.x, win_pos.y + win_size.y);
+
+    ///second part is not a typo, imgui windows with no input dont count for hovering purposes
+    //bool is_hovered = ImGui::IsMouseHoveringRect(win_pos, br) && !ImGui::IsMouseHoveringAnyWindow();
+
+    if(!show_detail)// && !is_hovered)
+        ImGui::SkipFrosting(tag);
+
+    /*if(ONCE_MACRO(sf::Mouse::Left) && is_hovered)
+    {
+        o->clicked = true;
+    }
+
+    if(is_hovered)
+    {
+        ImGui::reset_suppress_clicks();
+    }*/
+}
+
 void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col, bool show_detail, orbital* o)
 {
     auto real_coord = win.mapCoordsToPixel({absolute_pos.x(), absolute_pos.y()});
@@ -144,9 +168,6 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         auto pixel_rad = mapCoordsToPixel_float(rad_to_check + win.getView().getCenter().x, win.getView().getCenter().y, win.getView(), win);
 
         pixel_rad.x -= win.getSize().x/2;
-
-        if(!show_detail)
-            ImGui::SkipFrosting(tag);
 
         ImGui::SetNextWindowPos(ImVec2(real_coord.x + pixel_rad.x, real_coord.y));
 
@@ -170,13 +191,14 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
         o->expanded_window_clicked = false;
 
-        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0))
+        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0) && !ImGui::suppress_clicks)
         {
             o->expanded_window_clicked = true;
         }
 
-        ImGui::End();
+        handle_label_ui_interaction(o, show_detail, tag);
 
+        ImGui::End();
 
         ImGui::PopStyleColor();
 
@@ -716,6 +738,20 @@ void orbital::tick(float step_s)
             }
         }
     }
+}
+
+void orbital::check_and_open_popup(popup_info& popup)
+{
+    if(!clicked)
+        return;
+
+    clicked = false;
+
+    ImGui::suppress_clicks = true;
+
+    popup.going = true;
+
+    popup.insert(this);
 }
 
 float orbital::calculate_orbital_drift_angle(float orbital_length, float step_s)

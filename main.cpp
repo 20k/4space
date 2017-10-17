@@ -1089,6 +1089,11 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
     bool lshift = key_down(sf::Keyboard::LShift);
     bool lctrl = key_down(sf::Keyboard::LControl);
 
+    if(ImGui::suppress_clicks)
+    {
+        lclick = false;
+    }
+
     ///this is where we click away fleets
     if(lclick && !lshift && (system_manage.hovered_system == nullptr || system_manage.in_system_view()) && !ImGui::suppress_clicks)
     {
@@ -3177,6 +3182,14 @@ int main()
         }
 
         system_manage.tick(window, diff_s);
+
+        for(orbital_system* os : system_manage.systems)
+        {
+            for(orbital* o : os->orbitals)
+            {
+                o->check_and_open_popup(popup);
+            }
+        }
 
         bool any_open = false;
 

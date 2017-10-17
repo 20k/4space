@@ -123,6 +123,7 @@ struct position_history_element
     double time_s = 0.f;
 };
 
+struct popup_info;
 
 struct orbital : serialisable
 {
@@ -194,6 +195,7 @@ struct orbital : serialisable
     int vision_test_counter = 0;
     void do_vision_test();
     void tick(float step_s);
+    void check_and_open_popup(popup_info& popup);
 
     void draw(sf::RenderWindow& win, empire* viewer_empire);
 
@@ -295,7 +297,6 @@ struct orbital : serialisable
 
 float get_orbital_update_rate(orbital_info::type type);
 
-struct popup_info;
 struct fleet_manager;
 
 struct orbital_system : serialisable
@@ -377,8 +378,6 @@ struct orbital_system : serialisable
 
     void shuffle_networked_orbitals();
 };
-
-struct popup_info;
 
 struct system_manager : serialisable
 {
