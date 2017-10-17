@@ -777,6 +777,9 @@ struct ship : positional, serialisable, ship_base_context_menu
 
     float current_size = 1.f;
 
+    float get_current_size();
+    float get_visual_scale();
+
     void set_size(float new_size);
 
     float editor_size_storage = current_size;

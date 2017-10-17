@@ -5218,6 +5218,28 @@ sf::Texture* ship::get_world_texture()
     return get_world_texture(estimated_type);
 }
 
+float ship::get_current_size()
+{
+    return current_size;
+}
+
+float ship::get_visual_scale()
+{
+    float min_size = 0.25f;
+    float max_size = 4.f;
+
+    float csize = get_current_size();
+
+    float scale = log10(csize) + 1;
+
+    if(csize < 1)
+    {
+        csize = mix(min_size, 1.f, (csize - min_size) / (1.f - min_size));
+    }
+
+    return clamp(scale, min_size, max_size);
+}
+
 void ship::set_size(float new_size)
 {
     new_size = clamp(new_size, 0.1f, 1000.f);

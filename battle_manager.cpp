@@ -378,8 +378,8 @@ projectile* projectile_manager::make_new(battle_manager& battle_manage)
 
 bool point_within_ship(vec2f pos, ship* s)
 {
-    vec2f tl = s->local_pos - s->dim/2.f;
-    vec2f br = s->local_pos + s->dim/2.f;
+    vec2f tl = s->local_pos - s->get_visual_scale() * s->dim/2.f;
+    vec2f br = s->local_pos + s->get_visual_scale() * s->dim/2.f;
 
     float back_angle = -s->local_rot;
 
@@ -977,6 +977,8 @@ void battle_manager::draw(sf::RenderWindow& win, system_manager& system_manage, 
         spr.setOrigin(spr.getLocalBounds().width/2, spr.getLocalBounds().height/2);
         spr.setPosition({s->local_pos.x(), s->local_pos.y()});
         spr.setRotation(r2d(s->local_rot));
+
+        spr.setScale(s->get_visual_scale(), s->get_visual_scale());
 
         if(s->highlight)
         {
