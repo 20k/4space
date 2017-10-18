@@ -4202,6 +4202,8 @@ void system_manager::draw_ship_ui(empire* viewing_empire, popup_info& popup)
 
     ImGui::BeginOverride("Fleets", &top_bar::active[top_bar_info::FLEETS], ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
+    ImGui::clamp_window_to_screen();
+
     std::map<empire_popup, std::vector<orbital_system*>> empire_to_systems;
 
     empire* unknown_empire = viewing_empire->parent->unknown_empire;

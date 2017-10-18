@@ -92,11 +92,25 @@ namespace ImGui
     extern bool suppress_keyboard;
     extern bool suppress_clicks;
     extern int suppress_frames;
+    extern vec2i screen_dimensions;
+    extern vec2f to_offset_mouse;
+    extern bool lock_mouse;
+    static inline vec2f lock_dir;
+    static inline vec2f lock_pos;
 
     extern std::vector<std::string> to_skip_frosting;
 
     void DoFrosting(sf::RenderWindow& win);
     void SkipFrosting(const std::string& name);
+
+    inline
+    void set_screen_dimensions(vec2i sdim)
+    {
+        screen_dimensions = sdim;
+    }
+
+    ///allow bottom to go off screen, what we're really concerned about is the title bar
+    void clamp_window_to_screen();
 
     inline
     bool IsItemClicked_DragCompatible()

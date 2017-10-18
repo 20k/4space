@@ -5,6 +5,9 @@
 bool ImGui::suppress_keyboard = false;
 bool ImGui::suppress_clicks = false;
 int ImGui::suppress_frames = 2;
+vec2i ImGui::screen_dimensions = {800, 600};
+vec2f ImGui::to_offset_mouse;
+bool ImGui::lock_mouse;
 
 std::vector<std::string> ImGui::to_skip_frosting;
 
@@ -118,6 +121,55 @@ void ImGui::DoFrosting(sf::RenderWindow& win)
 void ImGui::SkipFrosting(const std::string& name)
 {
     to_skip_frosting.push_back(name);
+}
+
+void ImGui::clamp_window_to_screen()
+{
+    auto pos = ImGui::GetWindowPos();
+    auto dim = ImGui::GetWindowSize();
+
+    vec2f tl = {pos.x, pos.y};
+    vec2f br = {pos.x + dim.x, pos.y + get_title_bar_height()};
+
+    vec2f offset = {0,0};
+
+    if(tl.x() < 0)
+    {
+        offset.x() = fabs(tl.x());
+        lock_dir.x() = -1;
+    }
+    if(tl.y() < 0)
+    {
+        offset.y() = fabs(tl.y());
+        lock_dir.y() = -1;
+    }
+
+    if(br.x() >= screen_dimensions.x())
+    {
+        offset.x() = -fabs(br.x() - screen_dimensions.x());
+        lock_dir.x() = 1;
+    }
+    if(br.y() >= screen_dimensions.y())
+    {
+        offset.y() = -fabs(br.y() - screen_dimensions.y());
+        lock_dir.y() = 1;
+    }
+
+    if(offset.x() != 0 || offset.y() != 0)
+    {
+        ImGui::SetWindowPos(ImVec2(pos.x + offset.x(), pos.y + offset.y()));
+
+        if(!lock_mouse)
+        {
+            sf::Mouse mouse;
+
+            lock_pos = {mouse.getPosition().x, mouse.getPosition().y};
+        }
+
+        lock_mouse = true;
+    }
+
+    to_offset_mouse = offset;
 }
 
 void ImGui::SolidSmallButton(const std::string& txt, vec3f highlight_col, vec3f col, bool force_hover, vec2f dim)

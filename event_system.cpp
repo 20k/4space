@@ -933,6 +933,8 @@ void game_event::draw_ui()
 
     ImGui::BeginOverride((header_str + "###DLOGUE" + alert_location->name).c_str(), &dialogue.is_open);
 
+    ImGui::clamp_window_to_screen();
+
     std::vector<std::string> dialogue_options = {dialogue.text};
 
     ///patch dialogue options here if necessary

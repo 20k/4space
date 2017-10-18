@@ -215,6 +215,8 @@ void display_ship_info(ship& s, empire* owner, empire* claiming_empire, empire* 
 
     ImGui::BeginOverride((name_str + "###" + s.name + std::to_string(s.id)).c_str(), &s.display_ui, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
 
+    ImGui::clamp_window_to_screen();
+
     ImGuiWindow* win = ImGui::GetCurrentWindow();
 
     ImRect rect = win->TitleBarRect();
@@ -702,6 +704,8 @@ void debug_battle(battle_manager* battle, sf::RenderWindow& win, bool lclick, sy
 void init_battle_window()
 {
     ImGui::BeginOverride("Ongoing Battles", &top_bar::active[top_bar_info::BATTLES], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::clamp_window_to_screen();
 }
 
 ///maybe battle view should be very flexible, like entering/leaving a system is, where it feels
@@ -1351,6 +1355,8 @@ void do_popup(popup_info& popup, sf::RenderWindow& win, fleet_manager& fleet_man
     global_drag_and_drop.begin_drag_section("INFO_PANEL");
 
     ImGui::BeginOverride(("Selected###INFO_PANEL"), &popup.going, ImVec2(0,0), -1.f, ImGuiWindowFlags_AlwaysAutoResize | IMGUI_WINDOW_FLAGS);
+
+    ImGui::clamp_window_to_screen();
 
     //global_drag_and_drop.begin_dragging(nullptr, drag_and_drop_info::ORBITAL);
 
@@ -2344,6 +2350,8 @@ bool do_construction_window(orbital* o, empire* player_empire, fleet_manager& fl
 
     ImGui::BeginOverride(("Ship Construction (" + o->name + ")").c_str(), &o->construction_ui_open, ImGuiWindowFlags_AlwaysAutoResize);
 
+    ImGui::clamp_window_to_screen();
+
     for(int i=0; i<window_state.picked_research_levels.categories.size(); i++)
     {
         research_category& category = window_state.picked_research_levels.categories[i];
@@ -2495,6 +2503,8 @@ void do_ownership_ui(empire_manager& empire_manage, network_state& net_state)
     ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiSetCond_Appearing);
 
     ImGui::BeginOverride("Pick an Empire", 0, ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::clamp_window_to_screen();
 
     for(empire* e : empire_manage.empires)
     {
@@ -2911,10 +2921,15 @@ int main()
 
     network_updater net_update;
 
+    ImGui::set_screen_dimensions({window.getSize().x, window.getSize().y});
+
     //empire_manage.explicit_register();
     //fleet_manage.explicit_register();
     //system_manage.explicit_register();
     //all_battles->explicit_register();
+
+    bool mouse_locked = false;
+    vec2f lock_mouse_pos;
 
     while(window.isOpen())
     {
@@ -2968,6 +2983,8 @@ int main()
         mouse_last = mpos;
         mpos = {mouse.getPosition(window).x, mouse.getPosition(window).y};
 
+        vec2f real_mpos = {mouse.getPosition().x, mouse.getPosition().y};
+
         if(scrollwheel_delta < 0)
             scrollwheel_delta = -1;
         if(scrollwheel_delta > 0)
@@ -2986,6 +3003,8 @@ int main()
                 fullscreen = false;
             }
         }
+
+        ImGui::set_screen_dimensions({window.getSize().x, window.getSize().y});
 
         if(fullscreen)
         {
@@ -3343,6 +3362,8 @@ int main()
         }
 
         ImGui::BeginOverride("Test");
+
+        ImGui::clamp_window_to_screen();
 
         /*if(ImGui::Button("Save"))
         {
@@ -3773,6 +3794,8 @@ int main()
         system_manage.shuffle_networked_orbitals();
 
         ImGui::BeginOverride("Networking");
+
+        ImGui::clamp_window_to_screen();
 
         //if(ImGui::Button("Join"))
         {

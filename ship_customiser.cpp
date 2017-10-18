@@ -672,6 +672,8 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
 
     ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
+    ImGui::clamp_window_to_screen();
+
     ImGui::BeginGroup();
 
     do_selection_bar(*this);
