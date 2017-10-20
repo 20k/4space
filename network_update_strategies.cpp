@@ -193,7 +193,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///the reason why ship cleaning isn't working accross the network is beause its not being sent
     ///need to force packet sending on cleanup
     static update_strategy ship_strategy;
-    ship_strategy.do_update_strategy(dt_s, 2.f, ships, net_state, 0);
+    ship_strategy.do_update_strategy(dt_s, 4.f, ships, net_state, 0);
 
     static update_strategy ship_manager_strategy;
     ship_manager_strategy.do_update_strategy(dt_s, 10, ship_managers, net_state, 0);
@@ -224,7 +224,7 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     ///mode 2 is diff mode, where we send diff updates
     ///change in container size (num dirty), maybe diff hp as well
     static update_strategy system_strategy;
-    system_strategy.do_update_strategy(dt_s, 1.f, systems, net_state, 2);
+    system_strategy.do_update_strategy(dt_s, 4.f, systems, net_state, 2);
 
     /*std::vector<projectile*> projectiles;
 
@@ -321,10 +321,10 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     }
 
     static update_strategy empire_strategy;
-    empire_strategy.do_update_strategy(dt_s, 1.f, empires, net_state, 0);
+    empire_strategy.do_update_strategy(dt_s, 2.f, empires, net_state, 0);
 
     static update_strategy empire_attention_strategy;
-    empire_attention_strategy.do_update_strategy(dt_s, 1.f, needs_attention, net_state, 3);
+    empire_attention_strategy.do_update_strategy(dt_s, 2.f, needs_attention, net_state, 3);
 
     elapsed_time_s += dt_s;
 }
