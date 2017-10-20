@@ -1995,12 +1995,9 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
     }
 
     //view_handler handle(win);
-
     //win.setView(win.getDefaultView());
 
     float orbital_system_rad = approx_radius;
-
-    printf("approx %f\n", orbital_system_rad);
 
     int num_planets = planets.size();
 
@@ -2008,16 +2005,25 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     vec2f render_position = {orbital_system_rad * 1.1f, 0.f};
 
+    float scale = 2.f;
+    float total_y = 0;
+    float fudge = 1.4;
+    float spacing = 10;
+
     for(orbital* orb : planets)
     {
-        float scale = 2.f;
+        total_y += scale * orb->rad * 2 * fudge + spacing;
+    }
+
+    for(orbital* orb : planets)
+    {
         float rad = orb->rad;
 
         float mx = scale * rad;
 
-        render_position.y() += scale * rad * 2 * 1.1f + 5;
+        orb->simple_renderable.main_rendering(win, orb->rotation, {render_position.x() - mx, render_position.y() - total_y/2}, 2.f, {1,1,1});
 
-        orb->simple_renderable.main_rendering(win, 0.f, {render_position.x() - mx, render_position.y()}, 2.f, {1,1,1});
+        render_position.y() += scale * rad * 2 * fudge + spacing;
     }
 
     //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);
