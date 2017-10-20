@@ -2066,16 +2066,21 @@ std::vector<std::pair<orbital*, vec2f>> orbital_system::get_planet_ui_renderable
 
     //vec2f render_position = {win.getSize().x, win.getSize().y/2};
 
-    vec2f render_position = {orbital_system_rad * 1.1f, 0.f};
+    vec2f render_position = {orbital_system_rad * 1.2f, 0.f};
 
     float scale = 2.f;
     float total_y = 0;
     float fudge = 1.1;
     float spacing = 40;
 
+    int num = 0;
+
     for(orbital* orb : planets)
     {
-        total_y += scale * orb->rad * 2 * fudge + spacing;
+        if(num != 0)
+            total_y += scale * orb->rad * 2 * fudge + spacing;
+
+        num++;
     }
 
     std::vector<std::pair<orbital*, vec2f>> ret;
