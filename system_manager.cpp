@@ -1982,9 +1982,42 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
         i->draw(win, viewer_empire);
     }
 
+    std::vector<orbital*> planets;
+
     for(int kk=orbitals.size()-1; kk >= 0; kk--)
     {
         orbitals[kk]->draw(win, viewer_empire);
+
+        if(orbitals[kk]->type == orbital_info::PLANET)
+        {
+            planets.push_back(orbitals[kk]);
+        }
+    }
+
+    //view_handler handle(win);
+
+    //win.setView(win.getDefaultView());
+
+    float orbital_system_rad = approx_radius;
+
+    printf("approx %f\n", orbital_system_rad);
+
+    int num_planets = planets.size();
+
+    //vec2f render_position = {win.getSize().x, win.getSize().y/2};
+
+    vec2f render_position = {orbital_system_rad * 1.1f, 0.f};
+
+    for(orbital* orb : planets)
+    {
+        float scale = 2.f;
+        float rad = orb->rad;
+
+        float mx = scale * rad;
+
+        render_position.y() += scale * rad * 2 * 1.1f + 5;
+
+        orb->simple_renderable.main_rendering(win, 0.f, {render_position.x() - mx, render_position.y()}, 2.f, {1,1,1});
     }
 
     //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);

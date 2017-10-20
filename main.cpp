@@ -2744,6 +2744,7 @@ int main()
     tplanet->parent = sun;
 
     base->generate_asteroids_old(500, 5, 5);
+    base->calculate_radius();
     //base->generate_planet_resources(2.f);
 
 
