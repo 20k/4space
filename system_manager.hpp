@@ -91,7 +91,7 @@ struct orbital_simple_renderable : serialisable
 
     void init(int n, float min_rad, float max_rad);
 
-    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col = {1,1,1}, bool show_detail = false, orbital* o = nullptr);
+    void draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col = {1,1,1}, bool show_detail = false, orbital* o = nullptr, float scale = 1.f);
 
     void main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col);
 

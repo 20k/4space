@@ -148,7 +148,7 @@ void handle_label_ui_interaction(orbital* o, bool show_detail, const std::string
     }*/
 }
 
-void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col, bool show_detail, orbital* o)
+void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2f absolute_pos, bool force_high_quality, bool draw_outline, const std::string& tag, vec3f col, bool show_detail, orbital* o, float scale)
 {
     auto real_coord = win.mapCoordsToPixel({absolute_pos.x(), absolute_pos.y()});
 
@@ -183,7 +183,16 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
 
         ImGui::BeginOverride(tag.c_str(), nullptr, IMGUI_JUST_TEXT_WINDOW_INPUTS | extra);
 
-        ImGui::Text(tag.c_str());
+        std::string parsed = tag;
+
+        auto remove_pos = parsed.find("##");
+
+        if(remove_pos != std::string::npos)
+        {
+            parsed = parsed.substr(0, remove_pos);
+        }
+
+        ImGui::Text(parsed.c_str());
 
         if((show_detail && o && o->is_resource_object) || o->force_draw_expanded_window)
         {
@@ -206,7 +215,7 @@ void orbital_simple_renderable::draw(sf::RenderWindow& win, float rotation, vec2
         o->force_draw_expanded_window = false;
     }
 
-    main_rendering(win, rotation, absolute_pos, 1.f, col);
+    main_rendering(win, rotation, absolute_pos, scale, col);
 }
 
 void orbital_simple_renderable::main_rendering(sf::RenderWindow& win, float rotation, vec2f absolute_pos, float scale, vec3f col)
@@ -2031,7 +2040,9 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
         orbital* orb = i.first;
         vec2f pos = i.second;
 
-        orb->simple_renderable.main_rendering(win, orb->rotation, pos, 2.f, {1,1,1});
+        orb->simple_renderable.draw(win, orb->rotation, pos, true, true, orb->name + "##hello", orb->col, false, orb, 2.f);
+
+        //orb->simple_renderable.main_rendering(win, orb->rotation, pos, 2.f, {1,1,1});
     }
 
     //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);
@@ -2059,8 +2070,8 @@ std::vector<std::pair<orbital*, vec2f>> orbital_system::get_planet_ui_renderable
 
     float scale = 2.f;
     float total_y = 0;
-    float fudge = 1.4;
-    float spacing = 10;
+    float fudge = 1.1;
+    float spacing = 40;
 
     for(orbital* orb : planets)
     {

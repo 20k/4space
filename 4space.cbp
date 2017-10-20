@@ -100,6 +100,8 @@
 		<Unit filename="battle_manager.hpp" />
 		<Unit filename="camera.cpp" />
 		<Unit filename="camera.hpp" />
+		<Unit filename="clickable.cpp" />
+		<Unit filename="clickable.hpp" />
 		<Unit filename="context_menu.cpp" />
 		<Unit filename="context_menu.hpp" />
 		<Unit filename="drag_and_drop.cpp" />
