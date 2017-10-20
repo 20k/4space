@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include "ui_util.hpp"
 #include <set>
+#include "clickable.hpp"
 
 
 int orbital::gid;
@@ -1028,7 +1029,7 @@ void orbital::center_camera(system_manager& system_manage)
 }
 
 ///this function needs to be in screenspace so that we can have constant sized fleet icons
-bool orbital::point_within(vec2f pos, sf::RenderWindow& win)
+bool orbital::point_within(vec2f pos, sf::RenderWindow& win, vec2f override_item_pos)
 {
     float extra_dist = 0;
 
@@ -1049,7 +1050,9 @@ bool orbital::point_within(vec2f pos, sf::RenderWindow& win)
     extra_dist /= 2.f;
 
     vec2f dim = rad * 1.5f;
-    vec2f apos = last_viewed_position;
+    //vec2f apos = last_viewed_position;
+
+    vec2f apos = override_item_pos;
 
     auto sp2 = xy_to_vec(win.mapCoordsToPixel({apos.x(), apos.y()}));
 
@@ -1863,6 +1866,37 @@ orbital* orbital_system::make_fleet(fleet_manager& fleet_manage, float rad, floa
     return o;
 }
 
+std::vector<clickable> orbital_system::get_clickables(sf::RenderWindow& win)
+{
+    std::vector<clickable> ret;
+
+    for(orbital* o : orbitals)
+    {
+        clickable click;
+        click.make_from_local(o);
+
+        ret.push_back(click);
+    }
+
+    auto planet_uis = get_planet_ui_renderables(win);
+
+    for(auto& i : planet_uis)
+    {
+        orbital* orb = i.first;
+        vec2f pos = i.second;
+
+        clickable click;
+
+        click.o = orb;
+        click.pos = pos;
+        click.rad = orb->rad;
+
+        ret.push_back(click);
+    }
+
+    return ret;
+}
+
 /*void orbital_system::vision_test_all()
 {
     for(orbital* o : orbitals)
@@ -1982,20 +2016,38 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
         i->draw(win, viewer_empire);
     }
 
+    for(int kk=orbitals.size()-1; kk >= 0; kk--)
+    {
+        orbitals[kk]->draw(win, viewer_empire);
+    }
+
+    //view_handler handle(win);
+    //win.setView(win.getDefaultView());
+
+    auto renderables = get_planet_ui_renderables(win);
+
+    for(auto& i : renderables)
+    {
+        orbital* orb = i.first;
+        vec2f pos = i.second;
+
+        orb->simple_renderable.main_rendering(win, orb->rotation, pos, 2.f, {1,1,1});
+    }
+
+    //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);
+}
+
+std::vector<std::pair<orbital*, vec2f>> orbital_system::get_planet_ui_renderables(sf::RenderWindow& win)
+{
     std::vector<orbital*> planets;
 
     for(int kk=orbitals.size()-1; kk >= 0; kk--)
     {
-        orbitals[kk]->draw(win, viewer_empire);
-
         if(orbitals[kk]->type == orbital_info::PLANET)
         {
             planets.push_back(orbitals[kk]);
         }
     }
-
-    //view_handler handle(win);
-    //win.setView(win.getDefaultView());
 
     float orbital_system_rad = approx_radius;
 
@@ -2015,18 +2067,22 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
         total_y += scale * orb->rad * 2 * fudge + spacing;
     }
 
+    std::vector<std::pair<orbital*, vec2f>> ret;
+
     for(orbital* orb : planets)
     {
         float rad = orb->rad;
 
         float mx = scale * rad;
 
-        orb->simple_renderable.main_rendering(win, orb->rotation, {render_position.x() - mx, render_position.y() - total_y/2}, 2.f, {1,1,1});
+        vec2f pos = {render_position.x() - mx, render_position.y() - total_y/2};
+
+        ret.push_back({orb, pos});
 
         render_position.y() += scale * rad * 2 * fudge + spacing;
     }
 
-    //printf("elapsed %f\n", clk.getElapsedTime().asMicroseconds() / 1000.f);
+    return ret;
 }
 
 void orbital_system::cull_empty_orbital_fleets_deferred(popup_info& popup)
@@ -3717,7 +3773,10 @@ void system_manager::draw_universe_map(sf::RenderWindow& win, empire* viewer_emp
             if(o->type != orbital_info::FLEET)
                 continue;
 
-            advertised_universe_orbitals.push_back(o);
+            clickable click;
+            click.make_from_universe(o);
+
+            advertised_universe_orbitals.push_back(click);
 
             sorted_orbitals[o->parent_empire].push_back(o);
 

@@ -11,6 +11,7 @@
 #include "context_menu.hpp"
 #include "serialise.hpp"
 #include "camera.hpp"
+#include "clickable.hpp"
 
 namespace orbital_info
 {
@@ -208,7 +209,7 @@ struct orbital : serialisable
 
     void center_camera(system_manager& system_manage);
 
-    bool point_within(vec2f pos, sf::RenderWindow& win);
+    bool point_within(vec2f pos, sf::RenderWindow& win, vec2f override_item_pos);
 
     std::vector<std::string> get_info_str(empire* viewer_empire, bool use_info_warfare, bool full_detail, bool include_resources);
     std::string get_empire_str(bool newline = true);
@@ -326,6 +327,9 @@ struct orbital_system : serialisable
 
     ///with 0 ships
     orbital* make_fleet(fleet_manager& fm, float rad, float angle, empire* e = nullptr);
+
+    std::vector<clickable> get_clickables(sf::RenderWindow& win);
+    std::vector<std::pair<orbital*, vec2f>> get_planet_ui_renderables(sf::RenderWindow& win);
 
     void vision_test_all();
 
@@ -479,7 +483,7 @@ struct system_manager : serialisable
 
     bool suppress_click_away_fleet = false;
     std::vector<orbital*> hovered_orbitals;
-    std::vector<orbital*> advertised_universe_orbitals;
+    std::vector<clickable> advertised_universe_orbitals;
 
     void do_serialise(serialise& s, bool ser) override;
 

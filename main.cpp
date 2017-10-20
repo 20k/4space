@@ -36,6 +36,7 @@
 #include "serialise.hpp"
 #include "networking.hpp"
 #include "network_update_strategies.hpp"
+#include "clickable.hpp"
 
 
 /*std::string obfuscate(const std::string& str, bool should_obfuscate)
@@ -948,44 +949,39 @@ struct box_selection
 
         if(going)
         {
-            std::vector<orbital*>* orbitals = nullptr;
+            std::vector<clickable> orbitals;
 
             if(cur != nullptr)
-                orbitals = &cur->orbitals;
+                orbitals = cur->get_clickables(win);
 
             if(!system_manage.in_system_view())
-                orbitals = &system_manage.advertised_universe_orbitals;
+                orbitals = system_manage.advertised_universe_orbitals;
 
-            if(orbitals != nullptr)
+            for(clickable& click : orbitals)
             {
-                for(orbital* o : *orbitals)
+                orbital* o = click.o;
+
+                if(o->type == orbital_info::FLEET && lalt)
+                    continue;
+
+                if(!o->viewed_by[viewer_empire])
+                    continue;
+
+                vec2f pos = click.pos;
+
+                vec2f tl = min(mpos, start_pos);
+                vec2f br = max(mpos, start_pos);
+
+                auto spos = win.mapCoordsToPixel({pos.x(), pos.y()});
+
+                if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
                 {
-                    if(o->type == orbital_info::FLEET && lalt)
-                        continue;
+                    potential_orbitals.push_back(o);
 
-                    if(!o->viewed_by[viewer_empire])
-                        continue;
-
-                    vec2f pos = o->last_viewed_position;
-
-                    if(!system_manage.in_system_view())
-                        pos = o->universe_view_pos;
-
-                    vec2f tl = min(mpos, start_pos);
-                    vec2f br = max(mpos, start_pos);
-
-                    auto spos = win.mapCoordsToPixel({pos.x(), pos.y()});
-
-                    if(spos.x < br.x() && spos.x >= tl.x() && spos.y < br.y() && spos.y >= tl.y())
-                    {
-                        potential_orbitals.push_back(o);
-
-                        if(o->type == orbital_info::FLEET)
-                            any_is_fleet = true;
-                    }
+                    if(o->type == orbital_info::FLEET)
+                        any_is_fleet = true;
                 }
             }
-
 
             if(!lclick)
                 going = false;
@@ -1160,9 +1156,13 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         float min_dist = FLT_MAX;
         orbital* min_orb = nullptr;
 
-        for(orbital* orb : system_manage.currently_viewed->orbitals)
+        std::vector<clickable> clickables = system_manage.currently_viewed->get_clickables(win);
+
+        for(clickable& click : clickables)
         {
-            if(orb->point_within({transformed.x, transformed.y}, win))
+            orbital* orb = click.o;
+
+            if(orb->point_within({transformed.x, transformed.y}, win, click.pos))
             {
                 vec2f dist = (vec2f){transformed.x, transformed.y} - orb->absolute_pos;
 
@@ -1182,6 +1182,7 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
         }
     }
 
+    ///CLICKABLE: note not using clickables
     for(auto& i : system_manage.hovered_orbitals)
     {
         valid_selection_targets.push_back(i);
