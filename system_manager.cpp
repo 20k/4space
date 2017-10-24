@@ -615,7 +615,22 @@ void check_for_resources(orbital* me)
             if(ore_mult > FLOAT_BOUND)
                 ore_mult = (1 + ore_mult)/2.f;
 
-            attr.produced_per_s = ore_mult * min_orbital->produced_resources_ps.get_resource(res_type).amount / num_harvest;
+            double request_amount = ore_mult * min_orbital->produced_resources_ps.get_resource(res_type).amount;
+
+            double div = min_orbital->produced_resources_ps.get_resource(res_type).amount;
+
+            double last_frame_frac = 1.f;
+
+            if(div >= 0.0001)
+                last_frame_frac = min_orbital->last_harvested_frame.get_resource(res_type).amount / div;
+
+            double reduce_by_ratio = 1.f / last_frame_frac;
+
+            reduce_by_ratio = std::min(1., reduce_by_ratio);
+
+            min_orbital->current_harvested_frame.add(res_type, request_amount);
+
+            attr.produced_per_s = request_amount * reduce_by_ratio;
 
             me->is_mining = true;
             me->mining_target = min_orbital;
@@ -657,6 +672,9 @@ void orbital::tick(float step_s)
     {
         last_num_harvesting = current_num_harvesting;
         current_num_harvesting = 0;
+
+        last_harvested_frame = current_harvested_frame;
+        current_harvested_frame = resource_manager();
     }
 
     if(type == orbital_info::FLEET)
@@ -1502,6 +1520,8 @@ void orbital::do_serialise(serialise& s, bool ser)
         s.handle_serialise(parent_system, ser);
         s.handle_serialise(parent_empire, ser);
         s.handle_serialise(produced_resources_ps, ser);
+        s.handle_serialise(last_harvested_frame, ser);
+        s.handle_serialise(current_harvested_frame, ser);
         s.handle_serialise(is_resource_object, ser);
         s.handle_serialise(col, ser);
         s.handle_serialise(vision_test_counter, ser);

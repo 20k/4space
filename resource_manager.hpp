@@ -121,6 +121,7 @@ struct resource_manager : serialisable
     std::vector<resource_element> resources;
 
     void add(const std::map<resource::types, float>& val);
+    void add(resource::types type, float val);
 
     resource_element& get_resource(resource::types type);
 

@@ -41,6 +41,11 @@ void resource_manager::add(const std::map<resource::types, float>& val)
     }
 }
 
+void resource_manager::add(resource::types type, float val)
+{
+    resources[type].amount += val;
+}
+
 resource_element& resource_manager::get_resource(resource::types type)
 {
     for(auto& i : resources)

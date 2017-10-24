@@ -233,6 +233,8 @@ struct orbital : serialisable
     ///change to produces resources so we can apply to planets
     bool is_resource_object = false;
     resource_manager produced_resources_ps;
+    resource_manager last_harvested_frame;
+    resource_manager current_harvested_frame;
 
     void make_random_resource_asteroid(float max_ps);
     void make_random_resource_planet(float max_ps);
