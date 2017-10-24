@@ -201,8 +201,10 @@ struct orbital : serialisable
     void draw(sf::RenderWindow& win, empire* viewer_empire);
 
     bool rendered_asteroid_window = false;
+    void render_detail_ui_info();
     void begin_render_asteroid_window();
     void end_render_asteroid_window();
+
 
     float get_pixel_radius(sf::RenderWindow& win);
     float get_radius();

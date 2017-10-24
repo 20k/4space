@@ -126,6 +126,7 @@ struct resource_manager : serialisable
     resource_element& get_resource(resource::types type);
 
     float get_weighted_rarity();
+    double get_sum();
 
     void draw_ui(sf::RenderWindow& win, resource_manager& produced_ps);
 

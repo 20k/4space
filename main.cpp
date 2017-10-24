@@ -1277,10 +1277,17 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
 
             ImGui::BeginTooltip();
 
-            ImGui::Text(res_first.c_str());
+            if(orb->type != orbital_info::ASTEROID)
+            {
+                ImGui::Text(res_first.c_str());
 
-            if(orb->viewed_by[player_empire])
-                orb->produced_resources_ps.render_formatted_str(true);
+                if(orb->viewed_by[player_empire])
+                    orb->produced_resources_ps.render_formatted_str(true);
+            }
+            else
+            {
+                orb->render_detail_ui_info();
+            }
 
             ImGui::EndTooltip();
         }

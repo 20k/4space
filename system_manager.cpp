@@ -811,6 +811,42 @@ float orbital::calculate_orbital_drift_angle(float step_s)
     return calculate_orbital_drift_angle(orbital_length, step_s);
 }
 
+void orbital::render_detail_ui_info()
+{
+    ImGui::Text(name.c_str());
+
+    produced_resources_ps.render_formatted_str(true);
+
+    double sum = last_harvested_frame.get_sum();
+    double max_harvest = produced_resources_ps.get_sum();
+
+    double frac = 0.f;
+
+    if(max_harvest > 0.001)
+        frac = sum / max_harvest;
+
+    if(frac > 0)
+    {
+        std::string txt = "Mining:\n" + std::to_string((int)(frac * 100)) + "%%";
+
+        if(frac == 1.)
+        {
+            ImGui::Text(txt);
+        }
+
+        if(frac < 1)
+        {
+            ImGui::GoodTextNoHoverEffect(txt);
+        }
+
+        if(frac > 1)
+        {
+            ImGui::BadTextNoHoverEffect(txt);
+
+        }
+    }
+}
+
 void orbital::begin_render_asteroid_window()
 {
     ImGui::SetNextWindowPos(ImVec2(last_screen_pos.x(), last_screen_pos.y()));
@@ -819,9 +855,7 @@ void orbital::begin_render_asteroid_window()
 
     if(rendered_asteroid_window == false)
     {
-        ImGui::Text(name.c_str());
-
-        produced_resources_ps.render_formatted_str(true);
+        render_detail_ui_info();
     }
 
     rendered_asteroid_window = true;

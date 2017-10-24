@@ -77,6 +77,18 @@ float resource_manager::get_weighted_rarity()
     return accum;
 }
 
+double resource_manager::get_sum()
+{
+    double ret = 0;
+
+    for(auto& i : resources)
+    {
+        ret += i.amount;
+    }
+
+    return ret;
+}
+
 void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced_ps)
 {
     if(!top_bar::get_active(top_bar_info::ECONOMY))
