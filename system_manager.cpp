@@ -2035,12 +2035,32 @@ void orbital_system::draw(sf::RenderWindow& win, empire* viewer_empire)
 
     auto renderables = get_planet_ui_renderables(win);
 
+    bool first = true;
+
     for(auto& i : renderables)
     {
         orbital* orb = i.first;
         vec2f pos = i.second;
 
+        if(first)
+        {
+            //text_manager::render(win, "Planets", (vec2f){pos.x(), pos.y() - 50.f}, true, 50, 30.f);
+
+            /*auto proj_pos = win.mapCoordsToPixel(sf::Vector2f(pos.x(), pos.y() - 50));
+
+            ImGui::BeginOverride("Planets", nullptr, IMGUI_JUST_TEXT_WINDOW);
+
+            auto dim = ImGui::GetWindowSize();
+
+            ImGui::SetWindowPos(ImVec2(proj_pos.x - dim.x/2, proj_pos.y - dim.y/2));
+            ImGui::Text("Planets");
+
+            ImGui::End();*/
+        }
+
         orb->simple_renderable.draw(win, orb->rotation, pos, true, true, orb->name + "##hello", orb->col, false, orb, 2.f);
+
+        first = false;
 
         //orb->simple_renderable.main_rendering(win, orb->rotation, pos, 2.f, {1,1,1});
     }

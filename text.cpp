@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 
 
-
 bool text_manager::loaded = false;
 sf::Font text_manager::font;
 
