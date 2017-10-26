@@ -1,5 +1,5 @@
 #include "top_bar.hpp"
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 #include "ui_util.hpp"
 #include "popup.hpp"
 

@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 #include "ui_util.hpp"
 
 void notification_window::tick_draw()

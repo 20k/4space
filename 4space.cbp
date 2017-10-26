@@ -113,6 +113,7 @@
 		<Unit filename="gauss.fglsl" />
 		<Unit filename="imgui_customisation.cpp" />
 		<Unit filename="imgui_customisation.hpp" />
+		<Unit filename="imgui_freetype.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="network_update_strategies.cpp" />
 		<Unit filename="network_update_strategies.hpp" />

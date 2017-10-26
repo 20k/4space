@@ -1,6 +1,6 @@
 #include "event_system.hpp"
 #include "system_manager.hpp"
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 #include "util.hpp"
 #include "ship.hpp"
 #include "ship_definitions.hpp"

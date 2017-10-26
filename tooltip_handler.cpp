@@ -1,6 +1,6 @@
 #include "tooltip_handler.hpp"
 
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 
 std::string tooltip::tool;
 

@@ -1,4 +1,18 @@
 #include "imgui_customisation.hpp"
+
+bool ImGui::BeginOverride(const char* name, bool* p_open, ImGuiWindowFlags flags)
+{
+    return ImGui::Begin(name, p_open, flags);
+}
+
+bool ImGui::BeginOverride(const char* name, bool* p_open, const ImVec2& size_on_first_use, float bg_alpha, ImGuiWindowFlags flags)
+{
+    return ImGui::Begin(name, p_open, size_on_first_use, bg_alpha, flags);
+}
+
+#if 0
+
+#include "imgui_customisation.hpp"
 #include "ui_util.hpp"
 #define IMGUI_DEFINE_PLACEMENT_NEW
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -946,3 +960,5 @@ bool ImGui::BeginOverride(const char* name, bool* p_open, const ImVec2& size_on_
     window->SkipItems = (window->Collapsed || !window->Active) && window->AutoFitFramesX <= 0 && window->AutoFitFramesY <= 0;
     return !window->SkipItems;
 }
+
+#endif

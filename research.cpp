@@ -2,7 +2,7 @@
 #include "util.hpp"
 #include "empire.hpp"
 
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 #include "top_bar.hpp"
 #include "ui_util.hpp"
 #include "popup.hpp"

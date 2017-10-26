@@ -4,7 +4,7 @@
 #include <set>
 #include <unordered_set>
 #include "ship_definitions.hpp"
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 #include "top_bar.hpp"
 #include "util.hpp"
 #include "procedural_text_generator.hpp"

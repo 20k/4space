@@ -3215,9 +3215,6 @@ int main()
             context_menu::set_item(nullptr);
         }*/
 
-        sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
-        ImGui::SFML::Update(t);
-
         //display_ship_info(*test_ship);
 
         //debug_menu({test_ship});
@@ -4035,6 +4032,9 @@ int main()
         //playing_music.debug(window);
         window.display();
         window.clear();
+
+        sf::Time t = sf::microseconds(diff_s * 1000.f * 1000.f);
+        ImGui::SFML::Update(t);
 
         diff_s = clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f - last_time_s;
         last_time_s = clk.getElapsedTime().asMicroseconds() / 1000.f / 1000.f;

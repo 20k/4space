@@ -5,7 +5,7 @@
 #include <deque>
 #include <vector>
 #include <map>
-#include "../../render_projects/imgui/imgui.h"
+#include <imgui/imgui.h>
 #include "top_bar.hpp"
 #include <vec/vec.hpp>
 #include "ui_util.hpp"
