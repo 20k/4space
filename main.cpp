@@ -1335,6 +1335,14 @@ void debug_system(system_manager& system_manage, sf::RenderWindow& win, bool lcl
                         orb->data->toggle_fleet_ui = true;
                 }
             }
+
+
+            if(orb->type == orbital_info::PLANET && orb->parent_empire == player_empire)
+            {
+                orb->construction_ui_open = !orb->construction_ui_open;
+
+                continue;
+            }
         }
     }
 }
