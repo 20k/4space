@@ -94,7 +94,9 @@ void resource_manager::draw_ui(sf::RenderWindow& win, resource_manager& produced
     if(!top_bar::get_active(top_bar_info::ECONOMY))
         return;
 
-    ImGui::BeginOverride("Resources", &top_bar::active[top_bar_info::ECONOMY], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::SetNextWindowPos(ImVec2(0,0));
+
+    ImGui::BeginOverride("Resources", &top_bar::active[top_bar_info::ECONOMY], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar);
 
     /*std::vector<std::string> names_up;
     std::vector<std::string> vals_up;
