@@ -670,6 +670,10 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
         last_selected = saved.front().id;
     }
 
+    auto bg_col = ImGui::GetStyleCol(ImGuiCol_WindowBg);
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(bg_col.x, bg_col.y, bg_col.z, 0.9));
+
     ImGui::BeginOverride("Ship Customise", &top_bar::active[top_bar_info::SHIP_CUSTOMISER], IMGUI_WINDOW_FLAGS | ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::clamp_window_to_screen();
@@ -707,6 +711,8 @@ void ship_customiser::tick(float scrollwheel, bool lclick, vec2f mouse_change)
     }
 
     save();
+
+    ImGui::PopStyleColor(1);
 }
 
 void ship_customiser::save()
