@@ -190,10 +190,13 @@ void network_updater::tick(float dt_s, network_state& net_state, empire_manager&
     static update_strategy body_strategy;
     body_strategy.do_update_strategy(dt_s, get_orbital_update_rate(orbital_info::PLANET), bodies, net_state, 0);
 
+    ///most important parameter here by far
+    float ship_update_rate = 8;
+
     ///the reason why ship cleaning isn't working accross the network is beause its not being sent
     ///need to force packet sending on cleanup
     static update_strategy ship_strategy;
-    ship_strategy.do_update_strategy(dt_s, 4.f, ships, net_state, 0);
+    ship_strategy.do_update_strategy(dt_s, ship_update_rate, ships, net_state, 0);
 
     static update_strategy ship_manager_strategy;
     ship_manager_strategy.do_update_strategy(dt_s, 10, ship_managers, net_state, 0);

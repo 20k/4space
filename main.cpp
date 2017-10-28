@@ -2846,9 +2846,9 @@ int main()
     //player_empire->ally(e2);
     player_empire->positive_relations(e2, 0.5f);
 
-    system_manage.generate_universe(200);
+    system_manage.generate_universe(100);
 
-    empire_manage.birth_empires_random(fleet_manage, system_manage, 0.3f);
+    empire_manage.birth_empires_random(fleet_manage, system_manage, 0.6f);
     empire_manage.birth_empires_without_ownership(fleet_manage, system_manage);
     #endif
 
