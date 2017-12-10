@@ -92,6 +92,8 @@
 			<Add option="-lopenal32" />
 			<Add option="-logg" />
 		</Linker>
+		<Unit filename="../serialise/serialise.cpp" />
+		<Unit filename="../serialise/serialise.hpp" />
 		<Unit filename="ai_empire.cpp" />
 		<Unit filename="ai_empire.hpp" />
 		<Unit filename="ai_fleet.cpp" />
@@ -135,8 +137,6 @@
 		<Unit filename="research.hpp" />
 		<Unit filename="resource_manager.cpp" />
 		<Unit filename="resource_manager.hpp" />
-		<Unit filename="serialise.cpp" />
-		<Unit filename="serialise.hpp" />
 		<Unit filename="ship.cpp" />
 		<Unit filename="ship.hpp" />
 		<Unit filename="ship_customiser.cpp" />
