@@ -2932,6 +2932,7 @@ int main()
 
     networking_init();
     network_state net_state;
+    net_state.reliable_ordered.init_client();
 
     network_updater net_update;
 
@@ -3838,8 +3839,8 @@ int main()
             net_state.forward_data(no_test, ser);
         }
 
-        if(key_down(sf::Keyboard::H))
-            std::cout << "pid " << net_state.packet_id << std::endl;
+        //if(key_down(sf::Keyboard::H))
+        //    std::cout << "pid " << net_state.packet_id << std::endl;
 
         //if(ImGui::Button("Try mini packet") && net_state.my_id != -1)
 
@@ -3933,8 +3934,7 @@ int main()
 
         net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, *all_battles);
 
-        net_state.tick_join_game(diff_s);
-        net_state.tick();
+        net_state.tick(diff_s);
 
         handle_unprocessed();
 
