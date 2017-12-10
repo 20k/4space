@@ -88,6 +88,76 @@ void network_state::tick(double dt_s)
 {
     tick_join_game(dt_s);
 
-    if(!connected())
+    if(!sock.valid())
         return;
+
+    bool any_read = true;
+
+    while(any_read && sock_readable(sock))
+    {
+        sockaddr_storage tstore;
+
+        auto data = udp_receive_from(sock, &tstore);
+
+        any_read = data.size() > 0;
+
+        byte_fetch fetch;
+        fetch.ptr.swap(data);
+
+        while(!fetch.finished() && any_read)
+        {
+            int32_t found_canary = fetch.get<int32_t>();
+
+            while(found_canary != canary_start && !fetch.finished())
+            {
+                found_canary = fetch.get<int32_t>();
+            }
+
+            if(fetch.finished())
+                continue;
+
+            //while(!sock_writable(my_server)){}
+
+            int32_t type = fetch.get<int32_t>();
+
+            if(type == message::CLIENTJOINACK)
+            {
+                int32_t recv_id = fetch.get<int32_t>();
+
+                int32_t canary_found = fetch.get<int32_t>();
+
+                if(canary_found == canary_end)
+                    my_id = recv_id;
+                else
+                {
+                    printf("err in CLIENTJOINACK\n");
+                }
+
+                std::cout << recv_id << std::endl;
+            }
+
+            if(type == message::PING_DATA)
+            {
+                int num = fetch.get<int32_t>();
+
+                for(int i=0; i<num; i++)
+                {
+                    int pid = fetch.get<int32_t>();
+                    float ping = fetch.get<float>();
+                }
+
+                int32_t found_end = fetch.get<decltype(canary_end)>();
+
+                if(found_end != canary_end)
+                {
+                    printf("err in PING_DATA\n");
+                }
+            }
+
+            if(type == message::PING)
+            {
+                fetch.get<decltype(canary_end)>();
+            }
+        }
+    }
 }

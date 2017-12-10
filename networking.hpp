@@ -28,7 +28,7 @@ struct network_state
     bool have_sock = false;
     bool try_join = false;
 
-    float timeout = 0;
+    float timeout = 5;
     float timeout_max = 5;
 
     network_reliable_ordered reliable_ordered;
