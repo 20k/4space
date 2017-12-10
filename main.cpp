@@ -3624,60 +3624,82 @@ int main()
 
                 if(send_mode != 1)
                 {
-                    i.data.internal_counter = internal_counter;
+                    serialise_host_type host_id;
+
+                    i.data.handle_serialise(host_id, false);
+
+                    serialise_data_helper::send_mode = send_mode;
+                    serialise_data_helper::ref_mode = 0;
+
+                    serialisable* found_s = net_state.get_serialisable(host_id, i.object.serialise_id);
+
+                    if(found_s == nullptr)
+                    {
+                        i.set_complete();
+                        continue;
+                    }
+
+                    i.data.force_serialise(found_s, false);
+
+                    i.set_complete();
+
+                    handle_unprocessed();
 
                     continue;
                 }
 
-                serialise_data_helper::host_to_id_to_pointer.clear();
-
-                serialise_data_helper::send_mode = 1;
-                serialise_data_helper::ref_mode = 1;
-
-                std::cout << "got full gamestate" << std::endl;
-
-                popup.clear();
-
-                empire_manage.erase_all();
-                system_manage.erase_all();
-
-                fleet_manage.erase_all();
-
-                all_battles->erase_all();
-
-                serialise ser = i.data;
-
-                ser.handle_serialise(empire_manage, false);
-                ser.handle_serialise(system_manage, false);
-                ser.handle_serialise(fleet_manage, false);
-                ser.handle_serialise(all_battles, false);
-
-                for(empire* e : empire_manage.empires)
+                if(send_mode == 1)
                 {
-                    if(e->is_player)
+                    serialise_data_helper::host_to_id_to_pointer.clear();
+
+                    serialise_data_helper::send_mode = 1;
+                    serialise_data_helper::ref_mode = 1;
+
+                    std::cout << "got full gamestate" << std::endl;
+
+                    popup.clear();
+
+                    empire_manage.erase_all();
+                    system_manage.erase_all();
+
+                    fleet_manage.erase_all();
+
+                    all_battles->erase_all();
+
+                    serialise ser = i.data;
+
+                    ser.handle_serialise(empire_manage, false);
+                    ser.handle_serialise(system_manage, false);
+                    ser.handle_serialise(fleet_manage, false);
+                    ser.handle_serialise(all_battles, false);
+
+                    for(empire* e : empire_manage.empires)
                     {
-                        player_empire = e;
-
-                        break;
-                    }
-                }
-
-                //system_manage.ensure_found_orbitals_handled();
-
-                for(orbital_system* sys : system_manage.systems)
-                {
-                    for(orbital* o : sys->orbitals)
-                    {
-                        if(!o->owned_by_host)
+                        if(e->is_player)
                         {
-                            o->command_queue.cancel();
+                            player_empire = e;
+
+                            break;
                         }
                     }
+
+                    for(orbital_system* sys : system_manage.systems)
+                    {
+                        for(orbital* o : sys->orbitals)
+                        {
+                            if(!o->owned_by_host)
+                            {
+                                o->command_queue.cancel();
+                            }
+                        }
+                    }
+
+                    i.set_complete();
+
+                    handle_unprocessed();
+
+                    continue;
                 }
-
-                i.set_complete();
-
-                handle_unprocessed();
             }
 
             /*for(network_data& i : net_state.available_data)
@@ -3710,85 +3732,6 @@ int main()
 
                 i.set_complete();
             }*/
-
-            for(network_data& i : net_state.available_data)
-            {
-                if(i.processed)
-                    continue;
-
-                int32_t internal_counter = i.data.internal_counter;
-
-                int32_t send_mode = 0;
-
-                i.data.handle_serialise(send_mode, false);
-
-                if(send_mode == 1)
-                {
-                    i.data.internal_counter = internal_counter;
-
-                    continue;
-                }
-
-                serialise_host_type host_id;
-
-                i.data.handle_serialise(host_id, false);
-
-                //std::cout << "got mini packet" << std::endl;
-
-                serialise_data_helper::send_mode = send_mode;
-                serialise_data_helper::ref_mode = 0;
-
-                /*if(send_mode == 2)
-                {
-                    printf("hi\n");
-                }*/
-
-                /*for(orbital_system* sys : system_manage.systems)
-                {
-                    for(orbital* o : sys->orbitals)
-                    {
-                        i.data.handle_serialise(serialise_data_helper::disk_mode, false);
-                    }
-                }*/
-
-                //std::cout << i.object.owner_id << " " << i.object.serialise_id << std::endl;
-
-                serialisable* found_s = net_state.get_serialisable(host_id, i.object.serialise_id);
-
-                /*for(auto& i : serialise_data_helper::owner_to_id_to_pointer[i.object.owner_id])
-                {
-                    std::cout << i.first << std::endl;
-                    std::cout << i.second << std::endl;
-                }*/
-
-                //if(send_mode == 2)
-                {
-                    //std::cout << "yay" << send_mode << std::endl;
-                }
-
-
-                if(found_s == nullptr)
-                {
-                    //std::cout << "nullptr" << std::endl;
-
-                    i.set_complete();
-                    continue;
-                }
-                //std::cout << "got" << std::endl;
-
-                //std::cout << "doing mini packet of " << i.data.data.size() << std::endl;
-
-                //found_s->do_serialise(i.data, false);
-
-                ///because the next element is a pointer, we force the stream
-                ///to decode the pointer data
-                //i.data.allow_force = true;
-                i.data.force_serialise(found_s, false);
-
-                i.set_complete();
-
-                handle_unprocessed();
-            }
         }
 
         empire_manage.tick_network_take_ownership(net_state);

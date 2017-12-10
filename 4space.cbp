@@ -76,6 +76,7 @@
 			<Add option="-Wno-sign-compare" />
 			<Add option="-Wno-unused-variable" />
 			<Add option="-Werror=return-type" />
+			<Add option="-DNET_CLIENT" />
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32" />
