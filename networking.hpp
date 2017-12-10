@@ -19,33 +19,6 @@
 ///(ie on ship hit update its stats to ensure it doesn't take 1 second for it to update)
 ///very infrequently networking stuff the clients aren't looking at
 
-struct network_object
-{
-    ///who's sending the data
-    serialise_owner_type owner_id = -1;
-    serialise_data_type serialise_id = -1;
-};
-
-using packet_id_type = int32_t;
-using sequence_data_type = int32_t;
-
-struct network_data
-{
-    network_object object;
-    serialise data;
-    packet_id_type packet_id;
-    bool should_cleanup = false;
-    bool processed = false;
-
-    //sf::Clock clk;
-
-    void set_complete()
-    {
-        processed = true;
-        //clk.restart();
-    }
-};
-
 struct network_state
 {
     int my_id = -1;
@@ -55,9 +28,18 @@ struct network_state
     bool have_sock = false;
     bool try_join = false;
 
+    float timeout = 0;
+    float timeout_max = 5;
+
     network_reliable_ordered reliable_ordered;
 
+    packet_id_type next_packet_id = 0;
+
+    void tick_join_game(float dt_s);
+
 public:
+    //unused
+    void leave_game();
 
 ///THIS IS THE WHOLE EXPOSED API
     bool connected();
