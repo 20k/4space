@@ -117,6 +117,9 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="network_update_strategies.cpp" />
 		<Unit filename="network_update_strategies.hpp" />
+		<Unit filename="networking.cpp">
+			<Option weight="35" />
+		</Unit>
 		<Unit filename="networking.hpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />
