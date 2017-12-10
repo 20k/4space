@@ -158,6 +158,11 @@ void network_state::tick(double dt_s)
             {
                 fetch.get<decltype(canary_end)>();
             }
+
+            if(type == message::FORWARDING_ORDERED_RELIABLE)
+            {
+                reliable_ordered.handle_forwarding_ordered_reliable(fetch);
+            }
         }
     }
 }
