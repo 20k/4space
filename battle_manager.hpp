@@ -4,7 +4,7 @@
 #include "ship.hpp"
 #include <SFML/Graphics.hpp>
 
-#include "serialise.hpp"
+#include "../serialise/serialise.hpp"
 #include "system_manager.hpp"
 #include "procedural_text_generator.hpp"
 

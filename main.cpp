@@ -33,7 +33,7 @@
 #include "ship_customiser.hpp"
 #include "imgui_customisation.hpp"
 #include "stacktrace_helper.hpp"
-#include "serialise.hpp"
+#include "../serialise/serialise.hpp"
 #include "networking.hpp"
 #include "network_update_strategies.hpp"
 #include "clickable.hpp"

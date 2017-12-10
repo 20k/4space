@@ -10,7 +10,7 @@
 #include "research.hpp"
 #include "ai_fleet.hpp"
 #include "ai_empire.hpp"
-#include "serialise.hpp"
+#include "../serialise/serialise.hpp"
 #include "ui_util.hpp"
 
 #define FLOAT_BOUND 0.00000001f
