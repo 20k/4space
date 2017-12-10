@@ -72,11 +72,6 @@ network_state::forward_packet network_state::decode_forward(byte_fetch& fetch)
 
 bool network_state::owns(serialisable* s)
 {
-    /*if(s->host_id == -1 || s->host_id == my_id)
-        return true;
-
-    return false;*/
-
     return s->owned_by_host;
 }
 
@@ -84,21 +79,6 @@ void network_state::claim_for(serialisable* s, serialise_host_type new_host)
 {
     if(s == nullptr)
         return;
-
-    //serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = nullptr;
-
-    /*s->host_id = new_host;
-
-    serialise_data_type new_id = serialisable::gserialise_id++;
-
-    s->serialise_id = new_id;
-
-    serialise_data_helper::host_to_id_to_pointer[s->host_id][s->serialise_id] = s;
-
-    if(s->host_id == my_id)
-    {
-        s->owned_by_host = true;
-    }*/
 
     if(new_host == my_id)
     {
@@ -448,17 +428,6 @@ void network_state::tick()
     udp_send_to(sock, v1.ptr, (const sockaddr*)&store);
 
     bool any_recv = true;
-
-    /*bool any_recv = true;
-
-    while(any_recv && sock_readable(sock))
-    {
-        auto data = udp_receive_from(sock, &store);
-
-        any_recv = data.size() > 0;
-
-        byte_fetch fetch;
-        fetch.ptr.swap(data);*/
 
     {
         byte_fetch fetch;
