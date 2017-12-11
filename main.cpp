@@ -3782,8 +3782,8 @@ int main()
             net_state.forward_data(no_test, ser);
         }
 
-        //if(key_down(sf::Keyboard::H))
-        //    std::cout << "pid " << net_state.packet_id << std::endl;
+        if(key_down(sf::Keyboard::H))
+            std::cout << "pid " << net_state.reliable_ordered.next_packet_id << std::endl;
 
         //if(ImGui::Button("Try mini packet") && net_state.my_id != -1)
 

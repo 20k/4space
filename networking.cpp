@@ -165,6 +165,13 @@ void network_state::tick(double dt_s)
             {
                 reliable_ordered.handle_forwarding_ordered_reliable(fetch, -1);
             }
+
+            if(type == message::FORWARDING_ORDERED_RELIABLE_REQUEST)
+            {
+                reliable_ordered.handle_packet_request(sock, (const sockaddr*)&store, fetch);
+            }
         }
     }
+
+    reliable_ordered.request_all_packets_client(sock, (const sockaddr*)&store);
 }

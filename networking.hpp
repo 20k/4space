@@ -22,7 +22,7 @@
 struct network_state
 {
     int my_id = -1;
-    int16_t next_object_id = 0;
+    //int16_t next_object_id = 0;
     udp_sock sock;
     sockaddr_storage store;
     bool have_sock = false;
@@ -33,7 +33,7 @@ struct network_state
 
     network_reliable_ordered reliable_ordered;
 
-    packet_id_type next_packet_id = 0;
+    //packet_id_type next_packet_id = 0;
 
     void tick_join_game(float dt_s);
 
