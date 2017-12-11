@@ -81,7 +81,7 @@ void network_state::forward_data(const network_object& no, serialise& s)
     if(!connected())
         return;
 
-    reliable_ordered.forward_data_to(sock, (const sockaddr*)&store, no, s);
+    reliable_ordered.forward_data_to(sock, (const sockaddr*)&store, no, s, -1);
 }
 
 void network_state::tick(double dt_s)
