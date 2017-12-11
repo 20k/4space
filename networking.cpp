@@ -81,7 +81,7 @@ void network_state::forward_data(const network_object& no, serialise& s)
     if(!connected())
         return;
 
-    reliable_ordered.forward_data_to_server(sock, (const sockaddr*)&store, no, s);
+    reliable_ordered.forward_data_to(sock, (const sockaddr*)&store, no, s);
 }
 
 void network_state::tick(double dt_s)
@@ -90,6 +90,8 @@ void network_state::tick(double dt_s)
 
     if(!sock.valid())
         return;
+
+    reliable_ordered.make_packets_available_into(available_data);
 
     bool any_read = true;
 
@@ -161,7 +163,7 @@ void network_state::tick(double dt_s)
 
             if(type == message::FORWARDING_ORDERED_RELIABLE)
             {
-                reliable_ordered.handle_forwarding_ordered_reliable(fetch);
+                reliable_ordered.handle_forwarding_ordered_reliable(fetch, -1);
             }
         }
     }
