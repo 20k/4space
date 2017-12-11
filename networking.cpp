@@ -170,8 +170,16 @@ void network_state::tick(double dt_s)
             {
                 reliable_ordered.handle_packet_request(sock, (const sockaddr*)&store, fetch);
             }
+
+            if(type == message::FORWARDING_ORDERED_RELIABLE_ACK)
+            {
+                std::cout << "got ack\n";
+
+                reliable_ordered.handle_ack(fetch);
+            }
         }
     }
 
     reliable_ordered.request_all_packets_client(sock, (const sockaddr*)&store);
+    reliable_ordered.process_acks_client(sock, (const sockaddr*)&store);
 }
