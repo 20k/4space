@@ -1,5 +1,8 @@
 #include "networking.hpp"
 
+#define GAMESERVER_IP "77.96.132.101"
+//#define GAMESERVER_IP "192.168.0.54"
+
 void network_state::tick_join_game(float dt_s)
 {
     if(my_id != -1)
@@ -11,8 +14,8 @@ void network_state::tick_join_game(float dt_s)
     if(!sock.valid())
     {
         //sock = udp_connect("77.96.132.101", GAMESERVER_PORT);
-        sock = udp_connect("192.168.0.54", GAMESERVER_PORT);
-        sock_set_non_blocking(sock, 1);
+        sock = udp_connect(GAMESERVER_IP, GAMESERVER_PORT);
+        //sock_set_non_blocking(sock, 1);
     }
 
     timeout += dt_s;
@@ -117,6 +120,7 @@ void network_state::tick(double dt_s)
 
             if(fetch.finished())
                 continue;
+
 
             //while(!sock_writable(my_server)){}
 
