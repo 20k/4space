@@ -165,19 +165,26 @@ void network_state::tick(double dt_s)
                 fetch.get<decltype(canary_end)>();
             }
 
+            ///so the server does seem to respond to packet requests
+            ///so investigate this next
+            ///check owner_ids?
             if(type == message::FORWARDING_ORDERED_RELIABLE)
             {
+                //std::cout << "did\n";
+
                 reliable_ordered.handle_forwarding_ordered_reliable(fetch, -1);
             }
 
             if(type == message::FORWARDING_ORDERED_RELIABLE_REQUEST)
             {
                 reliable_ordered.handle_packet_request(sock, (const sockaddr*)&store, fetch);
+
+                //printf("greq ");
             }
 
             if(type == message::FORWARDING_ORDERED_RELIABLE_ACK)
             {
-                std::cout << "got ack\n";
+                //std::cout << "got ack\n";
 
                 reliable_ordered.handle_ack(fetch);
             }
