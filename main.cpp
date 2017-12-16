@@ -3779,6 +3779,8 @@ int main()
             no_test.owner_id = net_state.my_id;
             no_test.serialise_id = -2;
 
+            std::cout << "SIZE " << ser.data.size() << std::endl;
+
             net_state.forward_data(no_test, ser);
         }
 

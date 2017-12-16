@@ -191,6 +191,6 @@ void network_state::tick(double dt_s)
         }
     }
 
-    reliable_ordered.request_all_packets_client(sock, (const sockaddr*)&store);
-    reliable_ordered.process_acks_client(sock, (const sockaddr*)&store);
+    reliable_ordered.request_all_packets(sock, (const sockaddr*)&store);
+    reliable_ordered.process_acks(sock, (const sockaddr*)&store);
 }
