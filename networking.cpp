@@ -172,7 +172,7 @@ void network_state::tick(double dt_s)
             {
                 //std::cout << "did\n";
 
-                reliable_ordered.handle_forwarding_ordered_reliable(fetch, -1);
+                reliable_ordered.handle_forwarding_ordered_reliable(fetch);
             }
 
             if(type == message::FORWARDING_ORDERED_RELIABLE_REQUEST)
