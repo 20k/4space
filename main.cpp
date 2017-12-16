@@ -3510,6 +3510,8 @@ int main()
             ser.handle_serialise(fleet_manage, true);
             ser.handle_serialise(all_battles, true);
 
+            std::cout << ser.data.size() << std::endl;
+
             ser.save("Game.save");
         }
 
