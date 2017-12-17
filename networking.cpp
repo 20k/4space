@@ -84,9 +84,11 @@ void network_state::forward_data(const network_object& no, serialise& s)
     if(!connected())
         return;
 
-    reliable_ordered.forward_data_to(sock, (const sockaddr*)&store, no, s, -1);
+    reliable_ordered.forward_data_to(sock, (const sockaddr*)&store, no, s);
 }
 
+///server should only deal in compressed packets
+///compress when we forward in the above function, decompress when we receive after make packets available into
 void network_state::tick(double dt_s)
 {
     tick_join_game(dt_s);
