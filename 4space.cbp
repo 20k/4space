@@ -29,10 +29,6 @@
 				<Linker>
 					<Add option="-s" />
 				</Linker>
-				<ExtraCommands>
-					<Add after="post_build.bat" />
-					<Mode after="always" />
-				</ExtraCommands>
 			</Target>
 			<Target title="Profile">
 				<Option output="bin/Profile/4space" prefix_auto="1" extension_auto="1" />
@@ -62,10 +58,6 @@
 				<Linker>
 					<Add option="-s" />
 				</Linker>
-				<ExtraCommands>
-					<Add after="post_build.bat" />
-					<Mode after="always" />
-				</ExtraCommands>
 			</Target>
 			<Target title="Release_Run_Twice">
 				<Option output="bin/Release/4space" prefix_auto="1" extension_auto="1" />
@@ -114,7 +106,6 @@
 		</Linker>
 		<ExtraCommands>
 			<Add after="post_build.bat" />
-			<Add after="4space_single.bat" />
 			<Mode after="always" />
 		</ExtraCommands>
 		<Unit filename="../serialise/serialise.cpp" />

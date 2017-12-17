@@ -3882,6 +3882,7 @@ int main()
         net_update.tick(diff_s, net_state, empire_manage, system_manage, fleet_manage, *all_battles);
 
         net_state.tick(diff_s);
+        serialise::sleep_thread_pool();
 
         handle_unprocessed();
 
