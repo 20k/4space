@@ -4,7 +4,7 @@
 #include "empire.hpp"
 #include "util.hpp"
 #include <set>
-#include "networking.hpp"
+#include "../4space_server/networking.hpp"
 
 uint32_t battle_manager::gid = 0;
 

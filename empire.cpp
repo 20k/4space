@@ -9,7 +9,7 @@
 #include "util.hpp"
 #include "procedural_text_generator.hpp"
 #include "ui_util.hpp"
-#include "networking.hpp"
+#include "../4space_server/networking.hpp"
 
 empire::empire()
 {

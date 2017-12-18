@@ -34,7 +34,7 @@
 #include "imgui_customisation.hpp"
 #include "stacktrace_helper.hpp"
 #include "../serialise/serialise.hpp"
-#include "networking.hpp"
+#include "../4space_server/networking.hpp"
 #include "network_update_strategies.hpp"
 #include "clickable.hpp"
 

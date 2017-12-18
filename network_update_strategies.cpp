@@ -4,7 +4,7 @@
 #include "system_manager.hpp"
 #include "ship.hpp"
 #include "battle_manager.hpp"
-#include "networking.hpp"
+#include "../4space_server/networking.hpp"
 
 void network_updater::tick(float dt_s, network_state& net_state, empire_manager& empire_manage, system_manager& system_manage, fleet_manager& fleet_manage, all_battles_manager& all_battles)
 {

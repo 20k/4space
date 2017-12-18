@@ -108,6 +108,8 @@
 			<Add after="post_build.bat" />
 			<Mode after="always" />
 		</ExtraCommands>
+		<Unit filename="../4space_server/networking.cpp" />
+		<Unit filename="../4space_server/networking.hpp" />
 		<Unit filename="../serialise/serialise.cpp" />
 		<Unit filename="../serialise/serialise.hpp" />
 		<Unit filename="ai_empire.cpp" />
@@ -135,10 +137,6 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="network_update_strategies.cpp" />
 		<Unit filename="network_update_strategies.hpp" />
-		<Unit filename="networking.cpp">
-			<Option weight="35" />
-		</Unit>
-		<Unit filename="networking.hpp" />
 		<Unit filename="notification_window.cpp" />
 		<Unit filename="notification_window.hpp" />
 		<Unit filename="object_command_queue.cpp" />
